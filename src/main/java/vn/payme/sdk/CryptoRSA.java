@@ -1,4 +1,4 @@
-package com.payme.sdk.walet ;
+package vn.payme.sdk;
 
 import android.os.Build;
 import android.util.Base64;

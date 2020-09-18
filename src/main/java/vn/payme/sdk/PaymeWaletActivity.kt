@@ -1,11 +1,9 @@
-package com.payme.sdk.walet
+package vn.payme.sdk
 
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.webkit.WebView
+import com.payme.sdk.walet.R
 
 class PaymeWaletActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -13,7 +11,7 @@ class PaymeWaletActivity : AppCompatActivity() {
         setContentView(R.layout.webview_activity)
         val myWebView: WebView = findViewById(R.id.webview)
     myWebView.settings.javaScriptEnabled = true
-    myWebView.loadUrl("https://sdk.payme.com.vn/?deviceId=${PaymeModul.deviceId}&transID=${PaymeModul.transID}&userID=${PaymeModul.userID}&tokenLink=${PaymeModul.tokenLink}&action=${PaymeModul.action}&money=${PaymeModul.money}&userInfor=${PaymeModul?.info?.toJson()}")
+    myWebView.loadUrl("https://sdk.payme.com.vn/?deviceId=${PaymeModule.deviceId}&transID=${PaymeModule.transID}&userID=${PaymeModule.userID}&tokenLink=${PaymeModule.tokenLink}&action=${PaymeModule.action}&money=${PaymeModule.money}&userInfor=${PaymeModule?.info?.toJson()}")
 
     }
 

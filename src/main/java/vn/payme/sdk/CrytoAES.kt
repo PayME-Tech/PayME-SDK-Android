@@ -1,15 +1,9 @@
-package com.payme.sdk.walet
+package vn.payme.sdk
 import android.util.Base64
 import java.math.BigInteger
 import java.security.*
-import java.security.spec.*
-import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
-import javax.crypto.IllegalBlockSizeException
-import javax.crypto.NoSuchPaddingException
 import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.OAEPParameterSpec
-import javax.crypto.spec.PSource
 import javax.crypto.spec.SecretKeySpec
 import kotlin.text.Charsets.US_ASCII
 import kotlin.text.Charsets.UTF_8

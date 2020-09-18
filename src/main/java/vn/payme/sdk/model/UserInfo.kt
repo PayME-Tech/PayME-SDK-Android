@@ -1,4 +1,4 @@
-package com.payme.sdk.walet.modul
+package vn.payme.sdk.model
 
 class UserInfo {
     var phone : String? = ""

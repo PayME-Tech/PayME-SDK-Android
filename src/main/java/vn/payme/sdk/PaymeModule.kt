@@ -1,11 +1,11 @@
-package com.payme.sdk.walet
+package vn.payme.sdk
 
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
-import com.payme.sdk.walet.modul.UserInfo
+import vn.payme.sdk.model.UserInfo
 
-class PaymeModul {
+class PaymeModule {
     companion object {
         var transID: String? = ""
         var userID: String? = ""
@@ -26,12 +26,12 @@ class PaymeModul {
         money: Number?,
         info: UserInfo?
     ) {
-        PaymeModul.transID = transID
-        PaymeModul.userID = userID
-        PaymeModul.tokenLink = tokenLink
-        PaymeModul.action = action
-        PaymeModul.money = money
-        PaymeModul.info = info
+        Companion.transID = transID
+        Companion.userID = userID
+        Companion.tokenLink = tokenLink
+        Companion.action = action
+        Companion.money = money
+        Companion.info = info
 
         val intent: Intent = Intent(context, PaymeWaletActivity::class.java)
         context.startActivity(intent)
