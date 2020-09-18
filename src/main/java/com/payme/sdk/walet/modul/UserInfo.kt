@@ -1,6 +1,6 @@
 package com.payme.sdk.walet.modul
 
-class UserInfor {
+class UserInfo {
     var phone : String? = ""
     var fullName : String? = ""
     var address : String? = ""

@@ -19,11 +19,11 @@ import java.nio.charset.Charset
 
 
 class NetworkRequest(
-        private val context: Context,
-        private val url: String,
-        private val path: String,
-        private val token: String,
-        private val params: MutableMap<String, Any>
+    private val context: Context,
+    private val url: String,
+    private val path: String,
+    private val token: String,
+    private val params: MutableMap<String, Any>?
 ) {
     fun setOnRequest(
             onStart: (() -> Unit)?,
