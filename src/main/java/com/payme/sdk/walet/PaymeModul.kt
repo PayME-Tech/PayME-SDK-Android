@@ -45,7 +45,7 @@ class PaymeModul {
         return "https://wam.payme.vn/"
     }
 
-    public fun getBalance(context: Context, tokenLink: String,  onSuccessData: ((Int,Int,Int) -> Unit)) {
+    public fun getBalance(context: Context, tokenLink: String,  onSuccessData: ((Int,Int) -> Unit)) {
         val url = urlFeENV("sandbox")
         val path = "/Wallet/Information"
         val request = NetworkRequest(context, url, path, tokenLink, null)
@@ -64,7 +64,7 @@ class PaymeModul {
                 val detail = response.getJSONObject("detail")
                 val cash = detail.getInt("cash")
                 val lockCash = detail.getInt("lockCash")
-                onSuccessData(balance,cash,lockCash)
+                onSuccessData(cash,lockCash)
             }},
             onExpired = {
 
