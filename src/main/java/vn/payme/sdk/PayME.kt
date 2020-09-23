@@ -14,6 +14,8 @@ class PaymeModule {
         var money: Number? = 0
         var info: UserInfo? = null
         val deviceId : String = Settings.Secure.ANDROID_ID
+        var appId:String? = ""
+        var privateKey: String? = ""
     }
 
 
