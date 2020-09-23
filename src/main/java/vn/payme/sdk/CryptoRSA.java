@@ -19,7 +19,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-public class CryptoRSA {
+ class CryptoRSA {
     PublicKey publicKey;
     PrivateKey privateKey;
     byte[] encryptedBytes, decryptedBytes;
@@ -29,15 +29,7 @@ public class CryptoRSA {
     private final static String CRYPTO_METHOD = "RSA";
     private final static int CRYPTO_BITS = 512;
     private static final String PUBLIC_KEY_BASE64_ENCODED = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIVW27OgtWKDaFyvM7dr35fBKTIJhAOM5Ko/Y1OWDydHp903ofLtmGeeRYv5U8xsAepHYAiMXW3C4LYrqZZGSPkCAwEAAQ==";
-    private static final String PRIVATE_KEY_BASE64_ENCODED_1 = "-----BEGIN PRIVATE KEY-----\n" +
-            "    MIIBPAIBAAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKiwIhTJpAi1XnbfOSrW/Eb\n" +
-            "    w6h1485GOAvuG/OwB+ScsfPJBoNJeNFU6J0CAwEAAQJBAJSfTrSCqAzyAo59Ox+m\n" +
-            "    Q1ZdsYWBhxc2084DwTHM8QN/TZiyF4fbVYtjvyhG8ydJ37CiG7d9FY1smvNG3iDC\n" +
-            "    dwECIQDygv2UOuR1ifLTDo4YxOs2cK3+dAUy6s54mSuGwUeo4QIhAK7SiYDyGwGo\n" +
-            "    CwqjOdgOsQkJTGoUkDs8MST0MtmPAAs9AiEAjLT1/nBhJ9V/X3f9eF+g/bhJK+8T\n" +
-            "    KSTV4WE1wP0Z3+ECIA9E3DWi77DpWG2JbBfu0I+VfFMXkLFbxH8RxQ8zajGRAiEA\n" +
-            "    8Ly1xJ7UW3up25h9aa9SILBpGqWtJlNQgfVKBoabzsU=\n" +
-            "    -----END PRIVATE KEY-----";
+    private static final String PRIVATE_KEY_BASE64_ENCODED_1 = PayME.privateKey;
 
     public CryptoRSA() throws NoSuchAlgorithmException, InvalidKeySpecException {
         generateKeyPair();

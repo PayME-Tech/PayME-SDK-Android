@@ -3,41 +3,83 @@ package vn.payme.sdk
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
-import vn.payme.sdk.model.UserInfo
+import org.json.JSONObject
+import vn.payme.sdk.model.Action
 
-class PaymeModule {
+class PayME {
     companion object {
-        var transID: String? = ""
-        var userID: String? = ""
-        var tokenLink: String? = ""
-        var action: String? = ""
-        var money: Number? = 0
-        var info: UserInfo? = null
-        val deviceId : String = Settings.Secure.ANDROID_ID
-        var appId:String? = ""
-        var privateKey: String? = ""
+        lateinit var appPrivateKey: String
+        var appId: String? = ""
+        var publicKey: String? = ""
+        var connectToken: String? = ""
+        lateinit var action: Action
+
+        val deviceId: String = Settings.Secure.ANDROID_ID
+
+        var amount: Int = 0
+        var description: String? = null
+        var extraData: JSONObject? = null
+
+    }
+
+    constructor(appId: String, publicKey: String, connectToken: String, appPrivateKey: String) {
+        PayME.appId = appId
+        PayME.appPrivateKey = appPrivateKey
+        PayME.publicKey = publicKey
+        PayME.connectToken = connectToken
+
     }
 
 
-    public fun openLinkWallet(
+    public fun openWallet(
         context: Context,
-        transID: String?,
-        userID: String?,
-        tokenLink: String?,
-        action: String?,
-        money: Number?,
-        info: UserInfo?
+        action: Action,
+        amount: Int?,
+        description: String?,
+        extraData: JSONObject?,
+        onSuccess: (JSONObject) -> Unit,
+        onError: (String) -> Unit
     ) {
-        Companion.transID = transID
-        Companion.userID = userID
-        Companion.tokenLink = tokenLink
         Companion.action = action
-        Companion.money = money
-        Companion.info = info
+        Companion.description = description
+        Companion.extraData = extraData!!
+        Companion.amount = amount!!
 
         val intent: Intent = Intent(context, PaymeWaletActivity::class.java)
         context.startActivity(intent)
+
     }
+
+    public fun deposit(
+        amount: Int,
+        description: String?,
+        extraData: String,
+        onSuccess: (JSONObject) -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+    }
+
+    public fun withdraw(
+        amount: Int,
+        description: String?,
+        extraData: String,
+        onSuccess: (JSONObject) -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+    }
+
+    public fun pay(
+        amount: Int,
+        description: String?,
+        extraData: String,
+        onSuccess: (JSONObject) -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+    }
+
 
     private fun urlFeENV(env: String?): String {
         if (env == "sandbox") {
@@ -47,31 +89,29 @@ class PaymeModule {
         return "https://wam.payme.vn/"
     }
 
-    public fun getBalance(context: Context, tokenLink: String,  onSuccessData: ((Int,Int) -> Unit)) {
+    public fun isConnected(): Boolean {
+        return false
+    }
+
+    public fun geWalletInfo(context: Context, onSuccess: (JSONObject) -> Unit,onError: (String) -> Unit) {
         val url = urlFeENV("sandbox")
         val path = "/Wallet/Information"
-        val request = NetworkRequest(context, url, path, tokenLink, null)
-        request.setOnRequestCrypto(
+        val request = NetworkRequest(context, url, path, "", null)
+                request.setOnRequestCrypto(
             onStart = {
 
             },
-            onError = {
-
-            },
+            onError = onError,
             onFinally = {
 
             },
-            onSuccess = {response->{
-                val balance = response.getInt("balance")
-                val detail = response.getJSONObject("detail")
-                val cash = detail.getInt("cash")
-                val lockCash = detail.getInt("lockCash")
-                onSuccessData(cash,lockCash)
-            }},
+            onSuccess = onSuccess,
             onExpired = {
 
             })
 
 
     }
-}
+    }
+
+

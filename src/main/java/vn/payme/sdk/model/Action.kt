@@ -1,4 +1,5 @@
 package vn.payme.sdk.model
 
-class Action {
+enum class Action {
+    DEPOSIT, PAY, OPEN,
 }

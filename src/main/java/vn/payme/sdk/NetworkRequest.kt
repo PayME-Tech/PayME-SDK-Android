@@ -14,13 +14,11 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONException
 import org.json.JSONObject
-import vn.payme.sdk.CryptoAES
-import vn.payme.sdk.CryptoRSA
 import java.io.UnsupportedEncodingException
 import java.nio.charset.Charset
 
 
-class NetworkRequest(
+internal class NetworkRequest(
     private val context: Context,
     private val url: String,
     private val path: String,
@@ -86,11 +84,11 @@ class NetworkRequest(
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun setOnRequestCrypto(
-            onStart: (() -> Unit)?,
-            onSuccess: (response: JSONObject) -> Unit,
-            onError: (() -> Unit)?,
-            onFinally: (() -> Unit)?,
-            onExpired: (() -> Unit)?
+        onStart: (() -> Unit)?,
+        onSuccess: (response: JSONObject) -> Unit,
+        onError: (String) -> Unit,
+        onFinally: (() -> Unit)?,
+        onExpired: (() -> Unit)?
     ) {
         val cryptoAES = CryptoAES()
         val cryptoRSA = CryptoRSA()

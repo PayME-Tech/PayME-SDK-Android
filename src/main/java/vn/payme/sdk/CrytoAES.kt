@@ -8,7 +8,7 @@ import javax.crypto.spec.SecretKeySpec
 import kotlin.text.Charsets.US_ASCII
 import kotlin.text.Charsets.UTF_8
 
-class CryptoAES {
+internal class CryptoAES {
     private val SALTED_STR = "Salted__"
     private val SALTED_MAGIC: ByteArray = SALTED_STR.toByteArray(US_ASCII)
 
