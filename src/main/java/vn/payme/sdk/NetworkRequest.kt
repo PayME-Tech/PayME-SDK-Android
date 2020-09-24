@@ -160,10 +160,12 @@ internal class NetworkRequest(
                             }
                         } else {
                             val errorMessage = finalJSONObject.getJSONObject("data").getString("message")
-                            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                             if (onError != null) {
-                                onError()
+                                onError(errorMessage)
+
                             }
+
+
                         }
                         if (onFinally != null) {
                             onFinally()
@@ -177,7 +179,7 @@ internal class NetworkRequest(
                         onFinally()
                     }
                     if (onError != null) {
-                        onError()
+                        onError("$error")
                     }
                     Toast.makeText(context, "$error", Toast.LENGTH_SHORT).show()
                 }

@@ -10,7 +10,8 @@ class PayME {
     companion object {
         lateinit var appPrivateKey: String
         var appId: String? = ""
-        var publicKey: String? = ""
+        lateinit var publicKey: String
+
         var connectToken: String? = ""
         lateinit var action: Action
 
@@ -42,8 +43,10 @@ class PayME {
     ) {
         Companion.action = action
         Companion.description = description
-        Companion.extraData = extraData!!
-        Companion.amount = amount!!
+        Companion.extraData = extraData
+        if (amount != null) {
+            Companion.amount = amount
+        }
 
         val intent: Intent = Intent(context, PaymeWaletActivity::class.java)
         context.startActivity(intent)

@@ -28,8 +28,8 @@ import javax.crypto.NoSuchPaddingException;
 
     private final static String CRYPTO_METHOD = "RSA";
     private final static int CRYPTO_BITS = 512;
-    private static final String PUBLIC_KEY_BASE64_ENCODED = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIVW27OgtWKDaFyvM7dr35fBKTIJhAOM5Ko/Y1OWDydHp903ofLtmGeeRYv5U8xsAepHYAiMXW3C4LYrqZZGSPkCAwEAAQ==";
-    private static final String PRIVATE_KEY_BASE64_ENCODED_1 = PayME.privateKey;
+    private static final String PUBLIC_KEY_BASE64_ENCODED = PayME.publicKey;
+    private static final String PRIVATE_KEY_BASE64_ENCODED_1 = PayME.appPrivateKey;
 
     public CryptoRSA() throws NoSuchAlgorithmException, InvalidKeySpecException {
         generateKeyPair();
