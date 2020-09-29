@@ -1,21 +1,27 @@
 package vn.payme.sdk
 
-import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.webkit.WebMessage
 import android.webkit.WebView
+import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.model.JsObject
+import vn.payme.sdk.model.MyEven
 
 
 internal class PaymeWaletActivity : AppCompatActivity() {
-    @SuppressLint("JavascriptInterface")
+   private fun backScreen(): Unit {
+
+        runOnUiThread {
+            onBackPressed()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        val html :String = "<!DOCTYPE html><html><body>\n" +
+        val html: String = "<!DOCTYPE html><html><body>\n" +
                 "      <button onclick=\"onClick()\">Click me</button>\n" +
                 "      <script>\n" +
                 "      function onClick() {\n" +
-                "       window.injectedObject.onError('ádasdasdd')" +
+                "       window.injectedObject.onSuccess('{a:1,b:2}')" +
                 "      }\n" +
                 "      </script>\n" +
                 "      </body></html>\n"
@@ -23,29 +29,18 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         setContentView(R.layout.webview_activity)
         val myWebView: WebView = findViewById(R.id.webview)
         myWebView.settings.javaScriptEnabled = true
-        val jsObject : JsObject = JsObject()
-
-        myWebView.addJavascriptInterface(jsObject,"injectedObject")
-
-//        myWebView.loadData(html,"text/html", "UTF-8")
-
-        myWebView.loadUrl("https://sbx-sdk.payme.com.vn/?deviceId=${PayME.deviceId}")
-//        val webMessage : WebMessage = WebMessage()
-
-//        val webviewInterface : JsObject = JsObject()
-
-//        myWebView.addJavascriptInterface(webviewInterface,"")
-//        webviewInterface.onSuccess()
+        val jsObject: JsObject = JsObject(back = { backScreen() })
+        myWebView.addJavascriptInterface(jsObject, "injectedObject")
+//        myWebView.loadUrl("https://sbx-sdk.payme.com.vn/?deviceId=${PayME.deviceId}")
 
 
 
+        myWebView.loadData(html, "text/html", "UTF-8")
 
-//        myWebView.createWebMessageChannel()
 
-//        myWebView.postWebMessage()
+
 
     }
-
 
 
 }

@@ -1,6 +1,6 @@
 package vn.payme.sdk.model
 
-enum  class FuncCallBack {
+enum  class TypeCallBack {
     onError,
     onSuccess,
     onClose

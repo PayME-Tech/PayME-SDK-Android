@@ -3,8 +3,14 @@ package vn.payme.sdk
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import org.json.JSONObject
 import vn.payme.sdk.model.Action
+import vn.payme.sdk.model.JsObject
+import vn.payme.sdk.model.MyEven
+import vn.payme.sdk.model.TypeCallBack
 
 class PayME {
     companion object {
@@ -22,14 +28,19 @@ class PayME {
         var extraData: JSONObject? = null
 
     }
+    public var onSuccess : ((JSONObject) -> Unit)? = null
+    public var onError : ((String) -> Unit)? = null
 
     constructor(appId: String, publicKey: String, connectToken: String, appPrivateKey: String) {
         PayME.appId = appId
         PayME.appPrivateKey = appPrivateKey
         PayME.publicKey = publicKey
         PayME.connectToken = connectToken
+        EventBus.getDefault().register(this)
+
 
     }
+
 
 
     public fun openWallet(
@@ -47,9 +58,21 @@ class PayME {
         if (amount != null) {
             Companion.amount = amount
         }
-
         val intent: Intent = Intent(context, PaymeWaletActivity::class.java)
         context.startActivity(intent)
+        this.onSuccess = onSuccess
+        this.onError = onError
+    }
+    @Subscribe
+    fun onText(myEven: MyEven){
+        if(myEven.type===TypeCallBack.onClose){
+            (onError!!)(myEven.value.toString())
+        }
+        else  if(myEven.type===TypeCallBack.onSuccess){
+            val  json :JSONObject = JSONObject(myEven.value.toString())
+            (onSuccess!!)(json)
+        }
+
 
     }
 
@@ -62,6 +85,7 @@ class PayME {
     ) {
 
     }
+
 
     public fun withdraw(
         amount: Int,
