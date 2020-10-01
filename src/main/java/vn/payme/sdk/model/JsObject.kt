@@ -13,11 +13,7 @@ public class JsObject(val back : ()->Unit) {
             even.post(myEven)
         } catch (e: Exception) {
             println(e)
-
         }
-
-
-
     }
 
     @JavascriptInterface
@@ -38,9 +34,6 @@ public class JsObject(val back : ()->Unit) {
             back()
         } catch (e: Exception) {
             println(e)
-
         }
-
-
     }
 }

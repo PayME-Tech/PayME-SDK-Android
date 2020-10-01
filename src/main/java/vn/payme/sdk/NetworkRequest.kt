@@ -15,6 +15,7 @@ import com.android.volley.toolbox.Volley
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
+import java.lang.Exception
 import java.nio.charset.Charset
 
 
@@ -28,7 +29,7 @@ internal class NetworkRequest(
     fun setOnRequest(
             onStart: (() -> Unit)?,
             onSuccess: (response: JSONObject) -> Unit,
-            onError: (() -> Unit)?,
+            onError: ((String) -> Unit)?,
             onFinally: (() -> Unit)?,
             onExpired: (() -> Unit)?
     ) {
@@ -43,7 +44,6 @@ internal class NetworkRequest(
                 Response.Listener { response ->
                     try {
                         val jsonObject = JSONObject(response.toString())
-                        Log.d("VVV", jsonObject.toString())
                         if (jsonObject.getInt("code") == 1000) {
                             onSuccess(jsonObject.getJSONObject("data"))
                         } else if (jsonObject.getInt("code") == 401) {
@@ -52,9 +52,8 @@ internal class NetworkRequest(
                             }
                         } else {
                             val errorMessage = jsonObject.getJSONObject("data").getString("message")
-                            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                             if (onError != null) {
-                                onError()
+                                onError(errorMessage)
                             }
                         }
                         if (onFinally != null) {
@@ -98,6 +97,7 @@ internal class NetworkRequest(
         val xAPIAction = cryptoAES.encryptAES(encryptKey, path)
         val xAPIMessage = cryptoAES.encryptAES(encryptKey, JSONObject(params as Map<*, *>).toString())
 
+
         val objectValidateRequest: MutableMap<String, String> = mutableMapOf()
         objectValidateRequest["xApiAction"] = xAPIAction
         objectValidateRequest["method"] = "POST"
@@ -133,6 +133,7 @@ internal class NetworkRequest(
 
                         val decryptKey = cryptoRSA.decrypt(xAPIKeyResponse)
 
+
                         val objectValidateResponse: MutableMap<String, String> = mutableMapOf()
                         objectValidateResponse["x-api-action"] = xAPIActionResponse
                         objectValidateResponse["method"] = "POST"
@@ -145,13 +146,10 @@ internal class NetworkRequest(
                         validateString += decryptKey
                         val validateMD5 = cryptoAES.getMD5(validateString)
 
-                        Log.d("VVV", validateMD5)
-                        Log.d("VVV", xAPIValidateResponse)
 
 
                         val result = cryptoAES.decryptAES(decryptKey, xAPIMessageResponse)
                         val finalJSONObject = JSONObject(result)
-
                         if (finalJSONObject.getInt("code") == 1000) {
                             onSuccess(finalJSONObject.getJSONObject("data"))
                         } else if (finalJSONObject.getInt("code") == 401) {
@@ -162,10 +160,7 @@ internal class NetworkRequest(
                             val errorMessage = finalJSONObject.getJSONObject("data").getString("message")
                             if (onError != null) {
                                 onError(errorMessage)
-
                             }
-
-
                         }
                         if (onFinally != null) {
                             onFinally()
@@ -204,7 +199,7 @@ internal class NetworkRequest(
                     val jsonResponse = JSONObject(jsonString)
                     jsonResponse.put("headers", JSONObject(response.headers as Map<*, *>))
                     Response.success(jsonResponse, HttpHeaderParser.parseCacheHeaders(response))
-                } catch (e: UnsupportedEncodingException) {
+                } catch (e: JSONException) {
                     Response.error<JSONObject>(ParseError(e))
                 } catch (je: JSONException) {
                     Response.error<JSONObject>(ParseError(je))
@@ -213,4 +208,6 @@ internal class NetworkRequest(
         }
         queue.add(request)
     }
+
+
 }

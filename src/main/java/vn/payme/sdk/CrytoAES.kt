@@ -34,7 +34,7 @@ internal class CryptoAES {
         cipher.init(Cipher.ENCRYPT_MODE, key, IvParameterSpec(iv))
         var data: ByteArray? = cipher.doFinal(inBytes)
         data = arrayConcat(SALTED_MAGIC, salt).let { data?.let { it1 -> arrayConcat(it, it1) } }
-        return Base64.encodeToString(data, Base64.DEFAULT)
+        return Base64.encodeToString(data, Base64.NO_WRAP)
     }
 
     fun decryptAES(password: String, source: String?): String? {

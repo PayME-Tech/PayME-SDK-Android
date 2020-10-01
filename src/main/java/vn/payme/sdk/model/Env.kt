@@ -1,4 +1,6 @@
 package vn.payme.sdk.model
 
-class Env {
+enum class Env {
+    PRODUCTION,
+    SANDBOX
 }

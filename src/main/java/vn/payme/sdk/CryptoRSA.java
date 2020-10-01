@@ -10,10 +10,7 @@ import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.RSAPrivateKeySpec;
-import java.security.spec.RSAPublicKeySpec;
+import java.security.spec.*;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -29,6 +26,7 @@ import javax.crypto.NoSuchPaddingException;
     private final static String CRYPTO_METHOD = "RSA";
     private final static int CRYPTO_BITS = 512;
     private static final String PUBLIC_KEY_BASE64_ENCODED = PayME.publicKey;
+
     private static final String PRIVATE_KEY_BASE64_ENCODED_1 = PayME.appPrivateKey;
 
     public CryptoRSA() throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -38,7 +36,7 @@ import javax.crypto.NoSuchPaddingException;
     private void generateKeyPair()
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         privateKey = stringToPrivateKey(PRIVATE_KEY_BASE64_ENCODED_1);
-        publicKey = getPublicKey(privateKey);
+        publicKey =stringToPublicKey(PUBLIC_KEY_BASE64_ENCODED);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -90,6 +88,15 @@ import javax.crypto.NoSuchPaddingException;
         KeyFactory kf = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
         return kf.generatePrivate(keySpec);
+    }
+    public static PublicKey stringToPublicKey(String privateKeyPEM) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        privateKeyPEM = privateKeyPEM.replace("-----BEGIN PUBLIC KEY-----", "");
+        privateKeyPEM = privateKeyPEM.replace("-----END PUBLIC KEY-----", "");
+        byte[] encoded = Base64.decode(privateKeyPEM,Base64.DEFAULT);
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PublicKey pubKey = keyFactory.generatePublic(keySpec);
+        return pubKey;
     }
 
     static PublicKey getPublicKey(PrivateKey privKey) throws NoSuchAlgorithmException, InvalidKeySpecException {
