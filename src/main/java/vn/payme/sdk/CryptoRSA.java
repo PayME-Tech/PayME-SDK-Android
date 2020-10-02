@@ -30,11 +30,13 @@ import javax.crypto.NoSuchPaddingException;
     private static final String PRIVATE_KEY_BASE64_ENCODED_1 = PayME.appPrivateKey;
 
     public CryptoRSA() throws NoSuchAlgorithmException, InvalidKeySpecException {
-        generateKeyPair();
+            generateKeyPair();
+
     }
 
     private void generateKeyPair()
             throws NoSuchAlgorithmException, InvalidKeySpecException {
+
         privateKey = stringToPrivateKey(PRIVATE_KEY_BASE64_ENCODED_1);
         publicKey =stringToPublicKey(PUBLIC_KEY_BASE64_ENCODED);
     }

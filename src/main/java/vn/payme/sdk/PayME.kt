@@ -31,6 +31,7 @@ class PayME {
         var appPackageName : String? = ""
         var env : Env? = null
         var configColor : Array<String>? = null
+        var context : Context? = null
 
     }
     public var onSuccess : ((JSONObject) -> Unit)? = null
@@ -43,6 +44,7 @@ class PayME {
         PayME.connectToken = connectToken
         PayME.configColor  = configColor
         PayME.env = env
+        PayME.context = context
         Companion.appPackageName = context.packageName
         val packageInfo :PackageInfo = context.packageManager.getPackageInfo( context.packageName,0)
         PayME.appVersion = packageInfo.versionName
@@ -55,7 +57,6 @@ class PayME {
 
 
     public fun openWallet(
-        context: Context,
         action: Action,
         amount: Int?,
         description: String?,
@@ -71,7 +72,7 @@ class PayME {
             Companion.amount = amount
         }
         val intent: Intent = Intent(context, PaymeWaletActivity::class.java)
-        context.startActivity(intent)
+        context?.startActivity(intent)
         this.onSuccess = onSuccess
         this.onError = onError
     }
@@ -132,7 +133,7 @@ class PayME {
         return false
     }
 
-    public fun geWalletInfo(context: Context, onSuccess: (JSONObject) -> Unit,onError: (String) -> Unit) {
+    public fun geWalletInfo( onSuccess: (JSONObject) -> Unit,onError: (String) -> Unit) {
         val url = urlFeENV("sandbox")
         val path = "/v1/Wallet/Information"
         val params: MutableMap<String, Any> = mutableMapOf()
@@ -148,9 +149,8 @@ class PayME {
 
         params["clientInfo"] = clientInfo
 
-        println("Appptoken"+PayME.appToken)
-        println("params"+params)
-        val request = NetworkRequest(context, url, path, PayME.appToken, params)
+
+        val request = NetworkRequest(context!!, url, path, PayME.appToken, params)
                 request.setOnRequestCrypto(
             onStart = {
 
