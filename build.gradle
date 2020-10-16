@@ -1,69 +1,29 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
 
-ext {
-    bintrayRepo = 'PayMESDK'
-    bintrayName = 'PayMESDK'
-
-    publishedGroupId = 'vn.payme.sdk'
-    libraryName = 'PayMESDK'
-    artifact = 'paymesdk'
-
-    libraryDescription = 'Thư viện tích hợp tính năng của ví PayME'
-
-    siteUrl = 'https://payme.vn'
-    gitUrl = 'https://gitlab.com/paymesdk/paymesdk-android.git'
-
-    libraryVersion = '0.0.1'
-
-    developerId = 'payme'
-    developerName = 'Khoa Thai Minh'
-    developerEmail = 'khoatm@payme.vn'
-
-    licenseName = 'The Apache Software License, Version 2.0'
-    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    allLicenses = ["Apache-2.0"]
-}
-
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
-
-android {
-    compileSdkVersion 29
-    buildToolsVersion "30.0.2"
-
-    defaultConfig {
-        minSdkVersion 23
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
+buildscript {
+    ext.kotlin_version = "1.4.10"
+    repositories {
+        google()
+        jcenter()
     }
+    dependencies {
+        classpath "com.android.tools.build:gradle:4.0.1"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
     }
 }
 
-dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.core:core-ktx:1.1.0'
-    implementation 'com.android.volley:volley:1.1.1'
-    implementation 'org.greenrobot:eventbus:3.0.0'
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
 }
 
-tasks.withType(Javadoc).all {
-    enabled = false
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }

@@ -1,0 +1,3 @@
+include ':app'
+include ':androidsdk'
+rootProject.name = "AndroidPayMESDK"
