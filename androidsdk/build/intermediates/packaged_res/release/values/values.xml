@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="blackFive">#191919</color>
+    <color name="blackSeven">#0b0b0b</color>
+    <color name="blackSix">#090909</color>
+    <color name="brownishGrey">#737373</color>
+    <color name="emeraldGreenTwo">#0a9220</color>
+    <color name="endColor">#737373</color>
+    <color name="ice">#f2f4f3</color>
+    <color name="scarlet">#d0021b</color>
+    <color name="startColor">#737373</color>
+    <color name="steel">#728190</color>
+    <color name="veryLightPinkTwo">#cbcbcb</color>
+    <color name="white">#ffffff</color>
+    <string name="confirm">XÁC NHẬN</string>
+    <string name="confirm_otp">Xác thực OTP</string>
+    <string name="confirm_payment">Xác nhận thanh toán</string>
+    <string name="content">Nội dung</string>
+    <string name="payment">Thanh toán</string>
+    <string name="payment_fail">Thanh toán thất bại</string>
+    <string name="payment_success">Thanh toán thành công</string>
+    <string name="please_enter_otp_from_phone_number">Vui lòng nhập mã OTP được gửi tới số</string>
+    <string name="select_method_payment">Chọn nguồn thanh toán</string>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="pinViewStyle">@style/PinWidget.PinView</item>
+    </style>
+    <style name="progressBarWhite" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="colorAccent">@color/white</item>
+    </style>
+</resources>

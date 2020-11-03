@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "applicationId": "vn.payme.sdk",
+  "variantType": "LIBRARY",
+  "elements": [
+    {
+      "outputType": {
+        "type": "AAPT_FRIENDLY_MERGED_MANIFESTS"
+      },
+      "apkData": {
+        "type": "MAIN",
+        "splits": [],
+        "versionCode": 1,
+        "versionName": "0.0.5",
+        "outputFile": "androidsdk-release.aar",
+        "fullName": "release",
+        "baseName": "release",
+        "dirName": ""
+      },
+      "path": "AndroidManifest.xml",
+      "properties": {
+        "packageId": "vn.payme.sdk",
+        "split": ""
+      }
+    }
+  ]
+}

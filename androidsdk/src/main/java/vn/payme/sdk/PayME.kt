@@ -1,68 +1,59 @@
 package vn.payme.sdk
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
-import android.provider.Settings
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
-import org.json.JSONObject
-import vn.payme.sdk.model.*
-import java.lang.Exception
 
-class PayME {
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
+import org.json.JSONObject
+import vn.payme.sdk.api.NetworkRequest
+import vn.payme.sdk.model.*
+
+public class PayME {
     companion object {
         lateinit var appPrivateKey: String
         var appToken: String = ""
         lateinit var publicKey: String
-
         var connectToken: String = ""
         lateinit var action: Action
-
-        var deviceId: String? =  ""
-
         var amount: Int = 0
         var description: String? = null
-        var extraData: JSONObject? = null
-        var appVersion  : String = ""
-        var sdkVerSion : String = ""
-        var appPackageName : String? = ""
-        var env : Env? = null
-        var configColor : Array<String>? = null
-        var context : Context? = null
+        var transactionId: String? = null
+        var extraData: String? = null
+        var clientInfo: ClientInfo = ClientInfo()
+        var env: Env? = null
+        var configColor: Array<String>? = null
+        lateinit var context: Context
+        lateinit var onSuccess: ((JSONObject) -> Unit)
+        lateinit var onError: ((String) -> Unit)
+        var colorApp: ColorApp = ColorApp("#08941f", "#c6c6c6")
 
     }
-    public var onSuccess : ((JSONObject) -> Unit)? = null
-    public var onError : ((String) -> Unit)? = null
 
-    constructor(context: Context,appToken: String, publicKey: String, connectToken: String, appPrivateKey: String,configColor : Array<String> ?,env: Env) {
+
+    constructor(context: Context, appToken: String, publicKey: String, connectToken: String, appPrivateKey: String, configColor: Array<String>, env: Env) {
         PayME.appToken = appToken
         PayME.appPrivateKey = appPrivateKey
         PayME.publicKey = publicKey
         PayME.connectToken = connectToken
-        PayME.configColor  = configColor
+        PayME.configColor = configColor
         PayME.env = env
         PayME.context = context
-        Companion.appPackageName = context.packageName
-        val packageInfo :PackageInfo = context.packageManager.getPackageInfo( context.packageName,0)
-        PayME.appVersion = packageInfo.versionName
-
-        Companion.deviceId = Settings.Secure.getString(context.contentResolver,Settings.Secure.ANDROID_ID)
-        EventBus.getDefault().register(this)
+        Companion.colorApp = ColorApp(configColor[0], configColor[1])
+        Companion.clientInfo = ClientInfo(context)
 
     }
 
 
-
     public fun openWallet(
-        action: Action,
-        amount: Int?,
-        description: String?,
-        extraData: JSONObject?,
-        onSuccess: (JSONObject) -> Unit,
-        onError: (String) -> Unit
+            action: Action,
+            amount: Int?,
+            description: String?,
+            extraData: String?,
+            onSuccess: (JSONObject) -> Unit,
+            onError: (String) -> Unit
     ) {
 
         Companion.action = action
@@ -70,54 +61,77 @@ class PayME {
         Companion.extraData = extraData
         if (amount != null) {
             Companion.amount = amount
+        } else {
+            Companion.amount = 0
         }
         val intent: Intent = Intent(context, PaymeWaletActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context?.startActivity(intent)
-        this.onSuccess = onSuccess
-        this.onError = onError
-    }
-    @Subscribe
-    fun onText(myEven: MyEven){
-        if(myEven.type===TypeCallBack.onClose){
-            (onError!!)(myEven.value.toString())
-        }
-        else  if(myEven.type===TypeCallBack.onSuccess){
-            val  json :JSONObject = JSONObject(myEven.value.toString())
-            (onSuccess!!)(json)
-        }
-
-
+        Companion.onSuccess = onSuccess
+        Companion.onError = onError
     }
 
     public fun deposit(
-        amount: Int,
-        description: String?,
-        extraData: String,
-        onSuccess: (JSONObject) -> Unit,
-        onError: (String) -> Unit
+            amount: Int,
+            description: String?,
+            extraData: String,
+            onSuccess: (JSONObject) -> Unit,
+            onError: (String) -> Unit
     ) {
+        Companion.description = description
+        Companion.extraData = extraData
+        if (amount != null) {
+            Companion.amount = amount
+        } else {
+            Companion.amount = 0
+        }
+
+        this.openWallet(Action.DEPOSIT, amount, description, extraData, onSuccess, onError)
 
     }
 
 
     public fun withdraw(
-        amount: Int,
-        description: String?,
-        extraData: String,
-        onSuccess: (JSONObject) -> Unit,
-        onError: (String) -> Unit
+            amount: Int,
+            description: String?,
+            extraData: String,
+            onSuccess: (JSONObject) -> Unit,
+            onError: (String) -> Unit
     ) {
+        Companion.description = description
+        Companion.extraData = extraData
+        if (amount != null) {
+            Companion.amount = amount
+        } else {
+            Companion.amount = 0
+        }
+        this.openWallet(Action.WITHDRAW, amount, description, extraData, onSuccess, onError)
+
 
     }
 
     public fun pay(
-        amount: Int,
-        description: String?,
-        extraData: String,
-        onSuccess: (JSONObject) -> Unit,
-        onError: (String) -> Unit
+            f: FragmentManager,
+            amount: Int,
+            description: String?,
+            transactionId: String?,
+            extraData: String,
+            onSuccess: (JSONObject) -> Unit,
+            onError: (String) -> Unit
     ) {
+        Companion.description = description
+        Companion.extraData = extraData
+        if (amount != null) {
+            Companion.amount = amount
+        } else {
+            Companion.amount = 0
+        }
+        Companion.transactionId = transactionId
+        val activity: Activity = PayME.context as AppCompatActivity
+        val paymePayment: PaymePayment = PaymePayment()
+        paymePayment.show(
+                f,
+                "ModalBottomSheet")
 
     }
 
@@ -126,7 +140,6 @@ class PayME {
         if (env == "sandbox") {
             return "https://sbx-wam.payme.vn"
         }
-
         return "https://wam.payme.vn"
     }
 
@@ -134,40 +147,30 @@ class PayME {
         return false
     }
 
-    public fun geWalletInfo( onSuccess: (JSONObject) -> Unit,onError: (String) -> Unit) {
+    public fun geWalletInfo(onSuccess: (JSONObject) -> Unit, onError: (JSONObject?,Int?,String) -> Unit) {
         val url = urlFeENV("sandbox")
         val path = "/v1/Wallet/Information"
         val params: MutableMap<String, Any> = mutableMapOf()
         params["connectToken"] = connectToken.toString()
+        params["clientInfo"] = PayME.clientInfo.getClientInfo()
 
-        val clientInfo: MutableMap<String, Any> = mutableMapOf()
-        clientInfo["clientId"] = deviceId.toString()
-        clientInfo["platform"] = "ANDROID"
-        clientInfo["appVersion"] = appVersion.toString()
-        clientInfo["sdkVesion"] = sdkVerSion.toString()
-        clientInfo["sdkType"] = "native"
-        clientInfo["appPackageName"] = appPackageName.toString()
+        val request = NetworkRequest(context!!, url, path, appToken, params)
+        request.setOnRequestCrypto(
+                onStart = {
 
-        params["clientInfo"] = clientInfo
+                },
+                onError = onError,
+                onFinally = {
 
+                },
+                onSuccess = onSuccess,
+                onExpired = {
+                    println("401")
 
-        val request = NetworkRequest(context!!, url, path, PayME.appToken, params)
-                request.setOnRequestCrypto(
-            onStart = {
-
-            },
-            onError = onError,
-            onFinally = {
-
-            },
-            onSuccess = onSuccess,
-            onExpired = {
-                println("401")
-
-            })
+                })
 
 
     }
-    }
+}
 
 

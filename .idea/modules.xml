@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AndroidPayMESDK.iml" filepath="$PROJECT_DIR$/.idea/modules/AndroidPayMESDK.iml" group="AndroidPayMESDK" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/androidsdk/androidsdk.iml" filepath="$PROJECT_DIR$/.idea/modules/androidsdk/androidsdk.iml" group="AndroidPayMESDK/androidsdk" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" group="AndroidPayMESDK/app" />
+    </modules>
+  </component>
+</project>

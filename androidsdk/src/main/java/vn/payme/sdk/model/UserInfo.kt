@@ -26,7 +26,5 @@ class UserInfo {
     internal fun setIdentify(identifyUser: String){
         identify = identifyUser
     }
-    public fun toJson(): String {
-        return "{phone:${phone},fullName:${fullName},address:${address},identify:${identify}}"
-    }
+
 }

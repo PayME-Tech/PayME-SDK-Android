@@ -1,0 +1,35 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="vn.payme.sdk"
+4    android:versionCode="1"
+5    android:versionName="0.0.5" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="23"
+8-->/Users/hieupc/paymesdk-android/androidsdk/src/main/AndroidManifest.xml
+9        android:targetSdkVersion="29" />
+9-->/Users/hieupc/paymesdk-android/androidsdk/src/main/AndroidManifest.xml
+10
+11    <application
+11-->/Users/hieupc/paymesdk-android/androidsdk/src/main/AndroidManifest.xml:5:5-16:19
+12        android:allowBackup="true"
+12-->/Users/hieupc/paymesdk-android/androidsdk/src/main/AndroidManifest.xml:6:9-35
+13        android:supportsRtl="true" >
+13-->/Users/hieupc/paymesdk-android/androidsdk/src/main/AndroidManifest.xml:7:9-35
+14        <activity android:name="vn.payme.sdk.PaymeWaletActivity" >
+14-->/Users/hieupc/paymesdk-android/androidsdk/src/main/AndroidManifest.xml:9:9-15:20
+14-->/Users/hieupc/paymesdk-android/androidsdk/src/main/AndroidManifest.xml:9:19-65
+15            <intent-filter>
+15-->/Users/hieupc/paymesdk-android/androidsdk/src/main/AndroidManifest.xml:10:13-14:29
+16                <action android:name="android.intent.action.MAIN" />
+16-->/Users/hieupc/paymesdk-android/androidsdk/src/main/AndroidManifest.xml:11:17-68
+16-->/Users/hieupc/paymesdk-android/androidsdk/src/main/AndroidManifest.xml:11:25-66
+17
+18                <category android:name="android.intent.category.LAUNCHER" />
+18-->/Users/hieupc/paymesdk-android/androidsdk/src/main/AndroidManifest.xml:13:17-76
+18-->/Users/hieupc/paymesdk-android/androidsdk/src/main/AndroidManifest.xml:13:27-74
+19            </intent-filter>
+20        </activity>
+21    </application>
+22
+23</manifest>

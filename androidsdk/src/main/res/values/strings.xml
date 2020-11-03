@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="confirm">XÁC NHẬN</string>
+    <string name="confirm_payment">Xác nhận thanh toán</string>
+    <string name="payment">Thanh toán</string>
+    <string name="confirm_otp">Xác thực OTP</string>
+    <string name="content">Nội dung</string>
+    <string name="payment_success">Thanh toán thành công</string>
+    <string name="payment_fail">Thanh toán thất bại</string>
+    <string name="select_method_payment">Chọn nguồn thanh toán</string>
+    <string name="please_enter_otp_from_phone_number">Vui lòng nhập mã OTP được gửi tới số</string>
+</resources>

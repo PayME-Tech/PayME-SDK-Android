@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="blackFive">#191919</color>
+    <color name="blackSeven">#0b0b0b</color>
+    <color name="scarlet">#d0021b</color>
+    <color name="white">#ffffff</color>
+    <color name="steel">#728190</color>
+    <color name="veryLightPinkTwo">#cbcbcb</color>
+    <color name="blackSix">#090909</color>
+    <color name="ice">#f2f4f3</color>
+    <color name="emeraldGreenTwo">#0a9220</color>
+    <color name="brownishGrey">#737373</color>
+    <color name="startColor">#737373</color>
+    <color name="endColor">#737373</color>
+</resources>

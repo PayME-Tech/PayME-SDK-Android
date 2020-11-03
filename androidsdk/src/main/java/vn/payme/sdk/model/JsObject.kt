@@ -2,15 +2,17 @@ package vn.payme.sdk.model
 
 import android.webkit.JavascriptInterface
 import org.greenrobot.eventbus.EventBus
+import org.json.JSONObject
+import vn.payme.sdk.PayME
 
 
 public class JsObject(val back : ()->Unit) {
     @JavascriptInterface
     public  fun onSuccess(string: String){
         try {
-            var even : EventBus = EventBus.getDefault()
-            var myEven : MyEven = MyEven(TypeCallBack.onSuccess,string)
-            even.post(myEven)
+            val  json :JSONObject = JSONObject(string)
+            PayME.onSuccess(json)
+
         } catch (e: Exception) {
             println(e)
         }
@@ -19,9 +21,7 @@ public class JsObject(val back : ()->Unit) {
     @JavascriptInterface
     public  fun onError(string: String){
         try {
-            var even : EventBus = EventBus.getDefault()
-            var myEven : MyEven = MyEven(TypeCallBack.onError,string)
-            even.post(myEven)
+            PayME.onError(string)
         } catch (e: Exception) {
             println(e)
 

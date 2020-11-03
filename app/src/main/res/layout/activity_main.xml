@@ -9,10 +9,47 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:text="Số dư :"
+        android:id="@+id/textview"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
+    <Button
+        android:text="Open"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" tools:layout_editor_absoluteY="447dp"
+        tools:layout_editor_absoluteX="167dp" android:id="@+id/button"/>
+    <Button
+        android:text="Deposit"
+        android:layout_width="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/button"
+        android:layout_height="wrap_content" tools:layout_editor_absoluteY="447dp"
+        tools:layout_editor_absoluteX="167dp" android:id="@+id/buttonDeposit"/>
+    <Button
+        android:text="Withdraw"
+        android:layout_width="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/buttonDeposit"
+        android:layout_height="wrap_content"
+        tools:layout_editor_absoluteY="447dp"
+        tools:layout_editor_absoluteX="167dp"
+        android:id="@+id/buttonWithdraw"/>
+    <Button
+        android:text="Pay"
+        android:layout_width="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/buttonWithdraw"
+        android:layout_height="wrap_content" tools:layout_editor_absoluteY="447dp"
+        tools:layout_editor_absoluteX="167dp" android:id="@+id/buttonPay"/>
+    <EditText
+        app:layout_constraintTop_toBottomOf="@id/buttonPay"
+        android:id="@+id/inputConnectToken"
+        android:layout_width="wrap_content"
+        tools:layout_editor_absoluteY="447dp"
+        tools:layout_editor_absoluteX="167dp"
+        android:layout_height="wrap_content">
+
+    </EditText>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
