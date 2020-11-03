@@ -5,7 +5,6 @@
       <root url="jar://$PROJECT_DIR$/../.gradle/caches/transforms-2/files-2.1/501a73f6dea379217e50705f464b2e05/constraintlayout-2.0.4/jars/classes.jar!/" />
       <root url="file://$PROJECT_DIR$/../.gradle/caches/transforms-2/files-2.1/501a73f6dea379217e50705f464b2e05/constraintlayout-2.0.4/res" />
     </CLASSES>
-    <JAVADOC />
     <SOURCES />
   </library>
 </component>
