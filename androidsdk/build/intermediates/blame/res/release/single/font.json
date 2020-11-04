@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "/Users/hieupc/paymesdk-android/androidsdk/build/intermediates/res/merged/release/font/barlow_regular.ttf",
+        "source": "/Users/hieupc/paymesdk-android/androidsdk/src/main/res/font/barlow_regular.ttf"
+    },
+    {
+        "merged": "/Users/hieupc/paymesdk-android/androidsdk/build/intermediates/res/merged/release/font/barlow_medium.ttf",
+        "source": "/Users/hieupc/paymesdk-android/androidsdk/src/main/res/font/barlow_medium.ttf"
+    },
+    {
+        "merged": "/Users/hieupc/paymesdk-android/androidsdk/build/intermediates/res/merged/release/font/semi_bold.ttf",
+        "source": "/Users/hieupc/paymesdk-android/androidsdk/src/main/res/font/semi_bold.ttf"
+    },
+    {
+        "merged": "/Users/hieupc/paymesdk-android/androidsdk/build/intermediates/res/merged/release/font/fonts.xml",
+        "source": "/Users/hieupc/paymesdk-android/androidsdk/src/main/res/font/fonts.xml"
+    }
+]

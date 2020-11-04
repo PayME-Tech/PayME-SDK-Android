@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "/Users/hieupc/paymesdk-android/androidsdk/build/intermediates/res/merged/release/raw/result_thanh_cong.json",
+        "source": "/Users/hieupc/paymesdk-android/androidsdk/src/main/res/raw/result_thanh_cong.json"
+    },
+    {
+        "merged": "/Users/hieupc/paymesdk-android/androidsdk/build/intermediates/res/merged/release/raw/result_that_bai.json",
+        "source": "/Users/hieupc/paymesdk-android/androidsdk/src/main/res/raw/result_that_bai.json"
+    }
+]

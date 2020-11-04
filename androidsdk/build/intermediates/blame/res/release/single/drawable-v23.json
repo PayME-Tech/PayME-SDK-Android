@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "/Users/hieupc/paymesdk-android/androidsdk/build/intermediates/res/merged/release/drawable-v23/mtrl_popupmenu_background_dark.xml",
+        "source": "/Users/hieupc/.gradle/caches/transforms-2/files-2.1/c356b2b6bdf89ffeeb3d070516ba7fdf/material-1.2.1/res/drawable-v23/mtrl_popupmenu_background_dark.xml"
+    },
+    {
+        "merged": "/Users/hieupc/paymesdk-android/androidsdk/build/intermediates/res/merged/release/drawable-v23/abc_control_background_material.xml",
+        "source": "/Users/hieupc/.gradle/caches/transforms-2/files-2.1/f2a027c8e5bfd16986ebf385b4a34033/appcompat-1.2.0/res/drawable-v23/abc_control_background_material.xml"
+    }
+]

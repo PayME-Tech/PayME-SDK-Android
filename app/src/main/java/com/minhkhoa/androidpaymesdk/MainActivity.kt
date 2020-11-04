@@ -1,5 +1,6 @@
 package com.minhkhoa.androidpaymesdk
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -14,6 +15,8 @@ import vn.payme.sdk.model.Env
 
 class MainActivity : AppCompatActivity() {
     val AppToken: String = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MX0.wNtHVZ-olKe7OAkgLigkTSsLVQKv_YL9fHKzX9mn9II"
+    lateinit var payme: PayME
+    lateinit var context: Context
 
     val PublicKey: String = "-----BEGIN PUBLIC KEY-----\n" +
             "   MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKi\n" +
@@ -32,7 +35,9 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
+        context = this
         setContentView(R.layout.activity_main)
         val button: Button = findViewById(R.id.button)
         val buttonDeposit: Button = findViewById(R.id.buttonDeposit)
@@ -41,8 +46,7 @@ class MainActivity : AppCompatActivity() {
         val textView: TextView = findViewById(R.id.textview)
         val inputConnectToken: EditText = findViewById(R.id.inputConnectToken)
         var configColor = arrayOf<String>("#75255b", "#9d455f")
-        val payme: PayME =
-            PayME(this, AppToken, PublicKey, ConnectToken, PrivateKey, configColor, Env.SANDBOX)
+         this.payme = PayME(this, AppToken, PublicKey, ConnectToken, PrivateKey, configColor, Env.SANDBOX)
 
 
 
@@ -56,6 +60,8 @@ class MainActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 ConnectToken = s.toString()
+                payme = PayME(context, AppToken, PublicKey, ConnectToken, PrivateKey, configColor, Env.SANDBOX)
+
             }
         })
 

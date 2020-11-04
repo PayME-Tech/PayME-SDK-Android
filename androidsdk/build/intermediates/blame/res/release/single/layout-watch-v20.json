@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "/Users/hieupc/paymesdk-android/androidsdk/build/intermediates/res/merged/release/layout-watch-v20/abc_alert_dialog_title_material.xml",
+        "source": "/Users/hieupc/.gradle/caches/transforms-2/files-2.1/f2a027c8e5bfd16986ebf385b4a34033/appcompat-1.2.0/res/layout-watch-v20/abc_alert_dialog_title_material.xml"
+    },
+    {
+        "merged": "/Users/hieupc/paymesdk-android/androidsdk/build/intermediates/res/merged/release/layout-watch-v20/abc_alert_dialog_button_bar_material.xml",
+        "source": "/Users/hieupc/.gradle/caches/transforms-2/files-2.1/f2a027c8e5bfd16986ebf385b4a34033/appcompat-1.2.0/res/layout-watch-v20/abc_alert_dialog_button_bar_material.xml"
+    }
+]

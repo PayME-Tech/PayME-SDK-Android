@@ -28,7 +28,7 @@ public class PayME {
         lateinit var context: Context
         lateinit var onSuccess: ((JSONObject) -> Unit)
         lateinit var onError: ((String) -> Unit)
-        var colorApp: ColorApp = ColorApp("#08941f", "#c6c6c6")
+        lateinit var colorApp: ColorApp
 
     }
 

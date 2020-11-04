@@ -5,6 +5,9 @@
       <root url="jar://$PROJECT_DIR$/../.gradle/caches/transforms-2/files-2.1/3c5adf6467a0873c653fe9a3355a6196/jetified-pinview-1.4.4/jars/classes.jar!/" />
       <root url="file://$PROJECT_DIR$/../.gradle/caches/transforms-2/files-2.1/3c5adf6467a0873c653fe9a3355a6196/jetified-pinview-1.4.4/res" />
     </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../.gradle/caches/modules-2/files-2.1/com.chaos.view/pinview/1.4.4/8c3c55eff140e001a2e36d54d440643a9a1d394e/pinview-1.4.4-javadoc.jar!/" />
+    </JAVADOC>
     <SOURCES>
       <root url="jar://$PROJECT_DIR$/../.gradle/caches/modules-2/files-2.1/com.chaos.view/pinview/1.4.4/de4556e88cb581a2e9eb4f710112ade0bf16271f/pinview-1.4.4-sources.jar!/" />
     </SOURCES>
