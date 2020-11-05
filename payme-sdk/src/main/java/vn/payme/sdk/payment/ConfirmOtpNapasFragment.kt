@@ -24,12 +24,13 @@ class ConfirmOtpNapasFragment :Fragment() {
         val myWebView: WebView = view!!.findViewById(R.id.webview)
         myWebView.settings.javaScriptEnabled = true
         buttonClose = view!!.findViewById(R.id.buttonClose)
-        context?.let {
-//            val displayMetrics = it.resources.displayMetrics
-//            val params: ViewGroup.LayoutParams = myWebView.layoutParams
-//            params.height = 500  ;
-//            myWebView.setLayoutParams(params);
-        }
+//
+//        val newHeight = activity?.window?.decorView?.measuredHeight
+//        val viewGroupLayoutParams = myWebView.layoutParams
+//        if (newHeight != null) {
+//            viewGroupLayoutParams.height = newHeight - 700 ?: 0
+//        }
+//        myWebView.layoutParams = viewGroupLayoutParams
 
         buttonClose.setOnClickListener {
 

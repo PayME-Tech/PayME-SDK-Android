@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.TargetApi
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -28,6 +27,13 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         }
     }
 
+    private fun checkCamera() {
+        val hasCameraPermission = checkSelfPermission(Manifest.permission.CAMERA)
+        if (hasCameraPermission != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.CAMERA), 113)
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val html: String = "<!DOCTYPE html><html><body>\n" +
@@ -39,11 +45,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                 "      </script>\n" +
                 "      </body></html>\n"
         super.onCreate(savedInstanceState)
-        val hasCameraPermission = checkSelfPermission(Manifest.permission.CAMERA)
 
-        if (hasCameraPermission != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.CAMERA), 113)
-        }
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor = Color.TRANSPARENT
@@ -57,16 +59,30 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         val myWebView: WebView = findViewById(R.id.webview)
         myWebView.settings.javaScriptEnabled = true
         myWebView.settings.mediaPlaybackRequiresUserGesture = false
+        myWebView.setWebViewClient(object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView, url: String?): Boolean {
+                myWebView.loadUrl(url)
+                return true
+
+            }
+        })
+        CookieManager.getInstance().setAcceptThirdPartyCookies(myWebView, true);
+
+
         myWebView.setWebChromeClient(object : WebChromeClient() {
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
-                Log.d("LOG WEB", consoleMessage?.message() + " -- From line "
-                        + consoleMessage?.lineNumber() + " of "
-                        + consoleMessage?.sourceId() );
+                Log.d(
+                    "LOG WEB", consoleMessage?.message() + " -- From line "
+                            + consoleMessage?.lineNumber() + " of "
+                            + consoleMessage?.sourceId()
+                );
                 return super.onConsoleMessage(consoleMessage)
             }
+
             // Grant permissions for cam
             @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             override fun onPermissionRequest(request: PermissionRequest) {
+                checkCamera()
                 runOnUiThread() {
                     request.grant(request.getResources());
 
@@ -74,15 +90,16 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                 }
 
             }
+
         })
 
 
-        val jsObject: JsObject = JsObject(back = { backScreen() })
+        val jsObject: JsObject = JsObject(back = { backScreen() }, this.supportFragmentManager)
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
-        var action :String = PayME.action.toString()
+        var action: String = PayME.action.toString()
 
         var data: JSONObject = JSONObject(
-                """{
+            """{
                       connectToken:  '${PayME.connectToken}',
                       appToken: '${PayME.appToken}',
                       clientInfo: {
@@ -95,19 +112,27 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                       },
                       partner: 'ANDROID',
                       action:'${action}',
+                      amount:${PayME.amount},
                       partnerTop:${statusBarHeight},
                       configColor: ['${PayME.configColor?.get(0)}', '${PayME.configColor?.get(1)}']
                     }"""
         )
-        val encode :String = URLEncoder.encode(data.toString(),"utf-8")
-        println("OPEN:"+"https://sbx-sdk.payme.com.vn/active/${encode}")
-        if(PayME.env===Env.SANDBOX){
-            myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
+        val encode: String = URLEncoder.encode(data.toString(), "utf-8")
+        if (PayME.action == Action.TEST) {
+            myWebView.loadUrl("https://sbx-sdk.payme.com.vn/test")
 
-        }else{
-            myWebView.loadUrl("https://sdk.payme.com.vn/active/${encode}")
+        } else {
+            if (PayME.env === Env.SANDBOX) {
+//            myWebView.loadUrl("https://sbx-sdk.payme.com.vn/result?success=true&trans_id=0792609928&amount=10000")
+                myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
+//                myWebView.loadUrl("https://vi.webcamtests.com")
 
+            } else {
+                myWebView.loadUrl("https://sdk.payme.com.vn/active/${encode}")
+
+            }
         }
+
 
     }
 

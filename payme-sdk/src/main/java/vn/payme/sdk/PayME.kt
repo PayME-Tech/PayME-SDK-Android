@@ -28,6 +28,7 @@ public class PayME {
         lateinit var context: Context
         lateinit var onSuccess: ((JSONObject) -> Unit)
         lateinit var onError: ((String) -> Unit)
+        lateinit var onPay: ((String) -> Unit)
         lateinit var colorApp: ColorApp
 
     }
@@ -71,6 +72,7 @@ public class PayME {
         Companion.onError = onError
     }
 
+
     public fun deposit(
             amount: Int,
             description: String?,
@@ -111,7 +113,7 @@ public class PayME {
     }
 
     public fun pay(
-            f: FragmentManager,
+        fragmentManager: FragmentManager,
             amount: Int,
             description: String?,
             transactionId: String?,
@@ -130,7 +132,7 @@ public class PayME {
         val activity: Activity = PayME.context as AppCompatActivity
         val paymePayment: PaymePayment = PaymePayment()
         paymePayment.show(
-                f,
+            fragmentManager,
                 "ModalBottomSheet")
 
     }
