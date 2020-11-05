@@ -5,3 +5,4 @@
 .idea
 androidsdk/build
 .gradle
+payme-sdk/build

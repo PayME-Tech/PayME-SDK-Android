@@ -1,3 +1,3 @@
 include ':app'
-include ':androidsdk'
+include ':payme-sdk'
 rootProject.name = "AndroidPayMESDK"

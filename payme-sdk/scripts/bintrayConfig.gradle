@@ -1,0 +1,50 @@
+/*
+>>>>> To publish use below
+
+    ./gradlew clean build install bintrayUpload -Ppublish=true
+
+>>>>> To publish with javadoc Fail on error flag set to false
+
+   ./gradlew clean build install bintrayUpload -Ppublish=true -PjavadocFlag=true
+
+*/
+
+// publish property is checked here first
+if (project.hasProperty('publish') && project.getProperty('publish')) {
+  // Bintray Params
+  ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'payme-sdk'
+
+    publishedGroupId = 'vn.payme.sdk'
+    libraryName = 'payme-sdk' //rootProject.ext.libModuleName
+    artifact = 'payme-sdk' //rootProject.ext.libModuleName // Has to be same as your library module name
+
+    libraryDescription = 'Thư viện tích hợp tính năng của ví PayME'
+
+    // Your github repo link
+    siteUrl = 'https://gitlab.com/paymesdk/paymesdk-android' //rootProject.ext.libPomUrl
+    gitUrl = siteUrl + '.git'
+    githubRepository = gitUrl //rootProject.ext.libGithubRepo
+
+    libraryVersion = '0.0.5' //rootProject.ext.libVersionName
+
+    developerId = 'payme'
+    developerName = 'PayME'
+    developerEmail = 'contact@payme.vn'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+  }
+
+  // Place it at the end of the file
+  apply from: './scripts/installv1.gradle'
+  apply from: './scripts/bintrayv1.gradle'
+
+  if (project.hasProperty('javadocFlag') && project.getProperty('javadocFlag')) {
+    javadoc {
+      failOnError = false
+    }
+  }
+}
