@@ -8,22 +8,22 @@ task sourceJar(type: Jar) {
     classifier "sources"
 }
 
-publishing {
-    publications {
-        release(MavenPublication) {
-            groupId 'vn.payme.sdk'
-            artifactId 'paymesdk'
-            version '0.0.1'
-            artifact(sourceJar)
-            artifact("$buildDir/outputs/aar/payme-sdk-release.aar")
-        }
-    }
-    repositories {
-        maven {
-            url "$buildDir/repo"
-        }
-    }
-}
+//publishing {
+//    publications {
+//        release(MavenPublication) {
+//            groupId 'vn.payme.sdk'
+//            artifactId 'paymesdk'
+//            version '0.0.1'
+//            artifact(sourceJar)
+//            artifact("$buildDir/outputs/aar/payme-sdk-release.aar")
+//        }
+//    }
+//    repositories {
+//        maven {
+//            url "$buildDir/repo"
+//        }
+//    }
+//}
 
 android {
     compileSdkVersion 30
