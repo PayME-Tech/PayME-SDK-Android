@@ -3,31 +3,33 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 ext {
-    bintrayRepo = 'PayMESDK'
-    bintrayName = 'PayMESDK'
+    bintrayRepo = 'maven'
+    bintrayName = 'payme-sdk'
 
     publishedGroupId = 'vn.payme.sdk'
-    libraryName = 'PayMESDK'
-    artifact = 'paymesdk'
+    libraryName = 'payme-sdk'
+    artifact = 'payme-sdk'
 
     libraryDescription = 'Thư viện tích hợp tính năng của ví PayME'
 
-    siteUrl = 'https://payme.vn'
+    siteUrl = 'https://gitlab.com/paymesdk/paymesdk-android'
     gitUrl = 'https://gitlab.com/paymesdk/paymesdk-android.git'
 
     libraryVersion = '0.0.5'
 
     developerId = 'payme'
-    developerName = 'Khoa Thai Minh'
+    developerName = 'PayME'
     developerEmail = 'khoatm@payme.vn'
 
     licenseName = 'The Apache Software License, Version 2.0'
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
     allLicenses = ["Apache-2.0"]
 }
-
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
+//
+//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
+apply from: './scripts/installv1.gradle'
+apply from: './scripts/bintrayv1.gradle'
 
 android {
     compileSdkVersion 29
