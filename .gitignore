@@ -1,4 +1,4 @@
 /build
-\.idea/
-\.idea/*
+# \.idea/
+# \.idea/*
 /local.properties
