@@ -13,12 +13,12 @@
         android:layout_width="match_parent"
         android:background="@drawable/background_radius"
         android:paddingBottom="16dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         >
         <FrameLayout
             android:background="@drawable/background_radius"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/frame_container"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>

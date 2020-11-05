@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:clickable="false"
+
     android:layout_height="match_parent">
 
     <TextView
@@ -31,23 +32,25 @@
 
     <View
         android:id="@+id/border"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_margin="10dp"
         android:background="@color/veryLightPinkTwo"
         app:layout_constraintTop_toBottomOf="@id/textView" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:id="@+id/containerWebview"
-        android:layout_height="300dp"
-        app:layout_constraintTop_toBottomOf="@id/border">
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:id="@+id/containerWebview"-->
+<!--        android:layout_height="300dp"-->
+<!--        android:fitsSystemWindows="true"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/border">-->
 
         <WebView
             android:id="@+id/webview"
+            app:layout_constraintTop_toBottomOf="@id/border"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </LinearLayout>
+            android:layout_height="500dp" />
+<!--    </LinearLayout>-->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

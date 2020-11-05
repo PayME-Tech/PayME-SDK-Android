@@ -12,6 +12,7 @@ import android.webkit.WebViewClient
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
+import kotlinx.android.synthetic.main.webview_activity.*
 import vn.payme.sdk.R
 
 class ConfirmOtpNapasFragment :Fragment() {
@@ -24,12 +25,12 @@ class ConfirmOtpNapasFragment :Fragment() {
         myWebView.settings.javaScriptEnabled = true
         buttonClose = view!!.findViewById(R.id.buttonClose)
         context?.let {
-            val displayMetrics = it.resources.displayMetrics
-            val layout : LinearLayout = view!!.findViewById(R.id.containerWebview)
-            val params: ViewGroup.LayoutParams = layout.layoutParams
-            params.height = displayMetrics.heightPixels  ;
-            layout.setLayoutParams(params);
+//            val displayMetrics = it.resources.displayMetrics
+//            val params: ViewGroup.LayoutParams = myWebView.layoutParams
+//            params.height = 500  ;
+//            myWebView.setLayoutParams(params);
         }
+
         buttonClose.setOnClickListener {
 
             val  fragment = fragmentManager?.beginTransaction()

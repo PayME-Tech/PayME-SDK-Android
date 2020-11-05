@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 
 import androidx.annotation.Nullable
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -18,6 +19,10 @@ import vn.payme.sdk.model.MyEven
 import vn.payme.sdk.model.TypeCallBack
 import vn.payme.sdk.payment.SelectMethodFragment
 internal class PaymePayment : BottomSheetDialogFragment() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle)
+    }
 
     override fun onViewCreated(view: View, @Nullable savedInstanceState: Bundle?) {
 

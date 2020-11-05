@@ -27,9 +27,12 @@ anim design_bottom_sheet_slide_in
 anim design_bottom_sheet_slide_out
 anim design_snackbar_in
 anim design_snackbar_out
+anim fade_out
 anim mtrl_bottom_sheet_slide_in
 anim mtrl_bottom_sheet_slide_out
 anim mtrl_card_lowers_interpolator
+anim slide_in_left
+anim slide_in_right
 animator design_appbar_state_list_animator
 animator design_fab_hide_motion_spec
 animator design_fab_show_motion_spec
@@ -662,6 +665,11 @@ attr passwordToggleTint
 attr passwordToggleTintMode
 attr pathMotionArc
 attr path_percent
+attr pbLoadingText
+attr pbProgressColor
+attr pbText
+attr pbTextColor
+attr pbTextSize
 attr percentHeight
 attr percentWidth
 attr percentX
@@ -1470,6 +1478,7 @@ dimen pv_pin_view_item_radius
 dimen pv_pin_view_item_size
 dimen pv_pin_view_item_spacing
 dimen test_mtrl_calendar_day_cornerSize
+dimen text_default_size
 dimen tooltip_corner_radius
 dimen tooltip_horizontal_padding
 dimen tooltip_margin
@@ -1721,7 +1730,6 @@ id buttonClose
 id buttonPanel
 id buttonSubmit
 id cancel_button
-id cardView
 id center
 id chain
 id checkbox
@@ -1734,9 +1742,7 @@ id chip_group
 id chronometer
 id clear_text
 id confirm_button
-id constraint_layout
 id container
-id containerWebview
 id content
 id contentPanel
 id coordinator
@@ -1865,11 +1871,12 @@ id parent_matrix
 id password_toggle
 id path
 id pathRelative
+id pb_progress
+id pb_text
 id percent
 id pin
 id position
 id postLayout
-id progressBar
 id progress_circular
 id progress_horizontal
 id radio
@@ -2100,7 +2107,6 @@ layout notification_template_icon_group
 layout notification_template_part_chronometer
 layout notification_template_part_time
 layout payment_layout
-layout progress_button_layout
 layout result_payment_layout
 layout select_dialog_item_material
 layout select_dialog_multichoice_material
@@ -2121,6 +2127,7 @@ layout text_view_with_line_height_from_layout
 layout text_view_with_line_height_from_style
 layout text_view_with_theme_line_height
 layout text_view_without_line_height
+layout view_loading_button
 layout webview_activity
 plurals mtrl_badge_content_description
 raw result_thanh_cong
@@ -2459,6 +2466,7 @@ style Base_Widget_MaterialComponents_TextView
 style CardView
 style CardView_Dark
 style CardView_Light
+style DialogStyle
 style EmptyTheme
 style MaterialAlertDialog_MaterialComponents
 style MaterialAlertDialog_MaterialComponents_Body_Text
@@ -2986,6 +2994,7 @@ styleable Layout android_layout_height android_layout_marginBottom android_layou
 styleable LinearLayoutCompat android_baselineAligned android_baselineAlignedChildIndex android_gravity android_orientation android_weightSum divider dividerPadding measureWithLargestChild showDividers
 styleable LinearLayoutCompat_Layout android_layout_gravity android_layout_height android_layout_weight android_layout_width
 styleable ListPopupWindow android_dropDownHorizontalOffset android_dropDownVerticalOffset
+styleable LoadingButton pbLoadingText pbProgressColor pbText pbTextColor pbTextSize
 styleable LottieAnimationView lottie_autoPlay lottie_colorFilter lottie_enableMergePathsForKitKatAndAbove lottie_fileName lottie_imageAssetsFolder lottie_loop lottie_progress lottie_rawRes lottie_renderMode lottie_repeatCount lottie_repeatMode lottie_scale lottie_speed lottie_url
 styleable MaterialAlertDialog backgroundInsetBottom backgroundInsetEnd backgroundInsetStart backgroundInsetTop
 styleable MaterialAlertDialogTheme materialAlertDialogBodyTextStyle materialAlertDialogTheme materialAlertDialogTitleIconStyle materialAlertDialogTitlePanelStyle materialAlertDialogTitleTextStyle

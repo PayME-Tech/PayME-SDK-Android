@@ -49,7 +49,6 @@ id border
 id buttonClose
 id buttonSubmit
 id checkbox
-id containerWebview
 id content
 id dotted
 id frame_container
@@ -91,5 +90,6 @@ string payment_success
 string please_enter_otp_from_phone_number
 string select_method_payment
 style AppTheme
+style DialogStyle
 style progressBarWhite
 styleable LoadingButton pbText pbLoadingText pbTextSize pbTextColor pbProgressColor

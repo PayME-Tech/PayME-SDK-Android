@@ -26,9 +26,12 @@ int anim design_bottom_sheet_slide_in 0x0
 int anim design_bottom_sheet_slide_out 0x0
 int anim design_snackbar_in 0x0
 int anim design_snackbar_out 0x0
+int anim fade_out 0x0
 int anim mtrl_bottom_sheet_slide_in 0x0
 int anim mtrl_bottom_sheet_slide_out 0x0
 int anim mtrl_card_lowers_interpolator 0x0
+int anim slide_in_left 0x0
+int anim slide_in_right 0x0
 int animator design_appbar_state_list_animator 0x0
 int animator design_fab_hide_motion_spec 0x0
 int animator design_fab_show_motion_spec 0x0
@@ -661,6 +664,11 @@ int attr passwordToggleTint 0x0
 int attr passwordToggleTintMode 0x0
 int attr pathMotionArc 0x0
 int attr path_percent 0x0
+int attr pbLoadingText 0x0
+int attr pbProgressColor 0x0
+int attr pbText 0x0
+int attr pbTextColor 0x0
+int attr pbTextSize 0x0
 int attr percentHeight 0x0
 int attr percentWidth 0x0
 int attr percentX 0x0
@@ -1469,6 +1477,7 @@ int dimen pv_pin_view_item_radius 0x0
 int dimen pv_pin_view_item_size 0x0
 int dimen pv_pin_view_item_spacing 0x0
 int dimen test_mtrl_calendar_day_cornerSize 0x0
+int dimen text_default_size 0x0
 int dimen tooltip_corner_radius 0x0
 int dimen tooltip_horizontal_padding 0x0
 int dimen tooltip_margin 0x0
@@ -1720,7 +1729,6 @@ int id buttonClose 0x0
 int id buttonPanel 0x0
 int id buttonSubmit 0x0
 int id cancel_button 0x0
-int id cardView 0x0
 int id center 0x0
 int id chain 0x0
 int id checkbox 0x0
@@ -1733,9 +1741,7 @@ int id chip_group 0x0
 int id chronometer 0x0
 int id clear_text 0x0
 int id confirm_button 0x0
-int id constraint_layout 0x0
 int id container 0x0
-int id containerWebview 0x0
 int id content 0x0
 int id contentPanel 0x0
 int id coordinator 0x0
@@ -1864,11 +1870,12 @@ int id parent_matrix 0x0
 int id password_toggle 0x0
 int id path 0x0
 int id pathRelative 0x0
+int id pb_progress 0x0
+int id pb_text 0x0
 int id percent 0x0
 int id pin 0x0
 int id position 0x0
 int id postLayout 0x0
-int id progressBar 0x0
 int id progress_circular 0x0
 int id progress_horizontal 0x0
 int id radio 0x0
@@ -2099,7 +2106,6 @@ int layout notification_template_icon_group 0x0
 int layout notification_template_part_chronometer 0x0
 int layout notification_template_part_time 0x0
 int layout payment_layout 0x0
-int layout progress_button_layout 0x0
 int layout result_payment_layout 0x0
 int layout select_dialog_item_material 0x0
 int layout select_dialog_multichoice_material 0x0
@@ -2120,6 +2126,7 @@ int layout text_view_with_line_height_from_layout 0x0
 int layout text_view_with_line_height_from_style 0x0
 int layout text_view_with_theme_line_height 0x0
 int layout text_view_without_line_height 0x0
+int layout view_loading_button 0x0
 int layout webview_activity 0x0
 int plurals mtrl_badge_content_description 0x0
 int raw result_thanh_cong 0x0
@@ -2458,6 +2465,7 @@ int style Base_Widget_MaterialComponents_TextView 0x0
 int style CardView 0x0
 int style CardView_Dark 0x0
 int style CardView_Light 0x0
+int style DialogStyle 0x0
 int style EmptyTheme 0x0
 int style MaterialAlertDialog_MaterialComponents 0x0
 int style MaterialAlertDialog_MaterialComponents_Body_Text 0x0
@@ -3926,6 +3934,12 @@ int styleable LinearLayoutCompat_Layout_android_layout_width 3
 int[] styleable ListPopupWindow { 0x10102ac, 0x10102ad }
 int styleable ListPopupWindow_android_dropDownHorizontalOffset 0
 int styleable ListPopupWindow_android_dropDownVerticalOffset 1
+int[] styleable LoadingButton { 0x0, 0x0, 0x0, 0x0, 0x0 }
+int styleable LoadingButton_pbLoadingText 0
+int styleable LoadingButton_pbProgressColor 1
+int styleable LoadingButton_pbText 2
+int styleable LoadingButton_pbTextColor 3
+int styleable LoadingButton_pbTextSize 4
 int[] styleable LottieAnimationView { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 }
 int styleable LottieAnimationView_lottie_autoPlay 0
 int styleable LottieAnimationView_lottie_colorFilter 1

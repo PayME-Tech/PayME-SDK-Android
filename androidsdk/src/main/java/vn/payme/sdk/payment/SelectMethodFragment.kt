@@ -123,7 +123,14 @@ class SelectMethodFragment : Fragment() {
         layout.background = PayME.colorApp.backgroundColor
 
         buttonSubmit.setOnClickListener {
-            if (!loading) {
+//            if(true) {
+//                val confirmOtpFragment: ConfirmOtpFragment = ConfirmOtpFragment()
+//                val fragment = fragmentManager?.beginTransaction()
+//                fragment?.replace(R.id.frame_container, confirmOtpFragment)
+//                fragment?.commit()
+//
+//            }else
+                if (!loading) {
                 val paymentApi = PaymentApi()
                 this.showLoading()
                 val method = this.listMethod[this.methodSelected]

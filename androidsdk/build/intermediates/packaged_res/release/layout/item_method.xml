@@ -11,11 +11,11 @@
         android:layout_width="match_parent"
         android:padding="8dp"
         android:background="@drawable/background_radius_with_boder"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
         <ViewAnimator
             android:id="@+id/wrap_image_method"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:padding="4dp"
             app:layout_constraintLeft_toLeftOf="parent"
             android:layout_marginLeft="8dp"

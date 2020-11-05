@@ -23,8 +23,13 @@
     <string name="please_enter_otp_from_phone_number">Vui lòng nhập mã OTP được gửi tới số</string>
     <string name="select_method_payment">Chọn nguồn thanh toán</string>
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        
+        <!-- Customize your theme here. -->
         <item name="pinViewStyle">@style/PinWidget.PinView</item>
+    </style>
+    <style name="DialogStyle" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
     </style>
     <style name="progressBarWhite" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <item name="colorAccent">@color/white</item>
