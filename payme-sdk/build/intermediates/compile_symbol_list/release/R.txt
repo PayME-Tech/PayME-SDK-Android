@@ -569,8 +569,10 @@ int attr listPreferredItemPaddingStart 0x0
 int attr logo 0x0
 int attr logoDescription 0x0
 int attr lottie_autoPlay 0x0
+int attr lottie_cacheComposition 0x0
 int attr lottie_colorFilter 0x0
 int attr lottie_enableMergePathsForKitKatAndAbove 0x0
+int attr lottie_fallbackRes 0x0
 int attr lottie_fileName 0x0
 int attr lottie_imageAssetsFolder 0x0
 int attr lottie_loop 0x0
@@ -3940,21 +3942,23 @@ int styleable LoadingButton_pbProgressColor 1
 int styleable LoadingButton_pbText 2
 int styleable LoadingButton_pbTextColor 3
 int styleable LoadingButton_pbTextSize 4
-int[] styleable LottieAnimationView { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 }
+int[] styleable LottieAnimationView { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 }
 int styleable LottieAnimationView_lottie_autoPlay 0
-int styleable LottieAnimationView_lottie_colorFilter 1
-int styleable LottieAnimationView_lottie_enableMergePathsForKitKatAndAbove 2
-int styleable LottieAnimationView_lottie_fileName 3
-int styleable LottieAnimationView_lottie_imageAssetsFolder 4
-int styleable LottieAnimationView_lottie_loop 5
-int styleable LottieAnimationView_lottie_progress 6
-int styleable LottieAnimationView_lottie_rawRes 7
-int styleable LottieAnimationView_lottie_renderMode 8
-int styleable LottieAnimationView_lottie_repeatCount 9
-int styleable LottieAnimationView_lottie_repeatMode 10
-int styleable LottieAnimationView_lottie_scale 11
-int styleable LottieAnimationView_lottie_speed 12
-int styleable LottieAnimationView_lottie_url 13
+int styleable LottieAnimationView_lottie_cacheComposition 1
+int styleable LottieAnimationView_lottie_colorFilter 2
+int styleable LottieAnimationView_lottie_enableMergePathsForKitKatAndAbove 3
+int styleable LottieAnimationView_lottie_fallbackRes 4
+int styleable LottieAnimationView_lottie_fileName 5
+int styleable LottieAnimationView_lottie_imageAssetsFolder 6
+int styleable LottieAnimationView_lottie_loop 7
+int styleable LottieAnimationView_lottie_progress 8
+int styleable LottieAnimationView_lottie_rawRes 9
+int styleable LottieAnimationView_lottie_renderMode 10
+int styleable LottieAnimationView_lottie_repeatCount 11
+int styleable LottieAnimationView_lottie_repeatMode 12
+int styleable LottieAnimationView_lottie_scale 13
+int styleable LottieAnimationView_lottie_speed 14
+int styleable LottieAnimationView_lottie_url 15
 int[] styleable MaterialAlertDialog { 0x0, 0x0, 0x0, 0x0 }
 int styleable MaterialAlertDialog_backgroundInsetBottom 0
 int styleable MaterialAlertDialog_backgroundInsetEnd 1
