@@ -149,9 +149,8 @@ internal class NetworkRequest(
                         if (finalJSONObject.getInt("code") == 1000) {
                             onSuccess(finalJSONObject.getJSONObject("data"))
                         } else if (finalJSONObject.getInt("code") == 401) {
-                            if (onExpired != null) {
-                                onExpired()
-                            }
+                                val errorMessage = finalJSONObject.getJSONObject("data").getString("message")
+                                onError(finalJSONObject.getJSONObject("data"),finalJSONObject.getInt("code"),errorMessage)
                         } else {
                             val errorMessage = finalJSONObject.getJSONObject("data").getString("message")
 

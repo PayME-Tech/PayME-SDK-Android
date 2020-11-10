@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import org.json.JSONObject
 import vn.payme.sdk.api.NetworkRequest
+import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.model.*
 
 public class PayME {
@@ -148,8 +149,13 @@ public class PayME {
     public fun isConnected(): Boolean {
         return false
     }
+    public  fun  genConnectToken (userId:String,phone:String?,onSuccess: (JSONObject) -> Unit, onError: (JSONObject?,Int?,String) -> Unit) {
+        val paymentApi =  PaymentApi()
+        paymentApi.genConnectToken(userId,phone,onSuccess,onError)
 
-    public fun geWalletInfo(onSuccess: (JSONObject) -> Unit, onError: (JSONObject?,Int?,String) -> Unit) {
+    }
+
+    public fun getWalletInfo(onSuccess: (JSONObject) -> Unit, onError: (JSONObject?,Int?,String) -> Unit) {
         val url = urlFeENV("sandbox")
         val path = "/v1/Wallet/Information"
         val params: MutableMap<String, Any> = mutableMapOf()

@@ -1,65 +1,225 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
     tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Số dư :"
+            android:textColor="@color/colorBlack"
+            android:textSize="14dp"
+            />
+        <TextView
+            android:id="@+id/textBalance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="23dp"
+            android:text="90.000"
+            android:textColor="@color/colorBlack"
+            android:textSize="18dp"
+            />
+        <ImageView
+
+            android:id="@+id/buttonReload"
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/reload" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/titleUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:text="Nhập UserID"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top" />
+
+    <EditText
+        android:id="@+id/inputUserId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/background_input"
+        android:hint="required"
+        android:padding="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleUser" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Số dư :"
-        android:id="@+id/textview"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="16dp"
+        android:text="Nhập Phone Number"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="100dp"
-        />
-    <Button
-        android:text="Open"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/textview"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:id="@+id/button"/>
-    <Button
-        android:text="Deposit"
-        android:layout_width="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/button"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:id="@+id/buttonDeposit"/>
-    <Button
-        android:text="Withdraw"
-        android:layout_width="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/buttonDeposit"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_height="wrap_content"
-        tools:layout_editor_absoluteY="447dp"
-        tools:layout_editor_absoluteX="167dp"
-        android:id="@+id/buttonWithdraw"/>
-    <Button
-        android:text="Pay"
-        android:layout_width="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/buttonWithdraw"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:id="@+id/buttonPay"/>
+        app:layout_constraintTop_toBottomOf="@id/top" />
+
     <EditText
-        app:layout_constraintTop_toBottomOf="@id/buttonPay"
-        android:id="@+id/inputConnectToken"
-        android:layout_width="wrap_content"
+        android:id="@+id/inputPhoneNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/background_input"
+        android:hint="optional"
+        android:padding="8dp"
+        android:inputType="number"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleUser" />
+
+
+    <LinearLayout
+        android:id="@+id/buttonSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/background_button"
+        android:gravity="center"
+        android:padding="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_height="wrap_content">
+        app:layout_constraintTop_toBottomOf="@id/inputUserId" >
+        <ProgressBar
+            android:id="@+id/loading"
+            android:visibility="invisible"
+            android:layout_width="30dp"
+            android:layout_height="30dp"/>
+        <TextView
+            android:textColor="@color/blackFive"
+            android:layout_width="wrap_content"
+            android:text="Create Connect Token"
+            android:layout_height="wrap_content"/>
 
-    </EditText>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/background_button"
+        android:text="Mở SDK"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputUserId" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonDeposit"
+            android:layout_width="wrap_content"
+            android:layout_weight="2"
+            android:layout_height="match_parent"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/background_button"
+            android:paddingHorizontal="16dp"
+            android:text="Nạp tiền ví"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/button" />
+
+        <EditText
+            android:id="@+id/moneyDeposit"
+            android:layout_weight="8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_input"
+            android:hint="Nhập số tiền"
+            android:inputType="number"
+            android:padding="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/titleUser" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonWithdraw"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="8dp"
+            android:layout_weight="2"
+            android:background="@drawable/background_button"
+            android:paddingHorizontal="16dp"
+            android:text="Rút tiền ví"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/buttonDeposit"
+            tools:layout_editor_absoluteX="167dp"
+            tools:layout_editor_absoluteY="447dp" />
+
+        <EditText
+            android:id="@+id/moneyWithdraw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="8"
+            android:background="@drawable/background_input"
+            android:hint="Nhập số tiền"
+            android:inputType="number"
+            android:padding="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/titleUser" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonPay"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/background_button"
+            android:paddingHorizontal="16dp"
+            android:text="Thanh toán"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/buttonWithdraw" />
+
+        <EditText
+            android:id="@+id/moneyPay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="8"
+            android:background="@drawable/background_input"
+            android:hint="Nhập số tiền"
+            android:inputType="number"
+            android:padding="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/titleUser" />
+    </LinearLayout>
 
 
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

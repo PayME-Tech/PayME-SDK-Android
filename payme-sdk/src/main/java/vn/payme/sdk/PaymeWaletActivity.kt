@@ -37,16 +37,13 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val html: String = "<!DOCTYPE html><html><body>\n" +
-                "      <button onclick=\"onClick()\">Click me</button>\n" +
-                "      <script>\n" +
-                "      function onClick() {\n" +
-                "       window.messageHandlers.onSuccess('{a:1,b:2}')" +
-                "      }\n" +
-                "      </script>\n" +
-                "      </body></html>\n"
+
         super.onCreate(savedInstanceState)
 
+        WebView(applicationContext).clearCache(true)
+        WebStorage.getInstance().deleteAllData();
+        CookieManager.getInstance().removeAllCookies(null);
+        CookieManager.getInstance().flush();
 
 
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
@@ -60,6 +57,10 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             statusBarHeight = resources.getDimensionPixelSize(resourceId)
         }
         val myWebView: WebView = findViewById(R.id.webview)
+        myWebView.clearCache(true);
+        myWebView.clearFormData();
+        myWebView.clearHistory();
+        myWebView.clearSslPreferences();
         val cookieManager = CookieManager.getInstance()
         cookieManager.setAcceptCookie(true)
 
@@ -82,7 +83,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         webSettings.domStorageEnabled = true
         webSettings.databaseEnabled = true
         webSettings.setGeolocationEnabled(true)
-        webSettings.setGeolocationDatabasePath(filesDir.path)
 
         webSettings.loadWithOverviewMode = true
         webSettings.allowFileAccess = true
@@ -136,13 +136,22 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                       action:'${action}',
                       amount:${PayME.amount},
                       partnerTop:${statusBarHeight},
-                      configColor: ['${PayME.configColor?.get(0)}', '${PayME.configColor?.get(1)}']
+                      configColor: ['${PayME.configColor?.get(0)}', '${PayME.configColor?.get(1)}'],
+                      partner : {
+                        type:'ANDROID',
+                        paddingTop:${statusBarHeight}
+                      },
+                      actions:{
+                        type:${action},
+                        amount:${PayME.amount}
+                      }
                     }"""
         )
 
         val encode: String = URLEncoder.encode(data.toString(), "utf-8")
 //        cookieManager.setCookie("https://sbx-sdk.payme.com.vn/active/${encode}","$cookieKey=$cookieValue")
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
+
 
 
         if (PayME.env === Env.SANDBOX) {

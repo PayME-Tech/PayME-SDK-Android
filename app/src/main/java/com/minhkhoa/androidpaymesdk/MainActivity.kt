@@ -5,24 +5,51 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
+import android.view.View
+import android.widget.*
 import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.model.Action
 import vn.payme.sdk.model.Env
+import java.lang.Exception
+import java.text.DecimalFormat
 
 class MainActivity : AppCompatActivity() {
-    val AppToken: String = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MX0.wNtHVZ-olKe7OAkgLigkTSsLVQKv_YL9fHKzX9mn9II"
+    val AppToken: String =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MX0.wNtHVZ-olKe7OAkgLigkTSsLVQKv_YL9fHKzX9mn9II"
     lateinit var payme: PayME
     lateinit var context: Context
+    fun convertInt(amount: String): Int {
+        try {
+            return Integer.parseInt(amount)
+
+        } catch (e: Exception) {
+            return 0
+
+        }
+
+    }
+
+    lateinit var button: Button
+    lateinit var buttonSubmit: LinearLayout
+    lateinit var buttonReload: ImageView
+    lateinit var loading: ProgressBar
+    lateinit var buttonDeposit: Button
+    lateinit var buttonWithdraw: Button
+    lateinit var buttonPay: Button
+    lateinit var textView: TextView
+    lateinit var inputUserId: EditText
+    lateinit var inputPhoneNumber: EditText
+    lateinit var moneyDeposit: EditText
+    lateinit var moneyPay: EditText
+    lateinit var moneyWithdraw: EditText
 
     val PublicKey: String = "-----BEGIN PUBLIC KEY-----\n" +
             "   MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKi\n" +
             "   wIhTJpAi1XnbfOSrW/Ebw6h1485GOAvuG/OwB+ScsfPJBoNJeNFU6J0CAwEAAQ==\n" +
             "   -----END PUBLIC KEY-----"
-    var ConnectToken: String = "U2FsdGVkX1+iOzrma3dpZN1ZKgNFruz8U4cD+Pa5hNrRtsQ4b1ID3t42seTswQfDOdYyBiUzUjHj+LqcSoHOqAXQKkFibrbZHnGDxUyaD3sXkIG+OvhPAfVAMRos6tp8FwxWwXTYDeBMgnRMfazFPA=="
+    var ConnectToken: String =
+        "U2FsdGVkX1+iOzrma3dpZN1ZKgNFruz8U4cD+Pa5hNrRtsQ4b1ID3t42seTswQfDOdYyBiUzUjHj+LqcSoHOqAXQKkFibrbZHnGDxUyaD3sXkIG+OvhPAfVAMRos6tp8FwxWwXTYDeBMgnRMfazFPA=="
     val PrivateKey: String = "-----BEGIN PRIVATE KEY-----\n" +
             "    MIIBPAIBAAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKiwIhTJpAi1XnbfOSrW/Eb\n" +
             "    w6h1485GOAvuG/OwB+ScsfPJBoNJeNFU6J0CAwEAAQJBAJSfTrSCqAzyAo59Ox+m\n" +
@@ -33,50 +60,85 @@ class MainActivity : AppCompatActivity() {
             "    8Ly1xJ7UW3up25h9aa9SILBpGqWtJlNQgfVKBoabzsU=\n" +
             "    -----END PRIVATE KEY-----";
 
+    fun updateWalletInfo() {
+
+        payme.getWalletInfo(onSuccess = { jsonObject ->
+            println("onSuccess=" + jsonObject.toString())
+            val walletBalance = jsonObject.getJSONObject("walletBalance")
+            val balance = walletBalance.get("balance")
+            val decimal = DecimalFormat("#,###")
+            textView.text = "${decimal.format(balance)}đ"
+        }, onError = { jsonObject, code, message ->
+            Toast.makeText(context,message,Toast.LENGTH_LONG).show()
+
+            println("onError=" + message)
+        })
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         context = this
         setContentView(R.layout.activity_main)
-        val button: Button = findViewById(R.id.button)
-        val buttonDeposit: Button = findViewById(R.id.buttonDeposit)
-        val buttonWithdraw: Button = findViewById(R.id.buttonWithdraw)
-        val buttonPay: Button = findViewById(R.id.buttonPay)
-        val textView: TextView = findViewById(R.id.textview)
-        val inputConnectToken: EditText = findViewById(R.id.inputConnectToken)
+        button = findViewById(R.id.button)
+        buttonSubmit = findViewById(R.id.buttonSubmit)
+        buttonReload = findViewById(R.id.buttonReload)
+        loading = findViewById(R.id.loading)
+        buttonDeposit = findViewById(R.id.buttonDeposit)
+        buttonWithdraw = findViewById(R.id.buttonWithdraw)
+        buttonPay = findViewById(R.id.buttonPay)
+        textView = findViewById(R.id.textBalance)
+        inputUserId = findViewById(R.id.inputUserId)
+        inputPhoneNumber = findViewById(R.id.inputPhoneNumber)
+        moneyDeposit = findViewById(R.id.moneyDeposit)
+        moneyPay = findViewById(R.id.moneyPay)
+        moneyWithdraw = findViewById(R.id.moneyWithdraw)
         var configColor = arrayOf<String>("#75255b", "#9d455f")
-         this.payme = PayME(this, AppToken, PublicKey, ConnectToken, PrivateKey, configColor, Env.SANDBOX)
+        this.payme =
+            PayME(this, AppToken, PublicKey, ConnectToken, PrivateKey, configColor, Env.SANDBOX)
+
+        updateWalletInfo()
 
 
 
+        buttonReload.setOnClickListener {
+            updateWalletInfo()
 
-        inputConnectToken.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable) {
-                // you can call or do what you want with your EditText here
-                // yourEditText...
+        }
+        buttonSubmit.setOnClickListener {
+            if (loading.visibility == View.INVISIBLE && inputUserId.text.toString().length > 0) {
+                loading.visibility = View.VISIBLE
+                payme.genConnectToken(inputUserId.text.toString(),
+                    inputPhoneNumber.text.toString(),
+                    onSuccess = { jsonObject: JSONObject ->
+                        val connectToken = jsonObject.getString("connectToken")
+                        loading.visibility = View.INVISIBLE
+                        ConnectToken = connectToken
+                        println("connectToken" + connectToken)
+                        Toast.makeText(context,"Đăng ký Connect Token thành công",Toast.LENGTH_LONG).show()
+
+                        this.payme =
+                            PayME(
+                                this,
+                                AppToken,
+                                PublicKey,
+                                ConnectToken,
+                                PrivateKey,
+                                configColor,
+                                Env.SANDBOX
+                            )
+
+                    },
+                    onError = { json: JSONObject?, code: Int?, message: String ->
+                        Toast.makeText(context,message,Toast.LENGTH_LONG).show()
+                        loading.visibility = View.INVISIBLE
+
+                    })
             }
 
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                ConnectToken = s.toString()
-                payme = PayME(context, AppToken, PublicKey, ConnectToken, PrivateKey, configColor, Env.SANDBOX)
 
-            }
-        })
-
-        payme.geWalletInfo(onSuccess = { jsonObject ->
-            println("onSuccess=" + jsonObject.toString())
-            val walletBalance = jsonObject.getJSONObject("walletBalance")
-            val balance = walletBalance.get("balance")
-            textView.setText("Số dư : " + balance.toString())
-
-
-        }, onError = { jsonObject, code, message ->
-            println("onError=" + message)
-        })
-
-
+        }
         button.setOnClickListener {
             payme.openWallet(
                 Action.OPEN, null, null, null,
@@ -89,7 +151,8 @@ class MainActivity : AppCompatActivity() {
 
         }
         buttonDeposit.setOnClickListener {
-            payme.openWallet(Action.DEPOSIT, null, null, null,
+            val amount = convertInt(moneyDeposit.text.toString())
+            payme.openWallet(Action.DEPOSIT, amount, null, null,
                 onSuccess = { json: JSONObject ->
                     println("onSuccess2222" + json.toString())
                 },
@@ -99,7 +162,9 @@ class MainActivity : AppCompatActivity() {
 
         }
         buttonWithdraw.setOnClickListener {
-            payme.openWallet(Action.WITHDRAW, null, null, null,
+            val amount = convertInt(moneyWithdraw.text.toString())
+
+            payme.openWallet(Action.WITHDRAW, amount, null, null,
                 onSuccess = { json: JSONObject ->
                     println("onSuccess2222" + json.toString())
                 },
@@ -109,7 +174,9 @@ class MainActivity : AppCompatActivity() {
 
         }
         buttonPay.setOnClickListener {
-            payme.pay(this.supportFragmentManager, 2000000, "Merchant ghi chú đơn hàng", "", "",
+            val amount = convertInt(moneyPay.text.toString())
+
+            payme.pay(this.supportFragmentManager, amount, "Merchant ghi chú đơn hàng", "", "",
                 onSuccess = { json: JSONObject ->
                     println("onSuccess2222" + json.toString())
                 },
