@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentManager
 import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 import vn.payme.sdk.PayME
+import java.sql.RowId
 import java.time.temporal.TemporalAmount
 
 
@@ -30,10 +31,10 @@ public class JsObject(val back : ()->Unit,val fragmentManager: FragmentManager) 
         }
     }
     @JavascriptInterface
-    public  fun onPay(amount: Int){
+    public  fun onPay(type: String,amount:Int,content:String,orderId: String){
         try {
             val  payme  = PayME(PayME.context,PayME.appToken,PayME.publicKey,PayME.connectToken,PayME.appPrivateKey,PayME.configColor!!,PayME.env!!)
-            payme.pay(fragmentManager,amount,"","","",onSuccess = {
+            payme.pay(fragmentManager,amount,content,orderId,"",onSuccess = {
 
             },onError = {
 

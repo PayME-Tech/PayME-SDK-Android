@@ -4,8 +4,6 @@ import android.Manifest
 import android.annotation.TargetApi
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.net.Uri
-import android.net.http.SslError
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -20,6 +18,8 @@ import java.net.URLEncoder
 
 
 internal class PaymeWaletActivity : AppCompatActivity() {
+    private var cameraPermission: PermissionRequest? = null
+    private val CAMERA_PERMISSION_REQUEST = 1111
 
     private fun backScreen(): Unit {
 
@@ -32,12 +32,32 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         val hasCameraPermission = checkSelfPermission(Manifest.permission.CAMERA)
         if (hasCameraPermission != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.CAMERA), 113)
+
+        }else{
+            cameraPermission!!.grant(cameraPermission!!.resources)
+
         }
     }
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<String?>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        cameraPermission!!.grant(cameraPermission!!.resources)
+
+//        if (requestCode == CAMERA_PERMISSION_REQUEST) {
+//            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//            } else {
+//                cameraPermission!!.deny()
+//            }
+//        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+//        checkCamera()
         super.onCreate(savedInstanceState)
 
         WebView(applicationContext).clearCache(true)
@@ -104,14 +124,12 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             // Grant permissions for cam
             @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             override fun onPermissionRequest(request: PermissionRequest) {
+                cameraPermission  = request
+
                 checkCamera()
-                runOnUiThread() {
-                    request.grant(request.getResources());
-
-
-                }
 
             }
+
 
         })
 
@@ -151,6 +169,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         val encode: String = URLEncoder.encode(data.toString(), "utf-8")
 //        cookieManager.setCookie("https://sbx-sdk.payme.com.vn/active/${encode}","$cookieKey=$cookieValue")
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
+        println("https://sbx-sdk.payme.com.vn/active/${encode}")
 
 
 

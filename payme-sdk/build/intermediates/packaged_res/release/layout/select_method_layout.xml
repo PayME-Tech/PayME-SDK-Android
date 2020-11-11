@@ -20,13 +20,15 @@
         app:layout_constraintTop_toTopOf="parent" />
     />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/buttonClose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="16dp"
+        android:background="@null"
+        android:padding="16dp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintTop_toTopOf="parent"
         android:src="@drawable/close"
-        app:layout_constraintBottom_toBottomOf="@+id/textView"
         app:layout_constraintRight_toRightOf="parent" />
 
 

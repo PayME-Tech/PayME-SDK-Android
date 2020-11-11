@@ -37,7 +37,7 @@ class ResultPaymentFragment : Fragment() {
         textError = view.findViewById(R.id.note_error)
         textResult = view.findViewById(R.id.title_result)
         lottie = view.findViewById(R.id.animation_view)
-        textNote.text = PayME.description
+        textNote.text = PayME.content
         val message = arguments?.getString("message")
 
         if(message!=null){

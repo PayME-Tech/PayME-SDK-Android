@@ -54,7 +54,7 @@ class SelectMethodFragment : Fragment() {
         textAmount = view.findViewById(R.id.money)
         textNote = view.findViewById(R.id.note)
         layout = view.findViewById(R.id.content)
-        textNote.text = PayME.description
+        textNote.text = PayME.content
 
 
         val decimal = DecimalFormat("#,###")
@@ -123,13 +123,7 @@ class SelectMethodFragment : Fragment() {
         layout.background = PayME.colorApp.backgroundColor
 
         buttonSubmit.setOnClickListener {
-//            if(true) {
-//                val confirmOtpFragment: ConfirmOtpFragment = ConfirmOtpFragment()
-//                val fragment = fragmentManager?.beginTransaction()
-//                fragment?.replace(R.id.frame_container, confirmOtpFragment)
-//                fragment?.commit()
-//
-//            }else
+
                 if (!loading) {
                 val paymentApi = PaymentApi()
                 this.showLoading()

@@ -91,5 +91,6 @@ string please_enter_otp_from_phone_number
 string select_method_payment
 style AppTheme
 style DialogStyle
+style FullScreenDialog
 style progressBarWhite
 styleable LoadingButton pbText pbLoadingText pbTextSize pbTextColor pbProgressColor

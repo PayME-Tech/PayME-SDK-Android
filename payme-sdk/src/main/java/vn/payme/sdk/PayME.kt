@@ -20,8 +20,8 @@ public class PayME {
         var connectToken: String = ""
         lateinit var action: Action
         var amount: Int = 0
-        var description: String? = null
-        var transactionId: String? = null
+        var content: String? = null
+        var orderId: String? = null
         var extraData: String? = null
         var clientInfo: ClientInfo = ClientInfo()
         var env: Env? = null
@@ -52,14 +52,14 @@ public class PayME {
     public fun openWallet(
             action: Action,
             amount: Int?,
-            description: String?,
+            content: String?,
             extraData: String?,
             onSuccess: (JSONObject) -> Unit,
             onError: (String) -> Unit
     ) {
 
         Companion.action = action
-        Companion.description = description
+        Companion.content = content
         Companion.extraData = extraData
         if (amount != null) {
             Companion.amount = amount
@@ -76,12 +76,12 @@ public class PayME {
 
     public fun deposit(
             amount: Int,
-            description: String?,
+            content: String?,
             extraData: String,
             onSuccess: (JSONObject) -> Unit,
             onError: (String) -> Unit
     ) {
-        Companion.description = description
+        Companion.content = Companion.content
         Companion.extraData = extraData
         if (amount != null) {
             Companion.amount = amount
@@ -89,26 +89,26 @@ public class PayME {
             Companion.amount = 0
         }
 
-        this.openWallet(Action.DEPOSIT, amount, description, extraData, onSuccess, onError)
+        this.openWallet(Action.DEPOSIT, amount, content, extraData, onSuccess, onError)
 
     }
 
 
     public fun withdraw(
             amount: Int,
-            description: String?,
+            content: String?,
             extraData: String,
             onSuccess: (JSONObject) -> Unit,
             onError: (String) -> Unit
     ) {
-        Companion.description = description
+        Companion.content = content
         Companion.extraData = extraData
         if (amount != null) {
             Companion.amount = amount
         } else {
             Companion.amount = 0
         }
-        this.openWallet(Action.WITHDRAW, amount, description, extraData, onSuccess, onError)
+        this.openWallet(Action.WITHDRAW, amount, content, extraData, onSuccess, onError)
 
 
     }
@@ -116,20 +116,20 @@ public class PayME {
     public fun pay(
         fragmentManager: FragmentManager,
             amount: Int,
-            description: String?,
-            transactionId: String?,
+        content: String?,
+        orderId: String?,
             extraData: String,
             onSuccess: (JSONObject) -> Unit,
             onError: (String) -> Unit
     ) {
-        Companion.description = description
+        Companion.content = content
         Companion.extraData = extraData
         if (amount != null) {
             Companion.amount = amount
         } else {
             Companion.amount = 0
         }
-        Companion.transactionId = transactionId
+        Companion.orderId = orderId
         val activity: Activity = PayME.context as AppCompatActivity
         val paymePayment: PaymePayment = PaymePayment()
         paymePayment.show(

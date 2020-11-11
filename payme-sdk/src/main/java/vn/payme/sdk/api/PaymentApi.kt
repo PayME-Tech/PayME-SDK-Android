@@ -82,6 +82,8 @@ internal class PaymentApi {
         val path = "/v1/Transfer/AppWallet/Generate"
         val params: MutableMap<String, Any> = mutableMapOf()
         val data: MutableMap<String, Any> = mutableMapOf()
+        data["orderId"] = PayME.orderId!!
+        data["content"] = PayME.content!!
         params["connectToken"] = PayME.connectToken
         params["amount"] = PayME.amount
         params["destination"] = "AppPartner"
@@ -110,6 +112,8 @@ internal class PaymentApi {
         val path = "/v1/Transfer/Napas/Generate"
         val params: MutableMap<String, Any> = mutableMapOf()
         val data: MutableMap<String, Any> = mutableMapOf()
+        data["orderId"] = PayME.orderId!!
+        data["content"] = PayME.content!!
         params["connectToken"] = PayME.connectToken
         params["amount"] = PayME.amount
         params["linkedId"] = method.linkedId!!
@@ -141,6 +145,8 @@ internal class PaymentApi {
         val path = "/v1/Transfer/PVCBank/Generate"
         val params: MutableMap<String, Any> = mutableMapOf()
         val data: MutableMap<String, Any> = mutableMapOf()
+        data["orderId"] = PayME.orderId!!
+        data["content"] = PayME.content!!
         params["connectToken"] = PayME.connectToken
         params["amount"] = PayME.amount
         params["linkedId"] = method.linkedId!!
@@ -171,6 +177,8 @@ internal class PaymentApi {
         val path = "/v1/Transfer/PVCBank/Verify"
         val params: MutableMap<String, Any> = mutableMapOf()
         val data: MutableMap<String, Any> = mutableMapOf()
+        data["orderId"] = PayME.orderId!!
+        data["content"] = PayME.content!!
         params["connectToken"] = PayME.connectToken
         params["transferId"] = transferId
         params["OTP"] = OTP
