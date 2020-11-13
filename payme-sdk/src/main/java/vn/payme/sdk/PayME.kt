@@ -133,7 +133,6 @@ public class PayME {
             Companion.amount = 0
         }
         Companion.orderId = orderId
-        val activity: Activity = PayME.context as AppCompatActivity
         val paymePayment: PaymePayment = PaymePayment()
         paymePayment.show(
             fragmentManager,
