@@ -9,11 +9,11 @@ import java.sql.RowId
 import java.time.temporal.TemporalAmount
 
 
-public class JsObject(val back : ()->Unit,val fragmentManager: FragmentManager) {
+public class JsObject(val back: () -> Unit, val fragmentManager: FragmentManager) {
     @JavascriptInterface
-    public  fun onSuccess(string: String){
+    public fun onSuccess(string: String) {
         try {
-            val  json :JSONObject = JSONObject(string)
+            val json: JSONObject = JSONObject(string)
             PayME.onSuccess(json)
 
         } catch (e: Exception) {
@@ -22,7 +22,7 @@ public class JsObject(val back : ()->Unit,val fragmentManager: FragmentManager) 
     }
 
     @JavascriptInterface
-    public  fun onError(string: String){
+    public fun onError(string: String) {
         try {
             PayME.onError(string)
         } catch (e: Exception) {
@@ -30,15 +30,28 @@ public class JsObject(val back : ()->Unit,val fragmentManager: FragmentManager) 
 
         }
     }
+
     @JavascriptInterface
-    public  fun onPay(type: String,amount:Int,content:String,orderId: String){
+    public fun onPay(type: String, amount: Int, content: String, orderId: String) {
         try {
-            val  payme  = PayME(PayME.context,PayME.appToken,PayME.publicKey,PayME.connectToken,PayME.appPrivateKey,PayME.configColor!!,PayME.env!!)
-            payme.pay(fragmentManager,amount,content,orderId,"",onSuccess = {
+            val payme = PayME(
+                PayME.context,
+                PayME.appToken,
+                PayME.publicKey,
+                PayME.connectToken,
+                PayME.appPrivateKey,
+                PayME.configColor!!,
+                PayME.env!!
+            )
+            payme.pay(fragmentManager, amount, content, orderId, "", onSuccess = {
 
-            },onError = {
+            }, onError = {
 
-            })
+            },
+                onClose = {
+
+                }
+            )
 //            PayME.onPay(string)
         } catch (e: Exception) {
             println(e)
@@ -47,7 +60,7 @@ public class JsObject(val back : ()->Unit,val fragmentManager: FragmentManager) 
     }
 
     @JavascriptInterface
-    public  fun onClose(){
+    public fun onClose() {
         try {
             back()
         } catch (e: Exception) {

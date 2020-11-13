@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity() {
             "    8Ly1xJ7UW3up25h9aa9SILBpGqWtJlNQgfVKBoabzsU=\n" +
             "    -----END PRIVATE KEY-----";
 
+
     fun updateWalletInfo() {
 
         payme.getWalletInfo(onSuccess = { jsonObject ->
@@ -182,7 +183,11 @@ class MainActivity : AppCompatActivity() {
                 },
                 onError = { message: String ->
                     println("onError" + message)
-                })
+                },
+                onClose = {
+                    println("CLOSE")
+                }
+            )
 
         }
     }

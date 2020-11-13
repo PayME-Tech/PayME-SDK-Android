@@ -30,6 +30,7 @@ public class PayME {
         lateinit var onSuccess: ((JSONObject) -> Unit)
         lateinit var onError: ((String) -> Unit)
         lateinit var onPay: ((String) -> Unit)
+        lateinit var onClose: (() -> Unit)
         lateinit var colorApp: ColorApp
 
     }
@@ -120,10 +121,12 @@ public class PayME {
         orderId: String?,
             extraData: String,
             onSuccess: (JSONObject) -> Unit,
-            onError: (String) -> Unit
+            onError: (String) -> Unit,
+            onClose: () -> Unit,
     ) {
         Companion.content = content
         Companion.extraData = extraData
+        Companion.onClose = onClose
         if (amount != null) {
             Companion.amount = amount
         } else {

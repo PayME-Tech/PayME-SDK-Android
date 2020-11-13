@@ -71,6 +71,7 @@ internal class PaymePayment : BottomSheetDialogFragment() {
     }
 
     override fun onDestroy() {
+        PayME.onClose()
         EventBus.getDefault().unregister(this);
         super.onDestroy()
     }
