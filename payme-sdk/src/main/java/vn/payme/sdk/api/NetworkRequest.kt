@@ -5,12 +5,15 @@ import android.content.Context
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import com.android.volley.*
 import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONException
 import org.json.JSONObject
+import vn.payme.sdk.PayME
+import vn.payme.sdk.R
 import java.nio.charset.Charset
 
 
@@ -172,9 +175,8 @@ internal class NetworkRequest(
                         onFinally()
                     }
                     if (onError != null) {
-                        onError(null,null,error.toString())
+                        onError(null,-2,"Kết nối mạng bị sự cố, vui lòng kiểm tra và thử lại. Xin cảm ơn !")
                     }
-                    Toast.makeText(context, "$error", Toast.LENGTH_SHORT).show()
                 }
         ) {
             override fun getHeaders(): MutableMap<String, String> {

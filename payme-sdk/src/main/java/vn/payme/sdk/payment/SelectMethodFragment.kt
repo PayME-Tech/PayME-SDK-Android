@@ -124,33 +124,48 @@ class SelectMethodFragment : Fragment() {
 
         buttonSubmit.setOnClickListener {
 
-                if (!loading) {
+                if (!loading && this.listMethod.size>0) {
                 val paymentApi = PaymentApi()
                 this.showLoading()
+
                 val method = this.listMethod[this.methodSelected]
-                if (method.type == TYPE_PAYMENT.APP_WALLET) {
-                    paymentApi.postTransferAppWallet(onSuccess = { jsonObject ->
-
-                        val fragment = fragmentManager?.beginTransaction()
-                        fragment?.replace(R.id.frame_container, ResultPaymentFragment())
-                        fragment?.commit()
+                if (method?.type == TYPE_PAYMENT.APP_WALLET) {
+                    if(method.amount?.toInt()!! < PayME.amount){
                         this.disableLoading()
-                    },
-                        onError = { jsonObject, code, message ->
-                            this.disableLoading()
-                            val toast: Toast =
-                                Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
-                            toast.view.setBackgroundColor(
-                                ContextCompat.getColor(
-                                    PayME.context,
-                                    R.color.scarlet
-                                )
+                        val toast: Toast =
+                            Toast.makeText(PayME.context, "Số dư trong ví không đủ", Toast.LENGTH_SHORT)
+                        toast.view.setBackgroundColor(
+                            ContextCompat.getColor(
+                                PayME.context,
+                                R.color.scarlet
                             )
-                            toast.show()
+                        )
+                        toast.show()
 
-                        }
-                    )
-                } else if (method.type == TYPE_PAYMENT.NAPAS) {
+                    }else{
+                        paymentApi.postTransferAppWallet(onSuccess = { jsonObject ->
+
+                            val fragment = fragmentManager?.beginTransaction()
+                            fragment?.replace(R.id.frame_container, ResultPaymentFragment())
+                            fragment?.commit()
+                            this.disableLoading()
+                        },
+                            onError = { jsonObject, code, message ->
+                                this.disableLoading()
+                                val bundle: Bundle = Bundle()
+                                bundle.putString("message", message)
+                                val resultPaymentFragment: ResultPaymentFragment =
+                                    ResultPaymentFragment()
+                                resultPaymentFragment.arguments = bundle
+                                val fragment = fragmentManager?.beginTransaction()
+                                fragment?.replace(R.id.frame_container, resultPaymentFragment)
+                                fragment?.commit()
+
+                            }
+                        )
+                    }
+
+                } else if (method?.type == TYPE_PAYMENT.NAPAS) {
                     paymentApi.postTransferNapas(method, onSuccess = { jsonObject ->
                         this.disableLoading()
                         val form = jsonObject.getString("form")
@@ -178,7 +193,7 @@ class SelectMethodFragment : Fragment() {
                         }
                     )
 
-                } else if (method.type == TYPE_PAYMENT.PVCB) {
+                } else if (method?.type == TYPE_PAYMENT.PVCB) {
                     paymentApi.postTransferPVCB(method, onSuccess = { jsonObject ->
                         this.disableLoading()
                         val fragment = fragmentManager?.beginTransaction()

@@ -54,6 +54,7 @@ id dotted
 id frame_container
 id image
 id image_otp
+id loadingWebView
 id money
 id note
 id note_error
@@ -78,12 +79,15 @@ layout result_payment_layout
 layout select_method_layout
 layout view_loading_button
 layout webview_activity
+raw loading_payme_fi
 raw result_thanh_cong
 raw result_that_bai
+string cannot_open_file_chooser
 string confirm
 string confirm_otp
 string confirm_payment
 string content
+string file_browser
 string payment
 string payment_fail
 string payment_success

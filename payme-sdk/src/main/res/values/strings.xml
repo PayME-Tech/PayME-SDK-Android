@@ -5,6 +5,8 @@
     <string name="payment">Thanh toán</string>
     <string name="confirm_otp">Xác thực OTP</string>
     <string name="content">Nội dung</string>
+    <string name="file_browser">File Browser</string>
+    <string name="cannot_open_file_chooser">Cannot Open File Chooser</string>
     <string name="payment_success">Thanh toán thành công</string>
     <string name="payment_fail">Thanh toán thất bại</string>
     <string name="select_method_payment">Chọn nguồn thanh toán</string>

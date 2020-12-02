@@ -1815,6 +1815,7 @@ int id line3 0x0
 int id linear 0x0
 int id listMode 0x0
 int id list_item 0x0
+int id loadingWebView 0x0
 int id lottie_layer_name 0x0
 int id masked 0x0
 int id message 0x0
@@ -2131,6 +2132,7 @@ int layout text_view_without_line_height 0x0
 int layout view_loading_button 0x0
 int layout webview_activity 0x0
 int plurals mtrl_badge_content_description 0x0
+int raw loading_payme_fi 0x0
 int raw result_thanh_cong 0x0
 int raw result_that_bai 0x0
 int string abc_action_bar_home_description 0x0
@@ -2174,6 +2176,7 @@ int string abc_shareactionprovider_share_with_application 0x0
 int string abc_toolbar_collapse_description 0x0
 int string appbar_scrolling_view_behavior 0x0
 int string bottom_sheet_behavior 0x0
+int string cannot_open_file_chooser 0x0
 int string character_counter_content_description 0x0
 int string character_counter_overflowed_content_description 0x0
 int string character_counter_pattern 0x0
@@ -2187,6 +2190,7 @@ int string error_icon_content_description 0x0
 int string exposed_dropdown_menu_content_description 0x0
 int string fab_transformation_scrim_behavior 0x0
 int string fab_transformation_sheet_behavior 0x0
+int string file_browser 0x0
 int string hide_bottom_view_on_scroll_behavior 0x0
 int string icon_content_description 0x0
 int string item_view_role_description 0x0

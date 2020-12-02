@@ -1,16 +1,18 @@
 package vn.payme.sdk
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
-
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import org.json.JSONObject
+import org.spongycastle.jce.provider.BouncyCastleProvider
 import vn.payme.sdk.api.NetworkRequest
 import vn.payme.sdk.api.PaymentApi
-import vn.payme.sdk.model.*
+import vn.payme.sdk.model.Action
+import vn.payme.sdk.model.ClientInfo
+import vn.payme.sdk.model.ColorApp
+import vn.payme.sdk.model.Env
+import java.security.Security;
+
 
 public class PayME {
     companion object {
@@ -36,7 +38,15 @@ public class PayME {
     }
 
 
-    constructor(context: Context, appToken: String, publicKey: String, connectToken: String, appPrivateKey: String, configColor: Array<String>, env: Env) {
+    constructor(
+        context: Context,
+        appToken: String,
+        publicKey: String,
+        connectToken: String,
+        appPrivateKey: String,
+        configColor: Array<String>,
+        env: Env
+    ) {
         PayME.appToken = appToken
         PayME.appPrivateKey = appPrivateKey
         PayME.publicKey = publicKey
@@ -46,17 +56,17 @@ public class PayME {
         PayME.context = context
         Companion.colorApp = ColorApp(configColor[0], configColor[1])
         Companion.clientInfo = ClientInfo(context)
-
+        Security.insertProviderAt(BouncyCastleProvider(), 1)
     }
 
 
     public fun openWallet(
-            action: Action,
-            amount: Int?,
-            content: String?,
-            extraData: String?,
-            onSuccess: (JSONObject) -> Unit,
-            onError: (String) -> Unit
+        action: Action,
+        amount: Int?,
+        content: String?,
+        extraData: String?,
+        onSuccess: (JSONObject) -> Unit,
+        onError: (String) -> Unit
     ) {
 
         Companion.action = action
@@ -76,11 +86,11 @@ public class PayME {
 
 
     public fun deposit(
-            amount: Int,
-            content: String?,
-            extraData: String,
-            onSuccess: (JSONObject) -> Unit,
-            onError: (String) -> Unit
+        amount: Int,
+        content: String?,
+        extraData: String,
+        onSuccess: (JSONObject) -> Unit,
+        onError: (String) -> Unit
     ) {
         Companion.content = Companion.content
         Companion.extraData = extraData
@@ -96,11 +106,11 @@ public class PayME {
 
 
     public fun withdraw(
-            amount: Int,
-            content: String?,
-            extraData: String,
-            onSuccess: (JSONObject) -> Unit,
-            onError: (String) -> Unit
+        amount: Int,
+        content: String?,
+        extraData: String,
+        onSuccess: (JSONObject) -> Unit,
+        onError: (String) -> Unit
     ) {
         Companion.content = content
         Companion.extraData = extraData
@@ -116,13 +126,13 @@ public class PayME {
 
     public fun pay(
         fragmentManager: FragmentManager,
-            amount: Int,
+        amount: Int,
         content: String?,
         orderId: String?,
-            extraData: String,
-            onSuccess: (JSONObject) -> Unit,
-            onError: (String) -> Unit,
-            onClose: () -> Unit,
+        extraData: String,
+        onSuccess: (JSONObject) -> Unit,
+        onError: (String) -> Unit,
+        onClose: () -> Unit,
     ) {
         Companion.content = content
         Companion.extraData = extraData
@@ -136,7 +146,8 @@ public class PayME {
         val paymePayment: PaymePayment = PaymePayment()
         paymePayment.show(
             fragmentManager,
-                "ModalBottomSheet")
+            "ModalBottomSheet"
+        )
 
     }
 
@@ -151,13 +162,21 @@ public class PayME {
     public fun isConnected(): Boolean {
         return false
     }
-    public  fun  genConnectToken (userId:String,phone:String?,onSuccess: (JSONObject) -> Unit, onError: (JSONObject?,Int?,String) -> Unit) {
+    public  fun  genConnectToken(
+        userId: String,
+        phone: String?,
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
         val paymentApi =  PaymentApi()
-        paymentApi.genConnectToken(userId,phone,onSuccess,onError)
+        paymentApi.genConnectToken(userId, phone, onSuccess, onError)
 
     }
 
-    public fun getWalletInfo(onSuccess: (JSONObject) -> Unit, onError: (JSONObject?,Int?,String) -> Unit) {
+    public fun getWalletInfo(
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
         val url = urlFeENV("sandbox")
         val path = "/v1/Wallet/Information"
         val params: MutableMap<String, Any> = mutableMapOf()
@@ -166,18 +185,18 @@ public class PayME {
 
         val request = NetworkRequest(context!!, url, path, appToken, params)
         request.setOnRequestCrypto(
-                onStart = {
+            onStart = {
 
-                },
-                onError = onError,
-                onFinally = {
+            },
+            onError = onError,
+            onFinally = {
 
-                },
-                onSuccess = onSuccess,
-                onExpired = {
-                    println("401")
+            },
+            onSuccess = onSuccess,
+            onExpired = {
+                println("401")
 
-                })
+            })
 
 
     }

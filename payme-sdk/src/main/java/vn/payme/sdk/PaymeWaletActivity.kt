@@ -11,6 +11,8 @@ import android.view.View
 import android.view.WindowManager
 import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
+import com.airbnb.lottie.LottieAnimationView
+import kotlinx.android.synthetic.main.webview_activity.*
 import org.json.JSONObject
 import vn.payme.sdk.model.Env
 import vn.payme.sdk.model.JsObject
@@ -19,6 +21,7 @@ import java.net.URLEncoder
 
 internal class PaymeWaletActivity : AppCompatActivity() {
     private var cameraPermission: PermissionRequest? = null
+    private var lottie: LottieAnimationView? = null
     private val CAMERA_PERMISSION_REQUEST = 1111
 
     private fun backScreen(): Unit {
@@ -47,13 +50,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         cameraPermission!!.grant(cameraPermission!!.resources)
-
-//        if (requestCode == CAMERA_PERMISSION_REQUEST) {
-//            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//            } else {
-//                cameraPermission!!.deny()
-//            }
-//        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,6 +73,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             statusBarHeight = resources.getDimensionPixelSize(resourceId)
         }
         val myWebView: WebView = findViewById(R.id.webview)
+        lottie = findViewById(R.id.loadingWebView)
         myWebView.clearCache(true);
         myWebView.clearFormData();
         myWebView.clearHistory();
@@ -87,8 +84,8 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
         myWebView.setWebViewClient(object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
-
                 super.onPageFinished(view, url)
+                loadingWebView.visibility = View.INVISIBLE
             }
         })
 
@@ -107,10 +104,8 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         webSettings.loadWithOverviewMode = true
         webSettings.allowFileAccess = true
         webSettings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-
-
-//        setContentView(myWebView)
         myWebView.setWebChromeClient(object : WebChromeClient() {
+
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
                 Log.d(
                     "LOG WEB", consoleMessage?.message() + " -- From line "
@@ -119,21 +114,13 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                 );
                 return super.onConsoleMessage(consoleMessage)
             }
-
-
             // Grant permissions for cam
             @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             override fun onPermissionRequest(request: PermissionRequest) {
                 cameraPermission  = request
-
                 checkCamera()
-
             }
-
-
         })
-
-
         val jsObject: JsObject = JsObject(back = { backScreen() }, this.supportFragmentManager)
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
         var action: String = PayME.action.toString()
@@ -167,12 +154,8 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         )
 
         val encode: String = URLEncoder.encode(data.toString(), "utf-8")
-//        cookieManager.setCookie("https://sbx-sdk.payme.com.vn/active/${encode}","$cookieKey=$cookieValue")
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
-        println("https://sbx-sdk.payme.com.vn/active/${encode}")
-
-
-
+//        println("https://sbx-sdk.payme.com.vn/active/${encode}")
         if (PayME.env === Env.SANDBOX) {
             myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
 

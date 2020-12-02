@@ -13,10 +13,12 @@
     <color name="veryLightPinkTwo">#cbcbcb</color>
     <color name="white">#ffffff</color>
     <dimen name="text_default_size">14sp</dimen>
+    <string name="cannot_open_file_chooser">Cannot Open File Chooser</string>
     <string name="confirm">XÁC NHẬN</string>
     <string name="confirm_otp">Xác thực OTP</string>
     <string name="confirm_payment">Xác nhận thanh toán</string>
     <string name="content">Nội dung</string>
+    <string name="file_browser">File Browser</string>
     <string name="payment">Thanh toán</string>
     <string name="payment_fail">Thanh toán thất bại</string>
     <string name="payment_success">Thanh toán thành công</string>

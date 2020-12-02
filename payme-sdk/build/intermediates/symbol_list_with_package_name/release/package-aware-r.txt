@@ -1816,6 +1816,7 @@ id line3
 id linear
 id listMode
 id list_item
+id loadingWebView
 id lottie_layer_name
 id masked
 id message
@@ -2132,6 +2133,7 @@ layout text_view_without_line_height
 layout view_loading_button
 layout webview_activity
 plurals mtrl_badge_content_description
+raw loading_payme_fi
 raw result_thanh_cong
 raw result_that_bai
 string abc_action_bar_home_description
@@ -2175,6 +2177,7 @@ string abc_shareactionprovider_share_with_application
 string abc_toolbar_collapse_description
 string appbar_scrolling_view_behavior
 string bottom_sheet_behavior
+string cannot_open_file_chooser
 string character_counter_content_description
 string character_counter_overflowed_content_description
 string character_counter_pattern
@@ -2188,6 +2191,7 @@ string error_icon_content_description
 string exposed_dropdown_menu_content_description
 string fab_transformation_scrim_behavior
 string fab_transformation_sheet_behavior
+string file_browser
 string hide_bottom_view_on_scroll_behavior
 string icon_content_description
 string item_view_role_description
