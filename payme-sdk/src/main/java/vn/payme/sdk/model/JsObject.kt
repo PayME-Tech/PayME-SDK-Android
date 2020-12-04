@@ -1,15 +1,18 @@
 package vn.payme.sdk.model
 
+import android.hardware.camera2.CameraManager
 import android.webkit.JavascriptInterface
 import androidx.fragment.app.FragmentManager
-import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 import vn.payme.sdk.PayME
-import java.sql.RowId
-import java.time.temporal.TemporalAmount
 
 
-public class JsObject(val back: () -> Unit, val fragmentManager: FragmentManager) {
+
+public class JsObject(
+    val back: () -> Unit,
+    val fragmentManager: FragmentManager,
+    val cameraManager: CameraManager
+) {
     @JavascriptInterface
     public fun onSuccess(string: String) {
         try {
@@ -19,6 +22,17 @@ public class JsObject(val back: () -> Unit, val fragmentManager: FragmentManager
         } catch (e: Exception) {
             println(e)
         }
+    }
+
+    @JavascriptInterface
+    public fun onFlash(status: Boolean) {
+        try {
+            val cameraId = cameraManager.cameraIdList[0]
+            cameraManager.setTorchMode(cameraId, status)
+        } catch (e: java.lang.Exception) {
+        }
+
+
     }
 
     @JavascriptInterface

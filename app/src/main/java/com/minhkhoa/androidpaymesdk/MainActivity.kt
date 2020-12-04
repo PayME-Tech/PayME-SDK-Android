@@ -48,8 +48,7 @@ class MainActivity : AppCompatActivity() {
             "   MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKi\n" +
             "   wIhTJpAi1XnbfOSrW/Ebw6h1485GOAvuG/OwB+ScsfPJBoNJeNFU6J0CAwEAAQ==\n" +
             "   -----END PUBLIC KEY-----"
-    var ConnectToken: String =
-        "U2FsdGVkX1+iOzrma3dpZN1ZKgNFruz8U4cD+Pa5hNrRtsQ4b1ID3t42seTswQfDOdYyBiUzUjHj+LqcSoHOqAXQKkFibrbZHnGDxUyaD3sXkIG+OvhPAfVAMRos6tp8FwxWwXTYDeBMgnRMfazFPA=="
+    var ConnectToken: String = ""
     val PrivateKey: String = "-----BEGIN PRIVATE KEY-----\n" +
             "    MIIBPAIBAAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKiwIhTJpAi1XnbfOSrW/Eb\n" +
             "    w6h1485GOAvuG/OwB+ScsfPJBoNJeNFU6J0CAwEAAQJBAJSfTrSCqAzyAo59Ox+m\n" +
@@ -70,7 +69,7 @@ class MainActivity : AppCompatActivity() {
             val decimal = DecimalFormat("#,###")
             textView.text = "${decimal.format(balance)}đ"
         }, onError = { jsonObject, code, message ->
-            Toast.makeText(context,message,Toast.LENGTH_LONG).show()
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
 
             println("onError=" + message)
         })
@@ -99,12 +98,13 @@ class MainActivity : AppCompatActivity() {
         this.payme =
             PayME(this, AppToken, PublicKey, ConnectToken, PrivateKey, configColor, Env.SANDBOX)
 
-        updateWalletInfo()
 
 
 
         buttonReload.setOnClickListener {
-            updateWalletInfo()
+            if (ConnectToken.length > 0) {
+                updateWalletInfo()
+            }
 
         }
         buttonSubmit.setOnClickListener {
@@ -117,7 +117,11 @@ class MainActivity : AppCompatActivity() {
                         loading.visibility = View.INVISIBLE
                         ConnectToken = connectToken
                         println("connectToken" + connectToken)
-                        Toast.makeText(context,"Đăng ký Connect Token thành công",Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            context,
+                            "Đăng ký Connect Token thành công",
+                            Toast.LENGTH_LONG
+                        ).show()
 
                         this.payme =
                             PayME(
@@ -132,7 +136,7 @@ class MainActivity : AppCompatActivity() {
 
                     },
                     onError = { json: JSONObject?, code: Int?, message: String ->
-                        Toast.makeText(context,message,Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                         loading.visibility = View.INVISIBLE
 
                     })
@@ -141,54 +145,63 @@ class MainActivity : AppCompatActivity() {
 
         }
         button.setOnClickListener {
-            payme.openWallet(
-                Action.OPEN, null, null, null,
-                onSuccess = { json: JSONObject ->
-                    println("onSuccess2222" + json.toString())
-                },
-                onError = { message: String ->
-                    println("onError" + message)
-                })
+            if (ConnectToken.length > 0) {
+                payme.openWallet(
+                    Action.OPEN, null, null, null,
+                    onSuccess = { json: JSONObject ->
+                        println("onSuccess2222" + json.toString())
+                    },
+                    onError = { message: String ->
+                        println("onError" + message)
+                    })
+            }
+
 
         }
         buttonDeposit.setOnClickListener {
-            val amount = convertInt(moneyDeposit.text.toString())
-            payme.openWallet(Action.DEPOSIT, amount, null, null,
-                onSuccess = { json: JSONObject ->
-                    println("onSuccess2222" + json.toString())
-                },
-                onError = { message: String ->
-                    println("onError" + message)
-                })
+            if (ConnectToken.length > 0) {
+
+                val amount = convertInt(moneyDeposit.text.toString())
+                payme.openWallet(Action.DEPOSIT, amount, null, null,
+                    onSuccess = { json: JSONObject ->
+                        println("onSuccess2222" + json.toString())
+                    },
+                    onError = { message: String ->
+                        println("onError" + message)
+                    })
+            }
 
         }
         buttonWithdraw.setOnClickListener {
-            val amount = convertInt(moneyWithdraw.text.toString())
+            if (ConnectToken.length > 0) {
 
-            payme.openWallet(Action.WITHDRAW, amount, null, null,
-                onSuccess = { json: JSONObject ->
-                    println("onSuccess2222" + json.toString())
-                },
-                onError = { message: String ->
-                    println("onError" + message)
-                })
+                val amount = convertInt(moneyWithdraw.text.toString())
 
+                payme.openWallet(Action.WITHDRAW, amount, null, null,
+                    onSuccess = { json: JSONObject ->
+                        println("onSuccess2222" + json.toString())
+                    },
+                    onError = { message: String ->
+                        println("onError" + message)
+                    })
+            }
         }
         buttonPay.setOnClickListener {
-            val amount = convertInt(moneyPay.text.toString())
+            if (ConnectToken.length > 0) {
+                val amount = convertInt(moneyPay.text.toString())
+                payme.pay(this.supportFragmentManager, amount, "Merchant ghi chú đơn hàng", "", "",
+                    onSuccess = { json: JSONObject ->
+                        println("onSuccess2222" + json.toString())
+                    },
+                    onError = { message: String ->
+                        println("onError" + message)
+                    },
+                    onClose = {
+                        println("CLOSE")
+                    }
+                )
 
-            payme.pay(this.supportFragmentManager, amount, "Merchant ghi chú đơn hàng", "", "",
-                onSuccess = { json: JSONObject ->
-                    println("onSuccess2222" + json.toString())
-                },
-                onError = { message: String ->
-                    println("onError" + message)
-                },
-                onClose = {
-                    println("CLOSE")
-                }
-            )
-
+            }
         }
     }
 }
