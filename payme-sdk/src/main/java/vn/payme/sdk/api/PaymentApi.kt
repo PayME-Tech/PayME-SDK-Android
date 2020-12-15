@@ -50,7 +50,9 @@ internal class PaymentApi {
         val path = "/v1/Internal/ConnectToken/Generate"
         val params: MutableMap<String, Any> = mutableMapOf()
         params["userId"] = userId
-        params["phone"] = phone!!
+        if(phone!!.length>0){
+            params["phone"] = phone!!
+        }
         val tz = TimeZone.getTimeZone("UTC")
         val df: DateFormat =
             SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'") // Quoted "Z" to indicate UTC, no timezone offset

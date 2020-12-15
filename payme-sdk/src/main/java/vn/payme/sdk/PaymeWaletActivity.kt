@@ -7,6 +7,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
@@ -29,6 +30,9 @@ import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.*
 import android.hardware.camera2.CameraManager
+import android.util.DisplayMetrics
+import android.view.KeyEvent
+import vn.payme.sdk.kyc.CameraKyc
 import java.lang.Exception
 
 
@@ -51,6 +55,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
     private val FCR = 1
     private val FILECHOOSER_RESULTCODE = 1
     private lateinit var cameraManager: CameraManager
+    private lateinit var myWebView: WebView
 
 
     private fun backScreen(): Unit {
@@ -145,6 +150,17 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         }
     }
 
+    fun convertPixelsToDp(px: Float): Float {
+        return if (PayME.context != null) {
+            val resources = PayME.context.resources
+            val metrics = resources.displayMetrics
+            px / (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
+        } else {
+            val metrics = Resources.getSystem().displayMetrics
+            px / (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
+        }
+    }
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String?>,
@@ -176,8 +192,12 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         if (resourceId > 0) {
             statusBarHeight = resources.getDimensionPixelSize(resourceId)
         }
-        val myWebView: WebView = findViewById(R.id.webview)
-        lottie = findViewById(R.id.loadingWebView)
+        val intent: Intent = Intent(PayME.context, CameraKyc::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        PayME.context?.startActivity(intent)
+
+        myWebView = findViewById(R.id.webview)
+//        lottie = findViewById(R.id.loadingWebViewPaymeSDK)
         myWebView.clearCache(true);
         myWebView.clearFormData();
         myWebView.clearHistory();
@@ -189,9 +209,14 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         myWebView.setWebViewClient(object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                loadingWebView.visibility = View.INVISIBLE
+//                lottie?.visibility = View.INVISIBLE
             }
         })
+        getWindow().setFlags(
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        );
+
 
         val webSettings: WebSettings = myWebView.getSettings()
         webSettings.javaScriptEnabled = true
@@ -290,11 +315,10 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                       partner: 'ANDROID',
                       action:'${action}',
                       amount:${PayME.amount},
-                      partnerTop:${statusBarHeight},
                       configColor: ['${PayME.configColor?.get(0)}', '${PayME.configColor?.get(1)}'],
                       partner : {
                         type:'ANDROID',
-                        paddingTop:${statusBarHeight}
+                        paddingTop:${convertPixelsToDp(statusBarHeight.toFloat())}
                       },
                       actions:{
                         type:${action},
@@ -305,7 +329,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
         val encode: String = URLEncoder.encode(data.toString(), "utf-8")
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
-//        println("https://sbx-sdk.payme.com.vn/active/${encode}")
+        println("https://sbx-sdk.payme.com.vn/active/${encode}")
         if (PayME.env === Env.SANDBOX) {
             myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
 //            myWebView.loadData(html, "text/html", "UTF-8");
@@ -326,6 +350,16 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         } catch (e: Exception) {
         }
 
+    }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+
+        if (this.myWebView.canGoBack()) {
+            this.myWebView.goBack()
+        } else {
+            finish()
+        }
+        return true
     }
 
 

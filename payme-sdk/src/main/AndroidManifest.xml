@@ -2,6 +2,7 @@
     package="vn.payme.sdk">
 
 
+    <uses-permission android:name="android.permission.CAMERA" />
     <application
         android:allowBackup="true"
         android:supportsRtl="true"
@@ -9,7 +10,12 @@
         <activity android:name="vn.payme.sdk.PaymeWaletActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
+<!--                <category android:name="android.intent.category.LAUNCHER"/>-->
+            </intent-filter>
+        </activity>
+        <activity android:name="vn.payme.sdk.kyc.CameraKyc">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
 <!--                <category android:name="android.intent.category.LAUNCHER"/>-->
             </intent-filter>
         </activity>

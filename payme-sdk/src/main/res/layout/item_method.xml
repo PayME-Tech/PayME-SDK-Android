@@ -23,15 +23,11 @@
             >
             <ImageView
                 android:id="@+id/image"
-                android:minHeight="20dp"
-                android:maxHeight="20dp"
-                android:maxWidth="20dp"
-                android:minWidth="20dp"
                 android:scaleType="fitCenter"
                 android:adjustViewBounds="true"
                 android:src="@drawable/iconwallet"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_width="20dp"
+                android:layout_height="20dp"/>
         </ViewAnimator>
         <TextView
             android:layout_width="wrap_content"

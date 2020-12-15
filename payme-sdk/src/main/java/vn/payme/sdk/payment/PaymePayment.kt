@@ -1,4 +1,4 @@
-package vn.payme.sdk
+package vn.payme.sdk.payment
 
 import android.app.Dialog
 import android.os.Bundle
@@ -15,6 +15,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import vn.payme.sdk.PayME
+import vn.payme.sdk.R
 import vn.payme.sdk.model.MyEven
 import vn.payme.sdk.model.TypeCallBack
 import vn.payme.sdk.payment.SelectMethodFragment
@@ -23,9 +25,7 @@ internal class PaymePayment : BottomSheetDialogFragment() {
         super.onCreate(savedInstanceState)
         setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle)
     }
-
     override fun onViewCreated(view: View, @Nullable savedInstanceState: Bundle?) {
-
         super.onViewCreated(view, savedInstanceState)
         val bottomSheetDialogFragment : BottomSheetDialog = dialog as BottomSheetDialog
         val fragmentManager : FragmentManager
@@ -35,14 +35,13 @@ internal class PaymePayment : BottomSheetDialogFragment() {
         fragment.commit()
         bottomSheetDialogFragment.behavior.isDraggable = false
     }
-
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
         val v: View = inflater.inflate(
-                R.layout.payment_layout,
+            R.layout.payment_layout,
                 container, false
         )
         EventBus.getDefault().register(this)
@@ -55,9 +54,6 @@ internal class PaymePayment : BottomSheetDialogFragment() {
             this.dialog?.dismiss()
         }
     }
-
-
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = BottomSheetDialog(requireContext(), theme)
         dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -69,12 +65,9 @@ internal class PaymePayment : BottomSheetDialogFragment() {
         dialog.setContentView(contentView)
         (contentView.parent as View).setBackgroundColor(resources.getColor(android.R.color.transparent))
     }
-
     override fun onDestroy() {
         PayME.onClose()
         EventBus.getDefault().unregister(this);
         super.onDestroy()
     }
-
-
 }

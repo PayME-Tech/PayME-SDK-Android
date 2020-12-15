@@ -7,11 +7,11 @@ import org.json.JSONObject
 import org.spongycastle.jce.provider.BouncyCastleProvider
 import vn.payme.sdk.api.NetworkRequest
 import vn.payme.sdk.api.PaymentApi
-import vn.payme.sdk.model.Action
-import vn.payme.sdk.model.ClientInfo
-import vn.payme.sdk.model.ColorApp
-import vn.payme.sdk.model.Env
-import java.security.Security;
+import vn.payme.sdk.kyc.CameraKyc
+import vn.payme.sdk.model.*
+import vn.payme.sdk.payment.PaymePayment
+import vn.payme.sdk.payment.PopupSelectTypeIndentify
+import java.security.Security
 
 
 public class PayME {
@@ -21,6 +21,7 @@ public class PayME {
         lateinit var publicKey: String
         var connectToken: String = ""
         lateinit var action: Action
+        var kycInfo: KycInfo= KycInfo()
         var amount: Int = 0
         var content: String? = null
         var orderId: String? = null
@@ -143,6 +144,11 @@ public class PayME {
             Companion.amount = 0
         }
         Companion.orderId = orderId
+//        val paymePayment: PopupSelectTypeIndentify = PopupSelectTypeIndentify()
+//        paymePayment.show(
+//            fragmentManager,
+//            "ModalBottomSheet"
+//        )
         val paymePayment: PaymePayment = PaymePayment()
         paymePayment.show(
             fragmentManager,
@@ -150,6 +156,7 @@ public class PayME {
         )
 
     }
+
 
 
     private fun urlFeENV(env: String?): String {

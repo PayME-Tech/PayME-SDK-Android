@@ -48,24 +48,25 @@ public class JsObject(
     @JavascriptInterface
     public fun onPay(type: String, amount: Int, content: String, orderId: String) {
         try {
-            val payme = PayME(
-                PayME.context,
-                PayME.appToken,
-                PayME.publicKey,
-                PayME.connectToken,
-                PayME.appPrivateKey,
-                PayME.configColor!!,
-                PayME.env!!
-            )
-            payme.pay(fragmentManager, amount, content, orderId, "", onSuccess = {
 
-            }, onError = {
-
-            },
-                onClose = {
-
-                }
-            )
+//            val payme = PayME(
+//                PayME.context,
+//                PayME.appToken,
+//                PayME.publicKey,
+//                PayME.connectToken,
+//                PayME.appPrivateKey,
+//                PayME.configColor!!,
+//                PayME.env!!
+//            )
+//            payme.pay( amount, content, orderId, "", onSuccess = {
+//
+//            }, onError = {
+//
+//            },
+//                onClose = {
+//
+//                }
+//            )
 //            PayME.onPay(string)
         } catch (e: Exception) {
             println(e)

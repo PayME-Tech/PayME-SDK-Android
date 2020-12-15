@@ -7,15 +7,20 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import com.squareup.picasso.Picasso
 import vn.payme.sdk.R
 import vn.payme.sdk.enum.TYPE_PAYMENT
 import vn.payme.sdk.model.Method
 import java.text.DecimalFormat
 
-class MethodAdapter(private val context: Context,
-                    private val dataSource: ArrayList<Method>) : BaseAdapter() {
+class MethodAdapter(
+    private val context: Context,
+    private val dataSource: ArrayList<Method>
+) : BaseAdapter() {
 
-    private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    private val inflater: LayoutInflater =
+        context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
     override fun getCount(): Int {
         return dataSource.size
     }
@@ -48,29 +53,23 @@ class MethodAdapter(private val context: Context,
         }
     }
 
-    fun getImage(method: Method): Int {
+    private fun addImage(method: Method, imageView: ImageView) {
+        println("Method"+method.toString())
 
-        if (method.type === TYPE_PAYMENT.APP_WALLET) {
-            return R.drawable.iconwallet
+        if (method.type == TYPE_PAYMENT.APP_WALLET) {
+            imageView.setImageResource(R.drawable.iconwallet)
+        }else if (method.type == TYPE_PAYMENT.NAPAS || method.type == TYPE_PAYMENT.PVCB) {
+            println("LoadPICA")
+            Picasso.get()
+                .load("https://firebasestorage.googleapis.com/v0/b/vn-mecorp-payme-wallet.appspot.com/o/image_bank%2Fimage_method%2Fmethod${method.swiftCode}.png?alt=media&token=28cdb30e-fa9b-430c-8c0e-5369f500612e")
+                .resize(50, 50)
+                .centerInside()
+                .into(imageView)
+
+        }else{
+            imageView.setImageResource(R.drawable.iconwallet)
+
         }
-        if (method.type === TYPE_PAYMENT.NAPAS || method.type === TYPE_PAYMENT.PVCB) {
-            if (method.swiftCode === "BFTVVNVX") {
-                return R.drawable.bank_vietcom_bank_ico
-            }
-            if (method.swiftCode === "VBAAVNVX") {
-                return R.drawable.bank_agri_bank_ico
-            }
-            if (method.swiftCode === "WBVNVNVX") {
-                return R.drawable.bank_pvcombank_ico
-            }
-            if (method.swiftCode === "VTCBVNVX") {
-                return R.drawable.bank_techcombank_ico
-            }
-            if (method.swiftCode === "TPBVVNVX") {
-                return R.drawable.bank_tpbank_ico
-            }
-        }
-        return R.drawable.iconwallet
 
     }
 
@@ -90,7 +89,7 @@ class MethodAdapter(private val context: Context,
         }
         getTitle(method, titleText, noteMethod)
 
-        imageView.setImageResource(getImage(method))
+        addImage(method, imageView)
 
 
         return rowView

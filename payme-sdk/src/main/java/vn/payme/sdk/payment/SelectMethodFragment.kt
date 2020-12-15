@@ -1,6 +1,7 @@
 package vn.payme.sdk.payment
 
 import android.os.Bundle
+import android.os.Message
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,14 +31,26 @@ class SelectMethodFragment : Fragment() {
     private lateinit var layout: ConstraintLayout
     private var loading: Boolean = false
     val listMethod: ArrayList<Method> = ArrayList<Method>()
-    fun showLoading() {
+    private fun showLoading() {
         loading = true
         buttonSubmit.enableLoading()
     }
 
-    fun disableLoading() {
+    private fun disableLoading() {
         loading = false
         buttonSubmit.disableLoading()
+    }
+
+    private fun onGotoResult(message: String) {
+        this.disableLoading()
+        val bundle: Bundle = Bundle()
+        bundle.putString("message", message)
+        val resultPaymentFragment: ResultPaymentFragment =
+            ResultPaymentFragment()
+        resultPaymentFragment.arguments = bundle
+        val fragment = fragmentManager?.beginTransaction()
+        fragment?.replace(R.id.frame_container, resultPaymentFragment)
+        fragment?.commit()
     }
 
 
@@ -47,20 +60,17 @@ class SelectMethodFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View? = inflater?.inflate(R.layout.select_method_layout, container, false)
-
         listView = view!!.findViewById(R.id.recipe_list_view)
-        buttonSubmit = view.findViewById(R.id.buttonSubmit)
         buttonClose = view.findViewById(R.id.buttonClose)
+        buttonSubmit = view.findViewById(R.id.buttonSubmit)
         textAmount = view.findViewById(R.id.money)
         textNote = view.findViewById(R.id.note)
         layout = view.findViewById(R.id.content)
+        layout.background = PayME.colorApp.backgroundColor
         textNote.text = PayME.content
-
-
         val decimal = DecimalFormat("#,###")
         textAmount.text = "${decimal.format(PayME.amount)} đ"
         val paymentApi = PaymentApi()
-
         val methodAdapter: MethodAdapter = MethodAdapter(PayME.context, this.listMethod!!)
         this.listView.adapter = methodAdapter
         this.showLoading()
@@ -118,22 +128,22 @@ class SelectMethodFragment : Fragment() {
             }
 
         }
-
-
-        layout.background = PayME.colorApp.backgroundColor
-
         buttonSubmit.setOnClickListener {
 
-                if (!loading && this.listMethod.size>0) {
+            if (!loading && this.listMethod.size > 0) {
                 val paymentApi = PaymentApi()
                 this.showLoading()
 
                 val method = this.listMethod[this.methodSelected]
                 if (method?.type == TYPE_PAYMENT.APP_WALLET) {
-                    if(method.amount?.toInt()!! < PayME.amount){
+                    if (method.amount?.toInt()!! < PayME.amount) {
                         this.disableLoading()
                         val toast: Toast =
-                            Toast.makeText(PayME.context, "Số dư trong ví không đủ", Toast.LENGTH_SHORT)
+                            Toast.makeText(
+                                PayME.context,
+                                "Số dư trong ví không đủ",
+                                Toast.LENGTH_SHORT
+                            )
                         toast.view.setBackgroundColor(
                             ContextCompat.getColor(
                                 PayME.context,
@@ -142,7 +152,7 @@ class SelectMethodFragment : Fragment() {
                         )
                         toast.show()
 
-                    }else{
+                    } else {
                         paymentApi.postTransferAppWallet(onSuccess = { jsonObject ->
 
                             val fragment = fragmentManager?.beginTransaction()
@@ -151,16 +161,7 @@ class SelectMethodFragment : Fragment() {
                             this.disableLoading()
                         },
                             onError = { jsonObject, code, message ->
-                                this.disableLoading()
-                                val bundle: Bundle = Bundle()
-                                bundle.putString("message", message)
-                                val resultPaymentFragment: ResultPaymentFragment =
-                                    ResultPaymentFragment()
-                                resultPaymentFragment.arguments = bundle
-                                val fragment = fragmentManager?.beginTransaction()
-                                fragment?.replace(R.id.frame_container, resultPaymentFragment)
-                                fragment?.commit()
-
+                                this.onGotoResult(message)
                             }
                         )
                     }
@@ -180,16 +181,7 @@ class SelectMethodFragment : Fragment() {
 
                     },
                         onError = { jsonObject, code, message ->
-                            this.disableLoading()
-                            val bundle: Bundle = Bundle()
-                            bundle.putString("message", message)
-                            val resultPaymentFragment: ResultPaymentFragment =
-                                ResultPaymentFragment()
-                            resultPaymentFragment.arguments = bundle
-                            val fragment = fragmentManager?.beginTransaction()
-                            fragment?.replace(R.id.frame_container, resultPaymentFragment)
-                            fragment?.commit()
-
+                            this.onGotoResult(message)
                         }
                     )
 
@@ -214,14 +206,7 @@ class SelectMethodFragment : Fragment() {
                                 fragment?.commit()
 
                             } else {
-                                val bundle: Bundle = Bundle()
-                                bundle.putString("message", message)
-                                val resultPaymentFragment: ResultPaymentFragment =
-                                    ResultPaymentFragment()
-                                resultPaymentFragment.arguments = bundle
-                                val fragment = fragmentManager?.beginTransaction()
-                                fragment?.replace(R.id.frame_container, resultPaymentFragment)
-                                fragment?.commit()
+                                this.onGotoResult(message)
                             }
 
 
@@ -233,8 +218,6 @@ class SelectMethodFragment : Fragment() {
 
                 }
             }
-
-
         }
         buttonClose.setOnClickListener {
             if (!loading) {
@@ -242,8 +225,6 @@ class SelectMethodFragment : Fragment() {
                 var myEven: MyEven = MyEven(TypeCallBack.onClose, "")
                 even.post(myEven)
             }
-
-
         }
         return view
     }
