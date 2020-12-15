@@ -1,10 +1,9 @@
 package vn.payme.sdk
 
-import android.R.attr
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
-import android.database.Cursor
-import android.graphics.BitmapFactory
+import android.hardware.camera2.CameraManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -18,10 +17,12 @@ import com.google.zxing.common.HybridBinarizer
 import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.CaptureManager
 import kotlinx.android.synthetic.main.orientation_capture_activity.*
+import vn.payme.sdk.PayME.Companion.context
 
 
 class AnyOrientationCaptureActivity : AppCompatActivity() {
     private val PICK_IMAGE = 1
+    private var toggleTorch = true
     private lateinit var capture: CaptureManager
     private var btnPicker: LinearLayout? = null
     private var btnTorch: LinearLayout? = null
@@ -35,7 +36,7 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
         initScanner(savedInstanceState)
         eventPress()
 
-        popup.show(this.supportFragmentManager, "ModalBottomSheet")
+//        popup.show(this.supportFragmentManager, "ModalBottomSheet")
     }
 
     private fun eventPress() {
@@ -44,6 +45,15 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
             intent.type = "image/*"
             intent.action = Intent.ACTION_GET_CONTENT
             startActivityForResult(Intent.createChooser(intent, "Chọn ảnh"), PICK_IMAGE)
+        }
+        btnTorch!!.setOnClickListener {
+            try {
+                val cameraManager: CameraManager = this.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+                val cameraId = cameraManager.cameraIdList[0]
+                cameraManager.setTorchMode(cameraId, toggleTorch)
+                toggleTorch = !toggleTorch
+            } catch (e: java.lang.Exception) {
+            }
         }
     }
 
@@ -77,7 +87,7 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
                 val reader = MultiFormatReader()
                 try {
                     val result = reader.decode(bBitmap)
-                    Log.d("RRR", result.toString())
+                    Toast.makeText(this, result.toString(), Toast.LENGTH_LONG).show()
                 } catch (e: NotFoundException) {
                     Log.d("TAG", "Not found")
                 }
