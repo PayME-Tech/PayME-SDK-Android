@@ -3,6 +3,7 @@ package vn.payme.sdk.kyc;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
@@ -28,9 +29,9 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -48,7 +49,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import vn.payme.sdk.PayME;
 import vn.payme.sdk.R;
+import vn.payme.sdk.api.UploadApi;
+import vn.payme.sdk.component.Button;
 import vn.payme.sdk.payment.PopupSelectTypeIndentify;
 
 public class CameraKyc extends AppCompatActivity {
@@ -58,10 +62,11 @@ public class CameraKyc extends AppCompatActivity {
     private ImageView takePictureButton;
 
     // preview camera
-    private TextureView textureView;
+    private AutoFitTextureView textureView;
 
     // kiểm tra trạng thái  ORIENTATION của ảnh đầu ra
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
         ORIENTATIONS.append(Surface.ROTATION_90, 0);
@@ -69,9 +74,23 @@ public class CameraKyc extends AppCompatActivity {
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
 
+    private Button buttonBack;
+    private ImageView buttonBackHeader;
+    private ImageView buttonBackHeader2;
+    private Button buttonNext;
+    private ConstraintLayout preView;
+    public ImageView imagePreView;
+    public ConstraintLayout layoutConfirm;
+    private ConstraintLayout layoutUpload;
+    private TextView textGuiTakePicture;
+    private String saveImage = "";
+    private String imageFront = "";
+    private String imageBackSide = "";
+
+
+    private ConstraintLayout buttonSelectTypeIdentify;
 
     private String cameraId;
-    private ConstraintLayout buttonSelectTypeIdentify;
     protected CameraDevice cameraDevice;
     protected CameraCaptureSession cameraCaptureSessions;
     protected CaptureRequest captureRequest;
@@ -86,6 +105,7 @@ public class CameraKyc extends AppCompatActivity {
     private boolean mFlashSupported;
     private Handler mBackgroundHandler;
     private HandlerThread mBackgroundThread;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,8 +116,17 @@ public class CameraKyc extends AppCompatActivity {
         getWindow().setStatusBarColor(Color.WHITE);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
 
-        textureView = (TextureView) findViewById(R.id.texture);
+        textureView = (AutoFitTextureView) findViewById(R.id.previewCamera);
         buttonSelectTypeIdentify = (ConstraintLayout) findViewById(R.id.buttonSelectTypeIdentify);
+        buttonBack = (Button) findViewById(R.id.buttonBack);
+        buttonNext = (Button) findViewById(R.id.buttonNext);
+        buttonBackHeader = (ImageView) findViewById(R.id.buttonBackHeader);
+        buttonBackHeader2 = (ImageView) findViewById(R.id.buttonBackHeader2);
+        layoutConfirm = (ConstraintLayout) findViewById(R.id.confirm_screen);
+        layoutUpload = (ConstraintLayout) findViewById(R.id.upLoadKyc);
+        textGuiTakePicture = (TextView) findViewById(R.id.textGuiTakePicture);
+        imagePreView = (ImageView) findViewById(R.id.previewImage);
+        layoutUpload.setBackground(PayME.colorApp.getBackgroundColor());
         assert textureView != null;
         textureView.setSurfaceTextureListener(textureListener);
         takePictureButton = (ImageView) findViewById(R.id.btn_takepicture);
@@ -108,29 +137,75 @@ public class CameraKyc extends AppCompatActivity {
                 takePicture();
             }
         });
-        buttonSelectTypeIdentify.setOnClickListener(new View.OnClickListener() {
+        buttonBackHeader2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                popupSelectTypeIndentify= new PopupSelectTypeIndentify();
-                popupSelectTypeIndentify.show(getSupportFragmentManager(),"ModalBottomSheet");
+                layoutConfirm.setVisibility(View.GONE);
+                createCameraPreview();
+            }
+        });
+        buttonBackHeader.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+        buttonBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                layoutConfirm.setVisibility(View.GONE);
+                createCameraPreview();
+
+            }
+        });
+        buttonNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println("imageFront" + imageFront);
+                if (imageFront.length() > 0) {
+                    imageBackSide = saveImage;
+                    layoutUpload.setVisibility(View.VISIBLE);
+                    UploadApi uploadApi = new  UploadApi();
+                    uploadApi.uploadImage(imageFront,imageBackSide);
+
+
+                } else {
+                    layoutConfirm.setVisibility(View.GONE);
+                    imageFront = saveImage;
+                    createCameraPreview();
+
+                }
+
             }
         });
 
+//        buttonSelectTypeIdentify.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                popupSelectTypeIndentify= new PopupSelectTypeIndentify();
+//                popupSelectTypeIndentify.show(getSupportFragmentManager(),"ModalBottomSheet");
+//            }
+//        });
+
     }
+
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             // Open camera khi ready
             openCamera();
         }
+
         @Override
         public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
             // Transform you image captured size according to the surface width and height, và thay đổi kích thước ảnh
         }
+
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
             return false;
         }
+
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
         }
@@ -143,10 +218,12 @@ public class CameraKyc extends AppCompatActivity {
             cameraDevice = camera;
             createCameraPreview();
         }
+
         @Override
         public void onDisconnected(CameraDevice camera) {
             cameraDevice.close();
         }
+
         @Override
         public void onError(CameraDevice camera, int error) {
             cameraDevice.close();
@@ -154,7 +231,6 @@ public class CameraKyc extends AppCompatActivity {
         }
     };
 
-    // Thực hiển việc capture ảnh thông qua CAMERACAPTURESESSION
     final CameraCaptureSession.CaptureCallback captureCallbackListener = new CameraCaptureSession.CaptureCallback() {
         @Override
         public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
@@ -163,11 +239,14 @@ public class CameraKyc extends AppCompatActivity {
             createCameraPreview();
         }
     };
+
+
     protected void startBackgroundThread() {
         mBackgroundThread = new HandlerThread("Camera Background");
         mBackgroundThread.start();
         mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
     }
+
     protected void stopBackgroundThread() {
         mBackgroundThread.quitSafely();
         try {
@@ -178,8 +257,9 @@ public class CameraKyc extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     protected void takePicture() {
-        if(null == cameraDevice) {
+        if (null == cameraDevice) {
             Log.e(TAG, "cameraDevice is null");
             return;
         }
@@ -192,8 +272,8 @@ public class CameraKyc extends AppCompatActivity {
             }
 
             // CAPTURE IMAGE với tuỳ chỉnh kích thước
-            int width = 640;
-            int height = 480;
+            int width = textureView.getWidth();
+            int height = textureView.getHeight();
             if (jpegSizes != null && 0 < jpegSizes.length) {
                 width = jpegSizes[0].getWidth();
                 height = jpegSizes[0].getHeight();
@@ -208,7 +288,7 @@ public class CameraKyc extends AppCompatActivity {
             // kiểm tra orientation tuỳ thuộc vào mỗi device khác nhau như có nói bên trên
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
-            final File file = new File(Environment.getExternalStorageDirectory()+"/pic.jpg");
+            final File file = new File(Environment.getExternalStorageDirectory() + "/pic.jpg");
             ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader reader) {
@@ -248,8 +328,16 @@ public class CameraKyc extends AppCompatActivity {
                 @Override
                 public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
-                    Toast.makeText(CameraKyc.this, "Saved:" + file, Toast.LENGTH_SHORT).show();
-                    createCameraPreview();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            layoutConfirm.setVisibility(View.VISIBLE);
+                            imagePreView.setImageBitmap(BitmapFactory.decodeFile(file.getPath()));
+                            saveImage = file.getPath();
+                        }
+                    });
+
+
                 }
             };
             cameraDevice.createCaptureSession(outputSurfaces, new CameraCaptureSession.StateCallback() {
@@ -261,6 +349,7 @@ public class CameraKyc extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
+
                 @Override
                 public void onConfigureFailed(CameraCaptureSession session) {
                 }
@@ -279,7 +368,7 @@ public class CameraKyc extends AppCompatActivity {
             Surface surface = new Surface(texture);
             captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             captureRequestBuilder.addTarget(surface);
-            cameraDevice.createCaptureSession(Arrays.asList(surface), new CameraCaptureSession.StateCallback(){
+            cameraDevice.createCaptureSession(Arrays.asList(surface), new CameraCaptureSession.StateCallback() {
                 @Override
                 public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
                     //The camera is already closed
@@ -290,6 +379,7 @@ public class CameraKyc extends AppCompatActivity {
                     cameraCaptureSessions = cameraCaptureSession;
                     updatePreview();
                 }
+
                 @Override
                 public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
                     Toast.makeText(CameraKyc.this, "Configuration change", Toast.LENGTH_SHORT).show();
@@ -299,6 +389,7 @@ public class CameraKyc extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     private void openCamera() {
         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         Log.e(TAG, "is camera open");
@@ -320,8 +411,9 @@ public class CameraKyc extends AppCompatActivity {
         }
         Log.e(TAG, "openCamera X");
     }
+
     protected void updatePreview() {
-        if(null == cameraDevice) {
+        if (null == cameraDevice) {
             Log.e(TAG, "updatePreview error, return");
         }
         captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
@@ -331,6 +423,7 @@ public class CameraKyc extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     private void closeCamera() {
         if (null != cameraDevice) {
             cameraDevice.close();
@@ -341,6 +434,7 @@ public class CameraKyc extends AppCompatActivity {
             imageReader = null;
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
@@ -351,6 +445,7 @@ public class CameraKyc extends AppCompatActivity {
             }
         }
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -362,6 +457,7 @@ public class CameraKyc extends AppCompatActivity {
             textureView.setSurfaceTextureListener(textureListener);
         }
     }
+
     @Override
     protected void onPause() {
         Log.e(TAG, "onPause");

@@ -78,7 +78,7 @@ public class PayME(
         } else {
             Companion.amount = 0
         }
-        val intent = Intent(context, PayMEQRCode::class.java)
+        val intent = Intent(context, CameraKyc::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context?.startActivity(intent)
         Companion.onSuccess = onSuccess
@@ -190,7 +190,7 @@ public class PayME(
         params["connectToken"] = connectToken.toString()
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
 
-        val request = NetworkRequest(context!!, url, path, appToken, params)
+        val request = NetworkRequest(context!!, url, path, appToken, params,null)
         request.setOnRequestCrypto(
             onStart = {
 

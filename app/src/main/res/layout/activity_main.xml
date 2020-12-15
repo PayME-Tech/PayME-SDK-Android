@@ -59,6 +59,7 @@
         android:layout_marginTop="8dp"
         android:background="@drawable/background_input"
         android:hint="required"
+        android:text="CB001"
         android:padding="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/titleUser" />
@@ -79,6 +80,7 @@
         android:background="@drawable/background_input"
         android:hint="optional"
         android:padding="8dp"
+        android:text="0921112222"
         android:inputType="number"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/titleUser" />

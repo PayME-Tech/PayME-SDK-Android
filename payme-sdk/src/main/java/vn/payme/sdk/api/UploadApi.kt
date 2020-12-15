@@ -12,8 +12,7 @@ class UploadApi {
     }
 
     fun uploadImage(
-        onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit,
+
         imageFront: String,
         imageBackSide: String,
 
@@ -23,15 +22,19 @@ class UploadApi {
         var params = JSONObject()
         params.putOpt("files", imageFront)
         params.putOpt("files", imageBackSide)
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, null,params)
+        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, null, params)
         request.setOnRequest(
             onStart = {
 
             },
-            onError = onError,
+            onError = { jsonObject, i, s ->
+
+            },
             onFinally = {
             },
-            onSuccess = onSuccess,
+            onSuccess = {
+
+            },
             onExpired = {
 
             })

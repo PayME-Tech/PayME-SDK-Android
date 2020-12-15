@@ -25,7 +25,7 @@ internal class PaymentApi {
         val params: MutableMap<String, Any> = mutableMapOf()
         params["connectToken"] = PayME.connectToken
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
+        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params,null)
         request.setOnRequestCrypto(
             onStart = {
 
@@ -61,7 +61,7 @@ internal class PaymentApi {
         val nowAsISO: String = df.format(Date())
         println("nowAsISO" + nowAsISO)
         params["timestamp"] = nowAsISO
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
+        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params,null)
         request.setOnRequestCrypto(
             onStart = {
 
@@ -91,7 +91,7 @@ internal class PaymentApi {
         params["destination"] = "AppPartner"
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
         params["data"] = data
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
+        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params,null)
         request.setOnRequestCrypto(
             onStart = {
             },
@@ -124,7 +124,7 @@ internal class PaymentApi {
         params["returnUrl"] = "https://sbx-fe.payme.vn/"
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
         params["data"] = data
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
+        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params,null)
         request.setOnRequestCrypto(
             onStart = {
             },
@@ -155,7 +155,7 @@ internal class PaymentApi {
         params["destination"] = "AppPartner"
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
         params["data"] = data
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
+        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params,null)
         request.setOnRequestCrypto(
             onStart = {
             },
@@ -187,7 +187,7 @@ internal class PaymentApi {
         params["destination"] = "AppPartner"
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
         params["data"] = data
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
+        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params,null)
         request.setOnRequestCrypto(
             onStart = {
             },

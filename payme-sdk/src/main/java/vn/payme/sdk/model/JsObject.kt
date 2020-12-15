@@ -1,14 +1,20 @@
 package vn.payme.sdk.model
 
+import android.app.Activity
+import android.content.Intent
 import android.hardware.camera2.CameraManager
 import android.webkit.JavascriptInterface
 import androidx.fragment.app.FragmentManager
+import com.google.zxing.integration.android.IntentIntegrator
 import org.json.JSONObject
+import vn.payme.sdk.AnyOrientationCaptureActivity
 import vn.payme.sdk.PayME
-
+import vn.payme.sdk.PayMEQRCode
+import vn.payme.sdk.kyc.CameraKyc
 
 
 public class JsObject(
+    val activity: Activity,
     val back: () -> Unit,
     val fragmentManager: FragmentManager,
     val cameraManager: CameraManager
@@ -43,6 +49,25 @@ public class JsObject(
             println(e)
 
         }
+    }
+    @JavascriptInterface
+    public  fun  onScanQr(){
+        IntentIntegrator(activity).apply {
+            setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
+            captureActivity = AnyOrientationCaptureActivity::class.java
+            setPrompt("")
+            setCameraId(0)
+            setBeepEnabled(false)
+            setOrientationLocked(false)
+            initiateScan()
+        }
+
+    }
+    @JavascriptInterface
+    public  fun  onKyc(){
+        val intent = Intent(PayME.context, CameraKyc::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        PayME.context?.startActivity(intent)
     }
 
     @JavascriptInterface

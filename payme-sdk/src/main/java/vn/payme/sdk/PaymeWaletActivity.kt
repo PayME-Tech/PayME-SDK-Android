@@ -47,13 +47,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             "      </body></html>\n"
 
     private var cameraPermission: PermissionRequest? = null
-    private var lottie: LottieAnimationView? = null
-    private val CAMERA_PERMISSION_REQUEST = 1111
-    private var mCM: String? = null
-    private var mUM: ValueCallback<Uri>? = null
-    private var mUMA: ValueCallback<Array<Uri>>? = null
-    private val FCR = 1
-    private val FILECHOOSER_RESULTCODE = 1
     private lateinit var cameraManager: CameraManager
     private lateinit var myWebView: WebView
 
@@ -65,90 +58,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        intent: Intent?
-    ) {
-        super.onActivityResult(requestCode, resultCode, intent)
-        if (Build.VERSION.SDK_INT >= 21) {
-            var results: Array<Uri>? = null
-            //Check if response is positive
-            if (resultCode == Activity.RESULT_OK) {
-                if (requestCode == FCR) {
-                    if (null == mUMA) {
-                        return
-                    }
-                    if (intent == null) { //Capture Photo if no image available
-                        if (mCM != null) {
-                            results = arrayOf(Uri.parse(mCM))
-                        }
-                    } else {
-                        val dataString = intent.dataString
-                        if (dataString != null) {
-                            results = arrayOf(Uri.parse(dataString))
-                        }
-                    }
-                }
-            }
-            mUMA!!.onReceiveValue(results)
-            mUMA = null
-        } else {
-            if (requestCode == FCR) {
-                if (null == mUM) return
-                val result =
-                    if (intent == null || resultCode != Activity.RESULT_OK) null else intent.data
-                mUM!!.onReceiveValue(result)
-                mUM = null
-            }
-        }
-    }
-
-    @Throws(IOException::class)
-    private fun createImageFile(): File? {
-        @SuppressLint("SimpleDateFormat") val timeStamp: String =
-            SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val imageFileName = "img_" + timeStamp + "_"
-        val storageDir: File =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(imageFileName, ".jpg", storageDir)
-    }
-
-    fun openFileChooser(uploadMsg: ValueCallback<Uri?>?) {
-        this.openFileChooser(uploadMsg, "*/*")
-    }
-
-    fun openFileChooser(
-        uploadMsg: ValueCallback<Uri?>?,
-        acceptType: String?
-    ) {
-        this.openFileChooser(uploadMsg, acceptType, null)
-    }
-
-    fun openFileChooser(
-        uploadMsg: ValueCallback<Uri?>?,
-        acceptType: String?,
-        capture: String?
-    ) {
-        val i = Intent(Intent.ACTION_GET_CONTENT)
-        i.addCategory(Intent.CATEGORY_OPENABLE)
-        i.type = "*/*"
-        this@PaymeWaletActivity.startActivityForResult(
-            Intent.createChooser(i, "File Browser"),
-            FILECHOOSER_RESULTCODE
-        )
-    }
-
-    private fun checkCamera() {
-        val hasCameraPermission = checkSelfPermission(Manifest.permission.CAMERA)
-        if (hasCameraPermission != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.CAMERA), 113)
-
-        } else {
-            cameraPermission!!.grant(cameraPermission!!.resources)
-
-        }
-    }
 
     fun convertPixelsToDp(px: Float): Float {
         return if (PayME.context != null) {
@@ -162,13 +71,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
     }
 
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String?>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        cameraPermission!!.grant(cameraPermission!!.resources)
-    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 //        checkCamera()
@@ -192,9 +95,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         if (resourceId > 0) {
             statusBarHeight = resources.getDimensionPixelSize(resourceId)
         }
-        val intent: Intent = Intent(PayME.context, CameraKyc::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        PayME.context?.startActivity(intent)
 
         myWebView = findViewById(R.id.webview)
 //        lottie = findViewById(R.id.loadingWebViewPaymeSDK)
@@ -237,47 +137,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         webSettings.allowFileAccess = true
         webSettings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
         myWebView.setWebChromeClient(object : WebChromeClient() {
-            override fun onShowFileChooser(
-                webView: WebView,
-                filePathCallback: ValueCallback<Array<Uri>>,
-                fileChooserParams: FileChooserParams
-            ): Boolean {
-                if (mUMA != null) {
-                    mUMA!!.onReceiveValue(null)
-                }
-                mUMA = filePathCallback
-                var takePictureIntent: Intent? = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                if (takePictureIntent!!.resolveActivity(this@PaymeWaletActivity.getPackageManager()) != null) {
-                    var photoFile: File? = null
-                    try {
-                        photoFile = createImageFile()
-                        takePictureIntent.putExtra("PhotoPath", mCM)
-                    } catch (ex: IOException) {
-                        Log.e("Webview", "Image file creation failed", ex)
-                    }
-                    if (photoFile != null) {
-                        mCM = "file:" + photoFile.getAbsolutePath()
-                        takePictureIntent.putExtra(
-                            MediaStore.EXTRA_OUTPUT,
-                            Uri.fromFile(photoFile)
-                        )
-                    } else {
-                        takePictureIntent = null
-                    }
-                }
-                val contentSelectionIntent = Intent(Intent.ACTION_GET_CONTENT)
-                contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE)
-                contentSelectionIntent.type = "*/*"
-                val intentArray: Array<Intent>
-                intentArray = takePictureIntent?.let { arrayOf(it) } ?: arrayOf<Intent>()
-                val chooserIntent = Intent(Intent.ACTION_CHOOSER)
-                chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent)
-                chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser")
-                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
-                startActivityForResult(chooserIntent, FCR)
-                return true
-            }
-
 
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
                 Log.d(
@@ -287,17 +146,11 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                 );
                 return super.onConsoleMessage(consoleMessage)
             }
-
-            // Grant permissions for cam
-            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-            override fun onPermissionRequest(request: PermissionRequest) {
-                cameraPermission = request
-                checkCamera()
-            }
         })
         val jsObject: JsObject =
-            JsObject(back = { backScreen() }, this.supportFragmentManager, cameraManager)
+            JsObject(this,back = { backScreen() }, this.supportFragmentManager, cameraManager)
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
+        println("VAO  DDDDDDDDDDDDD")
         var action: String = PayME.action.toString()
 
         var data: JSONObject = JSONObject(
