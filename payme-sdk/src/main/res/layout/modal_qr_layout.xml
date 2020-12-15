@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    app:layout_constraintBottom_toBottomOf="parent"
+    android:paddingHorizontal="16dp"
+    android:paddingBottom="16dp">
+
+    <LinearLayout
+        android:id="@+id/layout_linear"
+        android:gravity="center"
+        android:background="@drawable/background_radius"
+        android:padding="20dp"
+        android:orientation="vertical"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:src="@drawable/qr_not_found"
+            android:layout_width="100dp"
+            android:layout_height="100dp" />
+        <TextView
+            android:textSize="22sp"
+            android:text="Không tìm thấy"
+            android:layout_marginVertical="20dp"
+            android:textColor="@color/darkBlueGrey"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:textSize="16sp"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:text="QRCode không đúng định dạng hoặc không tồn tại. Vui lòng kiểm tra và quét lại"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <vn.payme.sdk.component.Button
+            android:id="@+id/buttonSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            app:pbText="@string/confirm" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

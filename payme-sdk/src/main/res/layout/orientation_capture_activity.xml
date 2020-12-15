@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.journeyapps.barcodescanner.DecoratedBarcodeView
+        android:id="@+id/bcScanner"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:zxing_scanner_layout="@layout/custom_barcode_scanner" />
+
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="50dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/button_picker"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginHorizontal="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:background="@drawable/background_radius_button"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:src="@drawable/photo"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@string/backside" />
+            </LinearLayout>
+            <TextView
+                android:textSize="16sp"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/white"
+                android:text="Chọn ảnh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/button_torch"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginHorizontal="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:background="@drawable/background_radius_button"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:src="@drawable/flash"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@string/backside" />
+            </LinearLayout>
+            <TextView
+                android:textSize="16sp"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/white"
+                android:text="Bật flash"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

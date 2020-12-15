@@ -14,14 +14,22 @@ import vn.payme.sdk.payment.PopupSelectTypeIndentify
 import java.security.Security
 
 
-public class PayME {
+public class PayME(
+    context: Context,
+    appToken: String,
+    publicKey: String,
+    connectToken: String,
+    appPrivateKey: String,
+    configColor: Array<String>,
+    env: Env
+) {
     companion object {
         lateinit var appPrivateKey: String
         var appToken: String = ""
         lateinit var publicKey: String
         var connectToken: String = ""
         lateinit var action: Action
-        var kycInfo: KycInfo= KycInfo()
+        var kycInfo: KycInfo = KycInfo()
         var amount: Int = 0
         var content: String? = null
         var orderId: String? = null
@@ -39,15 +47,7 @@ public class PayME {
     }
 
 
-    constructor(
-        context: Context,
-        appToken: String,
-        publicKey: String,
-        connectToken: String,
-        appPrivateKey: String,
-        configColor: Array<String>,
-        env: Env
-    ) {
+    init {
         PayME.appToken = appToken
         PayME.appPrivateKey = appPrivateKey
         PayME.publicKey = publicKey
@@ -78,7 +78,7 @@ public class PayME {
         } else {
             Companion.amount = 0
         }
-        val intent: Intent = Intent(context, PaymeWaletActivity::class.java)
+        val intent = Intent(context, PayMEQRCode::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context?.startActivity(intent)
         Companion.onSuccess = onSuccess
@@ -158,7 +158,6 @@ public class PayME {
     }
 
 
-
     private fun urlFeENV(env: String?): String {
         if (env == "sandbox") {
             return "https://sbx-wam.payme.vn"
@@ -169,13 +168,14 @@ public class PayME {
     public fun isConnected(): Boolean {
         return false
     }
-    public  fun  genConnectToken(
+
+    public fun genConnectToken(
         userId: String,
         phone: String?,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        val paymentApi =  PaymentApi()
+        val paymentApi = PaymentApi()
         paymentApi.genConnectToken(userId, phone, onSuccess, onError)
 
     }

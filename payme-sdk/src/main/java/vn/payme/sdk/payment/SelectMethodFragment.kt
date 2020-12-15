@@ -105,7 +105,7 @@ class SelectMethodFragment : Fragment() {
                 this.disableLoading()
                 val toast: Toast =
                     Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
-                toast.view.setBackgroundColor(
+                toast.view?.setBackgroundColor(
                     ContextCompat.getColor(
                         PayME.context,
                         R.color.scarlet
@@ -144,7 +144,7 @@ class SelectMethodFragment : Fragment() {
                                 "Số dư trong ví không đủ",
                                 Toast.LENGTH_SHORT
                             )
-                        toast.view.setBackgroundColor(
+                        toast.view?.setBackgroundColor(
                             ContextCompat.getColor(
                                 PayME.context,
                                 R.color.scarlet

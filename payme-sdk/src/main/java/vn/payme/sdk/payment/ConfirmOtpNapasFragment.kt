@@ -41,7 +41,7 @@ class ConfirmOtpNapasFragment :Fragment() {
 
         val form = arguments?.getString("form")
         println("form"+form)
-        myWebView.loadDataWithBaseURL("x-data://base", form, "text/html", "UTF-8", null);
+        myWebView.loadDataWithBaseURL("x-data://base", form!!, "text/html", "UTF-8", null);
         myWebView.setWebViewClient(object : WebViewClient() {
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
                 // Here you can check your new URL.
