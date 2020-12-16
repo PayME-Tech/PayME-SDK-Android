@@ -7,9 +7,11 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
 import android.webkit.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import org.json.JSONObject
 import vn.payme.sdk.model.Env
@@ -223,6 +225,14 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         }
     }
 
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 5 && resultCode == Activity.RESULT_OK && data != null) {
+            val contents = data.getStringExtra(Intents.Scan.RESULT)
+            Toast.makeText(this, contents, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
