@@ -11,7 +11,6 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
 import android.webkit.*
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import org.json.JSONObject
 import vn.payme.sdk.model.Env
@@ -19,8 +18,6 @@ import vn.payme.sdk.model.JsObject
 import java.net.URLEncoder
 import android.hardware.camera2.CameraManager
 import android.util.DisplayMetrics
-import android.view.KeyEvent
-import android.widget.Toast
 import com.airbnb.lottie.LottieAnimationView
 import com.google.zxing.client.android.Intents
 import vn.payme.sdk.api.PaymentApi
@@ -224,16 +221,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 //            Toast.makeText(this, contents, Toast.LENGTH_SHORT).show()
         }
     }
-
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 5 && resultCode == Activity.RESULT_OK && data != null) {
-            val contents = data.getStringExtra(Intents.Scan.RESULT)
-            Toast.makeText(this, contents, Toast.LENGTH_SHORT).show()
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         try {
