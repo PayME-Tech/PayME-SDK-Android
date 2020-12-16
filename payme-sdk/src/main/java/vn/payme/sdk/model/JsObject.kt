@@ -57,7 +57,8 @@ public class JsObject(
             captureActivity = AnyOrientationCaptureActivity::class.java
             setPrompt("")
             setCameraId(0)
-            setBeepEnabled(false)
+            setRequestCode(5)
+            setBeepEnabled(true)
             setOrientationLocked(false)
             initiateScan()
         }

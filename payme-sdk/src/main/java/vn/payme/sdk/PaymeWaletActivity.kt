@@ -1,39 +1,26 @@
 package vn.payme.sdk
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Color
-import android.net.Uri
-import android.os.Build
+import android.hardware.camera2.CameraManager
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
+import android.util.DisplayMetrics
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
 import android.webkit.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.airbnb.lottie.LottieAnimationView
-import kotlinx.android.synthetic.main.webview_activity.*
+import com.google.zxing.client.android.Intents
+import com.google.zxing.integration.android.IntentIntegrator
 import org.json.JSONObject
 import vn.payme.sdk.model.Env
 import vn.payme.sdk.model.JsObject
-import java.io.File
-import java.io.IOException
 import java.net.URLEncoder
-import java.text.SimpleDateFormat
-import java.util.*
-import android.hardware.camera2.CameraManager
-import android.util.DisplayMetrics
-import android.view.KeyEvent
-import vn.payme.sdk.kyc.CameraKyc
-import java.lang.Exception
 
 
 internal class PaymeWaletActivity : AppCompatActivity() {
@@ -148,7 +135,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             }
         })
         val jsObject: JsObject =
-            JsObject(this,back = { backScreen() }, this.supportFragmentManager, cameraManager)
+            JsObject(this, back = { backScreen() }, this.supportFragmentManager, cameraManager)
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
         println("VAO  DDDDDDDDDDDDD")
         var action: String = PayME.action.toString()
@@ -193,6 +180,14 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 5 && resultCode == Activity.RESULT_OK && data != null) {
+            val contents = data.getStringExtra(Intents.Scan.RESULT)
+            Toast.makeText(this, contents, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDestroy() {

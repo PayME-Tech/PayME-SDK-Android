@@ -78,7 +78,7 @@ public class PayME(
         } else {
             Companion.amount = 0
         }
-        val intent = Intent(context, CameraKyc::class.java)
+        val intent = Intent(context, PaymeWaletActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context?.startActivity(intent)
         Companion.onSuccess = onSuccess
