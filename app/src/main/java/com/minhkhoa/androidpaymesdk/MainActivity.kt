@@ -7,6 +7,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.*
+import io.sentry.Sentry
 import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.model.Action
@@ -79,6 +80,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+        Sentry.captureMessage("testing SDK setup");
+
         context = this
         setContentView(R.layout.activity_main)
         button = findViewById(R.id.button)

@@ -12,7 +12,7 @@ import com.airbnb.lottie.LottieAnimationView
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
-import vn.payme.sdk.model.MyEven
+import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.TypeCallBack
 import java.text.DecimalFormat
 

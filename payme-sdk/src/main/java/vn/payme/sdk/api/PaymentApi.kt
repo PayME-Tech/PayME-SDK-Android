@@ -137,6 +137,31 @@ internal class PaymentApi {
             })
 
     }
+    fun postCheckDataQr(
+        dataQR:String,
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        val url = urlFeENV("sandbox")
+        val path = "/v1/Pay/PayWithQRCode"
+        val params: MutableMap<String, Any> = mutableMapOf()
+        val data: MutableMap<String, Any> = mutableMapOf()
+        params["connectToken"] = PayME.connectToken
+        params["data"] = dataQR
+        params["clientInfo"] = PayME.clientInfo.getClientInfo()
+        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params,null)
+        request.setOnRequestCrypto(
+            onStart = {
+            },
+            onError = onError,
+            onFinally = {
+            },
+            onSuccess = onSuccess,
+            onExpired = {
+
+            })
+
+    }
 
     fun postTransferPVCB(
         method: Method,

@@ -7,10 +7,9 @@ import org.json.JSONObject
 import org.spongycastle.jce.provider.BouncyCastleProvider
 import vn.payme.sdk.api.NetworkRequest
 import vn.payme.sdk.api.PaymentApi
-import vn.payme.sdk.kyc.CameraKyc
+import vn.payme.sdk.kyc.CameraKycActivity
 import vn.payme.sdk.model.*
 import vn.payme.sdk.payment.PaymePayment
-import vn.payme.sdk.payment.PopupSelectTypeIndentify
 import java.security.Security
 
 
@@ -78,7 +77,7 @@ public class PayME(
         } else {
             Companion.amount = 0
         }
-        val intent = Intent(context, CameraKyc::class.java)
+        val intent = Intent(context, PaymeWaletActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context?.startActivity(intent)
         Companion.onSuccess = onSuccess

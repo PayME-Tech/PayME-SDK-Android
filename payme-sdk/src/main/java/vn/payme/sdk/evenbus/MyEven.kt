@@ -1,4 +1,6 @@
-package vn.payme.sdk.model
+package vn.payme.sdk.evenbus
+
+import vn.payme.sdk.model.TypeCallBack
 
 class MyEven {
     var value: String?

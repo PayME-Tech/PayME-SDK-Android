@@ -28,15 +28,20 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
-import vn.payme.sdk.api.UploadApi
+import vn.payme.sdk.api.UploadKycApi
 import vn.payme.sdk.component.Button
-import vn.payme.sdk.payment.PopupSelectTypeIndentify
+import vn.payme.sdk.evenbus.ChangeTypeIdentify
+import vn.payme.sdk.model.TypeIdentify
+import vn.payme.sdk.payment.PopupSelectTypeIdentify
 import java.io.*
 import java.util.*
 
-class CameraKotlin : AppCompatActivity() {
+class CameraKycActivity : AppCompatActivity() {
     // Button cho capture ảnh
     private var takePictureButton: ImageView? = null
 
@@ -66,7 +71,6 @@ class CameraKotlin : AppCompatActivity() {
     var imagePreView: ImageView? = null
     var layoutConfirm: ConstraintLayout? = null
     private var layoutUpload: ConstraintLayout? = null
-    private var textGuiTakePicture: TextView? = null
     private var saveImage = ""
     private var imageFront = ""
     private var imageBackSide = ""
@@ -78,7 +82,10 @@ class CameraKotlin : AppCompatActivity() {
     protected var captureRequestBuilder: CaptureRequest.Builder? = null
     private var imageDimension: Size? = null
     private var imageReader: ImageReader? = null
-    private val popupSelectTypeIndentify: PopupSelectTypeIndentify? = null
+    private var textGuiTakePicture: TextView? = null
+    private val popupSelectTypeIndentify: PopupSelectTypeIdentify? = null
+    private var textTypeIdentify: TextView? = null
+    private var typeIdentify = "CMND"
 
     // LƯU RA FILE
     private val file: File? = null
@@ -88,13 +95,13 @@ class CameraKotlin : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.camera_fragment)
+        EventBus.getDefault().register(this)
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor = Color.WHITE
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         textureView = findViewById<View>(R.id.previewCamera) as AutoFitTextureView
-        buttonSelectTypeIdentify =
-            findViewById<View>(R.id.buttonSelectTypeIdentify) as ConstraintLayout
+
         buttonBack = findViewById<View>(R.id.buttonBack) as Button
         buttonNext = findViewById<View>(R.id.buttonNext) as Button
         buttonBackHeader = findViewById<View>(R.id.buttonBackHeader) as ImageView
@@ -102,6 +109,11 @@ class CameraKotlin : AppCompatActivity() {
         layoutConfirm = findViewById<View>(R.id.confirm_screen) as ConstraintLayout
         layoutUpload = findViewById<View>(R.id.upLoadKyc) as ConstraintLayout
         textGuiTakePicture = findViewById<View>(R.id.textGuiTakePicture) as TextView
+
+        textTypeIdentify = findViewById<View>(R.id.title_type_identify) as TextView
+        buttonSelectTypeIdentify =
+            findViewById<View>(R.id.buttonSelectTypeIdentify) as ConstraintLayout
+
         imagePreView = findViewById<View>(R.id.previewImage) as ImageView
         layoutUpload!!.background = PayME.colorApp.backgroundColor
         assert(textureView != null)
@@ -119,27 +131,41 @@ class CameraKotlin : AppCompatActivity() {
             createCameraPreview()
         }
         buttonNext!!.setOnClickListener {
-            println("imageFront$imageFront")
             if (imageFront.length > 0) {
                 imageBackSide = saveImage
                 layoutUpload!!.visibility = View.VISIBLE
-                val uploadApi = UploadApi()
-                uploadApi.uploadImage(imageFront, imageBackSide)
+                val uploadApi = UploadKycApi()
+                uploadApi.uploadKycInfo(imageFront, imageBackSide, onSuccess = {
+                    finish()
+
+                }, onError = { jsonObject, code, message ->
+                    layoutUpload!!.visibility = View.GONE
+                    val toast: Toast =
+                        Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
+                    toast.view?.setBackgroundColor(
+                        ContextCompat.getColor(
+                            PayME.context,
+                            R.color.scarlet
+                        )
+                    )
+                    toast.show()
+
+
+                })
             } else {
                 layoutConfirm!!.visibility = View.GONE
                 imageFront = saveImage
                 createCameraPreview()
             }
         }
+        buttonSelectTypeIdentify?.setOnClickListener {
+            val popupSelectTypeIdentify = PopupSelectTypeIdentify()
+            popupSelectTypeIdentify.show(this.supportFragmentManager, "ModalBottomSheet")
+        }
 
-//        buttonSelectTypeIdentify.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                popupSelectTypeIndentify= new PopupSelectTypeIndentify();
-//                popupSelectTypeIndentify.show(getSupportFragmentManager(),"ModalBottomSheet");
-//            }
-//        });
+
     }
+
 
     var textureListener: SurfaceTextureListener = object : SurfaceTextureListener {
         override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
@@ -181,7 +207,7 @@ class CameraKotlin : AppCompatActivity() {
             result: TotalCaptureResult
         ) {
             super.onCaptureCompleted(session, request, result)
-            Toast.makeText(this@CameraKotlin, "Saved:$file", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@CameraKycActivity, "Saved:$file", Toast.LENGTH_SHORT).show()
             createCameraPreview()
         }
     }
@@ -334,7 +360,11 @@ class CameraKotlin : AppCompatActivity() {
                     }
 
                     override fun onConfigureFailed(cameraCaptureSession: CameraCaptureSession) {
-                        Toast.makeText(this@CameraKotlin, "Configuration change", Toast.LENGTH_SHORT)
+                        Toast.makeText(
+                            this@CameraKycActivity,
+                            "Configuration change",
+                            Toast.LENGTH_SHORT
+                        )
                             .show()
                     }
                 },
@@ -364,7 +394,7 @@ class CameraKotlin : AppCompatActivity() {
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 ActivityCompat.requestPermissions(
-                    this@CameraKotlin,
+                    this@CameraKycActivity,
                     arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE),
                     REQUEST_CAMERA_PERMISSION
                 )
@@ -413,7 +443,7 @@ class CameraKotlin : AppCompatActivity() {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 // close the app
                 Toast.makeText(
-                    this@CameraKotlin,
+                    this@CameraKycActivity,
                     "Sorry!!!, you can't use this app without granting permission",
                     Toast.LENGTH_LONG
                 ).show()
@@ -438,5 +468,16 @@ class CameraKotlin : AppCompatActivity() {
         //closeCamera();
         stopBackgroundThread()
         super.onPause()
+    }
+
+    @Subscribe
+    fun onChange(myEven: TypeIdentify) {
+        textTypeIdentify?.text = myEven.title
+    }
+
+    override fun onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy()
+
     }
 }

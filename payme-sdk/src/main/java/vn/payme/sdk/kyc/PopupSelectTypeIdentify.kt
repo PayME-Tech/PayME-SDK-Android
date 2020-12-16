@@ -13,12 +13,17 @@ import androidx.fragment.app.DialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.zxing.integration.android.IntentIntegrator
+import org.greenrobot.eventbus.EventBus
+import vn.payme.sdk.AnyOrientationCaptureActivity
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.adapter.TypeIndentifyAdapter
+import vn.payme.sdk.evenbus.MyEven
+import vn.payme.sdk.model.TypeCallBack
 import vn.payme.sdk.model.TypeIdentify
 
-internal class PopupSelectTypeIndentify : BottomSheetDialogFragment() {
+internal class PopupSelectTypeIdentify : BottomSheetDialogFragment() {
 
     private var methodSelected: Int = 0
     private lateinit var listView: ListView
@@ -48,18 +53,14 @@ internal class PopupSelectTypeIndentify : BottomSheetDialogFragment() {
         this.listMethod.add(
             TypeIdentify(
                 "Chứng minh nhân dân",
+                "CMND",
                 true
             )
         )
         this.listMethod.add(
             TypeIdentify(
-                "Căn cước công dân",
-                false
-            )
-        )
-        this.listMethod.add(
-            TypeIdentify(
                 "Hộ chiếu",
+                "Passport",
                 false
             )
         )
@@ -70,12 +71,18 @@ internal class PopupSelectTypeIndentify : BottomSheetDialogFragment() {
                 this.listMethod[methodSelected].selected = false
                 this.methodSelected = i
                 methodAdapter.notifyDataSetChanged()
+                var even: EventBus = EventBus.getDefault()
+                var typeIdentify = this.listMethod[i]
+                even.post(typeIdentify)
+                this.dialog?.dismiss()
+
             }
 
         }
 
         buttonClose.setOnClickListener {
             this.dialog?.dismiss()
+
         }
         return view
     }

@@ -1,7 +1,6 @@
 package vn.payme.sdk.payment
 
 import android.os.Bundle
-import android.os.Message
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +16,7 @@ import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.enum.TYPE_PAYMENT
 import vn.payme.sdk.model.Method
-import vn.payme.sdk.model.MyEven
+import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.TypeCallBack
 import java.text.DecimalFormat
 

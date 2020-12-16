@@ -9,8 +9,7 @@ import com.google.zxing.integration.android.IntentIntegrator
 import org.json.JSONObject
 import vn.payme.sdk.AnyOrientationCaptureActivity
 import vn.payme.sdk.PayME
-import vn.payme.sdk.PayMEQRCode
-import vn.payme.sdk.kyc.CameraKyc
+import vn.payme.sdk.kyc.CameraKycActivity
 
 
 public class JsObject(
@@ -57,15 +56,17 @@ public class JsObject(
             captureActivity = AnyOrientationCaptureActivity::class.java
             setPrompt("")
             setCameraId(0)
-            setBeepEnabled(false)
+            setRequestCode(5)
+            setBeepEnabled(true)
             setOrientationLocked(false)
             initiateScan()
         }
 
+
     }
     @JavascriptInterface
     public  fun  onKyc(){
-        val intent = Intent(PayME.context, CameraKyc::class.java)
+        val intent = Intent(PayME.context, CameraKycActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         PayME.context?.startActivity(intent)
     }

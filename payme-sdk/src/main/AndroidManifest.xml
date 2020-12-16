@@ -21,14 +21,7 @@
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
-
-        <activity android:name=".PayMEQRCode">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name="vn.payme.sdk.kyc.CameraKyc">
+        <activity android:name="vn.payme.sdk.kyc.CameraKycActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <action android:name="android.intent.action.MAIN" />

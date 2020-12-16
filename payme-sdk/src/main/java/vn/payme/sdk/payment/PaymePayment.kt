@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 
 import androidx.annotation.Nullable
 import androidx.fragment.app.DialogFragment
@@ -17,9 +16,9 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
-import vn.payme.sdk.model.MyEven
+import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.TypeCallBack
-import vn.payme.sdk.payment.SelectMethodFragment
+
 internal class PaymePayment : BottomSheetDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

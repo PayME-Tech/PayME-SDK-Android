@@ -1,38 +1,27 @@
 package vn.payme.sdk
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Color
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
-import com.airbnb.lottie.LottieAnimationView
-import kotlinx.android.synthetic.main.webview_activity.*
 import org.json.JSONObject
 import vn.payme.sdk.model.Env
 import vn.payme.sdk.model.JsObject
-import java.io.File
-import java.io.IOException
 import java.net.URLEncoder
-import java.text.SimpleDateFormat
-import java.util.*
 import android.hardware.camera2.CameraManager
 import android.util.DisplayMetrics
 import android.view.KeyEvent
-import vn.payme.sdk.kyc.CameraKyc
+import android.widget.Toast
+import com.airbnb.lottie.LottieAnimationView
+import com.google.zxing.client.android.Intents
+import vn.payme.sdk.api.PaymentApi
 import java.lang.Exception
 
 
@@ -47,6 +36,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             "      </body></html>\n"
 
     private var cameraPermission: PermissionRequest? = null
+    private var lottie: LottieAnimationView? = null
     private lateinit var cameraManager: CameraManager
     private lateinit var myWebView: WebView
 
@@ -69,8 +59,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             px / (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
         }
     }
-
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,7 +85,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         }
 
         myWebView = findViewById(R.id.webview)
-//        lottie = findViewById(R.id.loadingWebViewPaymeSDK)
+        lottie = findViewById(R.id.loadingWeb)
         myWebView.clearCache(true);
         myWebView.clearFormData();
         myWebView.clearHistory();
@@ -109,7 +97,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         myWebView.setWebViewClient(object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-//                lottie?.visibility = View.INVISIBLE
+                lottie?.visibility = View.GONE
             }
         })
         getWindow().setFlags(
@@ -148,7 +136,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             }
         })
         val jsObject: JsObject =
-            JsObject(this,back = { backScreen() }, this.supportFragmentManager, cameraManager)
+            JsObject(this, back = { backScreen() }, this.supportFragmentManager, cameraManager)
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
         println("VAO  DDDDDDDDDDDDD")
         var action: String = PayME.action.toString()
@@ -194,6 +182,47 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
 
     }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 5 && resultCode == Activity.RESULT_OK && data != null) {
+            val contents = data.getStringExtra(Intents.Scan.RESULT)
+            val paymentApi = PaymentApi()
+            paymentApi.postCheckDataQr(contents.toString(),
+                onSuccess = { jsonObject ->
+                    val amount = jsonObject?.getInt("amount")
+                    val content = jsonObject?.getString("content")
+                    val orderId = jsonObject?.getString("orderId")
+                    val payme = PayME(
+                        PayME.context,
+                        PayME.appToken,
+                        PayME.publicKey,
+                        PayME.connectToken,
+                        PayME.appPrivateKey,
+                        PayME.configColor!!,
+                        PayME.env!!
+                    )
+                    payme.pay(this.supportFragmentManager, amount, content, orderId, "", onSuccess = {
+
+                    }, onError = {
+
+
+                    },
+                        onClose = {
+
+                        }
+                    )
+
+
+                },
+                onError = { jsonObject, code, message ->
+                     var popup: PayMEQRCodePopup = PayMEQRCodePopup()
+                    popup.show(this.supportFragmentManager, "ModalBottomSheet")
+                }
+            )
+//            Toast.makeText(this, contents, Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
