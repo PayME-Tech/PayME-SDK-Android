@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
             "   MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKi\n" +
             "   wIhTJpAi1XnbfOSrW/Ebw6h1485GOAvuG/OwB+ScsfPJBoNJeNFU6J0CAwEAAQ==\n" +
             "   -----END PUBLIC KEY-----"
-    var ConnectToken: String = "qBpM18YIyB15rdpFFfJpzsUBXNkaQ9rnCAN3asLNCrmEgQoS9YlhEVL8iQWT+6hhLSMs/C6uBUXxqD1PN33yhqhspdwGjJS855PhlcSgbpPlnR+KqNYCnT5MZcWaoBkX"
+    var ConnectToken: String = "Zn9T0j9jtZYPzi4B8Ti8NiXnEAJLACAljMcY20NKTyK58QzFP10VP4Tav2kKdmw\\/Xpq5Nm85hVpXGxFER6OPuBMcgUZRBhdkgc8SjkPDpjo="
     val PrivateKey: String = "-----BEGIN PRIVATE KEY-----\n" +
             "    MIIBPAIBAAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKiwIhTJpAi1XnbfOSrW/Eb\n" +
             "    w6h1485GOAvuG/OwB+ScsfPJBoNJeNFU6J0CAwEAAQJBAJSfTrSCqAzyAo59Ox+m\n" +

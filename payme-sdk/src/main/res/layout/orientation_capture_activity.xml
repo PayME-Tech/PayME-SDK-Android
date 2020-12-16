@@ -23,6 +23,7 @@
 
         <ImageView
             android:layout_width="30dp"
+            android:id="@+id/button_back"
             android:layout_height="30dp"
             android:src="@drawable/backarrow"
             app:layout_constraintBottom_toBottomOf="parent"

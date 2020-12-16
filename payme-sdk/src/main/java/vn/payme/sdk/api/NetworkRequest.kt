@@ -43,7 +43,6 @@ internal class NetworkRequest(
             url + path,
             paramsData,
             Response.Listener { response ->
-                println("RESPONSE$response")
                 try {
                     val jsonObject = JSONObject(response.toString())
                     if (jsonObject.getInt("code") == 1000) {
@@ -173,7 +172,6 @@ internal class NetworkRequest(
 
                     val result = cryptoAES.decryptAES(decryptKey, xAPIMessageResponse)
                     val finalJSONObject = JSONObject(result)
-                    println("RESPONSE$finalJSONObject")
 
                     if (finalJSONObject.getInt("code") == 1000) {
                         onSuccess(finalJSONObject.getJSONObject("data"))

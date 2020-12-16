@@ -20,7 +20,11 @@ import android.hardware.camera2.CameraManager
 import android.util.DisplayMetrics
 import com.airbnb.lottie.LottieAnimationView
 import com.google.zxing.client.android.Intents
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.api.PaymentApi
+import vn.payme.sdk.evenbus.MyEven
+import vn.payme.sdk.model.TypeCallBack
 import java.lang.Exception
 
 
@@ -63,6 +67,8 @@ internal class PaymeWaletActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 //        checkCamera()
         super.onCreate(savedInstanceState)
+        EventBus.getDefault().register(this)
+
         cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
 
@@ -181,54 +187,68 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
 
     }
+    fun checkScanQr (contents:String) {
+        val paymentApi = PaymentApi()
+        paymentApi.postCheckDataQr(contents,
+            onSuccess = { jsonObject ->
+                val amount = jsonObject?.getInt("amount")
+                val content = jsonObject?.getString("content")
+                val orderId = jsonObject?.getString("orderId")
+                val payme = PayME(
+                    PayME.context,
+                    PayME.appToken,
+                    PayME.publicKey,
+                    PayME.connectToken,
+                    PayME.appPrivateKey,
+                    PayME.configColor!!,
+                    PayME.env!!
+                )
+                payme.pay(this.supportFragmentManager, amount, content, orderId, "", onSuccess = {
+
+                }, onError = {
+
+
+                },
+                    onClose = {
+
+                    }
+                )
+
+
+            },
+            onError = { jsonObject, code, message ->
+                var popup: PayMEQRCodePopup = PayMEQRCodePopup()
+                popup.show(this.supportFragmentManager, "ModalBottomSheet")
+            }
+        )
+    }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 5 && resultCode == Activity.RESULT_OK && data != null) {
             val contents = data.getStringExtra(Intents.Scan.RESULT)
-            val paymentApi = PaymentApi()
-            paymentApi.postCheckDataQr(contents.toString(),
-                onSuccess = { jsonObject ->
-                    val amount = jsonObject?.getInt("amount")
-                    val content = jsonObject?.getString("content")
-                    val orderId = jsonObject?.getString("orderId")
-                    val payme = PayME(
-                        PayME.context,
-                        PayME.appToken,
-                        PayME.publicKey,
-                        PayME.connectToken,
-                        PayME.appPrivateKey,
-                        PayME.configColor!!,
-                        PayME.env!!
-                    )
-                    payme.pay(this.supportFragmentManager, amount, content, orderId, "", onSuccess = {
-
-                    }, onError = {
-
-
-                    },
-                        onClose = {
-
-                        }
-                    )
-
-
-                },
-                onError = { jsonObject, code, message ->
-                     var popup: PayMEQRCodePopup = PayMEQRCodePopup()
-                    popup.show(this.supportFragmentManager, "ModalBottomSheet")
-                }
-            )
+            checkScanQr(contents.toString())
 //            Toast.makeText(this, contents, Toast.LENGTH_SHORT).show()
         }
     }
     override fun onDestroy() {
-        super.onDestroy()
-        try {
-            val cameraId = cameraManager.cameraIdList[0]
-            cameraManager.setTorchMode(cameraId, false)
-        } catch (e: Exception) {
-        }
+        EventBus.getDefault().unregister(this);
 
+        super.onDestroy()
+//        try {
+//            val cameraId = cameraManager.cameraIdList[0]
+//            cameraManager.setTorchMode(cameraId, false)
+//        } catch (e: Exception) {
+//        }
+
+    }
+    @Subscribe
+    fun onText(myEven: MyEven){
+        if(myEven.type=== TypeCallBack.onReload){
+            this.myWebView.reload()
+        }
+        if(myEven.type=== TypeCallBack.onScan){
+            myEven.value?.let { checkScanQr(it) }
+        }
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {

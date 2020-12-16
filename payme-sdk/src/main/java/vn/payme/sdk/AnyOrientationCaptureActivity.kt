@@ -1,26 +1,26 @@
 package vn.payme.sdk
 
 import android.app.Activity
-import android.content.Context
+import android.app.Instrumentation
 import android.content.Intent
-import android.hardware.camera2.CameraManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.KeyEvent
+import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.zxing.*
+import com.google.zxing.BinaryBitmap
+import com.google.zxing.MultiFormatReader
+import com.google.zxing.NotFoundException
+import com.google.zxing.RGBLuminanceSource
 import com.google.zxing.common.HybridBinarizer
-import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.CaptureManager
 import kotlinx.android.synthetic.main.orientation_capture_activity.*
-import vn.payme.sdk.PayME.Companion.context
-import vn.payme.sdk.api.PaymentApi
-import vn.payme.sdk.payment.ConfirmOtpFragment
-import vn.payme.sdk.payment.ResultPaymentFragment
+import org.greenrobot.eventbus.EventBus
+import vn.payme.sdk.evenbus.MyEven
+import vn.payme.sdk.model.TypeCallBack
 
 
 class AnyOrientationCaptureActivity : AppCompatActivity() {
@@ -29,6 +29,7 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
     private lateinit var capture: CaptureManager
     private var btnPicker: LinearLayout? = null
     private var btnTorch: LinearLayout? = null
+    private var buttonBack: ImageView? = null
     private var popup: PayMEQRCodePopup = PayMEQRCodePopup()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,21 +50,31 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
             intent.action = Intent.ACTION_GET_CONTENT
             startActivityForResult(Intent.createChooser(intent, "Chọn ảnh"), PICK_IMAGE)
         }
+        buttonBack!!.setOnClickListener {
+            finish()
+        }
+
         btnTorch!!.setOnClickListener {
-            try {
-                val cameraManager: CameraManager =
-                    this.getSystemService(Context.CAMERA_SERVICE) as CameraManager
-                val cameraId = cameraManager.cameraIdList[0]
-                cameraManager.setTorchMode(cameraId, toggleTorch)
-                toggleTorch = !toggleTorch
-            } catch (e: java.lang.Exception) {
-            }
+            Thread {
+                try {
+                    val inst = Instrumentation()
+                    if (toggleTorch) {
+                        inst.sendKeyDownUpSync(KeyEvent.KEYCODE_VOLUME_UP)
+                    } else {
+                        inst.sendKeyDownUpSync(KeyEvent.KEYCODE_VOLUME_DOWN)
+                    }
+                    toggleTorch = !toggleTorch
+                } catch (e: InterruptedException) {
+                }
+            }.start()
+
         }
     }
 
     private fun mappingView() {
         btnPicker = findViewById(R.id.button_picker)
         btnTorch = findViewById(R.id.button_torch)
+        buttonBack = findViewById(R.id.button_back)
     }
 
     private fun initScanner(savedInstanceState: Bundle?) {
@@ -74,40 +85,7 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkDataScanQr(dataQr: String) {
-        val paymentApi = PaymentApi()
-        paymentApi.postCheckDataQr(dataQr,
-            onSuccess = { jsonObject ->
-                val amount = jsonObject?.getInt("amount")
-                val content = jsonObject?.getString("content")
-                val orderId = jsonObject?.getString("orderId")
-                val payme = PayME(
-                    PayME.context,
-                    PayME.appToken,
-                    PayME.publicKey,
-                    PayME.connectToken,
-                    PayME.appPrivateKey,
-                    PayME.configColor!!,
-                    PayME.env!!
-                )
-                payme.pay(this.supportFragmentManager, amount, content, orderId, "", onSuccess = {
 
-                }, onError = {
-
-
-                },
-                    onClose = {
-
-                    }
-                )
-
-
-            },
-            onError = { jsonObject, code, message ->
-                popup.show(this.supportFragmentManager, "ModalBottomSheet")
-            }
-        )
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -127,17 +105,13 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
                 try {
                     val result = reader.decode(bBitmap)
                     finish()
-                    checkDataScanQr(result.toString())
+                    var even: EventBus = EventBus.getDefault()
+                    var myEven: MyEven = MyEven(TypeCallBack.onScan, result.toString())
+                    even.post(myEven)
                 } catch (e: NotFoundException) {
                     Log.d("TAG", "Not found")
                 }
             }
-        }
-
-        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        Log.d("RRR", result.toString())
-        result?.let {
-            Toast.makeText(this, it.contents, Toast.LENGTH_LONG).show()
         }
     }
 

@@ -28,15 +28,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.android.volley.DefaultRetryPolicy
 import com.android.volley.toolbox.Volley
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.UploadKycApi
 import vn.payme.sdk.api.VolleyMultipartRequest
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.evenbus.ChangeTypeIdentify
+import vn.payme.sdk.evenbus.MyEven
+import vn.payme.sdk.model.TypeCallBack
 import vn.payme.sdk.model.TypeIdentify
 import vn.payme.sdk.payment.PopupSelectTypeIdentify
 import java.io.*
@@ -88,6 +92,8 @@ class CameraKycActivity : AppCompatActivity() {
     private val popupSelectTypeIndentify: PopupSelectTypeIdentify? = null
     private var textTypeIdentify: TextView? = null
     private var typeIdentify = "CMND"
+    private var file1: File? = null
+    private var file2: File? = null
 
     // LƯU RA FILE
     private val file: File? = null
@@ -134,26 +140,10 @@ class CameraKycActivity : AppCompatActivity() {
         }
         buttonNext!!.setOnClickListener {
             if (imageFront.length > 0) {
-                imageBackSide = saveImage
                 layoutUpload!!.visibility = View.VISIBLE
-                val uploadApi = UploadKycApi()
-                uploadApi.uploadKycInfo(imageFront, imageBackSide, onSuccess = {
-                    finish()
+                imageBackSide = saveImage
+                upload1()
 
-                }, onError = { jsonObject, code, message ->
-                    layoutUpload!!.visibility = View.GONE
-                    val toast: Toast =
-                        Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
-                    toast.view?.setBackgroundColor(
-                        ContextCompat.getColor(
-                            PayME.context,
-                            R.color.scarlet
-                        )
-                    )
-                    toast.show()
-
-
-                })
             } else {
                 layoutConfirm!!.visibility = View.GONE
                 imageFront = saveImage
@@ -246,8 +236,8 @@ class CameraKycActivity : AppCompatActivity() {
                     .getOutputSizes(ImageFormat.JPEG)
 
             // CAPTURE IMAGE với tuỳ chỉnh kích thước
-            var width = textureView!!.width
-            var height = textureView!!.height
+            var width = 480
+            var height = 640
             if (jpegSizes != null && jpegSizes.isNotEmpty()) {
                 width = jpegSizes[0].width
                 height = jpegSizes[0].height
@@ -480,11 +470,11 @@ class CameraKycActivity : AppCompatActivity() {
 
     }
 
-    private fun upload(uri: Uri) {
-        val file = File(uri.path!!)
-        val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
+    private fun upload1() {
+
+        val bitmap = BitmapFactory.decodeFile(imageFront)
         val byteArrayOutputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 80, byteArrayOutputStream)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream)
         val bytes = byteArrayOutputStream.toByteArray()
 
         val queue = Volley.newRequestQueue(this)
@@ -494,20 +484,140 @@ class CameraKycActivity : AppCompatActivity() {
             { response ->
                 val a = response.data
                 val b = String(a, StandardCharsets.UTF_8)
-                Toast.makeText(this, b, Toast.LENGTH_SHORT).show()
+                val jsonObject = JSONObject(b)
+                if (jsonObject.getInt("code") == 1000) {
+                    val arrayJson = jsonObject.getJSONArray("data")
+                    val jsonObject = arrayJson.getJSONObject(0)
+                    var path = jsonObject.optString("path")
+                    upload2(path)
+
+                }else{
+                    val message = jsonObject.getString("message")
+                    val toast: Toast =
+                        Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
+                    toast.view?.setBackgroundColor(
+                        ContextCompat.getColor(
+                            PayME.context,
+                            R.color.scarlet
+                        )
+                    )
+                }
+
+
             },
-            { error -> Toast.makeText(this, error.toString(), Toast.LENGTH_SHORT).show() }
+            { error ->
+                val toast: Toast =
+                    Toast.makeText(PayME.context, "Kết nối mạng bị sự cố, vui lòng kiểm tra và thử lại. Xin cảm ơn !", Toast.LENGTH_SHORT)
+                toast.view?.setBackgroundColor(
+                    ContextCompat.getColor(
+                        PayME.context,
+                        R.color.scarlet
+                    )
+                )
+            }
         ) {
             override fun getByteData(): MutableMap<String, DataPart> {
                 val params: MutableMap<String, DataPart> = HashMap()
                 params["files"] = DataPart(
                     "file_avatar_hieu_1.jpg",
                     bytes,
-                    "image/png"
+                    "image/jpeg"
                 )
+
                 return params
             }
         }
+        val defaultRetryPolicy = DefaultRetryPolicy(
+            30000,
+            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
+        b.retryPolicy = defaultRetryPolicy
+        queue.add(b)
+    }
+
+    private fun upload2(image1: String) {
+
+        val bitmap = BitmapFactory.decodeFile(imageBackSide)
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream)
+        val bytes = byteArrayOutputStream.toByteArray()
+
+        val queue = Volley.newRequestQueue(this)
+        val b = object : VolleyMultipartRequest(
+            Method.POST,
+            "https://sbx-static.payme.vn/Upload",
+            { response ->
+                val a = response.data
+                val b = String(a, StandardCharsets.UTF_8)
+                val jsonObject = JSONObject(b)
+                if (jsonObject.getInt("code") == 1000) {
+                    val arrayJson = jsonObject.getJSONArray("data")
+                    val jsonObject = arrayJson.getJSONObject(0)
+                    var path = jsonObject.optString("path")
+                    val uploadApi = UploadKycApi()
+                    uploadApi.uploadKycInfo(image1, path, onSuccess = {
+                        finish()
+                        var even: EventBus = EventBus.getDefault()
+                        var myEven: MyEven = MyEven(TypeCallBack.onReload,"")
+                        even.post(myEven)
+                    }, onError = { jsonObject, code, message ->
+                        layoutUpload!!.visibility = View.GONE
+                        val toast: Toast =
+                            Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
+                        toast.view?.setBackgroundColor(
+                            ContextCompat.getColor(
+                                PayME.context,
+                                R.color.scarlet
+                            )
+                        )
+                        toast.show()
+
+
+                    })
+
+                }else{
+                    val message = jsonObject.getString("message")
+                    val toast: Toast =
+                        Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
+                    toast.view?.setBackgroundColor(
+                        ContextCompat.getColor(
+                            PayME.context,
+                            R.color.scarlet
+                        )
+                    )
+                }
+
+
+            },
+            { error ->
+                val toast: Toast =
+                    Toast.makeText(PayME.context, "Kết nối mạng bị sự cố, vui lòng kiểm tra và thử lại. Xin cảm ơn !", Toast.LENGTH_SHORT)
+                toast.view?.setBackgroundColor(
+                    ContextCompat.getColor(
+                        PayME.context,
+                        R.color.scarlet
+                    )
+                )
+            }
+        ) {
+            override fun getByteData(): MutableMap<String, DataPart> {
+                val params: MutableMap<String, DataPart> = HashMap()
+                params["files"] = DataPart(
+                    "file_avatar_hieu_1.jpg",
+                    bytes,
+                    "image/jpeg"
+                )
+
+                return params
+            }
+        }
+        val defaultRetryPolicy = DefaultRetryPolicy(
+            30000,
+            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
+        b.retryPolicy = defaultRetryPolicy
         queue.add(b)
     }
 }
