@@ -34,7 +34,7 @@ internal class NetworkRequest(
         if (onStart != null) {
             onStart()
         }
-        println("REQUEST" + paramsData)
+        println("REQUEST$paramsData")
 
 
         val queue = Volley.newRequestQueue(context)
@@ -43,7 +43,7 @@ internal class NetworkRequest(
             url + path,
             paramsData,
             Response.Listener { response ->
-                println("RESPONSE" + response.toString())
+                println("RESPONSE$response")
                 try {
                     val jsonObject = JSONObject(response.toString())
                     if (jsonObject.getInt("code") == 1000) {
@@ -101,7 +101,7 @@ internal class NetworkRequest(
             DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
-        request.setRetryPolicy(defaultRetryPolicy)
+        request.retryPolicy = defaultRetryPolicy
         queue.add(request)
     }
 
@@ -173,7 +173,7 @@ internal class NetworkRequest(
 
                     val result = cryptoAES.decryptAES(decryptKey, xAPIMessageResponse)
                     val finalJSONObject = JSONObject(result)
-                    println("RESPONSE" + finalJSONObject.toString())
+                    println("RESPONSE$finalJSONObject")
 
                     if (finalJSONObject.getInt("code") == 1000) {
                         onSuccess(finalJSONObject.getJSONObject("data"))
@@ -191,13 +191,11 @@ internal class NetworkRequest(
 
 
 
-                        if (onError != null) {
-                            onError(
-                                finalJSONObject.getJSONObject("data"),
-                                finalJSONObject.getInt("code"),
-                                errorMessage
-                            )
-                        }
+                        onError(
+                            finalJSONObject.getJSONObject("data"),
+                            finalJSONObject.getInt("code"),
+                            errorMessage
+                        )
                     }
                     if (onFinally != null) {
                         onFinally()
@@ -210,13 +208,11 @@ internal class NetworkRequest(
                 if (onFinally != null) {
                     onFinally()
                 }
-                if (onError != null) {
-                    onError(
-                        null,
-                        -2,
-                        "Kết nối mạng bị sự cố, vui lòng kiểm tra và thử lại. Xin cảm ơn !"
-                    )
-                }
+                onError(
+                    null,
+                    -2,
+                    "Kết nối mạng bị sự cố, vui lòng kiểm tra và thử lại. Xin cảm ơn !"
+                )
             }
         ) {
             override fun getHeaders(): MutableMap<String, String> {
@@ -257,7 +253,7 @@ internal class NetworkRequest(
             DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
-        request.setRetryPolicy(defaultRetryPolicy)
+        request.retryPolicy = defaultRetryPolicy
         queue.add(request)
     }
 

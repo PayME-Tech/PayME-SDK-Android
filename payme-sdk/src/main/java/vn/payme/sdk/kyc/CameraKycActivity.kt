@@ -2,19 +2,18 @@ package vn.payme.sdk.kyc
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.graphics.ImageFormat
-import android.graphics.SurfaceTexture
+import android.graphics.*
 import android.hardware.camera2.*
 import android.hardware.camera2.CameraCaptureSession.CaptureCallback
 import android.media.Image
 import android.media.ImageReader
 import android.media.ImageReader.OnImageAvailableListener
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.HandlerThread
+import android.provider.MediaStore
 import android.util.Log
 import android.util.Size
 import android.util.SparseIntArray
@@ -29,16 +28,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.android.volley.toolbox.Volley
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.UploadKycApi
+import vn.payme.sdk.api.VolleyMultipartRequest
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.evenbus.ChangeTypeIdentify
 import vn.payme.sdk.model.TypeIdentify
 import vn.payme.sdk.payment.PopupSelectTypeIdentify
 import java.io.*
+import java.nio.charset.StandardCharsets
 import java.util.*
 
 class CameraKycActivity : AppCompatActivity() {
@@ -239,17 +241,14 @@ class CameraKycActivity : AppCompatActivity() {
             val characteristics = manager.getCameraCharacteristics(
                 cameraDevice!!.id
             )
-            var jpegSizes: Array<Size>? = null
-            if (characteristics != null) {
-                jpegSizes =
-                    characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)!!
-                        .getOutputSizes(ImageFormat.JPEG)
-            }
+            val jpegSizes: Array<Size>? =
+                characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)!!
+                    .getOutputSizes(ImageFormat.JPEG)
 
             // CAPTURE IMAGE với tuỳ chỉnh kích thước
             var width = textureView!!.width
             var height = textureView!!.height
-            if (jpegSizes != null && 0 < jpegSizes.size) {
+            if (jpegSizes != null && jpegSizes.isNotEmpty()) {
                 width = jpegSizes[0].width
                 height = jpegSizes[0].height
             }
@@ -479,5 +478,36 @@ class CameraKycActivity : AppCompatActivity() {
         EventBus.getDefault().unregister(this);
         super.onDestroy()
 
+    }
+
+    private fun upload(uri: Uri) {
+        val file = File(uri.path!!)
+        val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 80, byteArrayOutputStream)
+        val bytes = byteArrayOutputStream.toByteArray()
+
+        val queue = Volley.newRequestQueue(this)
+        val b = object : VolleyMultipartRequest(
+            Method.POST,
+            "https://sbx-static.payme.vn/Upload",
+            { response ->
+                val a = response.data
+                val b = String(a, StandardCharsets.UTF_8)
+                Toast.makeText(this, b, Toast.LENGTH_SHORT).show()
+            },
+            { error -> Toast.makeText(this, error.toString(), Toast.LENGTH_SHORT).show() }
+        ) {
+            override fun getByteData(): MutableMap<String, DataPart> {
+                val params: MutableMap<String, DataPart> = HashMap()
+                params["files"] = DataPart(
+                    "file_avatar_hieu_1.jpg",
+                    bytes,
+                    "image/png"
+                )
+                return params
+            }
+        }
+        queue.add(b)
     }
 }
