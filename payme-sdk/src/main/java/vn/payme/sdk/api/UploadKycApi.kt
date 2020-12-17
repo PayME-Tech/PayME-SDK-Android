@@ -1,5 +1,6 @@
 package vn.payme.sdk.api
 
+import android.util.Log
 import com.android.volley.DefaultRetryPolicy
 import org.json.JSONObject
 import vn.payme.sdk.PayME
@@ -20,12 +21,11 @@ class UploadKycApi {
     }
 
     fun uploadKycInfo(
-
+        typeIdentify: String,
         imageFront: String,
         imageBackSide: String,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
-
     ) {
 
         val url = urlFeENV("sandbox")
@@ -36,7 +36,7 @@ class UploadKycApi {
         image["back"] = imageBackSide
         params["image"] = image
         params["connectToken"] = PayME.connectToken.toString()
-        params["identifyType"] = "CMND"
+        params["identifyType"] = typeIdentify
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
 
         val request =

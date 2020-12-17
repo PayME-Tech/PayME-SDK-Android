@@ -66,7 +66,6 @@ internal class PopupSelectTypeIdentify : BottomSheetDialogFragment() {
         )
         methodAdapter.notifyDataSetChanged()
         listView.setOnItemClickListener { adapterView, view, i, l ->
-            if (!this.listMethod[i].selected!!) {
                 this.listMethod[i].selected = true
                 this.listMethod[methodSelected].selected = false
                 this.methodSelected = i
@@ -75,9 +74,6 @@ internal class PopupSelectTypeIdentify : BottomSheetDialogFragment() {
                 var typeIdentify = this.listMethod[i]
                 even.post(typeIdentify)
                 this.dialog?.dismiss()
-
-            }
-
         }
 
         buttonClose.setOnClickListener {

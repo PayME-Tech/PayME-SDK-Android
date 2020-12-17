@@ -142,9 +142,12 @@ class CameraKycActivity : AppCompatActivity() {
             if (imageFront.length > 0) {
                 layoutUpload!!.visibility = View.VISIBLE
                 imageBackSide = saveImage
+//                imagePreView!!.setImageBitmap(BitmapFactory.decodeFile(imageFront))
+
                 upload1()
 
             } else {
+                textGuiTakePicture?.text = "Mặt sau"
                 layoutConfirm!!.visibility = View.GONE
                 imageFront = saveImage
                 createCameraPreview()
@@ -256,7 +259,13 @@ class CameraKycActivity : AppCompatActivity() {
                 CaptureRequest.JPEG_ORIENTATION,
                 ORIENTATIONS[rotation]
             )
-            val file = File(Environment.getExternalStorageDirectory().toString() + "/pic.jpg")
+            var nameImage =  "pic"
+            if(imageFront.length>0){
+                nameImage = "picImageBackSide"
+            }else{
+                nameImage = "picImageFront"
+            }
+            val file = File(Environment.getExternalStorageDirectory().toString() + "/${nameImage}.jpg")
             val readerListener: OnImageAvailableListener = object : OnImageAvailableListener {
                 override fun onImageAvailable(reader: ImageReader) {
                     var image: Image? = null
@@ -471,7 +480,7 @@ class CameraKycActivity : AppCompatActivity() {
     }
 
     private fun upload1() {
-
+        println("REQUESSSSSSSSSSSSSSSSSSSS1IFront${imageFront}")
         val bitmap = BitmapFactory.decodeFile(imageFront)
         val byteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream)
@@ -489,6 +498,8 @@ class CameraKycActivity : AppCompatActivity() {
                     val arrayJson = jsonObject.getJSONArray("data")
                     val jsonObject = arrayJson.getJSONObject(0)
                     var path = jsonObject.optString("path")
+                    println("REQUESSSSSSSSSSSSSSSSSSSS1patht${path}")
+
                     upload2(path)
 
                 }else{
@@ -519,7 +530,7 @@ class CameraKycActivity : AppCompatActivity() {
             override fun getByteData(): MutableMap<String, DataPart> {
                 val params: MutableMap<String, DataPart> = HashMap()
                 params["files"] = DataPart(
-                    "file_avatar_hieu_1.jpg",
+                    "file_Payme_Identify_1.jpg",
                     bytes,
                     "image/jpeg"
                 )
@@ -537,6 +548,7 @@ class CameraKycActivity : AppCompatActivity() {
     }
 
     private fun upload2(image1: String) {
+        println("REQUESSSSSSSSSSSSSSSSSSSS1IimageBackSide${imageBackSide}")
 
         val bitmap = BitmapFactory.decodeFile(imageBackSide)
         val byteArrayOutputStream = ByteArrayOutputStream()
@@ -556,7 +568,9 @@ class CameraKycActivity : AppCompatActivity() {
                     val jsonObject = arrayJson.getJSONObject(0)
                     var path = jsonObject.optString("path")
                     val uploadApi = UploadKycApi()
-                    uploadApi.uploadKycInfo(image1, path, onSuccess = {
+                    uploadApi.uploadKycInfo(typeIdentify,image1, path, onSuccess = {
+                        println("REQUESSSSSSSSSSSSSSSSSSSS1patht222${path}")
+
                         finish()
                         var even: EventBus = EventBus.getDefault()
                         var myEven: MyEven = MyEven(TypeCallBack.onReload,"")
@@ -604,7 +618,7 @@ class CameraKycActivity : AppCompatActivity() {
             override fun getByteData(): MutableMap<String, DataPart> {
                 val params: MutableMap<String, DataPart> = HashMap()
                 params["files"] = DataPart(
-                    "file_avatar_hieu_1.jpg",
+                    "file_Payme_Identify_2.jpg",
                     bytes,
                     "image/jpeg"
                 )

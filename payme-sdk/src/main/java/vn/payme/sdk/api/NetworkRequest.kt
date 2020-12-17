@@ -34,7 +34,6 @@ internal class NetworkRequest(
         if (onStart != null) {
             onStart()
         }
-        println("REQUEST$paramsData")
 
 
         val queue = Volley.newRequestQueue(context)
@@ -113,6 +112,8 @@ internal class NetworkRequest(
         onExpired: (() -> Unit)?
     ) {
 
+        println("REQUESSSSSSSSSSSSSSSSSSSS1${params.toString()}")
+
         val cryptoAES = CryptoAES()
         val cryptoRSA = CryptoRSA()
 
@@ -149,6 +150,8 @@ internal class NetworkRequest(
             url,
             JSONObject(body as Map<*, *>),
             Response.Listener { response ->
+                println("Response${response.toString()}")
+
                 try {
                     val jsonObject = JSONObject(response.toString())
                     val xAPIMessageResponse = jsonObject.getString("x-api-message")
