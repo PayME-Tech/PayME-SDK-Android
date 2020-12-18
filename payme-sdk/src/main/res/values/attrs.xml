@@ -7,4 +7,16 @@
         <attr name="pbTextColor" format="color|reference"/>
         <attr name="pbProgressColor" format="color|reference"/>
     </declare-styleable>
+    <declare-styleable name="CameraKitView">
+        <attr name="android_adjustViewBounds" format="boolean" />
+        <attr name="camera_aspectRatio" format="float" />
+        <attr name="camera_facing" format="integer" />
+        <attr name="camera_flash" format="integer" />
+        <attr name="camera_focus" format="integer" />
+        <attr name="camera_zoomFactor" format="float" />
+        <attr name="camera_permissions" format="integer" />
+        <attr name="camera_imageMegaPixels" format="float" />
+        <attr name="camera_imageJpegQuality" format="integer" />
+    </declare-styleable>
+
 </resources>

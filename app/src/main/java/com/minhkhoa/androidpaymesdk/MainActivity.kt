@@ -1,11 +1,13 @@
 package com.minhkhoa.androidpaymesdk
 
 import android.content.Context
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.WindowManager
 import android.widget.*
 import io.sentry.Sentry
 import org.json.JSONObject

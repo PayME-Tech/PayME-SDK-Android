@@ -5,28 +5,47 @@
 
     <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
     <uses-permission android:name="android.permission.CAMERA" />
-
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.VIDEO_CAPTURE" />
+    <uses-permission android:name="android.permission.AUDIO_CAPTURE" />
+    <uses-feature android:name="android.hardware.camera.flash" />
     <application
         android:requestLegacyExternalStorage="true"
         android:allowBackup="true"
         android:supportsRtl="true">
 
         <activity
+
             android:screenOrientation="fullSensor"
             tools:replace="screenOrientation"
             android:name=".AnyOrientationCaptureActivity" />
 
-        <activity android:name=".PaymeWaletActivity">
+        <activity
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation"
+            android:name=".PaymeWaletActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
-        <activity android:name="vn.payme.sdk.kyc.CameraKycActivity">
+        <activity
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation"
+            android:name=".kyc.CameraKyc2Activity"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-                <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+
 
     </application>
 </manifest>

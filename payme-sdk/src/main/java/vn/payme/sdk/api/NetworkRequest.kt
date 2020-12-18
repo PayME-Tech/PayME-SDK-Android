@@ -4,15 +4,12 @@ import android.content.Context
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
 import com.android.volley.*
 import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONException
 import org.json.JSONObject
-import vn.payme.sdk.PayME
-import vn.payme.sdk.R
 import java.nio.charset.Charset
 
 
@@ -24,84 +21,8 @@ internal class NetworkRequest(
     private val params: MutableMap<String, Any>?,
     private val paramsData: JSONObject?,
 ) {
-    fun setOnRequest(
-        onStart: (() -> Unit)?,
-        onSuccess: (response: JSONObject) -> Unit,
-        onError: ((JSONObject?, Int, String) -> Unit)?,
-        onFinally: (() -> Unit)?,
-        onExpired: (() -> Unit)?
-    ) {
-        if (onStart != null) {
-            onStart()
-        }
 
 
-        val queue = Volley.newRequestQueue(context)
-        val request = object : JsonObjectRequest(
-            Method.POST,
-            url + path,
-            paramsData,
-            Response.Listener { response ->
-                try {
-                    val jsonObject = JSONObject(response.toString())
-                    if (jsonObject.getInt("code") == 1000) {
-                        onSuccess(jsonObject.getJSONObject("data"))
-                    } else if (jsonObject.getInt("code") == 401) {
-                        if (onError != null) {
-                            val errorMessage = jsonObject.getJSONObject("data").getString("message")
-                            onError(
-                                null,
-                                jsonObject.getInt("code"),
-                                errorMessage
-                            )
-                        }
-                    } else {
-                        val errorMessage = jsonObject.getJSONObject("data").getString("message")
-                        if (onError != null) {
-                            onError(
-                                jsonObject.getJSONObject("data"),
-                                jsonObject.getInt("code"),
-                                errorMessage
-                            )
-                        }
-                    }
-                    if (onFinally != null) {
-                        onFinally()
-                    }
-                } catch (error: JSONException) {
-                    if (onError != null) {
-                        onError(
-                            null,
-                            -2,
-                            "Kết nối mạng bị sự cố, vui lòng kiểm tra và thử lại. Xin cảm ơn !"
-                        )
-                    }
-
-                }
-            },
-            Response.ErrorListener { error ->
-                if (onFinally != null) {
-                    onFinally()
-                }
-                Toast.makeText(context, "$error", Toast.LENGTH_SHORT).show()
-            }
-        ) {
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers: MutableMap<String, String> = mutableMapOf()
-                headers["Authorization"] = token
-                headers["Accept"] = "application/json"
-                headers["Content-Type"] = "multipart/form-data"
-                return headers
-            }
-        }
-        val defaultRetryPolicy = DefaultRetryPolicy(
-            30000,
-            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        )
-        request.retryPolicy = defaultRetryPolicy
-        queue.add(request)
-    }
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun setOnRequestCrypto(

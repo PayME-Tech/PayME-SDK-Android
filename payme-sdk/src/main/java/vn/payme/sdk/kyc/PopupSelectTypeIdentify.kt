@@ -59,6 +59,13 @@ internal class PopupSelectTypeIdentify : BottomSheetDialogFragment() {
         )
         this.listMethod.add(
             TypeIdentify(
+                "Căn cước công dân",
+                "CMND",
+                false
+            )
+        )
+        this.listMethod.add(
+            TypeIdentify(
                 "Hộ chiếu",
                 "Passport",
                 false

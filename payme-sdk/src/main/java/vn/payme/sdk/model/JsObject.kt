@@ -9,7 +9,7 @@ import com.google.zxing.integration.android.IntentIntegrator
 import org.json.JSONObject
 import vn.payme.sdk.AnyOrientationCaptureActivity
 import vn.payme.sdk.PayME
-import vn.payme.sdk.kyc.CameraKycActivity
+import vn.payme.sdk.kyc.CameraKyc2Activity
 
 
 public class JsObject(
@@ -66,39 +66,11 @@ public class JsObject(
     }
     @JavascriptInterface
     public  fun  onKyc(){
-        val intent = Intent(PayME.context, CameraKycActivity::class.java)
+        val intent = Intent(PayME.context, CameraKyc2Activity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         PayME.context?.startActivity(intent)
     }
 
-    @JavascriptInterface
-    public fun onPay(type: String, amount: Int, content: String, orderId: String) {
-        try {
-
-//            val payme = PayME(
-//                PayME.context,
-//                PayME.appToken,
-//                PayME.publicKey,
-//                PayME.connectToken,
-//                PayME.appPrivateKey,
-//                PayME.configColor!!,
-//                PayME.env!!
-//            )
-//            payme.pay( amount, content, orderId, "", onSuccess = {
-//
-//            }, onError = {
-//
-//            },
-//                onClose = {
-//
-//                }
-//            )
-//            PayME.onPay(string)
-        } catch (e: Exception) {
-            println(e)
-
-        }
-    }
 
     @JavascriptInterface
     public fun onClose() {
