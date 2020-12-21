@@ -3,13 +3,16 @@ package vn.payme.sdk.kyc
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.camerakit.CameraKitView
 import com.camerakit.CameraKitView.ImageCallback
 import org.greenrobot.eventbus.EventBus
@@ -25,7 +28,7 @@ import vn.payme.sdk.payment.PopupSelectTypeIdentify
 import java.io.ByteArrayOutputStream
 
 
-class CameraKyc2Activity : AppCompatActivity() {
+class CameraKyc2Activity : Fragment() {
     private var cameraKitView: CameraKitView? = null
     private var buttonTakePicture: ImageView? = null
     private var layoutConfirm: ConstraintLayout? = null
@@ -44,26 +47,30 @@ class CameraKyc2Activity : AppCompatActivity() {
     private var typeIdentify = "CMND"
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.camera_activity)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+
+        val view: View? = inflater?.inflate(R.layout.camera_activity, container, false)
 
         EventBus.getDefault().register(this)
 
-        cameraKitView = findViewById(R.id.previewCamera)
-        buttonTakePicture = findViewById(R.id.btn_takepicture)
-        layoutConfirm = findViewById(R.id.confirm_screen)
-        layoutUpload = findViewById(R.id.upLoadKyc)
+        cameraKitView = view!!.findViewById(R.id.previewCamera)
+        buttonTakePicture = view!!.findViewById(R.id.btn_takepicture)
+        layoutConfirm = view!!.findViewById(R.id.confirm_screen)
+        layoutUpload = view!!.findViewById(R.id.upLoadKyc)
         layoutUpload!!.background = PayME.colorApp.backgroundColor
 
-        imagePreView = findViewById(R.id.previewImage)
-        buttonBack = findViewById(R.id.buttonBack)
-        buttonNext = findViewById(R.id.buttonNext)
-        buttonBackHeader = findViewById(R.id.buttonBackHeader)
-        buttonBackHeader2 = findViewById(R.id.buttonBackHeader2)
-        textGuiTakePicture = findViewById(R.id.textGuiTakePicture)
-        textTypeIdentify = findViewById(R.id.title_type_identify)
-        buttonSelectTypeIdentify = findViewById(R.id.buttonSelectTypeIdentify)
+        imagePreView = view!!.findViewById(R.id.previewImage)
+        buttonBack = view!!.findViewById(R.id.buttonBack)
+        buttonNext = view!!.findViewById(R.id.buttonNext)
+        buttonBackHeader = view!!.findViewById(R.id.buttonBackHeader)
+        buttonBackHeader2 = view!!.findViewById(R.id.buttonBackHeader2)
+        textGuiTakePicture = view!!.findViewById(R.id.textGuiTakePicture)
+        textTypeIdentify = view!!.findViewById(R.id.title_type_identify)
+        buttonSelectTypeIdentify = view!!.findViewById(R.id.buttonSelectTypeIdentify)
 
         buttonBackHeader2!!.setOnClickListener {
             layoutConfirm!!.visibility = View.GONE
@@ -80,7 +87,7 @@ class CameraKyc2Activity : AppCompatActivity() {
                 layoutUpload!!.visibility = View.VISIBLE
                 imageBackSide = saveImage
                 val uploadKycApi = UploadKycApi()
-                uploadKycApi.uploadImage(this@CameraKyc2Activity,
+                uploadKycApi.uploadImage(PayME.context,
                     imageFront!!,
                     imageBackSide!!,
                     typeIdentify,
@@ -112,7 +119,7 @@ class CameraKyc2Activity : AppCompatActivity() {
         }
         buttonSelectTypeIdentify?.setOnClickListener {
             val popupSelectTypeIdentify = PopupSelectTypeIdentify()
-            popupSelectTypeIdentify.show(this.supportFragmentManager, "ModalBottomSheet")
+            popupSelectTypeIdentify.show(fragmentManager!!, "ModalBottomSheet")
         }
 
         buttonTakePicture?.setOnClickListener {
@@ -140,9 +147,10 @@ class CameraKyc2Activity : AppCompatActivity() {
 
         }
         cameraKitView?.setErrorListener(CameraKitView.ErrorListener { cameraKitView, e ->
-            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this.context, e.toString(), Toast.LENGTH_SHORT).show()
 
         })
+        return  view
     }
 
     override fun onStart() {
@@ -156,7 +164,6 @@ class CameraKyc2Activity : AppCompatActivity() {
         val bitmapWidth = bitmap.width
         val bitmapheight = bitmap.height
 
-        // make sure crop isn't larger than bitmap size
         cropWidth = if (cropWidth > bitmapWidth) bitmapWidth else cropWidth
         cropHeight = if (cropHeight > bitmapheight) bitmapheight else cropHeight
         val newX = bitmapWidth / 2 - cropWidth / 2
@@ -192,6 +199,7 @@ class CameraKyc2Activity : AppCompatActivity() {
         super.onDestroy()
 
     }
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
