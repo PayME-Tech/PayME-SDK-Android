@@ -7,6 +7,7 @@ import org.json.JSONObject
 import org.spongycastle.jce.provider.BouncyCastleProvider
 import vn.payme.sdk.api.NetworkRequest
 import vn.payme.sdk.api.PaymentApi
+import vn.payme.sdk.kyc.CameraKycActivity
 import vn.payme.sdk.model.*
 import vn.payme.sdk.payment.PaymePayment
 import java.security.Security

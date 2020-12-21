@@ -3,6 +3,7 @@ package vn.payme.sdk
 import android.app.Activity
 import android.app.Instrumentation
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -39,6 +40,8 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
         mappingView()
         initScanner(savedInstanceState)
         eventPress()
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+        getWindow().setBackgroundDrawable(PayME.colorApp.backgroundColor);
 
 //        popup.show(this.supportFragmentManager, "ModalBottomSheet")
     }
@@ -89,6 +92,7 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        println("requestCode"+requestCode)
         if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
             val selectedImage: Uri? = data.data
             val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, selectedImage)
@@ -109,6 +113,7 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
                     var myEven: MyEven = MyEven(TypeCallBack.onScan, result.toString())
                     even.post(myEven)
                 } catch (e: NotFoundException) {
+                    popup.show(this.supportFragmentManager, "ModalBottomSheet")
                     Log.d("TAG", "Not found")
                 }
             }

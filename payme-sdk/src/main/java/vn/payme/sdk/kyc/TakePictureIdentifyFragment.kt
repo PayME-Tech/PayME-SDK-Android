@@ -1,38 +1,37 @@
 package vn.payme.sdk.kyc
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.camerakit.CameraKitView
 import com.camerakit.CameraKitView.ImageCallback
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
-import vn.payme.sdk.PayME
 import vn.payme.sdk.R
-import vn.payme.sdk.api.UploadKycApi
 import vn.payme.sdk.component.Button
-import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.model.TypeCallBack
 import vn.payme.sdk.model.TypeIdentify
 import vn.payme.sdk.payment.PopupSelectTypeIdentify
 import java.io.ByteArrayOutputStream
 
 
-class CameraKyc2Activity : Fragment() {
+class TakePictureIdentifyFragment : Fragment() {
     private var cameraKitView: CameraKitView? = null
     private var buttonTakePicture: ImageView? = null
     private var layoutConfirm: ConstraintLayout? = null
-    private var layoutUpload: ConstraintLayout? = null
     private var imagePreView: ImageView? = null
     private var buttonBackHeader: ImageView? = null
     private var buttonBackHeader2: ImageView? = null
@@ -45,6 +44,7 @@ class CameraKyc2Activity : Fragment() {
     private var textTypeIdentify: TextView? = null
     private var buttonSelectTypeIdentify: ConstraintLayout? = null
     private var typeIdentify = "CMND"
+    private var buttonSelectImage : LinearLayout? = null
 
 
     override fun onCreateView(
@@ -53,15 +53,13 @@ class CameraKyc2Activity : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        val view: View? = inflater?.inflate(R.layout.camera_activity, container, false)
+        val view: View? = inflater?.inflate(R.layout.take_picture_image_identify, container, false)
 
         EventBus.getDefault().register(this)
 
         cameraKitView = view!!.findViewById(R.id.previewCamera)
         buttonTakePicture = view!!.findViewById(R.id.btn_takepicture)
         layoutConfirm = view!!.findViewById(R.id.confirm_screen)
-        layoutUpload = view!!.findViewById(R.id.upLoadKyc)
-        layoutUpload!!.background = PayME.colorApp.backgroundColor
 
         imagePreView = view!!.findViewById(R.id.previewImage)
         buttonBack = view!!.findViewById(R.id.buttonBack)
@@ -71,12 +69,20 @@ class CameraKyc2Activity : Fragment() {
         textGuiTakePicture = view!!.findViewById(R.id.textGuiTakePicture)
         textTypeIdentify = view!!.findViewById(R.id.title_type_identify)
         buttonSelectTypeIdentify = view!!.findViewById(R.id.buttonSelectTypeIdentify)
+        buttonSelectImage = view!!.findViewById(R.id.buttonSelectImage)
+        buttonSelectImage?.setOnClickListener {
+            CropImage.activity()
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .start(requireActivity());
+
+        }
 
         buttonBackHeader2!!.setOnClickListener {
             layoutConfirm!!.visibility = View.GONE
         }
         buttonBackHeader!!.setOnClickListener {
-            finish()
+//            finish()
+            activity?.finish()
         }
         buttonBack!!.setOnClickListener {
             layoutConfirm!!.visibility = View.GONE
@@ -84,32 +90,15 @@ class CameraKyc2Activity : Fragment() {
         }
         buttonNext!!.setOnClickListener {
             if (imageFront != null) {
-                layoutUpload!!.visibility = View.VISIBLE
                 imageBackSide = saveImage
-                val uploadKycApi = UploadKycApi()
-                uploadKycApi.uploadImage(PayME.context,
-                    imageFront!!,
-                    imageBackSide!!,
-                    typeIdentify,
-                    onSuccess = {
-                        finish()
-                        var even: EventBus = EventBus.getDefault()
-                        var myEven: MyEven = MyEven(TypeCallBack.onReload, "")
-                        even.post(myEven)
-
-                    },
-                    onError = { jsonObject, code, message ->
-                        layoutUpload!!.visibility = View.GONE
-                        val toast: Toast =
-                            Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
-                        toast.view?.setBackgroundColor(
-                            ContextCompat.getColor(
-                                PayME.context,
-                                R.color.scarlet
-                            )
-                        )
-                        toast.show()
-                    })
+                val bundle: Bundle = Bundle()
+                bundle.putByteArray("imageFront", imageFront)
+                bundle.putByteArray("imageBackSide", imageBackSide)
+                val takePictureAvataFragment = TakePictureAvataFragment()
+                takePictureAvataFragment.arguments = bundle
+                val fragment = activity?.supportFragmentManager?.beginTransaction()
+                fragment?.replace(R.id.content_kyc, takePictureAvataFragment)
+                fragment?.commit()
 
             } else {
                 textGuiTakePicture?.text = "Mặt sau"
@@ -119,7 +108,7 @@ class CameraKyc2Activity : Fragment() {
         }
         buttonSelectTypeIdentify?.setOnClickListener {
             val popupSelectTypeIdentify = PopupSelectTypeIdentify()
-            popupSelectTypeIdentify.show(fragmentManager!!, "ModalBottomSheet")
+            popupSelectTypeIdentify.show(childFragmentManager, "ModalBottomSheet")
         }
 
         buttonTakePicture?.setOnClickListener {
@@ -150,7 +139,7 @@ class CameraKyc2Activity : Fragment() {
             Toast.makeText(this.context, e.toString(), Toast.LENGTH_SHORT).show()
 
         })
-        return  view
+        return view
     }
 
     override fun onStart() {
@@ -208,6 +197,33 @@ class CameraKyc2Activity : Fragment() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         cameraKitView!!.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        println("data"+data.toString())
+
+        if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            val result = CropImage.getActivityResult(data)
+            println("result"+result.toString())
+            if (resultCode === RESULT_OK) {
+                val resultUri: Uri = result.uri
+                val bitmapImage = BitmapFactory.decodeFile(resultUri.path)
+                imagePreView!!.setImageBitmap(
+                    bitmapImage
+                )
+
+                layoutConfirm?.visibility = View.VISIBLE
+                val stream = ByteArrayOutputStream()
+                bitmapImage?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+                val byteArray: ByteArray = stream.toByteArray()
+                saveImage = byteArray
+
+            } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                val error = result.error
+            }
+        }
+
 
     }
 

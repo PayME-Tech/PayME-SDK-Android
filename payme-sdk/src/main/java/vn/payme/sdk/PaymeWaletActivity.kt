@@ -5,47 +5,35 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
+import android.hardware.camera2.CameraManager
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
 import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
-import org.json.JSONObject
-import vn.payme.sdk.model.Env
-import vn.payme.sdk.model.JsObject
-import java.net.URLEncoder
-import android.hardware.camera2.CameraManager
-import android.util.DisplayMetrics
+import androidx.core.view.ViewCompat
 import com.airbnb.lottie.LottieAnimationView
 import com.google.zxing.client.android.Intents
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import org.json.JSONObject
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.evenbus.MyEven
+import vn.payme.sdk.model.Env
+import vn.payme.sdk.model.JsObject
 import vn.payme.sdk.model.TypeCallBack
-import java.lang.Exception
+import java.net.URLEncoder
 
 
 internal class PaymeWaletActivity : AppCompatActivity() {
-    val html: String = "<!DOCTYPE html><html><body>\n" +
-            "      <button onclick=\"onClick()\">Click me</button>\n" +
-            "      <script>\n" +
-            "      function onClick() {\n" +
-            "       window.messageHandlers.onFlash(true)" +
-            "      }\n" +
-            "      </script>\n" +
-            "      </body></html>\n"
-
-    private var cameraPermission: PermissionRequest? = null
     private var lottie: LottieAnimationView? = null
     private lateinit var cameraManager: CameraManager
     private lateinit var myWebView: WebView
 
-
     private fun backScreen(): Unit {
-
         runOnUiThread {
             onBackPressed()
         }
@@ -77,17 +65,14 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         CookieManager.getInstance().removeAllCookies(null);
         CookieManager.getInstance().flush();
 
-
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = Color.DKGRAY
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
         setContentView(R.layout.webview_activity)
         var statusBarHeight = 0
         val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
         if (resourceId > 0) {
             statusBarHeight = resources.getDimensionPixelSize(resourceId)
         }
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+        getWindow().setBackgroundDrawable(PayME.colorApp.backgroundColor);
 
         myWebView = findViewById(R.id.webview)
         lottie = findViewById(R.id.loadingWeb)
@@ -105,10 +90,9 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                 lottie?.visibility = View.GONE
             }
         })
-        getWindow().setFlags(
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-        );
+
+
+
 
 
         val webSettings: WebSettings = myWebView.getSettings()
@@ -143,7 +127,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         val jsObject: JsObject =
             JsObject(this, back = { backScreen() }, this.supportFragmentManager, cameraManager)
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
-        println("VAO  DDDDDDDDDDDDD")
         var action: String = PayME.action.toString()
 
         var data: JSONObject = JSONObject(
@@ -164,7 +147,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                       configColor: ['${PayME.configColor?.get(0)}', '${PayME.configColor?.get(1)}'],
                       partner : {
                         type:'ANDROID',
-                        paddingTop:${convertPixelsToDp(statusBarHeight.toFloat())}
+                        paddingTop:${0}
                       },
                       actions:{
                         type:${action},
@@ -175,7 +158,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
         val encode: String = URLEncoder.encode(data.toString(), "utf-8")
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
-        println("https://sbx-sdk.payme.com.vn/active/${encode}")
         if (PayME.env === Env.SANDBOX) {
             myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
 //            myWebView.loadData(html, "text/html", "UTF-8");
@@ -187,10 +169,13 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
 
     }
-    fun checkScanQr (contents:String) {
+    fun checkScanQr(contents: String) {
         val paymentApi = PaymentApi()
+        lottie?.visibility = View.VISIBLE
         paymentApi.postCheckDataQr(contents,
             onSuccess = { jsonObject ->
+                lottie?.visibility = View.GONE
+
                 val amount = jsonObject?.getInt("amount")
                 val content = jsonObject?.getString("content")
                 val orderId = jsonObject?.getString("orderId")
@@ -217,6 +202,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
             },
             onError = { jsonObject, code, message ->
+                lottie?.visibility = View.GONE
                 var popup: PayMEQRCodePopup = PayMEQRCodePopup()
                 popup.show(this.supportFragmentManager, "ModalBottomSheet")
             }
@@ -227,18 +213,13 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         if (requestCode == 5 && resultCode == Activity.RESULT_OK && data != null) {
             val contents = data.getStringExtra(Intents.Scan.RESULT)
             checkScanQr(contents.toString())
-//            Toast.makeText(this, contents, Toast.LENGTH_SHORT).show()
         }
     }
     override fun onDestroy() {
         EventBus.getDefault().unregister(this);
 
         super.onDestroy()
-//        try {
-//            val cameraId = cameraManager.cameraIdList[0]
-//            cameraManager.setTorchMode(cameraId, false)
-//        } catch (e: Exception) {
-//        }
+
 
     }
     @Subscribe

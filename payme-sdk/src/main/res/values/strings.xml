@@ -4,6 +4,7 @@
     <string name="next">TIẾP TỤC</string>
     <string name="take_picture_again">CHỤP LẠI</string>
     <string name="paper_photography">Chụp ảnh giấy tờ</string>
+    <string name="please_take_avatar">Vui lòng giữ gương mặt trong khung tròn</string>
     <string name="confirm_take_photography">Xác nhận hình chụp</string>
     <string name="select_identity">Chọn loại giấy tờ</string>
     <string name="identity_card">Chứng minh nhân dân</string>

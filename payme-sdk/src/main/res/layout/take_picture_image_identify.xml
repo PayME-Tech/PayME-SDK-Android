@@ -90,17 +90,18 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-
     <com.camerakit.CameraKitView
         android:id="@+id/previewCamera"
+        camera_imageMegaPixels="50"
         android:layout_width="match_parent"
         android:layout_height="250dp"
+        android:layout_marginHorizontal="16dp"
         android:adjustViewBounds="true"
         android:keepScreenOn="true"
+        app:camera_aspectRatio="1"
         app:camera_facing="back"
         app:camera_flash="auto"
-        app:camera_focus="continuous"
-        camera_imageMegaPixels="50"
+        app:camera_focus="auto"
         app:camera_permissions="camera"
         app:layout_constraintTop_toBottomOf="@id/container_select_type" />
 
@@ -117,15 +118,47 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/previewCamera" />
 
-    <ImageView
-        android:id="@+id/btn_takepicture"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="36dp"
-        android:src="@drawable/takepic"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:id="@+id/buttonSelectImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/selectimage" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/barlow_regular"
+                android:text="Chọn hình"
+                android:textColor="@color/white"
+                android:textSize="14dp" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btn_takepicture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/takepic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <RelativeLayout
         android:id="@+id/rel_layout"
@@ -185,9 +218,11 @@
 
         <ImageView
             android:id="@+id/previewImage"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="250dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:scaleType="centerInside"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/header2" />
@@ -195,10 +230,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="30dp"
             android:layout_marginTop="16dp"
-            android:textAlignment="center"
+            android:paddingHorizontal="30dp"
             android:text="@string/confirm_image_take_pictures_identify"
+            android:textAlignment="center"
             android:textColor="@color/darkBlueGrey"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -233,49 +268,5 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
     <!--    UploadScreen-->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/upLoadKyc"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white"
-        android:visibility="gone">
 
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/loadingUpload"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:lottie_autoPlay="true"
-            app:lottie_loop="true"
-            app:lottie_rawRes="@raw/proccessing_upload_1" />
-
-        <TextView
-            android:id="@+id/textUpload"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:fontFamily="@font/semi_bold"
-            android:text="Đang tải dữ liệu …"
-            android:textColor="@color/white"
-            android:textSize="24dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/loadingUpload" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:fontFamily="@font/barlow_regular"
-            android:text="Vui lòng chờ trong giây lát."
-            android:textColor="@color/white"
-            android:textSize="16dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textUpload" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

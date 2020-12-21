@@ -9,7 +9,8 @@ import com.google.zxing.integration.android.IntentIntegrator
 import org.json.JSONObject
 import vn.payme.sdk.AnyOrientationCaptureActivity
 import vn.payme.sdk.PayME
-import vn.payme.sdk.kyc.CameraKyc2Activity
+import vn.payme.sdk.kyc.CameraKycActivity
+import vn.payme.sdk.kyc.TakePictureIdentifyFragment
 
 
 public class JsObject(
@@ -66,7 +67,7 @@ public class JsObject(
     }
     @JavascriptInterface
     public  fun  onKyc(){
-        val intent = Intent(PayME.context, CameraKyc2Activity::class.java)
+        val intent = Intent(PayME.context, CameraKycActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         PayME.context?.startActivity(intent)
     }
