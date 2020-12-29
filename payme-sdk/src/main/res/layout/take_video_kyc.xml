@@ -6,7 +6,16 @@
     android:background="@color/blackSeven"
     android:clickable="false">
 
+    <com.otaliastudios.cameraview.CameraView
+        android:id="@+id/previewCamera"
+        app:cameraMode="video"
+        app:cameraFacing="front"
+        app:cameraAudio="off"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cameraRequestPermissions="true"
 
+       />
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
@@ -24,130 +33,31 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/textTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:fontFamily="@font/semi_bold"
-            android:text="@string/paper_photography"
-            android:textColor="@color/white"
-            android:textSize="18dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/container_select_type"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="16dp"
-        app:layout_constraintTop_toBottomOf="@id/header">
-        <!--        SelectTypeKyc-->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/buttonSelectTypeIdentify"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="visible"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/title_type_identify"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/semi_bold"
-                android:text="@string/identity_card"
-                android:textColor="@color/white"
-                android:textSize="16dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginLeft="16dp"
-                android:src="@drawable/arrowdown"
-                app:layout_constraintLeft_toRightOf="@id/title_type_identify"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <TextView
-            android:id="@+id/textGuiTakePicture"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/barlow_medium"
-            android:text="@string/front"
-            android:textColor="@color/white"
-            android:textSize="16dp"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <com.camerakit.CameraKitView
-        android:id="@+id/previewCamera"
-        camera_imageMegaPixels="50"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:layout_marginHorizontal="16dp"
-        android:adjustViewBounds="true"
-        android:keepScreenOn="true"
-        app:camera_aspectRatio="1"
-        app:camera_facing="back"
-        app:camera_flash="auto"
-        app:camera_focus="auto"
-        app:camera_permissions="camera"
-        app:layout_constraintTop_toBottomOf="@id/container_select_type" />
-
-
     <TextView
+        android:id="@+id/textTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:fontFamily="@font/barlow_medium"
-        android:text="@string/please_take_pictures_center"
+        android:layout_gravity="center"
+        android:fontFamily="@font/semi_bold"
+        android:text="@string/please_take_video"
         android:textColor="@color/white"
-        android:textSize="14dp"
+        android:textSize="16dp"
+        android:paddingHorizontal="32dp"
+        android:textAlignment="center"
+        app:layout_constraintTop_toBottomOf="@id/header"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/previewCamera" />
+        />
+
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         app:layout_constraintBottom_toBottomOf="parent">
-
-        <LinearLayout
-            android:id="@+id/buttonSelectImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent">
-
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/selectimage" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/barlow_regular"
-                android:text="Chọn hình"
-                android:textColor="@color/white"
-                android:textSize="14dp" />
-        </LinearLayout>
 
         <ImageView
             android:id="@+id/btn_takepicture"
@@ -160,20 +70,8 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    <RelativeLayout
-        android:id="@+id/rel_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-        <!---Customize your views and button-->
 
-    </RelativeLayout>
-
-    <TextView
-        android:id="@+id/iuhiu"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
 
     <!--    ConfirmScreen-->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -207,20 +105,20 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:fontFamily="@font/semi_bold"
-                android:text="@string/confirm_take_photography"
+                android:text="@string/confirm_take_video"
                 android:textColor="@color/darkBlueGrey"
-                android:textSize="18dp"
+                android:textSize="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ImageView
+        <VideoView
             android:id="@+id/previewImage"
             android:layout_width="match_parent"
             android:layout_height="250dp"
-            android:layout_marginHorizontal="16dp"
+            android:layout_marginHorizontal="50dp"
             android:layout_marginTop="16dp"
             android:scaleType="centerInside"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -232,7 +130,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:paddingHorizontal="30dp"
-            android:text="@string/confirm_image_take_pictures_identify"
+            android:text="@string/confirm_image_take_video_identify"
             android:textAlignment="center"
             android:textColor="@color/darkBlueGrey"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -253,7 +151,7 @@
                 android:layout_marginHorizontal="16dp"
                 android:layout_weight="0.5"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:pbText="@string/take_picture_again" />
+                app:pbText="@string/take_again" />
 
             <vn.payme.sdk.component.Button
                 android:id="@+id/buttonNext"
@@ -262,7 +160,7 @@
                 android:layout_marginHorizontal="16dp"
                 android:layout_weight="0.5"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:pbText="@string/next" />
+                app:pbText="@string/done" />
         </LinearLayout>
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/upLoadKyc"

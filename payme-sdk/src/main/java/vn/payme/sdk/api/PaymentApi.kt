@@ -5,15 +5,14 @@ import vn.payme.sdk.PayME
 import vn.payme.sdk.model.Method
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.time.Instant
 import java.util.*
 
 internal class PaymentApi {
     private fun urlFeENV(env: String?): String {
         if (env == "sandbox") {
-            return "https://sbx-wam.payme.vn"
+            return "https://sbx-fe.payme.vn/"
         }
-        return "https://wam.payme.vn"
+        return "https://fe.payme.vn/"
     }
 
     fun getTransferMethods(
@@ -25,16 +24,42 @@ internal class PaymentApi {
         val params: MutableMap<String, Any> = mutableMapOf()
         params["connectToken"] = PayME.connectToken
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params,null)
+        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
         request.setOnRequestCrypto(
-            onStart = {
 
-            },
             onError = onError,
-            onFinally = {
-            },
+
             onSuccess = onSuccess,
             onExpired = {
+
+            })
+
+    }
+
+    fun getBalance(
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        val url = urlFeENV("sandbox")
+        val path = "/graphql"
+        val params: MutableMap<String, Any> = mutableMapOf()
+        val variables: MutableMap<String, Any> = mutableMapOf()
+        val query = "query Query {\n" +
+                "  Wallet {\n" +
+                "    balance\n" +
+                "    cash\n" +
+                "    lockCash\n" +
+                "  }\n" +
+                "}"
+        params["query"] = query
+        params["variables"] = variables
+        val request = NetworkRequest(PayME.context!!, url, path, PayME.token, params)
+        request.setOnRequestCrypto(
+            onError = onError,
+
+            onSuccess = onSuccess,
+            onExpired = {
+                println("401")
 
             })
 
@@ -50,7 +75,7 @@ internal class PaymentApi {
         val path = "/v1/Internal/ConnectToken/Generate"
         val params: MutableMap<String, Any> = mutableMapOf()
         params["userId"] = userId
-        if(phone!!.length>0){
+        if (phone!!.length > 0) {
             params["phone"] = phone!!
         }
         val tz = TimeZone.getTimeZone("UTC")
@@ -61,14 +86,11 @@ internal class PaymentApi {
         val nowAsISO: String = df.format(Date())
         println("nowAsISO" + nowAsISO)
         params["timestamp"] = nowAsISO
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params,null)
+        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
         request.setOnRequestCrypto(
-            onStart = {
 
-            },
             onError = onError,
-            onFinally = {
-            },
+
             onSuccess = onSuccess,
             onExpired = {
 
@@ -91,13 +113,9 @@ internal class PaymentApi {
         params["destination"] = "AppPartner"
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
         params["data"] = data
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params,null)
+        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
         request.setOnRequestCrypto(
-            onStart = {
-            },
             onError = onError,
-            onFinally = {
-            },
             onSuccess = onSuccess,
             onExpired = {
 
@@ -124,21 +142,19 @@ internal class PaymentApi {
         params["returnUrl"] = "https://sbx-fe.payme.vn/"
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
         params["data"] = data
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params,null)
+        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
         request.setOnRequestCrypto(
-            onStart = {
-            },
             onError = onError,
-            onFinally = {
-            },
+
             onSuccess = onSuccess,
             onExpired = {
-
-            })
+            }
+        )
 
     }
+
     fun postCheckDataQr(
-        dataQR:String,
+        dataQR: String,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
@@ -149,13 +165,11 @@ internal class PaymentApi {
         params["connectToken"] = PayME.connectToken
         params["data"] = dataQR
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params,null)
+        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
         request.setOnRequestCrypto(
-            onStart = {
-            },
+
             onError = onError,
-            onFinally = {
-            },
+
             onSuccess = onSuccess,
             onExpired = {
 
@@ -180,13 +194,9 @@ internal class PaymentApi {
         params["destination"] = "AppPartner"
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
         params["data"] = data
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params,null)
+        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
         request.setOnRequestCrypto(
-            onStart = {
-            },
             onError = onError,
-            onFinally = {
-            },
             onSuccess = onSuccess,
             onExpired = {
 
@@ -212,13 +222,10 @@ internal class PaymentApi {
         params["destination"] = "AppPartner"
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
         params["data"] = data
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params,null)
+        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
         request.setOnRequestCrypto(
-            onStart = {
-            },
+
             onError = onError,
-            onFinally = {
-            },
             onSuccess = onSuccess,
             onExpired = {
 

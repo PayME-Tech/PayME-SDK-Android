@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.fragment.app.FragmentManager
 import org.json.JSONObject
 import org.spongycastle.jce.provider.BouncyCastleProvider
-import vn.payme.sdk.api.NetworkRequest
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.kyc.CameraKycActivity
 import vn.payme.sdk.model.*
@@ -25,6 +24,8 @@ public class PayME(
     companion object {
         lateinit var appPrivateKey: String
         var appToken: String = ""
+        var token: String =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjEzNzMsImFjY291bnRJZCI6MjQyMjQzNjkyOCwic2NvcGUiOltdLCJjbGllbnRJZCI6IjdiYzRhZTZiYjJmZmUwMDEiLCJpYXQiOjE2MDg4NzkwNDZ9.5rQilr8-CMdfsUDqhGE8S8AUSUX1YUnLk8UXUqRGn5k"
         lateinit var publicKey: String
         var connectToken: String = ""
         lateinit var action: Action
@@ -42,6 +43,11 @@ public class PayME(
         lateinit var onPay: ((String) -> Unit)
         lateinit var onClose: (() -> Unit)
         lateinit var colorApp: ColorApp
+
+        //KYC
+        var kycIdenity = false
+        var kycVideo = false
+        var kycFade = false
 
     }
 
@@ -77,12 +83,18 @@ public class PayME(
         } else {
             Companion.amount = 0
         }
-        val intent = Intent(context, PaymeWaletActivity::class.java)
+//        val intent = Intent(context, PaymeWaletActivity::class.java)
+        PayME.kycVideo= true
+        PayME.kycIdenity= false
+        PayME.kycFade= false
+
+        val intent = Intent(context, CameraKycActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context?.startActivity(intent)
         Companion.onSuccess = onSuccess
         Companion.onError = onError
     }
+
 
 
     public fun deposit(
@@ -157,12 +169,6 @@ public class PayME(
     }
 
 
-    private fun urlFeENV(env: String?): String {
-        if (env == "sandbox") {
-            return "https://sbx-wam.payme.vn"
-        }
-        return "https://wam.payme.vn"
-    }
 
     public fun isConnected(): Boolean {
         return false
@@ -183,26 +189,30 @@ public class PayME(
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        val url = urlFeENV("sandbox")
-        val path = "/v1/Wallet/Information"
-        val params: MutableMap<String, Any> = mutableMapOf()
-        params["connectToken"] = connectToken.toString()
-        params["clientInfo"] = PayME.clientInfo.getClientInfo()
-
-        val request = NetworkRequest(context!!, url, path, appToken, params,null)
-        request.setOnRequestCrypto(
-            onStart = {
-
-            },
-            onError = onError,
-            onFinally = {
-
-            },
-            onSuccess = onSuccess,
-            onExpired = {
-                println("401")
-
-            })
+        val paymentApi = PaymentApi()
+        paymentApi.getBalance(onSuccess, onError)
+//        val url = urlFeENV("sandbox")
+//        val path = "/graphql"
+//        val params: MutableMap<String, Any> = mutableMapOf()
+//        val variables: MutableMap<String, Any> = mutableMapOf()
+//        val query= "query Query(\$feedFeedId: BigInt!) {\n" +
+//                "  Feed(feedId: \$feedFeedId) {\n" +
+//                "    feedId\n" +
+//                "  }\n" +
+//                "}"
+//        println("STRINGTEST"+query.toString())
+//        params["query"] =query
+//
+//        variables["feedFeedId"] = 10
+//        params["variables"] = variables
+//        val request = NetworkRequest(context!!, url, path, PayME.token, params)
+//        request.setOnRequestCrypto(
+//            onError = onError,
+//            onSuccess = onSuccess,
+//            onExpired = {
+//                println("401")
+//
+//            })
 
 
     }

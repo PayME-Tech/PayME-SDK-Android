@@ -2,9 +2,11 @@ package vn.payme.sdk.api
 
 import android.content.Context
 import android.os.Build
-import android.widget.Toast
 import androidx.annotation.RequiresApi
-import com.android.volley.*
+import com.android.volley.DefaultRetryPolicy
+import com.android.volley.NetworkResponse
+import com.android.volley.ParseError
+import com.android.volley.Response
 import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
@@ -19,19 +21,14 @@ internal class NetworkRequest(
     private val path: String,
     private val token: String,
     private val params: MutableMap<String, Any>?,
-    private val paramsData: JSONObject?,
 ) {
-
-
-
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun setOnRequestCrypto(
-        onStart: (() -> Unit)?,
         onSuccess: (response: JSONObject) -> Unit,
         onError: (data: JSONObject?, code: Int?, message: String) -> Unit,
-        onFinally: (() -> Unit)?,
         onExpired: (() -> Unit)?
     ) {
+
 
         println("REQUESSSSSSSSSSSSSSSSSSSS1${params.toString()}")
 
@@ -57,10 +54,6 @@ internal class NetworkRequest(
         }
         valueParams += encryptKey
         val xAPIValidate = cryptoAES.getMD5(valueParams)
-
-        if (onStart != null) {
-            onStart()
-        }
 
         val body: MutableMap<String, Any> = mutableMapOf()
         body["x-api-message"] = xAPIMessage
@@ -92,44 +85,32 @@ internal class NetworkRequest(
                     }
                     validateString += decryptKey
                     val validateMD5 = cryptoAES.getMD5(validateString)
-
-
                     val result = cryptoAES.decryptAES(decryptKey, xAPIMessageResponse)
-                    val finalJSONObject = JSONObject(result)
+                    println("result" + result)
+                    val json = result?.replace("\\\"","'");
+                    val finalJSONObject = JSONObject(json?.substring(1,json?.length-1))
 
-                    if (finalJSONObject.getInt("code") == 1000) {
-                        onSuccess(finalJSONObject.getJSONObject("data"))
-                    } else if (finalJSONObject.getInt("code") == 401) {
-                        val errorMessage =
-                            finalJSONObject.getJSONObject("data").getString("message")
-                        onError(
-                            finalJSONObject.getJSONObject("data"),
-                            finalJSONObject.getInt("code"),
-                            errorMessage
-                        )
-                    } else {
-                        val errorMessage =
-                            finalJSONObject.getJSONObject("data").getString("message")
+                    val data =  finalJSONObject.optJSONObject("data")
+                    val errors =  finalJSONObject.optJSONArray("errors")
 
-
-
-                        onError(
-                            finalJSONObject.getJSONObject("data"),
-                            finalJSONObject.getInt("code"),
-                            errorMessage
-                        )
+                    if(errors!=null){
+                        val error = errors.getJSONObject(0)
+                        val message = error.getString("message")
+                        onError(data,-3,message)
+                    }else if(data!=null){
+                        onSuccess(data)
                     }
-                    if (onFinally != null) {
-                        onFinally()
-                    }
+
+                    println("data"+data)
+                    println("error"+errors)
+
+
                 } catch (error: JSONException) {
                     error.printStackTrace()
                 }
             },
             Response.ErrorListener { error ->
-                if (onFinally != null) {
-                    onFinally()
-                }
+
                 onError(
                     null,
                     -2,

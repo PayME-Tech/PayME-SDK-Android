@@ -11,10 +11,8 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
-import android.view.WindowManager
 import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
 import com.airbnb.lottie.LottieAnimationView
 import com.google.zxing.client.android.Intents
 import org.greenrobot.eventbus.EventBus
@@ -38,6 +36,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             onBackPressed()
         }
     }
+
 
 
     fun convertPixelsToDp(px: Float): Float {
@@ -124,8 +123,9 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                 return super.onConsoleMessage(consoleMessage)
             }
         })
+
         val jsObject: JsObject =
-            JsObject(this, back = { backScreen() }, this.supportFragmentManager, cameraManager)
+            JsObject(this, back = { backScreen() },  this.supportFragmentManager, cameraManager)
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
         var action: String = PayME.action.toString()
 
@@ -146,8 +146,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                       amount:${PayME.amount},
                       configColor: ['${PayME.configColor?.get(0)}', '${PayME.configColor?.get(1)}'],
                       partner : {
-                        type:'ANDROID',
-                        paddingTop:${0}
+                        type:'ANDROID'
                       },
                       actions:{
                         type:${action},

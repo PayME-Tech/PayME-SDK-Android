@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
 
         payme.getWalletInfo(onSuccess = { jsonObject ->
             println("onSuccess=" + jsonObject.toString())
-            val walletBalance = jsonObject.getJSONObject("walletBalance")
+            val walletBalance = jsonObject.getJSONObject("Wallet")
             val balance = walletBalance.get("balance")
             val decimal = DecimalFormat("#,###")
             textView.text = "${decimal.format(balance)}đ"
@@ -100,8 +100,20 @@ class MainActivity : AppCompatActivity() {
         moneyPay = findViewById(R.id.moneyPay)
         moneyWithdraw = findViewById(R.id.moneyWithdraw)
         var configColor = arrayOf<String>("#75255b", "#9d455f")
+
         this.payme =
             PayME(this, AppToken, PublicKey, ConnectToken, PrivateKey, configColor, Env.SANDBOX)
+//        payme.pay(this.supportFragmentManager, 100000, "Merchant ghi chú đơn hàng", "", "",
+//            onSuccess = { json: JSONObject ->
+//                println("onSuccess2222" + json.toString())
+//            },
+//            onError = { message: String ->
+//                println("onError" + message)
+//            },
+//            onClose = {
+//                println("CLOSE")
+//            }
+//        )
 
 
 

@@ -14,15 +14,23 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.camerakit.CameraKitView
 import com.camerakit.CameraKitView.ImageCallback
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import vn.payme.sdk.PayME
 import vn.payme.sdk.R
+import vn.payme.sdk.api.UploadKycApi
 import vn.payme.sdk.component.Button
+import vn.payme.sdk.enum.KEY_KYC
+import vn.payme.sdk.evenbus.MyEven
+import vn.payme.sdk.model.TypeCallBack
 import vn.payme.sdk.model.TypeIdentify
 import vn.payme.sdk.payment.PopupSelectTypeIdentify
 import java.io.ByteArrayOutputStream
@@ -43,9 +51,34 @@ class TakePictureIdentifyFragment : Fragment() {
     private var textGuiTakePicture: TextView? = null
     private var textTypeIdentify: TextView? = null
     private var buttonSelectTypeIdentify: ConstraintLayout? = null
+    private var layoutUpload: ConstraintLayout? = null
     private var typeIdentify = "CMND"
-    private var buttonSelectImage : LinearLayout? = null
+    private var buttonSelectImage: LinearLayout? = null
 
+    suspend fun uploadKYC() {
+        this.layoutUpload!!.visibility = View.VISIBLE
+        val uploadKycApi = UploadKycApi()
+        uploadKycApi.upLoadKYC(imageFront, imageBackSide, null, null,
+            onSuccess = {
+                activity?.finish()
+                var even: EventBus = EventBus.getDefault()
+                var myEven: MyEven = MyEven(TypeCallBack.onReload, "")
+                even.post(myEven)
+
+            },
+            onError = { jsonObject, code, message ->
+                layoutUpload!!.visibility = View.GONE
+                val toast: Toast =
+                    Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
+                toast.view?.setBackgroundColor(
+                    ContextCompat.getColor(
+                        PayME.context,
+                        R.color.scarlet
+                    )
+                )
+                toast.show()
+            })
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,6 +103,9 @@ class TakePictureIdentifyFragment : Fragment() {
         textTypeIdentify = view!!.findViewById(R.id.title_type_identify)
         buttonSelectTypeIdentify = view!!.findViewById(R.id.buttonSelectTypeIdentify)
         buttonSelectImage = view!!.findViewById(R.id.buttonSelectImage)
+        layoutUpload = view!!.findViewById(R.id.upLoadKyc)
+        layoutUpload!!.background = PayME.colorApp.backgroundColor
+
         buttonSelectImage?.setOnClickListener {
             CropImage.activity()
                 .setGuidelines(CropImageView.Guidelines.ON)
@@ -88,17 +124,32 @@ class TakePictureIdentifyFragment : Fragment() {
             layoutConfirm!!.visibility = View.GONE
 
         }
+
         buttonNext!!.setOnClickListener {
             if (imageFront != null) {
                 imageBackSide = saveImage
                 val bundle: Bundle = Bundle()
                 bundle.putByteArray("imageFront", imageFront)
                 bundle.putByteArray("imageBackSide", imageBackSide)
-                val takePictureAvataFragment = TakePictureAvataFragment()
-                takePictureAvataFragment.arguments = bundle
-                val fragment = activity?.supportFragmentManager?.beginTransaction()
-                fragment?.replace(R.id.content_kyc, takePictureAvataFragment)
-                fragment?.commit()
+                if (PayME.kycFade) {
+                    val takePictureAvataFragment = TakePictureAvataFragment()
+                    takePictureAvataFragment.arguments = bundle
+                    val fragment = activity?.supportFragmentManager?.beginTransaction()
+                    fragment?.replace(R.id.content_kyc, takePictureAvataFragment)
+                    fragment?.commit()
+                } else if (PayME.kycVideo) {
+                    val takePictureAvataFragment = TakeVideoKycFragment()
+                    takePictureAvataFragment.arguments = bundle
+                    val fragment = activity?.supportFragmentManager?.beginTransaction()
+                    fragment?.replace(R.id.content_kyc, takePictureAvataFragment)
+                    fragment?.commit()
+                } else {
+                    GlobalScope.launch {
+                        uploadKYC()
+
+                    }
+                }
+
 
             } else {
                 textGuiTakePicture?.text = "Mặt sau"
@@ -201,11 +252,11 @@ class TakePictureIdentifyFragment : Fragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        println("data"+data.toString())
+        println("data" + data.toString())
 
         if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             val result = CropImage.getActivityResult(data)
-            println("result"+result.toString())
+            println("result" + result.toString())
             if (resultCode === RESULT_OK) {
                 val resultUri: Uri = result.uri
                 val bitmapImage = BitmapFactory.decodeFile(resultUri.path)

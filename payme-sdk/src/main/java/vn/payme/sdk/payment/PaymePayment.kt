@@ -30,7 +30,7 @@ internal class PaymePayment : BottomSheetDialogFragment() {
         val fragmentManager : FragmentManager
         fragmentManager = childFragmentManager
         val  fragment = fragmentManager.beginTransaction()
-        fragment.add(R.id.frame_container,SelectMethodFragment())
+        fragment.add(R.id.frame_container,ConfirmPassFragment())
         fragment.commit()
         bottomSheetDialogFragment.behavior.isDraggable = false
     }

@@ -8,21 +8,34 @@ import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
+import vn.payme.sdk.enum.KEY_KYC
 
-class CameraKycActivity :AppCompatActivity(R.layout.camera_kyc_activity) {
+class CameraKycActivity : AppCompatActivity(R.layout.camera_kyc_activity) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         getWindow().setBackgroundDrawable(PayME.colorApp.backgroundColor);
         if (savedInstanceState == null) {
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                add<TakePictureIdentifyFragment>(R.id.content_kyc)
-            }
-
+                if (PayME.kycIdenity) {
+                    supportFragmentManager.commit {
+                        setReorderingAllowed(true)
+                        add<TakePictureIdentifyFragment>(R.id.content_kyc)
+                    }
+                } else if (PayME.kycFade) {
+                    supportFragmentManager.commit {
+                        setReorderingAllowed(true)
+                        add<TakePictureAvataFragment>(R.id.content_kyc)
+                    }
+                } else if (PayME.kycVideo) {
+                    supportFragmentManager.commit {
+                        setReorderingAllowed(true)
+                        add<TakeVideoKycFragment>(R.id.content_kyc)
+                    }
+                }
         }
 
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         for (fragment in supportFragmentManager.fragments) {
