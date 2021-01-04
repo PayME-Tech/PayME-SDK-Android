@@ -1,5 +1,6 @@
 package vn.payme.sdk.kyc
 
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -12,8 +13,9 @@ import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.camerakit.CameraKitView
-import com.camerakit.CameraKitView.ImageCallback
+import com.otaliastudios.cameraview.CameraListener
+import com.otaliastudios.cameraview.CameraView
+import com.otaliastudios.cameraview.PictureResult
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
@@ -24,14 +26,11 @@ import vn.payme.sdk.component.Button
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.TypeCallBack
 
-import java.io.ByteArrayOutputStream
-
 
 class TakePictureAvataFragment : Fragment() {
-    private var cameraKitView: CameraKitView? = null
+    private var cameraKitView: CameraView? = null
     private var buttonTakePicture: ImageView? = null
     private var layoutConfirm: ConstraintLayout? = null
-    private var layoutUpload: ConstraintLayout? = null
     private var imagePreView: ImageView? = null
     private var buttonBackHeader: ImageView? = null
     private var buttonBackHeader2: ImageView? = null
@@ -39,33 +38,24 @@ class TakePictureAvataFragment : Fragment() {
     private var buttonNext: Button? = null
     private var saveImage: ByteArray? = null
     private var cardViewCamera: CardView? = null
-    suspend fun uploadKYC() {
-        this.layoutUpload!!.visibility = View.VISIBLE
-        val uploadKycApi = UploadKycApi()
-        val imageFront = arguments?.getByteArray("imageFront")
-        val imageBackSide = arguments?.getByteArray("imageBackSide")
-        uploadKycApi.upLoadKYC(imageFront, imageBackSide, null, saveImage,
-            onSuccess = {
-                activity?.finish()
-                var even: EventBus = EventBus.getDefault()
-                var myEven: MyEven = MyEven(TypeCallBack.onReload, "")
-                even.post(myEven)
 
-            },
-            onError = { jsonObject, code, message ->
-                layoutUpload!!.visibility = View.GONE
-                val toast: Toast =
-                    Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
-                toast.view?.setBackgroundColor(
-                    ContextCompat.getColor(
-                        PayME.context,
-                        R.color.scarlet
-                    )
-                )
-                toast.show()
-            })
+    private inner class Listener : CameraListener() {
+
+        override fun onPictureTaken(result: PictureResult) {
+
+            super.onPictureTaken(result)
+           val  bytearray= result.data
+            val bmp = BitmapFactory.decodeByteArray(bytearray, 0, bytearray.size)
+
+            imagePreView!!.setImageBitmap(
+                bmp
+            )
+
+            layoutConfirm?.visibility = View.VISIBLE
+
+            saveImage = result.data
+        }
     }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -75,8 +65,7 @@ class TakePictureAvataFragment : Fragment() {
         cameraKitView = view!!.findViewById(R.id.previewCamera)
         buttonTakePicture = view!!.findViewById(R.id.btn_takepicture)
         layoutConfirm = view!!.findViewById(R.id.confirm_screen)
-        layoutUpload = view!!.findViewById(R.id.upLoadKyc)
-        layoutUpload!!.background = PayME.colorApp.backgroundColor
+
 
         imagePreView = view!!.findViewById(R.id.previewImage)
         buttonBack = view!!.findViewById(R.id.buttonBack)
@@ -95,116 +84,55 @@ class TakePictureAvataFragment : Fragment() {
             layoutConfirm!!.visibility = View.GONE
 
         }
-
+        cameraKitView!!.setLifecycleOwner(this)
+        cameraKitView!!.addCameraListener(Listener())
 
 
 //        cardCornerRadius
 
         buttonNext!!.setOnClickListener {
-            layoutUpload!!.visibility = View.VISIBLE
-            if(PayME.kycVideo){
-                val imageFront = arguments?.getByteArray("imageFront")
-                val imageBackSide = arguments?.getByteArray("imageBackSide")
-                val bundle: Bundle = Bundle()
-                bundle.putByteArray("imageFront", imageFront)
-                bundle.putByteArray("imageBackSide", imageBackSide)
-                bundle.putByteArray("imageFade", saveImage)
+            val imageFront = arguments?.getByteArray("imageFront")
+            val imageBackSide = arguments?.getByteArray("imageBackSide")
+            val bundle: Bundle = Bundle()
+            bundle.putByteArray("imageFront", imageFront)
+            bundle.putByteArray("imageBackSide", imageBackSide)
+            bundle.putByteArray("imageFade", saveImage)
+            if (PayME.kycVideo) {
                 val takePictureAvataFragment = TakeVideoKycFragment()
                 takePictureAvataFragment.arguments = bundle
                 val fragment = activity?.supportFragmentManager?.beginTransaction()
                 fragment?.replace(R.id.content_kyc, takePictureAvataFragment)
                 fragment?.commit()
-            }else{
-                GlobalScope.launch {
-                    uploadKYC()
-
-                }
-
+            } else {
+                val newFragment = UploadKycFragment()
+                newFragment.arguments = bundle
+                val fragment = activity?.supportFragmentManager?.beginTransaction()
+                fragment?.addToBackStack(null)
+                fragment?.add(R.id.content_kyc, newFragment)
+                fragment?.commit()
             }
-
-
 
 
         }
 
         buttonTakePicture?.setOnClickListener {
-            cameraKitView?.captureImage(ImageCallback { cameraKitView, capturedImage ->
-                val bitmapImage = cropBitmapCenter(
-                    BitmapFactory.decodeByteArray(
-                        capturedImage,
-                        0,
-                        capturedImage.size
-                    ), cameraKitView.width, cameraKitView.height
-                )
-                imagePreView!!.setImageBitmap(
-                    bitmapImage
-                )
-
-                layoutConfirm?.visibility = View.VISIBLE
-                val stream = ByteArrayOutputStream()
-                bitmapImage?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-                val byteArray: ByteArray = stream.toByteArray()
-                saveImage = byteArray
-            })
-
-
+            cameraKitView!!.takePictureSnapshot()
         }
-        cameraKitView?.setErrorListener(CameraKitView.ErrorListener { cameraKitView, e ->
-            Toast.makeText(this.context, e.toString(), Toast.LENGTH_SHORT).show()
 
-        })
         return view
     }
 
-    override fun onStart() {
-        super.onStart()
-        cameraKitView!!.onStart()
-    }
-
-    private fun cropBitmapCenter(bitmap: Bitmap, cropWidth: Int, cropHeight: Int): Bitmap? {
-        var cropWidth = cropWidth
-        var cropHeight = cropHeight
-
-        val bitmapWidth = bitmap.width
-        val bitmapheight = bitmap.height
-
-        cropWidth = if (cropWidth > bitmapWidth) bitmapWidth else cropWidth
-        cropHeight = if (cropHeight > bitmapheight) bitmapheight else cropHeight
-        val newX = bitmapWidth / 2 - cropWidth / 2
-        val newY = bitmapheight / 2 - cropHeight / 2
-        return Bitmap.createBitmap(bitmap, newX, newY, cropWidth, cropHeight)
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-        cameraKitView!!.onResume()
-    }
-
-    override fun onPause() {
-        cameraKitView!!.onPause()
-        super.onPause()
-    }
-
-    override fun onStop() {
-        cameraKitView!!.onStop()
-        super.onStop()
-    }
-
-    override fun onDestroy() {
-        cameraKitView!!.onStop()
-        super.onDestroy()
-
-    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
-        permissions: Array<out String>,
+        permissions: Array<String?>,
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        cameraKitView!!.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
+        val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+        if (valid && !cameraKitView!!.isOpened) {
+            cameraKitView!!.open()
+        }
     }
 
 

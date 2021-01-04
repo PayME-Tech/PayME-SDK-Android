@@ -12,32 +12,25 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.camerakit.CameraKitView
-import com.camerakit.CameraKitView.ImageCallback
+import com.otaliastudios.cameraview.CameraListener
+import com.otaliastudios.cameraview.CameraView
+import com.otaliastudios.cameraview.PictureResult
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
-import vn.payme.sdk.api.UploadKycApi
 import vn.payme.sdk.component.Button
-import vn.payme.sdk.enum.KEY_KYC
-import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.model.TypeCallBack
 import vn.payme.sdk.model.TypeIdentify
 import vn.payme.sdk.payment.PopupSelectTypeIdentify
 import java.io.ByteArrayOutputStream
 
 
 class TakePictureIdentifyFragment : Fragment() {
-    private var cameraKitView: CameraKitView? = null
+    private var cameraKitView: CameraView? = null
     private var buttonTakePicture: ImageView? = null
     private var layoutConfirm: ConstraintLayout? = null
     private var imagePreView: ImageView? = null
@@ -51,34 +44,22 @@ class TakePictureIdentifyFragment : Fragment() {
     private var textGuiTakePicture: TextView? = null
     private var textTypeIdentify: TextView? = null
     private var buttonSelectTypeIdentify: ConstraintLayout? = null
-    private var layoutUpload: ConstraintLayout? = null
     private var typeIdentify = "CMND"
     private var buttonSelectImage: LinearLayout? = null
 
-    suspend fun uploadKYC() {
-        this.layoutUpload!!.visibility = View.VISIBLE
-        val uploadKycApi = UploadKycApi()
-        uploadKycApi.upLoadKYC(imageFront, imageBackSide, null, null,
-            onSuccess = {
-                activity?.finish()
-                var even: EventBus = EventBus.getDefault()
-                var myEven: MyEven = MyEven(TypeCallBack.onReload, "")
-                even.post(myEven)
-
-            },
-            onError = { jsonObject, code, message ->
-                layoutUpload!!.visibility = View.GONE
-                val toast: Toast =
-                    Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
-                toast.view?.setBackgroundColor(
-                    ContextCompat.getColor(
-                        PayME.context,
-                        R.color.scarlet
-                    )
-                )
-                toast.show()
-            })
+    private inner class Listener : CameraListener() {
+        override fun onPictureTaken(result: PictureResult) {
+            super.onPictureTaken(result)
+            val bytearray = result.data
+            val bmp = BitmapFactory.decodeByteArray(bytearray, 0, bytearray.size)
+            imagePreView!!.setImageBitmap(
+                bmp
+            )
+            layoutConfirm?.visibility = View.VISIBLE
+            saveImage = result.data
+        }
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -103,8 +84,7 @@ class TakePictureIdentifyFragment : Fragment() {
         textTypeIdentify = view!!.findViewById(R.id.title_type_identify)
         buttonSelectTypeIdentify = view!!.findViewById(R.id.buttonSelectTypeIdentify)
         buttonSelectImage = view!!.findViewById(R.id.buttonSelectImage)
-        layoutUpload = view!!.findViewById(R.id.upLoadKyc)
-        layoutUpload!!.background = PayME.colorApp.backgroundColor
+
 
         buttonSelectImage?.setOnClickListener {
             CropImage.activity()
@@ -117,7 +97,6 @@ class TakePictureIdentifyFragment : Fragment() {
             layoutConfirm!!.visibility = View.GONE
         }
         buttonBackHeader!!.setOnClickListener {
-//            finish()
             activity?.finish()
         }
         buttonBack!!.setOnClickListener {
@@ -131,23 +110,25 @@ class TakePictureIdentifyFragment : Fragment() {
                 val bundle: Bundle = Bundle()
                 bundle.putByteArray("imageFront", imageFront)
                 bundle.putByteArray("imageBackSide", imageBackSide)
-                if (PayME.kycFade) {
-                    val takePictureAvataFragment = TakePictureAvataFragment()
-                    takePictureAvataFragment.arguments = bundle
+                if (PayME.kycFace) {
+                    val newFragment = TakePictureAvataFragment()
+                    newFragment.arguments = bundle
                     val fragment = activity?.supportFragmentManager?.beginTransaction()
-                    fragment?.replace(R.id.content_kyc, takePictureAvataFragment)
+                    fragment?.replace(R.id.content_kyc, newFragment)
                     fragment?.commit()
                 } else if (PayME.kycVideo) {
-                    val takePictureAvataFragment = TakeVideoKycFragment()
-                    takePictureAvataFragment.arguments = bundle
+                    val newFragment = TakeVideoKycFragment()
+                    newFragment.arguments = bundle
                     val fragment = activity?.supportFragmentManager?.beginTransaction()
-                    fragment?.replace(R.id.content_kyc, takePictureAvataFragment)
+                    fragment?.replace(R.id.content_kyc, newFragment)
                     fragment?.commit()
                 } else {
-                    GlobalScope.launch {
-                        uploadKYC()
-
-                    }
+                    val newFragment = UploadKycFragment()
+                    newFragment.arguments = bundle
+                    val fragment = activity?.supportFragmentManager?.beginTransaction()
+                    fragment?.add(R.id.content_kyc, newFragment)
+                    fragment?.addToBackStack(null)
+                    fragment?.commit()
                 }
 
 
@@ -161,94 +142,22 @@ class TakePictureIdentifyFragment : Fragment() {
             val popupSelectTypeIdentify = PopupSelectTypeIdentify()
             popupSelectTypeIdentify.show(childFragmentManager, "ModalBottomSheet")
         }
+        cameraKitView!!.setLifecycleOwner(this)
+        cameraKitView!!.addCameraListener(Listener())
+
 
         buttonTakePicture?.setOnClickListener {
-            cameraKitView?.captureImage(ImageCallback { cameraKitView, capturedImage ->
-                val bitmapImage = cropBitmapCenter(
-                    BitmapFactory.decodeByteArray(
-                        capturedImage,
-                        0,
-                        capturedImage.size
-                    ), cameraKitView.width, cameraKitView.height
-                )
-                imagePreView!!.setImageBitmap(
-                    bitmapImage
-                )
-
-                layoutConfirm?.visibility = View.VISIBLE
-                val stream = ByteArrayOutputStream()
-                bitmapImage?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-                val byteArray: ByteArray = stream.toByteArray()
-                saveImage = byteArray
-
-
-            })
-
-
+            cameraKitView!!.takePictureSnapshot()
         }
-        cameraKitView?.setErrorListener(CameraKitView.ErrorListener { cameraKitView, e ->
-            Toast.makeText(this.context, e.toString(), Toast.LENGTH_SHORT).show()
 
-        })
         return view
     }
 
-    override fun onStart() {
-        super.onStart()
-        cameraKitView!!.onStart()
-    }
-
-    private fun cropBitmapCenter(bitmap: Bitmap, cropWidth: Int, cropHeight: Int): Bitmap? {
-        var cropWidth = cropWidth
-        var cropHeight = cropHeight
-        val bitmapWidth = bitmap.width
-        val bitmapheight = bitmap.height
-
-        cropWidth = if (cropWidth > bitmapWidth) bitmapWidth else cropWidth
-        cropHeight = if (cropHeight > bitmapheight) bitmapheight else cropHeight
-        val newX = bitmapWidth / 2 - cropWidth / 2
-        val newY = bitmapheight / 2 - cropHeight / 2
-        return Bitmap.createBitmap(bitmap, newX, newY, cropWidth, cropHeight)
-    }
 
     @Subscribe
     fun onChange(myEven: TypeIdentify) {
         textTypeIdentify?.text = myEven.title
         typeIdentify = myEven.type
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-        cameraKitView!!.onResume()
-    }
-
-    override fun onPause() {
-        cameraKitView!!.onPause()
-        super.onPause()
-    }
-
-    override fun onStop() {
-        cameraKitView!!.onStop()
-        super.onStop()
-    }
-
-    override fun onDestroy() {
-        cameraKitView!!.onStop()
-        EventBus.getDefault().unregister(this);
-        super.onDestroy()
-
-    }
-
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        cameraKitView!!.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -2,9 +2,12 @@ package vn.payme.sdk
 
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import org.json.JSONObject
 import org.spongycastle.jce.provider.BouncyCastleProvider
+import vn.payme.sdk.api.AccountApi
+import vn.payme.sdk.api.ENV_API
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.kyc.CameraKycActivity
 import vn.payme.sdk.model.*
@@ -32,6 +35,9 @@ public class PayME(
         var kycInfo: KycInfo = KycInfo()
         var amount: Int = 0
         var content: String? = null
+        var clientId: String = ""
+        var handShake: String? = ""
+        var accessToken: String? = ""
         var orderId: String? = null
         var extraData: String? = null
         var clientInfo: ClientInfo = ClientInfo()
@@ -47,7 +53,7 @@ public class PayME(
         //KYC
         var kycIdenity = false
         var kycVideo = false
-        var kycFade = false
+        var kycFace = false
 
     }
 
@@ -63,6 +69,45 @@ public class PayME(
         Companion.colorApp = ColorApp(configColor[0], configColor[1])
         Companion.clientInfo = ClientInfo(context)
         Security.insertProviderAt(BouncyCastleProvider(), 1)
+        val accountApi = AccountApi()
+        val pref = PayME.context.getSharedPreferences("PayME_SDK", Context.MODE_PRIVATE)
+        val clientId = pref.getString("clientId", "")
+        ENV_API.updateEnv()
+        if (clientId?.length!! <= 0) {
+            accountApi.registerClient(
+                onSuccess = { jsonObject ->
+                    val Client = jsonObject?.optJSONObject("Client")
+                    val Register = Client?.optJSONObject("Register")
+                    val clientId = Register?.optString("clientId")
+                    pref.edit().putString("clientId", clientId).commit()
+                    PayME.clientId = clientId.toString()
+                    this.isConnected(onSuccess = { jsonObject ->
+                        println("jsonObject" + jsonObject)
+                    }, onError = { jsonObject, code, message ->
+                        println("jsonObject" + jsonObject)
+                        println("code" + code)
+                        println("message" + message)
+
+                    })
+                },
+                onError = { jsonObject, code, message ->
+                    Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT).show()
+
+                }
+            )
+        } else {
+            PayME.clientId = clientId
+            this.isConnected(onSuccess = { jsonObject ->
+                println("jsonObjectDKYDDDD" + jsonObject)
+            }, onError = { jsonObject, code, message ->
+                println("jsonObjectDKYDDDD" + jsonObject)
+                println("code" + code)
+                println("message" + message)
+            })
+
+        }
+
+
     }
 
 
@@ -83,18 +128,17 @@ public class PayME(
         } else {
             Companion.amount = 0
         }
-//        val intent = Intent(context, PaymeWaletActivity::class.java)
-        PayME.kycVideo= true
-        PayME.kycIdenity= false
-        PayME.kycFade= false
+        val intent = Intent(context, PaymeWaletActivity::class.java)
+//        PayME.kycVideo = true
+//        PayME.kycIdenity = false
+//        PayME.kycFade = false
 
-        val intent = Intent(context, CameraKycActivity::class.java)
+//        val intent = Intent(context, CameraKycActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context?.startActivity(intent)
         Companion.onSuccess = onSuccess
         Companion.onError = onError
     }
-
 
 
     public fun deposit(
@@ -155,11 +199,6 @@ public class PayME(
             Companion.amount = 0
         }
         Companion.orderId = orderId
-//        val paymePayment: PopupSelectTypeIndentify = PopupSelectTypeIndentify()
-//        paymePayment.show(
-//            fragmentManager,
-//            "ModalBottomSheet"
-//        )
         val paymePayment: PaymePayment = PaymePayment()
         paymePayment.show(
             fragmentManager,
@@ -169,9 +208,34 @@ public class PayME(
     }
 
 
+    public fun isConnected(
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        val accountApi = AccountApi()
+        accountApi.intAccount(onSuccess = { jsonObject ->
+            onSuccess(jsonObject)
+            val OpenEWallet = jsonObject.getJSONObject("OpenEWallet")
+            val Init = OpenEWallet.getJSONObject("Init")
+            val accessToken = Init.optString("accessToken")
+            val handShake = Init.optString("handShake")
+            val succeeded = Init.optBoolean("succeeded")
+            val isExistInMainWallet = Init.optBoolean("isExistInMainWallet")
+            PayME.accessToken = accessToken
+            PayME.handShake = handShake
+            val kyc = Init.optJSONObject("kyc")
+            if (kyc != null) {
+                val state = kyc.optString("kyc")
+            }
+            println("jsonObject" + jsonObject)
 
-    public fun isConnected(): Boolean {
-        return false
+        }, onError = { jsonObject, code, message ->
+            onError(jsonObject, code, message)
+            println("jsonObject" + jsonObject)
+            println("code" + code)
+            println("message" + message)
+
+        })
     }
 
     public fun genConnectToken(
@@ -191,30 +255,6 @@ public class PayME(
     ) {
         val paymentApi = PaymentApi()
         paymentApi.getBalance(onSuccess, onError)
-//        val url = urlFeENV("sandbox")
-//        val path = "/graphql"
-//        val params: MutableMap<String, Any> = mutableMapOf()
-//        val variables: MutableMap<String, Any> = mutableMapOf()
-//        val query= "query Query(\$feedFeedId: BigInt!) {\n" +
-//                "  Feed(feedId: \$feedFeedId) {\n" +
-//                "    feedId\n" +
-//                "  }\n" +
-//                "}"
-//        println("STRINGTEST"+query.toString())
-//        params["query"] =query
-//
-//        variables["feedFeedId"] = 10
-//        params["variables"] = variables
-//        val request = NetworkRequest(context!!, url, path, PayME.token, params)
-//        request.setOnRequestCrypto(
-//            onError = onError,
-//            onSuccess = onSuccess,
-//            onExpired = {
-//                println("401")
-//
-//            })
-
-
     }
 }
 

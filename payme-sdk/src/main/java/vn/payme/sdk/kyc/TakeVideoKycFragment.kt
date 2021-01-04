@@ -14,42 +14,30 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.MediaController
-import android.widget.Toast
 import android.widget.VideoView
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.camerakit.CameraKitView
-import com.camerakit.CameraKitView.ImageCallback
+import com.airbnb.lottie.LottieAnimationView
 import com.otaliastudios.cameraview.CameraListener
-import com.otaliastudios.cameraview.CameraOptions
 import com.otaliastudios.cameraview.CameraView
 import com.otaliastudios.cameraview.VideoResult
-import kotlinx.coroutines.*
-import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
-import vn.payme.sdk.api.UploadKycApi
 import vn.payme.sdk.component.Button
-import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.model.TypeCallBack
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.nio.file.Files
 
 
 class TakeVideoKycFragment : Fragment() {
     private var cameraKitView: CameraView? = null
-    private var buttonTakePicture: ImageView? = null
+    private var buttonTakePicture: LottieAnimationView? = null
     private var layoutConfirm: ConstraintLayout? = null
-    private var layoutUpload: ConstraintLayout? = null
     private var imagePreView: VideoView? = null
     private var buttonBackHeader: ImageView? = null
     private var buttonBackHeader2: ImageView? = null
     private var buttonBack: Button? = null
     private var buttonNext: Button? = null
-    private var saveImage: ByteArray? = null
+    private var saveVideo: ByteArray? = null
     private var cardViewCamera: CardView? = null
     fun playVideo() {
         if (!imagePreView!!.isPlaying) {
@@ -66,7 +54,7 @@ class TakeVideoKycFragment : Fragment() {
             controller.setMediaPlayer(imagePreView)
             imagePreView?.setMediaController(controller)
             imagePreView?.setVideoURI(Uri.fromFile(result.file))
-            saveImage = File(result.file.absolutePath).inputStream().use { it.readBytes() }
+            saveVideo = File(result.file.absolutePath).inputStream().use { it.readBytes() }
             imagePreView?.setOnPreparedListener { mp ->
                 val lp = imagePreView?.layoutParams
                 val videoWidth = mp.videoWidth.toFloat()
@@ -83,43 +71,8 @@ class TakeVideoKycFragment : Fragment() {
                 }
             }
         }
-
-        override fun onVideoRecordingStart() {
-            super.onVideoRecordingStart()
-        }
-
-        override fun onVideoRecordingEnd() {
-            super.onVideoRecordingEnd()
-        }
     }
 
-    suspend fun uploadKYC() {
-        this.layoutUpload!!.visibility = View.VISIBLE
-        val uploadKycApi = UploadKycApi()
-        val imageFront = arguments?.getByteArray("imageFront")
-        val imageBackSide = arguments?.getByteArray("imageBackSide")
-        val imageFade = arguments?.getByteArray("imageFade")
-        uploadKycApi.upLoadKYC(imageFront, imageBackSide, imageFade, saveImage,
-            onSuccess = {
-                activity?.finish()
-                var even: EventBus = EventBus.getDefault()
-                var myEven: MyEven = MyEven(TypeCallBack.onReload, "")
-                even.post(myEven)
-
-            },
-            onError = { jsonObject, code, message ->
-                layoutUpload!!.visibility = View.GONE
-                val toast: Toast =
-                    Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
-                toast.view?.setBackgroundColor(
-                    ContextCompat.getColor(
-                        PayME.context,
-                        R.color.scarlet
-                    )
-                )
-                toast.show()
-            })
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -130,8 +83,7 @@ class TakeVideoKycFragment : Fragment() {
         cameraKitView = view!!.findViewById(R.id.previewCamera)
         buttonTakePicture = view!!.findViewById(R.id.btn_takepicture)
         layoutConfirm = view!!.findViewById(R.id.confirm_screen)
-        layoutUpload = view!!.findViewById(R.id.upLoadKyc)
-        layoutUpload!!.background = PayME.colorApp.backgroundColor
+
 
         imagePreView = view!!.findViewById(R.id.previewImage)
         buttonBack = view!!.findViewById(R.id.buttonBack)
@@ -142,57 +94,35 @@ class TakeVideoKycFragment : Fragment() {
 
         buttonBackHeader2!!.setOnClickListener {
             layoutConfirm!!.visibility = View.GONE
+            buttonTakePicture?.progress =0f
+
         }
         buttonBackHeader!!.setOnClickListener {
             activity?.finish()
         }
         buttonBack!!.setOnClickListener {
             layoutConfirm!!.visibility = View.GONE
+            buttonTakePicture?.progress =0f
         }
         cameraKitView!!.setLifecycleOwner(this)
         imagePreView!!.setOnClickListener { playVideo() }
 
-
-
-//        cardCornerRadius
-
         buttonNext!!.setOnClickListener {
-            layoutUpload!!.visibility = View.VISIBLE
-            GlobalScope.launch {
-                uploadKYC()
-
-            }
-
-
+            val bundle: Bundle = Bundle()
+            bundle.putByteArray("imageFront", saveVideo)
+            val newFragment = UploadKycFragment()
+            newFragment.arguments = bundle
+            val fragment = activity?.supportFragmentManager?.beginTransaction()
+            fragment?.addToBackStack(null)
+            fragment?.add(R.id.content_kyc, newFragment)
+            fragment?.commit()
         }
 
         cameraKitView!!.addCameraListener(Listener())
         buttonTakePicture?.setOnClickListener {
+            buttonTakePicture?.playAnimation()
             val screenShotDirPath = activity?.getApplication()!!.getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.path
-
-            cameraKitView!!.takeVideo(File(screenShotDirPath,"video.mp4"), 5000)
-
-
-//            cameraKitView?.captureImage(ImageCallback { cameraKitView, capturedImage ->
-//                val bitmapImage = cropBitmapCenter(
-//                    BitmapFactory.decodeByteArray(
-//                        capturedImage,
-//                        0,
-//                        capturedImage.size
-//                    ), cameraKitView.width, cameraKitView.height
-//                )
-//                imagePreView!!.setImageBitmap(
-//                    bitmapImage
-//                )
-//
-//                layoutConfirm?.visibility = View.VISIBLE
-//                val stream = ByteArrayOutputStream()
-//                bitmapImage?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-//                val byteArray: ByteArray = stream.toByteArray()
-//                saveImage = byteArray
-//            })
-
-
+            cameraKitView!!.takeVideoSnapshot(File(screenShotDirPath,"video.mp4"), 5000)
         }
 
         return view

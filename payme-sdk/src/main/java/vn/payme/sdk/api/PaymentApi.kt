@@ -8,31 +8,21 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 internal class PaymentApi {
-    private fun urlFeENV(env: String?): String {
-        if (env == "sandbox") {
-            return "https://sbx-fe.payme.vn/"
-        }
-        return "https://fe.payme.vn/"
-    }
+
 
     fun getTransferMethods(
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        val url = urlFeENV("sandbox")
         val path = "/v1/Transfer/GetMethods"
         val params: MutableMap<String, Any> = mutableMapOf()
         params["connectToken"] = PayME.connectToken
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.appToken, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
-
             onError = onError,
-
             onSuccess = onSuccess,
-            onExpired = {
-
-            })
+           )
 
     }
 
@@ -40,7 +30,6 @@ internal class PaymentApi {
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        val url = urlFeENV("sandbox")
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
         val variables: MutableMap<String, Any> = mutableMapOf()
@@ -53,15 +42,11 @@ internal class PaymentApi {
                 "}"
         params["query"] = query
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.token, params)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.token, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
-
             onSuccess = onSuccess,
-            onExpired = {
-                println("401")
-
-            })
+        )
 
     }
 
@@ -71,7 +56,6 @@ internal class PaymentApi {
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        val url = urlFeENV("sandbox")
         val path = "/v1/Internal/ConnectToken/Generate"
         val params: MutableMap<String, Any> = mutableMapOf()
         params["userId"] = userId
@@ -86,15 +70,11 @@ internal class PaymentApi {
         val nowAsISO: String = df.format(Date())
         println("nowAsISO" + nowAsISO)
         params["timestamp"] = nowAsISO
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.appToken, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
-
             onError = onError,
-
             onSuccess = onSuccess,
-            onExpired = {
-
-            })
+        )
 
     }
 
@@ -102,7 +82,6 @@ internal class PaymentApi {
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        val url = urlFeENV("sandbox")
         val path = "/v1/Transfer/AppWallet/Generate"
         val params: MutableMap<String, Any> = mutableMapOf()
         val data: MutableMap<String, Any> = mutableMapOf()
@@ -113,13 +92,11 @@ internal class PaymentApi {
         params["destination"] = "AppPartner"
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
         params["data"] = data
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.appToken, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
-            onExpired = {
-
-            })
+           )
 
     }
 
@@ -128,7 +105,6 @@ internal class PaymentApi {
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        val url = urlFeENV("sandbox")
         val path = "/v1/Transfer/Napas/Generate"
         val params: MutableMap<String, Any> = mutableMapOf()
         val data: MutableMap<String, Any> = mutableMapOf()
@@ -142,13 +118,10 @@ internal class PaymentApi {
         params["returnUrl"] = "https://sbx-fe.payme.vn/"
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
         params["data"] = data
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.appToken, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
-
             onSuccess = onSuccess,
-            onExpired = {
-            }
         )
 
     }
@@ -158,22 +131,17 @@ internal class PaymentApi {
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        val url = urlFeENV("sandbox")
         val path = "/v1/Pay/PayWithQRCode"
         val params: MutableMap<String, Any> = mutableMapOf()
         val data: MutableMap<String, Any> = mutableMapOf()
         params["connectToken"] = PayME.connectToken
         params["data"] = dataQR
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.appToken, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
-
             onError = onError,
-
             onSuccess = onSuccess,
-            onExpired = {
-
-            })
+          )
 
     }
 
@@ -182,7 +150,6 @@ internal class PaymentApi {
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        val url = urlFeENV("sandbox")
         val path = "/v1/Transfer/PVCBank/Generate"
         val params: MutableMap<String, Any> = mutableMapOf()
         val data: MutableMap<String, Any> = mutableMapOf()
@@ -194,13 +161,11 @@ internal class PaymentApi {
         params["destination"] = "AppPartner"
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
         params["data"] = data
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.appToken, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
-            onExpired = {
-
-            })
+           )
 
     }
 
@@ -210,7 +175,6 @@ internal class PaymentApi {
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        val url = urlFeENV("sandbox")
         val path = "/v1/Transfer/PVCBank/Verify"
         val params: MutableMap<String, Any> = mutableMapOf()
         val data: MutableMap<String, Any> = mutableMapOf()
@@ -222,14 +186,11 @@ internal class PaymentApi {
         params["destination"] = "AppPartner"
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
         params["data"] = data
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.appToken, params)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.appToken, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
-
             onError = onError,
             onSuccess = onSuccess,
-            onExpired = {
-
-            })
+            )
 
     }
 }

@@ -5,11 +5,8 @@ import com.android.volley.toolbox.Volley
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import vn.payme.sdk.PayME
-import vn.payme.sdk.model.Env
 import java.nio.charset.StandardCharsets
 import java.util.HashMap
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -27,45 +24,11 @@ class ResponseHander() {
 }
 
 class UploadKycApi {
-    private val executor = Executors.newSingleThreadScheduledExecutor {
-        Thread(it, "scheduler").apply { isDaemon = true }
-    }
-
-    suspend fun delay(time: Long, unit: TimeUnit = TimeUnit.MILLISECONDS): String =
-        suspendCoroutine { cont ->
-            val paymentApi = PaymentApi()
-            paymentApi.getBalance(onSuccess = {
-
-            }, onError = { j, f, d ->
-                cont.resume("HIEUY")
-
-            })
-        }
-
     suspend fun uploadFileCoroutine(file: ByteArray): ResponseHander = suspendCoroutine { cont ->
         uploadFile(file, { responseHander ->
             cont.resume(responseHander)
-
-
         })
-
-
     }
-
-    private fun urlStaticENV(env: Env): String {
-        if (env == Env.SANDBOX) {
-            return "https://sbx-static.payme.vn/Upload"
-        }
-        return "https://static.payme.vn/Upload"
-    }
-
-    private fun urlFeENV(env: String?): String {
-        if (env == "sandbox") {
-            return "https://sbx-fe.payme.vn/"
-        }
-        return "https://fe.payme.vn/"
-    }
-
     suspend fun upLoadKYC(
         imageFront: ByteArray?,
         imageBackSide: ByteArray?,
@@ -166,10 +129,9 @@ class UploadKycApi {
         responseHander.message =
             "Kết nối mạng bị sự cố, vui lòng kiểm tra và thử lại. Xin cảm ơn !"
         val queue = Volley.newRequestQueue(PayME.context)
-        val domain = urlStaticENV(PayME.env!!)
         val b = object : VolleyMultipartRequest(
             Method.POST,
-            domain,
+            ENV_API.API_STATIC,
             { response ->
                 val a = response.data
                 val b = String(a, StandardCharsets.UTF_8)
@@ -187,23 +149,15 @@ class UploadKycApi {
                     responseHander.path = path
                     onResult(responseHander)
 //                            continuation.resume(responseHander)
-
                 } else {
                     val message = jsonObject.getString("message")
-
                     responseHander.code = code
                     responseHander.message = message
                     responseHander.data = jsonObject
                     responseHander.status = false
                     onResult(responseHander)
-
-
 //                            continuation.resume(responseHander)
-
-
                 }
-
-
             },
             { error ->
                 val message =
@@ -260,7 +214,6 @@ class UploadKycApi {
         println("imageBackSide" + imageBackSide)
         println("face" + face)
         println("video" + video)
-        val url = urlFeENV("sandbox")
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
         val variables: MutableMap<String, Any> = mutableMapOf()
@@ -288,14 +241,11 @@ class UploadKycApi {
 
         variables["kycInput"] = kycInput
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, url, path, PayME.token, params)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.token, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
-            onExpired = {
-                println("401")
-
-            })
+          )
 
 
     }

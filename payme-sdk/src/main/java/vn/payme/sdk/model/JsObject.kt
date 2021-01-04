@@ -50,8 +50,9 @@ public class JsObject(
 
         }
     }
+
     @JavascriptInterface
-    public  fun  onScanQr(){
+    public fun onScanQr() {
         IntentIntegrator(activity).apply {
             setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
             captureActivity = AnyOrientationCaptureActivity::class.java
@@ -65,8 +66,15 @@ public class JsObject(
 
 
     }
+
     @JavascriptInterface
-    public  fun  onKyc(){
+    public fun onKyc(kycVideo: Boolean, kycIdenity: Boolean, kycFace: Boolean) {
+        PayME.kycVideo = kycVideo
+        PayME.kycIdenity = kycIdenity
+        PayME.kycFace = kycFace
+//        PayME.kycVideo = true
+//        PayME.kycIdenity = false
+//        PayME.kycFade = false
         val intent = Intent(PayME.context, CameraKycActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         PayME.context?.startActivity(intent)

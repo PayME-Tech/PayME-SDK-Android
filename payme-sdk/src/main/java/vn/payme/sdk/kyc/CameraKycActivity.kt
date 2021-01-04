@@ -21,7 +21,7 @@ class CameraKycActivity : AppCompatActivity(R.layout.camera_kyc_activity) {
                         setReorderingAllowed(true)
                         add<TakePictureIdentifyFragment>(R.id.content_kyc)
                     }
-                } else if (PayME.kycFade) {
+                } else if (PayME.kycFace) {
                     supportFragmentManager.commit {
                         setReorderingAllowed(true)
                         add<TakePictureAvataFragment>(R.id.content_kyc)

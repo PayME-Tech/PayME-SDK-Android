@@ -38,7 +38,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
     }
 
 
-
     fun convertPixelsToDp(px: Float): Float {
         return if (PayME.context != null) {
             val resources = PayME.context.resources
@@ -91,9 +90,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         })
 
 
-
-
-
         val webSettings: WebSettings = myWebView.getSettings()
         webSettings.javaScriptEnabled = true
         webSettings.setAppCacheEnabled(true)
@@ -125,7 +121,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         })
 
         val jsObject: JsObject =
-            JsObject(this, back = { backScreen() },  this.supportFragmentManager, cameraManager)
+            JsObject(this, back = { backScreen() }, this.supportFragmentManager, cameraManager)
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
         var action: String = PayME.action.toString()
 
@@ -133,16 +129,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             """{
                       connectToken:  '${PayME.connectToken}',
                       appToken: '${PayME.appToken}',
-                      clientInfo: {
-                        clientId: '${PayME.clientInfo.deviceId}',
-                        platform: 'ANDROID',
-                        appVersion: '${PayME.clientInfo.appVersion}', 
-                        sdkVesion: '${PayME.clientInfo.sdkVerSion}', 
-                        sdkType: 'native',
-                        appPackageName: '${PayME.clientInfo.appPackageName}'
-                      },
-                      partner: 'ANDROID',
-                      action:'${action}',
+                      clientId: '${PayME.clientId}',
                       amount:${PayME.amount},
                       configColor: ['${PayME.configColor?.get(0)}', '${PayME.configColor?.get(1)}'],
                       partner : {
@@ -157,8 +144,10 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
         val encode: String = URLEncoder.encode(data.toString(), "utf-8")
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
-        if (PayME.env === Env.SANDBOX) {
-            myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
+        println("https://sbx-sdk2.payme.com.vn/active/${encode}")
+        if (PayME.env === Env.DEV) {
+            myWebView.loadUrl("https://sbx-sdk2.payme.com.vn/active/${encode}")
+//            myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
 //            myWebView.loadData(html, "text/html", "UTF-8");
 
 
@@ -168,6 +157,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
 
     }
+
     fun checkScanQr(contents: String) {
         val paymentApi = PaymentApi()
         lottie?.visibility = View.VISIBLE
@@ -207,6 +197,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             }
         )
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 5 && resultCode == Activity.RESULT_OK && data != null) {
@@ -214,6 +205,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             checkScanQr(contents.toString())
         }
     }
+
     override fun onDestroy() {
         EventBus.getDefault().unregister(this);
 
@@ -221,12 +213,13 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
 
     }
+
     @Subscribe
-    fun onText(myEven: MyEven){
-        if(myEven.type=== TypeCallBack.onReload){
+    fun onText(myEven: MyEven) {
+        if (myEven.type === TypeCallBack.onReload) {
             this.myWebView.reload()
         }
-        if(myEven.type=== TypeCallBack.onScan){
+        if (myEven.type === TypeCallBack.onScan) {
             myEven.value?.let { checkScanQr(it) }
         }
     }

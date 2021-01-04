@@ -13,6 +13,7 @@ import com.android.volley.toolbox.Volley
 import org.json.JSONException
 import org.json.JSONObject
 import java.nio.charset.Charset
+import java.util.*
 
 
 internal class NetworkRequest(
@@ -21,27 +22,22 @@ internal class NetworkRequest(
     private val path: String,
     private val token: String,
     private val params: MutableMap<String, Any>?,
+    private val isSecurity:Boolean,
+
 ) {
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun setOnRequestCrypto(
         onSuccess: (response: JSONObject) -> Unit,
         onError: (data: JSONObject?, code: Int?, message: String) -> Unit,
-        onExpired: (() -> Unit)?
     ) {
-
-
         println("REQUESSSSSSSSSSSSSSSSSSSS1${params.toString()}")
-
         val cryptoAES = CryptoAES()
         val cryptoRSA = CryptoRSA()
-
         val encryptKey = "10000000"
         val xAPIKey = cryptoRSA.encrypt(encryptKey)
         val xAPIAction = cryptoAES.encryptAES(encryptKey, path)
         val xAPIMessage =
             cryptoAES.encryptAES(encryptKey, JSONObject(params as Map<*, *>).toString())
-
-
         val objectValidateRequest: MutableMap<String, String> = mutableMapOf()
         objectValidateRequest["xApiAction"] = xAPIAction
         objectValidateRequest["method"] = "POST"
@@ -54,44 +50,58 @@ internal class NetworkRequest(
         }
         valueParams += encryptKey
         val xAPIValidate = cryptoAES.getMD5(valueParams)
+        var body: MutableMap<String, Any> = mutableMapOf()
 
-        val body: MutableMap<String, Any> = mutableMapOf()
-        body["x-api-message"] = xAPIMessage
+        if(isSecurity){
+            body["x-api-message"] = xAPIMessage
+        }else{
+            body = params
+        }
+
+        var pathAPi = ""
+        if(isSecurity){
+            pathAPi = url
+        }else{
+            pathAPi = url+path
+        }
+        println("pathAPi:"+pathAPi)
+
+
 
         val queue = Volley.newRequestQueue(context)
         val request = object : JsonObjectRequest(
             Method.POST,
-            url,
+            pathAPi,
             JSONObject(body as Map<*, *>),
             Response.Listener { response ->
-                println("Response${response.toString()}")
-
                 try {
-                    val jsonObject = JSONObject(response.toString())
-                    val xAPIMessageResponse = jsonObject.getString("x-api-message")
-                    val headers = jsonObject.getJSONObject("headers")
-                    val xAPIActionResponse = headers.getString("x-api-action")
-                    val xAPIKeyResponse = headers.getString("x-api-key")
-                    val xAPIValidateResponse = headers.getString("x-api-validate")
-                    val decryptKey = cryptoRSA.decrypt(xAPIKeyResponse)
-                    val objectValidateResponse: MutableMap<String, String> = mutableMapOf()
-                    objectValidateResponse["x-api-action"] = xAPIActionResponse
-                    objectValidateResponse["method"] = "POST"
-                    objectValidateResponse["accessToken"] = token
-                    objectValidateResponse["x-api-message"] = xAPIMessageResponse
-                    var validateString = ""
-                    for (key in objectValidateResponse.keys) {
-                        validateString += objectValidateResponse[key]
+                    var finalJSONObject : JSONObject? = null
+                    if(isSecurity){
+                        val jsonObject = JSONObject(response.toString())
+                        val xAPIMessageResponse = jsonObject.getString("x-api-message")
+                        val headers = jsonObject.getJSONObject("headers")
+                        val xAPIActionResponse = headers.getString("x-api-action")
+                        val xAPIKeyResponse = headers.getString("x-api-key")
+                        val decryptKey = cryptoRSA.decrypt(xAPIKeyResponse)
+                        val objectValidateResponse: MutableMap<String, String> = mutableMapOf()
+                        objectValidateResponse["x-api-action"] = xAPIActionResponse
+                        objectValidateResponse["method"] = "POST"
+                        objectValidateResponse["accessToken"] = token
+                        objectValidateResponse["x-api-message"] = xAPIMessageResponse
+                        var validateString = ""
+                        for (key in objectValidateResponse.keys) {
+                            validateString += objectValidateResponse[key]
+                        }
+                        validateString += decryptKey
+                        val result = cryptoAES.decryptAES(decryptKey, xAPIMessageResponse)
+                        println("Response"+result)
+                        val json = result?.replace("\\\"","'");
+                        finalJSONObject = JSONObject(json?.substring(1,json?.length-1))
+                    }else{
+                        finalJSONObject = JSONObject(response.toString())
                     }
-                    validateString += decryptKey
-                    val validateMD5 = cryptoAES.getMD5(validateString)
-                    val result = cryptoAES.decryptAES(decryptKey, xAPIMessageResponse)
-                    println("result" + result)
-                    val json = result?.replace("\\\"","'");
-                    val finalJSONObject = JSONObject(json?.substring(1,json?.length-1))
-
-                    val data =  finalJSONObject.optJSONObject("data")
-                    val errors =  finalJSONObject.optJSONArray("errors")
+                    val data =  finalJSONObject?.optJSONObject("data")
+                    val errors =  finalJSONObject?.optJSONArray("errors")
 
                     if(errors!=null){
                         val error = errors.getJSONObject(0)
@@ -106,8 +116,11 @@ internal class NetworkRequest(
 
 
                 } catch (error: JSONException) {
-                    error.printStackTrace()
-                }
+                    onError(
+                        null,
+                        -2,
+                        "Không thể kết nối tới server, vui lòng kiểm tra và thử lại. Xin cảm ơn !"
+                    )                }
             },
             Response.ErrorListener { error ->
 
@@ -123,10 +136,12 @@ internal class NetworkRequest(
                 headers["Authorization"] = token
                 headers["Accept"] = "application/json"
                 headers["Content-Type"] = "application/json"
-                headers["x-api-client"] = "app"
-                headers["x-api-key"] = xAPIKey
-                headers["x-api-action"] = xAPIAction
-                headers["x-api-validate"] = xAPIValidate
+                if(isSecurity){
+                    headers["x-api-client"] = "app"
+                    headers["x-api-key"] = xAPIKey
+                    headers["x-api-action"] = xAPIAction
+                    headers["x-api-validate"] = xAPIValidate
+                }
                 return headers
             }
 

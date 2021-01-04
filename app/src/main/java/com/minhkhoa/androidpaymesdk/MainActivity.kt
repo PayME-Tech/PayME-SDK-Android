@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.*
@@ -15,7 +16,10 @@ import vn.payme.sdk.PayME
 import vn.payme.sdk.model.Action
 import vn.payme.sdk.model.Env
 import java.lang.Exception
+import java.text.DateFormat
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
     val AppToken: String =
@@ -51,7 +55,8 @@ class MainActivity : AppCompatActivity() {
             "   MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKi\n" +
             "   wIhTJpAi1XnbfOSrW/Ebw6h1485GOAvuG/OwB+ScsfPJBoNJeNFU6J0CAwEAAQ==\n" +
             "   -----END PUBLIC KEY-----"
-    var ConnectToken: String = "Zn9T0j9jtZYPzi4B8Ti8NiXnEAJLACAljMcY20NKTyK58QzFP10VP4Tav2kKdmw\\/Xpq5Nm85hVpXGxFER6OPuBMcgUZRBhdkgc8SjkPDpjo="
+    var ConnectToken: String =
+        "Zn9T0j9jtZYPzi4B8Ti8NiXnEAJLACAljMcY20NKTyK58QzFP10VP4Tav2kKdmw\\/Xpq5Nm85hVpXGxFER6OPuBMcgUZRBhdkgc8SjkPDpjo="
     val PrivateKey: String = "-----BEGIN PRIVATE KEY-----\n" +
             "    MIIBPAIBAAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKiwIhTJpAi1XnbfOSrW/Eb\n" +
             "    w6h1485GOAvuG/OwB+ScsfPJBoNJeNFU6J0CAwEAAQJBAJSfTrSCqAzyAo59Ox+m\n" +
@@ -102,7 +107,7 @@ class MainActivity : AppCompatActivity() {
         var configColor = arrayOf<String>("#75255b", "#9d455f")
 
         this.payme =
-            PayME(this, AppToken, PublicKey, ConnectToken, PrivateKey, configColor, Env.SANDBOX)
+            PayME(this, AppToken, PublicKey, ConnectToken, PrivateKey, configColor, Env.DEV)
 //        payme.pay(this.supportFragmentManager, 100000, "Merchant ghi chú đơn hàng", "", "",
 //            onSuccess = { json: JSONObject ->
 //                println("onSuccess2222" + json.toString())
@@ -117,7 +122,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
         buttonReload.setOnClickListener {
             if (ConnectToken.length > 0) {
                 updateWalletInfo()
@@ -125,39 +129,31 @@ class MainActivity : AppCompatActivity() {
 
         }
         buttonSubmit.setOnClickListener {
-            if (loading.visibility == View.INVISIBLE && inputUserId.text.toString().length > 0) {
-                loading.visibility = View.VISIBLE
-                payme.genConnectToken(inputUserId.text.toString(),
-                    inputPhoneNumber.text.toString(),
-                    onSuccess = { jsonObject: JSONObject ->
-                        val connectToken = jsonObject.getString("connectToken")
-                        loading.visibility = View.INVISIBLE
-                        ConnectToken = connectToken
-                        println("connectToken" + connectToken)
-                        Toast.makeText(
-                            context,
-                            "Đăng ký Connect Token thành công",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        this.payme =
-                            PayME(
-                                this,
-                                AppToken,
-                                PublicKey,
-                                ConnectToken,
-                                PrivateKey,
-                                configColor,
-                                Env.SANDBOX
-                            )
-                    },
-                    onError = { json: JSONObject?, code: Int?, message: String ->
-                        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-                        loading.visibility = View.INVISIBLE
-
-                    })
-            }
-
-
+            val tz = TimeZone.getTimeZone("UTC")
+            val df: DateFormat =
+                SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'") // Quoted "Z" to indicate UTC, no timezone offset
+            df.setTimeZone(tz)
+            val nowAsISO: String = df.format(Date())
+            val dataExample =
+                "{\"userId\":\"${inputUserId.text.toString()}\",\"timestamp\":\"${nowAsISO}\",\"phone\":\"${inputPhoneNumber.text.toString()}\"}"
+            val connectToken = CryptoAES.encrypt(dataExample, "3zA9HDejj1GnyVK0")
+            Log.d("connectToken", connectToken)
+            ConnectToken = connectToken
+            Toast.makeText(
+                context,
+                "Đăng ký Connect Token thành công",
+                Toast.LENGTH_LONG
+            ).show()
+            this.payme =
+                PayME(
+                    this,
+                    AppToken,
+                    PublicKey,
+                    ConnectToken,
+                    PrivateKey,
+                    configColor,
+                    Env.DEV
+                )
         }
         button.setOnClickListener {
             if (ConnectToken.length > 0) {
@@ -189,9 +185,7 @@ class MainActivity : AppCompatActivity() {
         }
         buttonWithdraw.setOnClickListener {
             if (ConnectToken.length > 0) {
-
                 val amount = convertInt(moneyWithdraw.text.toString())
-
                 payme.openWallet(Action.WITHDRAW, amount, null, null,
                     onSuccess = { json: JSONObject ->
                         println("onSuccess2222" + json.toString())
