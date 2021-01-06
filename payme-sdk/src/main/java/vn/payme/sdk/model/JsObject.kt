@@ -3,7 +3,9 @@ package vn.payme.sdk.model
 import android.app.Activity
 import android.content.Intent
 import android.hardware.camera2.CameraManager
+import android.os.Bundle
 import android.webkit.JavascriptInterface
+import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import com.google.zxing.integration.android.IntentIntegrator
 import org.json.JSONObject
@@ -11,6 +13,9 @@ import vn.payme.sdk.AnyOrientationCaptureActivity
 import vn.payme.sdk.PayME
 import vn.payme.sdk.kyc.CameraKycActivity
 import vn.payme.sdk.kyc.TakePictureIdentifyFragment
+import vn.payme.sdk.payment.PopupTakeFace
+import vn.payme.sdk.payment.PopupTakeIdentify
+import vn.payme.sdk.payment.PopupTakeVideo
 
 
 public class JsObject(
@@ -24,6 +29,19 @@ public class JsObject(
         try {
             val json: JSONObject = JSONObject(string)
             PayME.onSuccess(json)
+
+        } catch (e: Exception) {
+            println(e)
+        }
+    }
+
+    @JavascriptInterface
+    public fun onRegisterSuccess(accessToken: String, handShake: String) {
+        try {
+            println("accessToken"+accessToken)
+            println("handShake"+handShake)
+            PayME.accessToken = accessToken
+            PayME.handShake = handShake
 
         } catch (e: Exception) {
             println(e)
@@ -68,16 +86,31 @@ public class JsObject(
     }
 
     @JavascriptInterface
-    public fun onKyc(kycVideo: Boolean, kycIdenity: Boolean, kycFace: Boolean) {
+    public fun onKyc(kycVideo: Boolean, kycIdentity: Boolean, kycFace: Boolean) {
+        println("kycVideo" + kycVideo)
+        println("kycIdenity" + kycIdentity)
+        println("kycFace" + kycFace)
         PayME.kycVideo = kycVideo
-        PayME.kycIdenity = kycIdenity
+        PayME.kycIdenity = kycIdentity
         PayME.kycFace = kycFace
-//        PayME.kycVideo = true
-//        PayME.kycIdenity = false
-//        PayME.kycFade = false
-        val intent = Intent(PayME.context, CameraKycActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        PayME.context?.startActivity(intent)
+        val bundle: Bundle = Bundle()
+        bundle.putBoolean("openKycActivity", true)
+        if (kycIdentity) {
+            val popupTakeIdentify = PopupTakeIdentify()
+            popupTakeIdentify.arguments = bundle
+            popupTakeIdentify.show(fragmentManager, "ModalBottomSheet")
+        } else if (kycFace) {
+            val popupTakeFace = PopupTakeFace()
+            popupTakeFace.arguments = bundle
+            popupTakeFace.show(fragmentManager, "ModalBottomSheet")
+
+        } else if (kycVideo) {
+            val popupTakeVideo = PopupTakeVideo()
+            popupTakeVideo.arguments = bundle
+            popupTakeVideo.show(fragmentManager, "ModalBottomSheet")
+        }
+
+
     }
 
 

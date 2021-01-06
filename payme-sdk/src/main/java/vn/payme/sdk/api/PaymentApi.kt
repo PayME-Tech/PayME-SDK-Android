@@ -18,7 +18,7 @@ internal class PaymentApi {
         val params: MutableMap<String, Any> = mutableMapOf()
         params["connectToken"] = PayME.connectToken
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.appToken, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -42,7 +42,7 @@ internal class PaymentApi {
                 "}"
         params["query"] = query
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.token, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -70,7 +70,7 @@ internal class PaymentApi {
         val nowAsISO: String = df.format(Date())
         println("nowAsISO" + nowAsISO)
         params["timestamp"] = nowAsISO
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.appToken, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -92,7 +92,7 @@ internal class PaymentApi {
         params["destination"] = "AppPartner"
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
         params["data"] = data
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.appToken, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -118,7 +118,7 @@ internal class PaymentApi {
         params["returnUrl"] = "https://sbx-fe.payme.vn/"
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
         params["data"] = data
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.appToken, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -137,7 +137,7 @@ internal class PaymentApi {
         params["connectToken"] = PayME.connectToken
         params["data"] = dataQR
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.appToken, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -161,7 +161,7 @@ internal class PaymentApi {
         params["destination"] = "AppPartner"
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
         params["data"] = data
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.appToken, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -186,7 +186,7 @@ internal class PaymentApi {
         params["destination"] = "AppPartner"
         params["clientInfo"] = PayME.clientInfo.getClientInfo()
         params["data"] = data
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.appToken, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,

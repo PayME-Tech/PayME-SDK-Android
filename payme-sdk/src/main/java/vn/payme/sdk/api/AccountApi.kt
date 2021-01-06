@@ -26,7 +26,7 @@ internal class  AccountApi {
         params["query"] = query
         variables["registerInput"] = PayME.clientInfo.getClientInfo()
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.token, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -60,7 +60,7 @@ internal class  AccountApi {
         initInput["clientId"] = PayME.clientId
         variables["initInput"] = initInput
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.token, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,

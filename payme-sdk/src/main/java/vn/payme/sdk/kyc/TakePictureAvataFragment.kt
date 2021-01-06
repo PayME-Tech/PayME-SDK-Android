@@ -25,6 +25,9 @@ import vn.payme.sdk.api.UploadKycApi
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.TypeCallBack
+import vn.payme.sdk.payment.PopupTakeFace
+import vn.payme.sdk.payment.PopupTakeIdentify
+import vn.payme.sdk.payment.PopupTakeVideo
 
 
 class TakePictureAvataFragment : Fragment() {
@@ -51,9 +54,10 @@ class TakePictureAvataFragment : Fragment() {
                 bmp
             )
 
+            saveImage = result.data
+
             layoutConfirm?.visibility = View.VISIBLE
 
-            saveImage = result.data
         }
     }
     override fun onCreateView(
@@ -61,12 +65,11 @@ class TakePictureAvataFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         val view: View? = inflater?.inflate(R.layout.take_picture_image_avata, container, false)
         cameraKitView = view!!.findViewById(R.id.previewCamera)
         buttonTakePicture = view!!.findViewById(R.id.btn_takepicture)
         layoutConfirm = view!!.findViewById(R.id.confirm_screen)
-
-
         imagePreView = view!!.findViewById(R.id.previewImage)
         buttonBack = view!!.findViewById(R.id.buttonBack)
         buttonNext = view!!.findViewById(R.id.buttonNext)
@@ -96,13 +99,16 @@ class TakePictureAvataFragment : Fragment() {
             val bundle: Bundle = Bundle()
             bundle.putByteArray("imageFront", imageFront)
             bundle.putByteArray("imageBackSide", imageBackSide)
-            bundle.putByteArray("imageFade", saveImage)
+            bundle.putByteArray("imageFace", saveImage)
             if (PayME.kycVideo) {
-                val takePictureAvataFragment = TakeVideoKycFragment()
-                takePictureAvataFragment.arguments = bundle
-                val fragment = activity?.supportFragmentManager?.beginTransaction()
-                fragment?.replace(R.id.content_kyc, takePictureAvataFragment)
-                fragment?.commit()
+                val popupTakeVideo = PopupTakeVideo()
+                popupTakeVideo.arguments = bundle
+                popupTakeVideo.show(parentFragmentManager,"ModalBottomSheet")
+//                val takePictureAvataFragment = TakeVideoKycFragment()
+//                takePictureAvataFragment.arguments = bundle
+//                val fragment = activity?.supportFragmentManager?.beginTransaction()
+//                fragment?.replace(R.id.content_kyc, takePictureAvataFragment)
+//                fragment?.commit()
             } else {
                 val newFragment = UploadKycFragment()
                 newFragment.arguments = bundle

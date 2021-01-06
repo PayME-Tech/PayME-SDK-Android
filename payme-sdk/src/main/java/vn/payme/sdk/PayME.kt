@@ -27,8 +27,6 @@ public class PayME(
     companion object {
         lateinit var appPrivateKey: String
         var appToken: String = ""
-        var token: String =
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjEzNzMsImFjY291bnRJZCI6MjQyMjQzNjkyOCwic2NvcGUiOltdLCJjbGllbnRJZCI6IjdiYzRhZTZiYjJmZmUwMDEiLCJpYXQiOjE2MDg4NzkwNDZ9.5rQilr8-CMdfsUDqhGE8S8AUSUX1YUnLk8UXUqRGn5k"
         lateinit var publicKey: String
         var connectToken: String = ""
         lateinit var action: Action
@@ -129,9 +127,9 @@ public class PayME(
             Companion.amount = 0
         }
         val intent = Intent(context, PaymeWaletActivity::class.java)
-//        PayME.kycVideo = true
-//        PayME.kycIdenity = false
-//        PayME.kycFade = false
+        PayME.kycVideo = true
+        PayME.kycIdenity = true
+        PayME.kycFace = true
 
 //        val intent = Intent(context, CameraKycActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -221,6 +219,7 @@ public class PayME(
             val handShake = Init.optString("handShake")
             val succeeded = Init.optBoolean("succeeded")
             val isExistInMainWallet = Init.optBoolean("isExistInMainWallet")
+            println("accessToken"+accessToken)
             PayME.accessToken = accessToken
             PayME.handShake = handShake
             val kyc = Init.optJSONObject("kyc")
@@ -236,17 +235,6 @@ public class PayME(
             println("message" + message)
 
         })
-    }
-
-    public fun genConnectToken(
-        userId: String,
-        phone: String?,
-        onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
-    ) {
-        val paymentApi = PaymentApi()
-        paymentApi.genConnectToken(userId, phone, onSuccess, onError)
-
     }
 
     public fun getWalletInfo(

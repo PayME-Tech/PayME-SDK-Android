@@ -65,7 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:lottie_autoPlay="false"
-            app:lottie_rawRes="@raw/button_take_video"
+            app:lottie_rawRes="@raw/button_video"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent" />
@@ -78,6 +78,7 @@
     <!--    ConfirmScreen-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:clickable="false"
+
         android:id="@+id/confirm_screen"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -116,17 +117,33 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <VideoView
-            android:id="@+id/previewImage"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:layout_marginHorizontal="50dp"
-            android:layout_marginTop="16dp"
-            android:scaleType="centerInside"
+        <androidx.constraintlayout.widget.ConstraintLayout
             app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginHorizontal="50dp"
+            android:id="@+id/containerPreviewVideo"
+            app:layout_constraintTop_toBottomOf="@id/header2"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/header2" />
+            android:layout_width="match_parent"
+            android:layout_height="250dp">
+            <VideoView
+                android:id="@+id/previewImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="16dp"
+                android:scaleType="centerInside"
+                 />
+            <ImageView
+                android:src="@drawable/icon_pay"
+                android:id="@+id/buttonPlay"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_width="100dp"
+                android:scaleType="fitCenter"
+                android:layout_height="100dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:layout_width="wrap_content"
@@ -138,7 +155,7 @@
             android:textColor="@color/darkBlueGrey"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/previewImage" />
+            app:layout_constraintTop_toBottomOf="@id/containerPreviewVideo" />
 
         <LinearLayout
             android:layout_width="match_parent"

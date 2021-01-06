@@ -20,14 +20,16 @@ import vn.payme.sdk.model.TypeCallBack
 
 class UploadKycFragment : Fragment() {
     private var layoutUpload: ConstraintLayout? = null
+    private var loadingUploadKycApi = false
     suspend fun uploadKYC() {
         val uploadKycApi = UploadKycApi()
         val imageFront = arguments?.getByteArray("imageFront")
         val imageBackSide = arguments?.getByteArray("imageBackSide")
-        val imageFade = arguments?.getByteArray("imageFade")
+        val imageFace = arguments?.getByteArray("imageFace")
         val video = arguments?.getByteArray("video")
-        uploadKycApi.upLoadKYC(imageFront, imageBackSide, imageFade, video,
+        uploadKycApi.upLoadKYC(imageFront, imageBackSide, imageFace, video,
             onSuccess = {
+                loadingUploadKycApi = false
                 activity?.finish()
                 var even: EventBus = EventBus.getDefault()
                 var myEven: MyEven = MyEven(TypeCallBack.onReload, "")
@@ -35,6 +37,8 @@ class UploadKycFragment : Fragment() {
 
             },
             onError = { jsonObject, code, message ->
+                loadingUploadKycApi = false
+
                 parentFragmentManager.popBackStack()
                 val toast: Toast =
                     Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
@@ -56,8 +60,12 @@ class UploadKycFragment : Fragment() {
         val view: View? = inflater?.inflate(R.layout.upload_kyc_fragment, container, false)
         layoutUpload = view!!.findViewById(R.id.upLoadKyc)
         layoutUpload!!.background = PayME.colorApp.backgroundColor
-        GlobalScope.launch(Dispatchers.Main){
-            uploadKYC()
+        GlobalScope.launch(Dispatchers.Main) {
+            if (!loadingUploadKycApi) {
+                loadingUploadKycApi = true
+                uploadKYC()
+
+            }
         }
 
         return view

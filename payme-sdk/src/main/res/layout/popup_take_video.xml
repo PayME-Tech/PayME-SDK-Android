@@ -20,7 +20,7 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:scaleType="centerCrop"
-            app:lottie_rawRes="@raw/guilde_take_face"
+            app:lottie_rawRes="@raw/guilde_take_video"
             app:lottie_loop="true"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -29,7 +29,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:id="@+id/title"
-            android:text="@string/take_face_photography"
+            android:paddingHorizontal="30dp"
+            android:textAlignment="center"
+            android:text="@string/take_video_face_identify"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/animation_view"
@@ -58,7 +60,7 @@
                 android:textColor="@color/dark"
                 android:layout_marginLeft="16dp"
                 android:layout_width="wrap_content"
-                android:text="@string/please_keep_your_face_in_the_circle_frame"
+                android:text="@string/time_video"
                 android:layout_height="wrap_content">
             </TextView>
 
@@ -84,7 +86,7 @@
                 android:textColor="@color/dark"
                 android:layout_marginLeft="16dp"
                 android:layout_width="wrap_content"
-                android:text="@string/keeps_photos_sharp_without_blurring"
+                android:text="@string/keeps_face_identify"
                 android:layout_height="wrap_content">
             </TextView>
 
@@ -93,8 +95,8 @@
 
         <vn.payme.sdk.component.Button
             android:id="@+id/buttonNext"
-            app:layout_constraintTop_toBottomOf="@id/note2"
             android:layout_width="match_parent"
+            app:layout_constraintTop_toBottomOf="@id/note2"
             android:layout_height="wrap_content"
             app:pbText="@string/next"
             android:layout_marginTop="16dp"

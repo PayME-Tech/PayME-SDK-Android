@@ -25,7 +25,10 @@ import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.model.TypeIdentify
+import vn.payme.sdk.payment.*
 import vn.payme.sdk.payment.PopupSelectTypeIdentify
+import vn.payme.sdk.payment.PopupTakeFace
+import vn.payme.sdk.payment.PopupTakeVideo
 import java.io.ByteArrayOutputStream
 
 
@@ -111,17 +114,25 @@ class TakePictureIdentifyFragment : Fragment() {
                 bundle.putByteArray("imageFront", imageFront)
                 bundle.putByteArray("imageBackSide", imageBackSide)
                 if (PayME.kycFace) {
-                    val newFragment = TakePictureAvataFragment()
-                    newFragment.arguments = bundle
-                    val fragment = activity?.supportFragmentManager?.beginTransaction()
-                    fragment?.replace(R.id.content_kyc, newFragment)
-                    fragment?.commit()
+                    val popupTakeFace = PopupTakeFace()
+                    popupTakeFace.arguments = bundle
+                    popupTakeFace.show(parentFragmentManager,"ModalBottomSheet")
+
+//                    val newFragment = TakePictureAvataFragment()
+//                    newFragment.arguments = bundle
+//                    val fragment = activity?.supportFragmentManager?.beginTransaction()
+//                    fragment?.replace(R.id.content_kyc, newFragment)
+//                    fragment?.commit()
                 } else if (PayME.kycVideo) {
-                    val newFragment = TakeVideoKycFragment()
-                    newFragment.arguments = bundle
-                    val fragment = activity?.supportFragmentManager?.beginTransaction()
-                    fragment?.replace(R.id.content_kyc, newFragment)
-                    fragment?.commit()
+
+                    val popupTakeVideo = PopupTakeVideo()
+                    popupTakeVideo.arguments = bundle
+                    popupTakeVideo.show(parentFragmentManager,"ModalBottomSheet")
+//                    val newFragment = TakeVideoKycFragment()
+//                    newFragment.arguments = bundle
+//                    val fragment = activity?.supportFragmentManager?.beginTransaction()
+//                    fragment?.replace(R.id.content_kyc, newFragment)
+//                    fragment?.commit()
                 } else {
                     val newFragment = UploadKycFragment()
                     newFragment.arguments = bundle

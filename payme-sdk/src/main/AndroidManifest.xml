@@ -22,8 +22,7 @@
         android:supportsRtl="true">
 
         <activity
-
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="portrait"
             tools:replace="screenOrientation"
             android:name=".AnyOrientationCaptureActivity" />
 

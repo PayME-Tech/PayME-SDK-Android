@@ -98,6 +98,9 @@ internal class NetworkRequest(
                         val json = result?.replace("\\\"","'");
                         finalJSONObject = JSONObject(json?.substring(1,json?.length-1))
                     }else{
+                        println("Response"+response.toString())
+
+
                         finalJSONObject = JSONObject(response.toString())
                     }
                     val data =  finalJSONObject?.optJSONObject("data")

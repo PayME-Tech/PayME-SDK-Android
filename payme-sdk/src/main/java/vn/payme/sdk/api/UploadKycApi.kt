@@ -32,7 +32,7 @@ class UploadKycApi {
     suspend fun upLoadKYC(
         imageFront: ByteArray?,
         imageBackSide: ByteArray?,
-        imageFade: ByteArray?,
+        imageFace: ByteArray?,
         video: ByteArray?,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
@@ -42,12 +42,19 @@ class UploadKycApi {
             var urlImageBack: String? = null
             var urlImageFace: String? = null
             var urlVideo: String? = null
+            println("imageFront"+imageFront)
+            println("imageBackSide"+imageBackSide)
+            println("imageFace"+imageFace)
+
+            println("urlImageFront"+urlImageFront)
+            println("urlImageBack"+urlImageBack)
+            println("urlImageFace"+urlImageFace)
+            println("urlVideo"+urlVideo)
             println("CALLREPONSE1")
-            val responseImageFront = uploadFileCoroutine(imageFront!!)
-            println("REPONSE1" + responseImageFront.status)
             if (imageFront != null) {
 
-
+                val responseImageFront = uploadFileCoroutine(imageFront!!)
+                println("REPONSE1" + responseImageFront.status)
                 if (responseImageFront.status) {
                     urlImageFront = responseImageFront.path
 
@@ -95,24 +102,28 @@ class UploadKycApi {
 
 
             }
-            if (imageFade != null) {
+            if (imageFace != null) {
                 println("GOI 4")
 
-                val responseImageFade = uploadFileCoroutine(imageFade!!)
-                println("REPONSE4" + responseImageFade.status)
+                val responseImageFace = uploadFileCoroutine(imageFace!!)
+                println("REPONSE4" + responseImageFace.status)
 
-                if (responseImageFade.status) {
-                    urlVideo = responseImageFade.path
+                if (responseImageFace.status) {
+                    urlImageFace = responseImageFace.path
                 } else {
                     onError(
-                        responseImageFade.data,
-                        responseImageFade.code,
-                        responseImageFade.message!!
+                        responseImageFace.data,
+                        responseImageFace.code,
+                        responseImageFace.message!!
                     )
 
                 }
 
             }
+            println("urlImageFront"+urlImageFront)
+            println("urlImageBack"+urlImageBack)
+            println("urlImageFace"+urlImageFace)
+            println("urlVideo"+urlVideo)
 
             uploadKycInfo(urlImageFront, urlImageBack, urlImageFace, urlVideo, onSuccess, onError)
         }
@@ -219,14 +230,14 @@ class UploadKycApi {
         val variables: MutableMap<String, Any> = mutableMapOf()
         val kycInput: MutableMap<String, Any> = mutableMapOf()
         val image: MutableMap<String, Any> = mutableMapOf()
-        val query = "mutation Mutation(\$kycInput: KYCInput!) {\n" +
+        val query = "mutation KYCMutation(\$kycInput: KYCInput!) {\n" +
                 "  Account {\n" +
                 "    KYC(input: \$kycInput) {\n" +
                 "      succeeded\n" +
+                "      message\n" +
                 "    }\n" +
                 "  }\n" +
                 "}"
-        params["query"] = query
         if (imageBackSide != null && imageFront != null) {
             image["back"] = imageBackSide!!
             image["front"] = imageFront!!
@@ -238,10 +249,11 @@ class UploadKycApi {
         if (face != null) {
             kycInput["face"] = face!!
         }
-
+        kycInput["clientId"] = PayME.clientId
         variables["kycInput"] = kycInput
+        params["query"] = query
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.token, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
