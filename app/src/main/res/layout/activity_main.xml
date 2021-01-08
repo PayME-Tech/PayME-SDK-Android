@@ -25,6 +25,11 @@
             android:textColor="@color/colorBlack"
             android:textSize="14dp"
             />
+        <Button
+            android:id="@+id/buttonChangeENV"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="dev"/>
         <TextView
             android:id="@+id/textBalance"
             android:layout_width="wrap_content"

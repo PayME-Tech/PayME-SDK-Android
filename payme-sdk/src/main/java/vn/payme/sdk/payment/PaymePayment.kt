@@ -16,6 +16,8 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
+import vn.payme.sdk.enum.TYPE_PAYMENT
+import vn.payme.sdk.evenbus.ChangeTypePayment
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.TypeCallBack
 
@@ -30,7 +32,7 @@ internal class PaymePayment : BottomSheetDialogFragment() {
         val fragmentManager : FragmentManager
         fragmentManager = childFragmentManager
         val  fragment = fragmentManager.beginTransaction()
-        fragment.add(R.id.frame_container,ConfirmPassFragment())
+        fragment.add(R.id.frame_container,SelectMethodFragment())
         fragment.commit()
         bottomSheetDialogFragment.behavior.isDraggable = false
     }
@@ -48,10 +50,22 @@ internal class PaymePayment : BottomSheetDialogFragment() {
 
     }
     @Subscribe
-    fun onText(myEven: MyEven){
+    fun onClose(myEven: MyEven){
         if(myEven.type=== TypeCallBack.onClose){
             this.dialog?.dismiss()
         }
+    }
+    @Subscribe
+    fun onText(typePayment: ChangeTypePayment) {
+        if(typePayment.type == TYPE_PAYMENT.PAYMENT_SUCCESS){
+
+        }else if (typePayment.type == TYPE_PAYMENT.WALLET) {
+            val confirmPassFragment: ConfirmPassFragment = ConfirmPassFragment()
+            val fragment = childFragmentManager?.beginTransaction()
+            fragment?.replace(R.id.frame_container, confirmPassFragment)
+            fragment?.commit()
+        }
+
     }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = BottomSheetDialog(requireContext(), theme)
@@ -65,6 +79,7 @@ internal class PaymePayment : BottomSheetDialogFragment() {
         (contentView.parent as View).setBackgroundColor(resources.getColor(android.R.color.transparent))
     }
     override fun onDestroy() {
+
         PayME.onClose()
         EventBus.getDefault().unregister(this);
         super.onDestroy()

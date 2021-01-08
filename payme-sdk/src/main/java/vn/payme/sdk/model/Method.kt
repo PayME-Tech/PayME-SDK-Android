@@ -1,26 +1,23 @@
 package vn.payme.sdk.model
 
 class Method {
-    var linkedId : Number? = null
-    var detail : String? = ""
-    var bankCode : String? = ""
-    var amount : Number? = 0
+    var data : DataMethod? = null
+    var fee : Number? = null
+    var label : String? = null
+    var methodId : Number? = null
+    var minFee : Number? = null
+    var title : String? = null
     var type : String? = null
-    var cardNumber : String? = ""
-    var swiftCode : String? = ""
-    var selected : Boolean? = false
 
-
-    constructor(detail: String?,linkedId:Number?,bankCode:String?,amount:Number?,type:String?,cardNumber:String?,swiftCode:String?,selected:Boolean?){
-        this.linkedId = linkedId
-        this.detail = detail
-        this.bankCode = bankCode
-        this.amount = amount
+    constructor(data : DataMethod?,fee : Number?,label : String?,methodId : Number?,minFee : Number?,title : String?,type : String?){
+        this.data= data
+        this.fee = fee
+        this.label = label
+        this.methodId = methodId
+        this.minFee = minFee
+        this.title = title
         this.type = type
-        this.cardNumber = cardNumber
-        this.swiftCode = swiftCode
-        this.selected = selected
-
-
     }
+
+
 }

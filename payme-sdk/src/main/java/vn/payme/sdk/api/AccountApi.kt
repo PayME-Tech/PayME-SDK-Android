@@ -50,6 +50,8 @@ internal class  AccountApi {
                 "      kyc {\n" +
                 "        state\n" +
                 "      }\n" +
+                "      message\n" +
+                "      phone\n" +
                 "      succeeded\n" +
                 "    }\n" +
                 "  }\n" +

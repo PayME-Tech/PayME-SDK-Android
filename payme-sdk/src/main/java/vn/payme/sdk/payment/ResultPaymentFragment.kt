@@ -37,7 +37,7 @@ class ResultPaymentFragment : Fragment() {
         textError = view.findViewById(R.id.note_error)
         textResult = view.findViewById(R.id.title_result)
         lottie = view.findViewById(R.id.animation_view)
-        textNote.text = PayME.content
+        textNote.text = PayME.infoPayment?.note
         val message = arguments?.getString("message")
 
         if(message!=null){
@@ -47,7 +47,7 @@ class ResultPaymentFragment : Fragment() {
 
         }
         val decimal = DecimalFormat("#,###")
-        textAmount.text = "${decimal.format(PayME.amount)} đ"
+        textAmount.text = "${decimal.format(PayME.infoPayment?.amount)} đ"
         buttonSubmit.background = PayME.colorApp.backgroundColorRadius
         buttonSubmit.setOnClickListener {
             var even: EventBus = EventBus.getDefault()

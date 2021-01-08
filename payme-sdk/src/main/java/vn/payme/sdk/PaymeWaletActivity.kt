@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.webkit.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.airbnb.lottie.LottieAnimationView
 import com.google.zxing.client.android.Intents
@@ -21,6 +22,7 @@ import org.json.JSONObject
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.Env
+import vn.payme.sdk.model.InfoPayment
 import vn.payme.sdk.model.JsObject
 import vn.payme.sdk.model.TypeCallBack
 import java.net.URLEncoder
@@ -124,11 +126,13 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             JsObject(this, back = { backScreen() }, this.supportFragmentManager, cameraManager)
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
         var action: String = PayME.action.toString()
-
         var data: JSONObject = JSONObject(
             """{
                       connectToken:  '${PayME.connectToken}',
                       appToken: '${PayME.appToken}',
+                      accessToken: '${PayME.accessToken}',
+                      env: '${PayME.env.toString()}',
+                      handShake: '${PayME.handShake}',
                       clientId: '${PayME.clientId}',
                       amount:${PayME.amount},
                       configColor: ['${PayME.configColor?.get(0)}', '${PayME.configColor?.get(1)}'],
@@ -144,13 +148,13 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
         val encode: String = URLEncoder.encode(data.toString(), "utf-8")
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
-        println("https://sbx-sdk2.payme.com.vn/active/${encode}")
-        if (PayME.env === Env.DEV) {
+        if (PayME.env == Env.DEV) {
+            println("https://sbx-sdk.payme.com.vn/active/${encode}")
+
             myWebView.loadUrl("https://sbx-sdk2.payme.com.vn/active/${encode}")
-//            myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
-//            myWebView.loadData(html, "text/html", "UTF-8");
-
-
+        } else if (PayME.env == Env.SANDBOX) {
+            println("https://sbx-sdk.payme.com.vn/active/${encode}")
+            myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
         } else {
             myWebView.loadUrl("https://sdk.payme.com.vn/active/${encode}")
         }
@@ -164,25 +168,32 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         paymentApi.postCheckDataQr(contents,
             onSuccess = { jsonObject ->
                 lottie?.visibility = View.GONE
+                val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
+                val Payment = OpenEWallet.optJSONObject("OpenEWallet")
+                val Detect = Payment.optJSONObject("Detect")
+                val action = Detect.optString("Detect")
+                val message = Detect.optString("message")
+                val note = Detect.optString("message")
+                val amount = Detect.optInt("amount")
+                val orderId = Detect.optInt("amount")
+                val storeId = Detect.optInt("amount")
+                val succeeded = Detect.optBoolean("amount")
+                val type = Detect.optString("type")
 
-                val amount = jsonObject?.getInt("amount")
-                val content = jsonObject?.getString("content")
-                val orderId = jsonObject?.getString("orderId")
-                val payme = PayME(
-                    PayME.context,
-                    PayME.appToken,
-                    PayME.publicKey,
-                    PayME.connectToken,
-                    PayME.appPrivateKey,
-                    PayME.configColor!!,
-                    PayME.env!!
-                )
-                payme.pay(this.supportFragmentManager, amount, content, orderId, "", onSuccess = {
+                if (!succeeded) {
+                    lottie?.visibility = View.GONE
+                    var popup: PayMEQRCodePopup = PayMEQRCodePopup()
+                    popup.show(this.supportFragmentManager, "ModalBottomSheet")
+                }
+                val infoPayment = InfoPayment(action, amount, note, orderId, storeId, type)
 
-                }, onError = {
+                PayME.pay(this.supportFragmentManager, infoPayment,
+                    onSuccess = {
+
+                    }, onError = {
 
 
-                },
+                    },
                     onClose = {
 
                     }

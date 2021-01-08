@@ -47,7 +47,7 @@ class TakePictureAvataFragment : Fragment() {
         override fun onPictureTaken(result: PictureResult) {
 
             super.onPictureTaken(result)
-           val  bytearray= result.data
+            val bytearray = result.data
             val bmp = BitmapFactory.decodeByteArray(bytearray, 0, bytearray.size)
 
             imagePreView!!.setImageBitmap(
@@ -60,6 +60,7 @@ class TakePictureAvataFragment : Fragment() {
 
         }
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -91,6 +92,7 @@ class TakePictureAvataFragment : Fragment() {
         cameraKitView!!.addCameraListener(Listener())
 
 
+
 //        cardCornerRadius
 
         buttonNext!!.setOnClickListener {
@@ -103,7 +105,7 @@ class TakePictureAvataFragment : Fragment() {
             if (PayME.kycVideo) {
                 val popupTakeVideo = PopupTakeVideo()
                 popupTakeVideo.arguments = bundle
-                popupTakeVideo.show(parentFragmentManager,"ModalBottomSheet")
+                popupTakeVideo.show(parentFragmentManager, "ModalBottomSheet")
 //                val takePictureAvataFragment = TakeVideoKycFragment()
 //                takePictureAvataFragment.arguments = bundle
 //                val fragment = activity?.supportFragmentManager?.beginTransaction()

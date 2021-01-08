@@ -8,6 +8,7 @@ class ColorApp {
     var startColor:String = "#08941f"
     var endColor:String = "#0eb92a"
     var backgroundColorRadius : GradientDrawable = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
+    var backgroundColorRadiusAlpha : GradientDrawable = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
     var backgroundColor: GradientDrawable = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
 
     constructor(startColor: String,endColor:String){
@@ -18,6 +19,10 @@ class ColorApp {
         this.backgroundColorRadius = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
         this.backgroundColorRadius.cornerRadius = 30F
         this.backgroundColor = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
+        this.backgroundColorRadiusAlpha = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
+        this.backgroundColorRadiusAlpha.alpha = 150
+        this.backgroundColorRadiusAlpha.cornerRadius = 30F
+
 
     }
 }

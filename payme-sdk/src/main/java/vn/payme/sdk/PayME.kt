@@ -3,6 +3,7 @@ package vn.payme.sdk
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import org.json.JSONObject
 import org.spongycastle.jce.provider.BouncyCastleProvider
@@ -32,12 +33,14 @@ public class PayME(
         lateinit var action: Action
         var kycInfo: KycInfo = KycInfo()
         var amount: Int = 0
+        var balance: Int = 0
         var content: String? = null
         var clientId: String = ""
         var handShake: String? = ""
-        var accessToken: String? = ""
+        var accessToken: String? = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTkxMzUsImFjY291bnRJZCI6MjQyMjQzNjkyOCwic2NvcGUiOltdLCJjbGllbnRJZCI6IjdiYzRhZTZiYjJmZmUwMDEiLCJhcHBJZCI6MSwiaWF0IjoxNjEwMTM2OTgyfQ.ltQT0cFITN-ZrnpiJWkVhqXBGgoTrY1RwzfqgJgYEfU"
         var orderId: String? = null
         var extraData: String? = null
+        var infoPayment: InfoPayment? = null
         var clientInfo: ClientInfo = ClientInfo()
         var env: Env? = null
         var configColor: Array<String>? = null
@@ -52,7 +55,85 @@ public class PayME(
         var kycIdenity = false
         var kycVideo = false
         var kycFace = false
+        fun showError(message:String){
+            val toast: Toast = Toast.makeText(
+                PayME.context,
+                message,
+                Toast.LENGTH_SHORT
+            )
+            toast.view?.setBackgroundColor(
+                ContextCompat.getColor(
+                    PayME.context,
+                    R.color.scarlet
+                )
+            )
 
+        }
+
+        public fun pay(
+            fragmentManager: FragmentManager,
+            infoPayment: InfoPayment,
+            onSuccess: (JSONObject) -> Unit,
+            onError: (String) -> Unit,
+            onClose: () -> Unit,
+        ) {
+            Companion.infoPayment = infoPayment
+            Companion.onClose = onClose
+            if (amount != null) {
+                Companion.amount = amount
+            } else {
+                Companion.amount = 0
+            }
+            val paymePayment: PaymePayment = PaymePayment()
+            paymePayment.show(
+                fragmentManager,
+                "ModalBottomSheet"
+            )
+
+        }
+
+    }
+
+    public fun initAccount(
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        val accountApi = AccountApi()
+        val pref = PayME.context.getSharedPreferences("PayME_SDK", Context.MODE_PRIVATE)
+        val clientId = pref.getString("clientId", "")
+        val dataRegisterClientInfo = pref.getString("dataRegisterClientInfo", "")
+        println("dataRegisterClientInfo:"+dataRegisterClientInfo)
+        println("PayME.clientInfo.toString()+PayME.env.toString():"+PayME.clientInfo.getClientInfo().toString()+PayME.env.toString())
+
+        if (clientId?.length!! <= 0 || !dataRegisterClientInfo.equals(PayME.clientInfo.getClientInfo().toString()+PayME.env.toString())) {
+            accountApi.registerClient(
+                onSuccess = { jsonObject ->
+                    val Client = jsonObject?.optJSONObject("Client")
+                    val Register = Client?.optJSONObject("Register")
+                    val clientId = Register?.optString("clientId")
+                    pref.edit().putString("clientId", clientId).commit()
+                    pref.edit().putString("dataRegisterClientInfo", PayME.clientInfo.getClientInfo().toString()+PayME.env.toString()).commit()
+                    PayME.clientId = clientId.toString()
+                    this.getAccountInfo(onSuccess = { jsonObject ->
+                        onSuccess(jsonObject)
+                    }, onError = { jsonObject, code, message ->
+                        onError(jsonObject, code, message)
+                    })
+                },
+                onError = { jsonObject, code, message ->
+                    onError(jsonObject, code, message)
+                }
+            )
+        } else {
+            PayME.clientId = clientId
+            this.getAccountInfo(onSuccess = { jsonObject ->
+                onSuccess(jsonObject)
+            }, onError = { jsonObject, code, message ->
+                onError(jsonObject, code, message)
+
+            })
+
+        }
     }
 
 
@@ -67,43 +148,10 @@ public class PayME(
         Companion.colorApp = ColorApp(configColor[0], configColor[1])
         Companion.clientInfo = ClientInfo(context)
         Security.insertProviderAt(BouncyCastleProvider(), 1)
-        val accountApi = AccountApi()
-        val pref = PayME.context.getSharedPreferences("PayME_SDK", Context.MODE_PRIVATE)
-        val clientId = pref.getString("clientId", "")
         ENV_API.updateEnv()
-        if (clientId?.length!! <= 0) {
-            accountApi.registerClient(
-                onSuccess = { jsonObject ->
-                    val Client = jsonObject?.optJSONObject("Client")
-                    val Register = Client?.optJSONObject("Register")
-                    val clientId = Register?.optString("clientId")
-                    pref.edit().putString("clientId", clientId).commit()
-                    PayME.clientId = clientId.toString()
-                    this.isConnected(onSuccess = { jsonObject ->
-                        println("jsonObject" + jsonObject)
-                    }, onError = { jsonObject, code, message ->
-                        println("jsonObject" + jsonObject)
-                        println("code" + code)
-                        println("message" + message)
 
-                    })
-                },
-                onError = { jsonObject, code, message ->
-                    Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT).show()
 
-                }
-            )
-        } else {
-            PayME.clientId = clientId
-            this.isConnected(onSuccess = { jsonObject ->
-                println("jsonObjectDKYDDDD" + jsonObject)
-            }, onError = { jsonObject, code, message ->
-                println("jsonObjectDKYDDDD" + jsonObject)
-                println("code" + code)
-                println("message" + message)
-            })
 
-        }
 
 
     }
@@ -180,33 +228,17 @@ public class PayME(
 
     public fun pay(
         fragmentManager: FragmentManager,
-        amount: Int,
-        content: String?,
-        orderId: String?,
-        extraData: String,
+        infoPayment: InfoPayment,
         onSuccess: (JSONObject) -> Unit,
         onError: (String) -> Unit,
         onClose: () -> Unit,
     ) {
-        Companion.content = content
-        Companion.extraData = extraData
-        Companion.onClose = onClose
-        if (amount != null) {
-            Companion.amount = amount
-        } else {
-            Companion.amount = 0
-        }
-        Companion.orderId = orderId
-        val paymePayment: PaymePayment = PaymePayment()
-        paymePayment.show(
-            fragmentManager,
-            "ModalBottomSheet"
-        )
+        PayME.pay(fragmentManager, infoPayment, onSuccess, onError, onClose)
 
     }
 
 
-    public fun isConnected(
+    public fun getAccountInfo(
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
@@ -215,17 +247,41 @@ public class PayME(
             onSuccess(jsonObject)
             val OpenEWallet = jsonObject.getJSONObject("OpenEWallet")
             val Init = OpenEWallet.getJSONObject("Init")
-            val accessToken = Init.optString("accessToken")
-            val handShake = Init.optString("handShake")
-            val succeeded = Init.optBoolean("succeeded")
+
             val isExistInMainWallet = Init.optBoolean("isExistInMainWallet")
-            println("accessToken"+accessToken)
-            PayME.accessToken = accessToken
-            PayME.handShake = handShake
+//            Cần phải Register hay không, hay chỉ Login của người dùng ( false -> gọi register, true -> gọi login)
+
+            val succeeded = Init.optBoolean("succeeded")
+
+//            Kết quả (có tồn tại account hay chưa )
+
             val kyc = Init.optJSONObject("kyc")
             if (kyc != null) {
                 val state = kyc.optString("kyc")
+                //           APPROVED
+//            Đã duyệt
+//             REJECTED
+//            Đã từ chối
+//            PENDING
+//            Chờ duyệt
+//            CANCELED
+//            Đã huỷ
+//            BANNED
+//            Bị ban do sai nhìu lần
             }
+
+
+            val accessToken = Init.optString("accessToken")
+            val handShake = Init.optString("handShake")
+
+            if (!accessToken.equals("null")) {
+                PayME.accessToken = accessToken
+            } else {
+                PayME.accessToken = ""
+            }
+
+            PayME.handShake = handShake
+
             println("jsonObject" + jsonObject)
 
         }, onError = { jsonObject, code, message ->

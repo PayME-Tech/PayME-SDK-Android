@@ -8,6 +8,7 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import com.squareup.picasso.Picasso
+import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.enum.TYPE_PAYMENT
 import vn.payme.sdk.model.Method
@@ -36,32 +37,33 @@ class MethodAdapter(
     }
 
     fun getTitle(method: Method, titleText: TextView, noteMethod: TextView) {
-
-        if (method.type == TYPE_PAYMENT.APP_WALLET) {
-            titleText.text = "Số dư ví "
+        if(method.type==TYPE_PAYMENT.BANK_CARD){
+            titleText.text = method.title
+        }else if (method.type == TYPE_PAYMENT.WALLET) {
+            titleText.text = method.title
             val decimal = DecimalFormat("#,###")
-            noteMethod.text = "(${decimal.format(method.amount?.toLong())}đ)"
+            noteMethod.text = "(${decimal.format(PayME.balance?.toLong())}đ)"
             noteMethod.textSize = 12F
             return
-        } else if (method.type == TYPE_PAYMENT.NAPAS || method.type == TYPE_PAYMENT.PVCB) {
-            titleText.text = method.bankCode!!
-            noteMethod.text = method.cardNumber
+        } else if (method.type == TYPE_PAYMENT.NAPAS || method.type == TYPE_PAYMENT.LINKED) {
+            titleText.text = method.label!!
             return
-
         } else {
-            titleText.text = method.detail
+            titleText.text = method.title
         }
     }
 
     private fun addImage(method: Method, imageView: ImageView) {
         println("Method"+method.toString())
-
-        if (method.type == TYPE_PAYMENT.APP_WALLET) {
+        if(method.type==TYPE_PAYMENT.BANK_CARD){
+            imageView.setImageResource(R.drawable.icon_atm)
+        }else if (method.type == TYPE_PAYMENT.WALLET) {
             imageView.setImageResource(R.drawable.iconwallet)
-        }else if (method.type == TYPE_PAYMENT.NAPAS || method.type == TYPE_PAYMENT.PVCB) {
+        }else if (method.type == TYPE_PAYMENT.NAPAS || method.type == TYPE_PAYMENT.LINKED) {
             println("LoadPICA")
-            Picasso.get()
-                .load("https://firebasestorage.googleapis.com/v0/b/vn-mecorp-payme-wallet.appspot.com/o/image_bank%2Fimage_method%2Fmethod${method.swiftCode}.png?alt=media&token=28cdb30e-fa9b-430c-8c0e-5369f500612e")
+            val picasso = Picasso.get()
+            picasso.setIndicatorsEnabled(false)
+            picasso.load("https://firebasestorage.googleapis.com/v0/b/vn-mecorp-payme-wallet.appspot.com/o/image_bank%2Fimage_method%2Fmethod${method.data?.swiftCode}.png?alt=media&token=28cdb30e-fa9b-430c-8c0e-5369f500612e")
                 .resize(50, 50)
                 .centerInside()
                 .into(imageView)
@@ -81,12 +83,7 @@ class MethodAdapter(
         val titleText = rowView.findViewById(R.id.title) as TextView
         val noteMethod = rowView.findViewById(R.id.note_method) as TextView
         val imageView = rowView.findViewById(R.id.image) as ImageView
-        val checkBox = rowView.findViewById(R.id.checkbox) as ImageView
-        if (method.selected!!) {
-            checkBox.setImageResource(R.drawable.checked)
-        } else {
-            checkBox.setImageResource(R.drawable.uncheck)
-        }
+
         getTitle(method, titleText, noteMethod)
 
         addImage(method, imageView)

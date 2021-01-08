@@ -93,7 +93,7 @@
         android:id="@+id/previewCamera"
         app:layout_constraintTop_toBottomOf="@id/container_select_type"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="220dp"
         android:layout_marginHorizontal="16dp"
         app:cameraFacing="back"
         app:cameraMode="picture"
@@ -218,7 +218,7 @@
         <ImageView
             android:id="@+id/previewImage"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="220dp"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="16dp"
             android:scaleType="centerInside"
