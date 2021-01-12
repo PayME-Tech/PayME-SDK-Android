@@ -1,24 +1,16 @@
 package com.minhkhoa.androidpaymesdk
 
 import android.content.Context
-import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.View
-import android.view.WindowManager
 import android.widget.*
-import io.sentry.Sentry
+import androidx.appcompat.app.AppCompatActivity
 import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.model.Action
 import vn.payme.sdk.model.Env
 import vn.payme.sdk.model.InfoPayment
-import java.lang.Exception
-import java.math.BigInteger
-import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.text.DateFormat
 import java.text.DecimalFormat
@@ -32,7 +24,6 @@ class MainActivity : AppCompatActivity() {
     fun convertInt(amount: String): Int {
         try {
             return Integer.parseInt(amount)
-
         } catch (e: Exception) {
             return 0
 
@@ -84,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         val byteArray = text.toByteArray(charset)
         val digest = MessageDigest.getInstance("SHA-256")
         val hash = digest.digest(byteArray)
-        return hash.fold("", { str, it -> str + "%02x".format(it)})
+        return hash.fold("", { str, it -> str + "%02x".format(it) })
     }
     fun updateWalletInfo() {
 
@@ -105,8 +96,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        Sentry.captureMessage("testing SDK setup");
-        println("SHA256"+SHA256("291995"))
+
+
+
         context = this
         setContentView(R.layout.activity_main)
         button = findViewById(R.id.button)
@@ -206,7 +198,7 @@ class MainActivity : AppCompatActivity() {
                     configColor,
                     env
                 )
-            this.payme.initAccount(onSuccess = {jsonObject->
+            this.payme.initAccount(onSuccess = { jsonObject ->
                 loading.visibility = View.GONE
 
                 Toast.makeText(
@@ -215,15 +207,15 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG
                 ).show()
             },
-            onError = {jsonObject, code, message ->
-                loading.visibility = View.GONE
+                onError = { jsonObject, code, message ->
+                    loading.visibility = View.GONE
 
-                Toast.makeText(
-                    context,
-                    message,
-                    Toast.LENGTH_LONG
-                ).show()
-            })
+                    Toast.makeText(
+                        context,
+                        message,
+                        Toast.LENGTH_LONG
+                    ).show()
+                })
         }
         button.setOnClickListener {
             if (ConnectToken.length > 0) {
@@ -268,7 +260,7 @@ class MainActivity : AppCompatActivity() {
         buttonPay.setOnClickListener {
             if (ConnectToken.length > 0) {
                 val amount = convertInt(moneyPay.text.toString())
-                val infoPayment = InfoPayment("PAY", 10000, "Thành công.", 4323, 1, "OpenEWallet")
+                val infoPayment = InfoPayment("PAY", 200000, "Thành công.", 4323, 1, "OpenEWallet")
                 payme.pay(this.supportFragmentManager, infoPayment,
                     onSuccess = { json: JSONObject ->
                         println("onSuccess2222" + json.toString())

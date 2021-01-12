@@ -26,10 +26,10 @@ import java.text.DecimalFormat
 
 class ListMethodPaymentFragment : Fragment() {
     private var loading: Boolean = false
-    private var methodSelected: Int = 0
     private lateinit var listView: ListView
     private lateinit var loadingProcess: ProgressBar
     private lateinit var methodAdapter: MethodAdapter
+
     val listMethod: ArrayList<Method> = ArrayList<Method>()
     private fun showLoading() {
         loadingProcess.visibility = View.VISIBLE
@@ -56,6 +56,67 @@ class ListMethodPaymentFragment : Fragment() {
         })
     }
 
+    private fun paymentLinkedBank(method: Method) {
+        val paymentApi = PaymentApi()
+        showLoading()
+        var even: EventBus = EventBus.getDefault()
+
+        var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.PAYMENT_RESULT, "")
+        println("method111111" + method.data?.linkedId)
+
+        paymentApi.payment(method, null, null, null, null, null, null,
+            onSuccess = { jsonObject ->
+                disableLoading()
+                val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
+                val Payment = OpenEWallet.optJSONObject("Payment")
+                val Pay = Payment.optJSONObject("Pay")
+                val succeeded = Pay.optBoolean("succeeded")
+                val payment = Pay.optJSONObject("payment")
+                val message = Pay.optString("message")
+                if (succeeded) {
+                    println("THANH CONG")
+
+                    even.post(myEven)
+                } else {
+                    println("payment" + payment)
+                    if (payment != null) {
+                        val statePaymentLinkedResponsed =
+                            payment.optString("statePaymentLinkedResponsed")
+                        println("statePaymentLinkedResponsed" + statePaymentLinkedResponsed)
+                        if (statePaymentLinkedResponsed == "REQUIRED_VERIFY") {
+                            val html = payment.optString("html")
+                            var changeFragmentOtp: ChangeTypePayment =
+                                ChangeTypePayment(TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS, html)
+                            even.post(changeFragmentOtp)
+                        } else if (statePaymentLinkedResponsed == "REQUIRED_OTP") {
+                                println("REQUIRED_OTP" + "1111111")
+                                val transaction = payment.optString("transaction")
+                                var changeFragmentOtp: ChangeTypePayment =
+                                    ChangeTypePayment(TYPE_PAYMENT.CONFIRM_OTP_BANK, transaction)
+                                even.post(changeFragmentOtp)
+                            } else {
+                                myEven.value = message
+                                even.post(myEven)
+                            }
+                    } else {
+                        println("THAT BAI ")
+                        myEven.value = message
+                        even.post(myEven)
+                    }
+
+                }
+                loading = false
+
+            },
+            onError = { jsonObject, i, s ->
+                disableLoading()
+                loading = false
+                PayME.showError(s)
+
+            }
+        )
+    }
+
     private fun getListMethod() {
         val paymentApi = PaymentApi()
         this.showLoading()
@@ -77,7 +138,7 @@ class ListMethodPaymentFragment : Fragment() {
                     var data = jsonObject.optJSONObject("data")
                     var dataMethod = DataMethod(null, "")
                     if (data != null) {
-                        val linkedId = data.optInt("linkedId")
+                        val linkedId = data.optString("linkedId")
                         val swiftCode = data.optString("swiftCode")
                         dataMethod = DataMethod(linkedId, swiftCode)
 
@@ -189,89 +250,30 @@ class ListMethodPaymentFragment : Fragment() {
 
 
         this.listView.setOnItemClickListener { adapterView, view, i, l ->
-            if (!loading && this.listMethod.size > 0) {
+            if (!loading) {
                 val paymentApi = PaymentApi()
-//                this.showLoading()
-
                 val method = this.listMethod[i]
+                PayME.methodSelected = method!!
                 if (method.type == TYPE_PAYMENT.BANK_CARD) {
                     val fragment = fragmentManager?.beginTransaction()
-                    fragment?.add(R.id.frame_container_select_method, EnterAtmCardFragment())
-                    fragment?.addToBackStack(null)
+                    fragment?.replace(R.id.frame_container_select_method, EnterAtmCardFragment())
                     fragment?.commit()
 
 
                 } else if (method?.type == TYPE_PAYMENT.WALLET) {
-
-
-                    if (PayME.balance < PayME.amount) {
-                        val toast: Toast = Toast.makeText(
-                            PayME.context,
-                            "Số dư trong ví không đủ",
-                            Toast.LENGTH_SHORT
-                        )
-                        toast.view?.setBackgroundColor(
-                            ContextCompat.getColor(
-                                PayME.context,
-                                R.color.scarlet
-                            )
-                        )
-                        toast.show()
+                    println("PayME.balance"+PayME.balance)
+                    println("PayMEayME.amount"+PayME.infoPayment?.amount)
+                    if (PayME.balance < PayME.infoPayment?.amount!!) {
+                       PayME.showError("Số dư trong ví không đủ")
                     } else {
                         var even: EventBus = EventBus.getDefault()
                         var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.WALLET, "")
                         even.post(myEven)
                     }
 
-                } else if (method?.type == TYPE_PAYMENT.NAPAS) {
-//                    paymentApi.postTransferNapas(method, onSuccess = { jsonObject ->
-//                        this.disableLoading()
-//                        val form = jsonObject.getString("form")
-//                        val bundle: Bundle = Bundle()
-//                        bundle.putString("form", form)
-//                        val confirmOtpNapasFragment: ConfirmOtpNapasFragment =
-//                            ConfirmOtpNapasFragment()
-//                        confirmOtpNapasFragment.arguments = bundle
-//                        val fragment = fragmentManager?.beginTransaction()
-//                        fragment?.replace(R.id.frame_container, confirmOtpNapasFragment)
-//                        fragment?.commit()
-//
-//                    },
-//                        onError = { jsonObject, code, message ->
-//                            this.onGotoResult(message)
-//                        }
-//                    )
-
                 } else if (method?.type == TYPE_PAYMENT.LINKED) {
-//                    paymentApi.postTransferPVCB(method, onSuccess = { jsonObject ->
-//                        this.disableLoading()
-//                        val fragment = fragmentManager?.beginTransaction()
-//                        fragment?.replace(R.id.frame_container, ResultPaymentFragment())
-//                        fragment?.commit()
-//
-//                    },
-//                        onError = { jsonObject, code, message ->
-//                            this.disableLoading()
-//                            if (code == 1004) {
-//                                val bundle: Bundle = Bundle()
-//                                val transferId = jsonObject?.getString("transferId")
-//                                bundle.putString("transferId", transferId)
-//                                val confirmOtpFragment: ConfirmOtpFragment = ConfirmOtpFragment()
-//                                confirmOtpFragment.arguments = bundle
-//                                val fragment = fragmentManager?.beginTransaction()
-//                                fragment?.replace(R.id.frame_container, confirmOtpFragment)
-//                                fragment?.commit()
-//
-//                            } else {
-//                                this.onGotoResult(message)
-//                            }
-//
-//
-//                        }
-//                    )
-
+                    paymentLinkedBank(method)
                 } else {
-//                    this.disableLoading()
 
                 }
             }

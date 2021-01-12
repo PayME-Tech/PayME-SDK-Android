@@ -1,9 +1,9 @@
 package vn.payme.sdk.model
 
 class DataMethod {
-    var linkedId : Number? = null
+    var linkedId : String? = null
     var swiftCode : String? = null
-    constructor(linkedId : Number?,swiftCode : String?){
+    constructor(linkedId : String?,swiftCode : String?){
         this.linkedId = linkedId
         this.swiftCode = swiftCode
     }

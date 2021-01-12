@@ -13,6 +13,7 @@ import vn.payme.sdk.component.Button
 class EnterAtmCardFragment :Fragment() {
     private lateinit var buttonSubmit: Button
     private lateinit var contentButtonChangeMethod: ConstraintLayout
+    private lateinit var buttonChangeMethod: ConstraintLayout
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -22,6 +23,12 @@ class EnterAtmCardFragment :Fragment() {
         val view: View? = inflater?.inflate(R.layout.enter_atm_card_fragment, container, false)
         buttonSubmit = view!!.findViewById(R.id.buttonSubmit)
         contentButtonChangeMethod = view!!.findViewById(R.id.contentButtonChangeMethod)
+        buttonChangeMethod = view!!.findViewById(R.id.buttonChangeMethod)
+        buttonChangeMethod.setOnClickListener{
+            val fragment = fragmentManager?.beginTransaction()
+            fragment?.replace(R.id.frame_container_select_method, ListMethodPaymentFragment())
+            fragment?.commit()
+        }
         contentButtonChangeMethod.background  = PayME.colorApp.backgroundColorRadiusAlpha
         buttonSubmit.setOnClickListener {
         }

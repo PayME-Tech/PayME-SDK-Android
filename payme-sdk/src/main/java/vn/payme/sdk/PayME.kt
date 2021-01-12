@@ -5,6 +5,7 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
+import es.dmoral.toasty.Toasty
 import org.json.JSONObject
 import org.spongycastle.jce.provider.BouncyCastleProvider
 import vn.payme.sdk.api.AccountApi
@@ -37,7 +38,7 @@ public class PayME(
         var content: String? = null
         var clientId: String = ""
         var handShake: String? = ""
-        var accessToken: String? = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTkxMzUsImFjY291bnRJZCI6MjQyMjQzNjkyOCwic2NvcGUiOltdLCJjbGllbnRJZCI6IjdiYzRhZTZiYjJmZmUwMDEiLCJhcHBJZCI6MSwiaWF0IjoxNjEwMTM2OTgyfQ.ltQT0cFITN-ZrnpiJWkVhqXBGgoTrY1RwzfqgJgYEfU"
+        var accessToken: String? = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTk3MDAsImFjY291bnRJZCI6MTE1NTEyMzk5Mywic2NvcGUiOltdLCJjbGllbnRJZCI6IjdiYzRhZTZiYjJmZmUwMDEiLCJhcHBJZCI6MSwiaWF0IjoxNjEwMzcwNDA1fQ.uNnQ2LaXQHrba9Ht6Q0JcIIFQc7y8TY5tqdQT183waA"
         var orderId: String? = null
         var extraData: String? = null
         var infoPayment: InfoPayment? = null
@@ -50,24 +51,14 @@ public class PayME(
         lateinit var onPay: ((String) -> Unit)
         lateinit var onClose: (() -> Unit)
         lateinit var colorApp: ColorApp
+        lateinit var methodSelected: Method
 
         //KYC
         var kycIdenity = false
         var kycVideo = false
         var kycFace = false
         fun showError(message:String){
-            val toast: Toast = Toast.makeText(
-                PayME.context,
-                message,
-                Toast.LENGTH_SHORT
-            )
-            toast.view?.setBackgroundColor(
-                ContextCompat.getColor(
-                    PayME.context,
-                    R.color.scarlet
-                )
-            )
-
+            Toasty.error(PayME.context, message, Toast.LENGTH_SHORT, true).show();
         }
 
         public fun pay(
@@ -102,8 +93,6 @@ public class PayME(
         val pref = PayME.context.getSharedPreferences("PayME_SDK", Context.MODE_PRIVATE)
         val clientId = pref.getString("clientId", "")
         val dataRegisterClientInfo = pref.getString("dataRegisterClientInfo", "")
-        println("dataRegisterClientInfo:"+dataRegisterClientInfo)
-        println("PayME.clientInfo.toString()+PayME.env.toString():"+PayME.clientInfo.getClientInfo().toString()+PayME.env.toString())
 
         if (clientId?.length!! <= 0 || !dataRegisterClientInfo.equals(PayME.clientInfo.getClientInfo().toString()+PayME.env.toString())) {
             accountApi.registerClient(
@@ -111,8 +100,6 @@ public class PayME(
                     val Client = jsonObject?.optJSONObject("Client")
                     val Register = Client?.optJSONObject("Register")
                     val clientId = Register?.optString("clientId")
-                    pref.edit().putString("clientId", clientId).commit()
-                    pref.edit().putString("dataRegisterClientInfo", PayME.clientInfo.getClientInfo().toString()+PayME.env.toString()).commit()
                     PayME.clientId = clientId.toString()
                     this.getAccountInfo(onSuccess = { jsonObject ->
                         onSuccess(jsonObject)

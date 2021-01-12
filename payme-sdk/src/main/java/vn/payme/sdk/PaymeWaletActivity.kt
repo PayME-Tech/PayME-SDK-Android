@@ -110,17 +110,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         webSettings.loadWithOverviewMode = true
         webSettings.allowFileAccess = true
         webSettings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-        myWebView.setWebChromeClient(object : WebChromeClient() {
 
-            override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
-                Log.d(
-                    "LOG WEB", consoleMessage?.message() + " -- From line "
-                            + consoleMessage?.lineNumber() + " of "
-                            + consoleMessage?.sourceId()
-                );
-                return super.onConsoleMessage(consoleMessage)
-            }
-        })
 
         val jsObject: JsObject =
             JsObject(this, back = { backScreen() }, this.supportFragmentManager, cameraManager)
@@ -132,6 +122,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                       appToken: '${PayME.appToken}',
                       accessToken: '${PayME.accessToken}',
                       env: '${PayME.env.toString()}',
+                      showLog: '1',
                       handShake: '${PayME.handShake}',
                       clientId: '${PayME.clientId}',
                       amount:${PayME.amount},
@@ -150,7 +141,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
         if (PayME.env == Env.DEV) {
             println("https://sbx-sdk.payme.com.vn/active/${encode}")
-
             myWebView.loadUrl("https://sbx-sdk2.payme.com.vn/active/${encode}")
         } else if (PayME.env == Env.SANDBOX) {
             println("https://sbx-sdk.payme.com.vn/active/${encode}")

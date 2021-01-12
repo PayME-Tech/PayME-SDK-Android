@@ -69,7 +69,7 @@ class ConfirmPassFragment : Fragment() {
                                     TYPE_PAYMENT.WALLET
                                 )
                                 val paymentApi = PaymentApi()
-                                paymentApi.payment(method, securityCode, null, null, null, null,
+                                paymentApi.payment(method, securityCode, null, null, null, null,null,
                                     onSuccess = { jsonObject ->
                                         val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
                                         val Payment = OpenEWallet.optJSONObject("Payment")

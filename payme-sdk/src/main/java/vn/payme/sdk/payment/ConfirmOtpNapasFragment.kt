@@ -39,14 +39,14 @@ class ConfirmOtpNapasFragment :Fragment() {
             fragment?.commit()
         }
 
-        val form = arguments?.getString("form")
+        val form = arguments?.getString("html")
         println("form"+form)
         myWebView.loadDataWithBaseURL("x-data://base", form!!, "text/html", "UTF-8", null);
         myWebView.setWebViewClient(object : WebViewClient() {
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
                 // Here you can check your new URL.
-                val checkSuccess = url.contains("https://sbx-fe.payme.vn/?success=true")
-                val checkError = url.contains("https://sbx-fe.payme.vn/?success=false")
+                val checkSuccess = url.contains("https://payme.vn/?success=true")
+                val checkError = url.contains("https://payme.vn/?success=false")
                 if(checkSuccess){
                     val fragment = fragmentManager?.beginTransaction()
                     fragment?.replace(R.id.frame_container, ResultPaymentFragment())

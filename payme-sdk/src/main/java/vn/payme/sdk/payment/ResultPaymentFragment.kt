@@ -1,5 +1,6 @@
 package vn.payme.sdk.payment
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,14 +8,20 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
+import kotlinx.android.synthetic.main.result_payment_layout.*
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
+import vn.payme.sdk.enum.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.TypeCallBack
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ResultPaymentFragment : Fragment() {
     private lateinit var buttonSubmit: Button
@@ -23,9 +30,16 @@ class ResultPaymentFragment : Fragment() {
     private lateinit var textNote: TextView
     private lateinit var textResult: TextView
     private lateinit var textError: TextView
+    private lateinit var textTransactionCode: TextView
+    private lateinit var textTransactionTime: TextView
+    private lateinit var textMethodTitle: TextView
+    private lateinit var textMethodValue: TextView
+    private lateinit var containerMethod: ConstraintLayout
+    private lateinit var textNumberCard: TextView
     private lateinit var lottie: LottieAnimationView
 
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val view: View? = inflater?.inflate(R.layout.result_payment_layout, container, false)
@@ -35,6 +49,21 @@ class ResultPaymentFragment : Fragment() {
         textAmount = view.findViewById(R.id.money)
         textNote = view.findViewById(R.id.note)
         textError = view.findViewById(R.id.note_error)
+
+        textTransactionCode = view.findViewById(R.id.transition_code_title)
+        textTransactionTime = view.findViewById(R.id.transition_time_value)
+        textMethodValue = view.findViewById(R.id.method_value)
+        textNumberCard = view.findViewById(R.id.number_card_title)
+        containerMethod = view.findViewById(R.id.content_method)
+
+
+        val dateFormat = SimpleDateFormat("HH:mm DD/MM/YYYY")
+        val GetDate = Date()
+        var DateStr: String? = dateFormat.format(GetDate)
+        textTransactionTime.text = DateStr
+        textMethodValue.text = PayME.methodSelected.title
+        textNumberCard.text = PayME.methodSelected.label
+
         textResult = view.findViewById(R.id.title_result)
         lottie = view.findViewById(R.id.animation_view)
         textNote.text = PayME.infoPayment?.note
@@ -45,6 +74,9 @@ class ResultPaymentFragment : Fragment() {
             lottie.setAnimation(R.raw.result_that_bai)
             textResult.text = getString(R.string.payment_fail)
 
+        }
+        if(PayME.methodSelected.type == TYPE_PAYMENT.WALLET){
+            containerMethod.visibility = View.GONE
         }
         val decimal = DecimalFormat("#,###")
         textAmount.text = "${decimal.format(PayME.infoPayment?.amount)} đ"

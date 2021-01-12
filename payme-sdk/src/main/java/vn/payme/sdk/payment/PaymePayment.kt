@@ -26,40 +26,85 @@ internal class PaymePayment : BottomSheetDialogFragment() {
         super.onCreate(savedInstanceState)
         setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle)
     }
+
     override fun onViewCreated(view: View, @Nullable savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val bottomSheetDialogFragment : BottomSheetDialog = dialog as BottomSheetDialog
-        val fragmentManager : FragmentManager
+        val bottomSheetDialogFragment: BottomSheetDialog = dialog as BottomSheetDialog
+        val fragmentManager: FragmentManager
         fragmentManager = childFragmentManager
-        val  fragment = fragmentManager.beginTransaction()
-        fragment.add(R.id.frame_container,SelectMethodFragment())
+        val fragment = fragmentManager.beginTransaction()
+        fragment.add(R.id.frame_container, SelectMethodFragment())
         fragment.commit()
         bottomSheetDialogFragment.behavior.isDraggable = false
     }
+
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         val v: View = inflater.inflate(
             R.layout.payment_layout,
-                container, false
+            container, false
         )
         EventBus.getDefault().register(this)
         return v
 
     }
+
     @Subscribe
-    fun onClose(myEven: MyEven){
-        if(myEven.type=== TypeCallBack.onClose){
+    fun onClose(myEven: MyEven) {
+        if (myEven.type === TypeCallBack.onClose) {
             this.dialog?.dismiss()
         }
     }
-    @Subscribe
-    fun onText(typePayment: ChangeTypePayment) {
-        if(typePayment.type == TYPE_PAYMENT.PAYMENT_SUCCESS){
 
-        }else if (typePayment.type == TYPE_PAYMENT.WALLET) {
+    @Subscribe
+    fun onChangeFragment(typePayment: ChangeTypePayment) {
+        println("CHNAG IOTPP" + typePayment.type)
+        if (typePayment.type == TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS) {
+            println("CHNAG IOTPP")
+            val confirmOtpFragment = ConfirmOtpNapasFragment()
+            val bundle: Bundle = Bundle()
+            bundle.putString("html", typePayment.value)
+            val fragment = childFragmentManager?.beginTransaction()
+            confirmOtpFragment.arguments = bundle
+            fragment?.replace(
+                R.id.frame_container,
+                confirmOtpFragment
+            )
+            fragment?.commit()
+
+        } else if (typePayment.type == TYPE_PAYMENT.CONFIRM_OTP_BANK) {
+            println("CHNAG IOTPP")
+            val confirmOtpFragment: ConfirmOtpFragment =
+                ConfirmOtpFragment()
+            val bundle: Bundle = Bundle()
+            bundle.putString("transaction", typePayment.value)
+            val fragment = childFragmentManager?.beginTransaction()
+            confirmOtpFragment.arguments = bundle
+            fragment?.replace(
+                R.id.frame_container,
+                confirmOtpFragment
+            )
+            fragment?.commit()
+
+        } else if (typePayment.type == TYPE_PAYMENT.PAYMENT_RESULT) {
+            val message = typePayment.value
+            val bundle: Bundle = Bundle()
+            if (message?.length!! > 0) {
+                bundle.putString("message", message)
+            }
+            val resultPaymentFragment: ResultPaymentFragment =
+                ResultPaymentFragment()
+            resultPaymentFragment.arguments = bundle
+            val fragment = childFragmentManager?.beginTransaction()
+            fragment?.replace(
+                R.id.frame_container,
+                resultPaymentFragment
+            )
+            fragment?.commit()
+        } else if (typePayment.type == TYPE_PAYMENT.WALLET) {
             val confirmPassFragment: ConfirmPassFragment = ConfirmPassFragment()
             val fragment = childFragmentManager?.beginTransaction()
             fragment?.replace(R.id.frame_container, confirmPassFragment)
@@ -67,17 +112,20 @@ internal class PaymePayment : BottomSheetDialogFragment() {
         }
 
     }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = BottomSheetDialog(requireContext(), theme)
         dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         dialog.behavior.skipCollapsed = true
         return dialog
     }
+
     override fun setupDialog(dialog: Dialog, style: Int) {
         val contentView = View.inflate(context, R.layout.payment_layout, null)
         dialog.setContentView(contentView)
         (contentView.parent as View).setBackgroundColor(resources.getColor(android.R.color.transparent))
     }
+
     override fun onDestroy() {
 
         PayME.onClose()

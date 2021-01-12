@@ -1,6 +1,7 @@
 package vn.payme.sdk.api
 
 import org.json.JSONObject
+import org.spongycastle.util.Integers
 import vn.payme.sdk.PayME
 import vn.payme.sdk.enum.TYPE_PAYMENT
 import vn.payme.sdk.model.Method
@@ -43,6 +44,44 @@ internal class PaymentApi {
             onSuccess = onSuccess,
         )
 
+    }
+    fun  detechCardHolder(
+        swiftCode:String,
+        cardNumber:String,
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ){
+        val path = "/graphql"
+        val params: MutableMap<String, Any> = mutableMapOf()
+        val variables: MutableMap<String, Any> = mutableMapOf()
+        val getBankNameInput: MutableMap<String, Any> = mutableMapOf()
+        val query = "mutation GetBankNameMutation(\$getBankNameInput: AccountBankInfoInput) {\n" +
+                "  Utility {\n" +
+                "    GetBankName(input: \$getBankNameInput) {\n" +
+                "      accountName\n" +
+                "      message\n" +
+                "      succeeded\n" +
+                "    }\n" +
+                "  }\n" +
+                "}"
+        params["query"] = query
+        getBankNameInput["swiftCode"] = swiftCode
+        getBankNameInput["cardNumber"] = cardNumber
+        getBankNameInput["type"] = "CARD"
+        variables["getBankNameInput"] = getBankNameInput
+        params["variables"] = variables
+        val request = NetworkRequest(
+            PayME.context!!,
+            ENV_API.API_FE,
+            path,
+            PayME.accessToken!!,
+            params,
+            ENV_API.IS_SECURITY
+        )
+        request.setOnRequestCrypto(
+            onError = onError,
+            onSuccess = onSuccess,
+        )
     }
 
     fun getSecuriryCode(
@@ -93,6 +132,7 @@ internal class PaymentApi {
         cardHolder: String?,
         cardDate: String?,
         otp: String?,
+        transaction: String?,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
@@ -101,15 +141,13 @@ internal class PaymentApi {
         val variables: MutableMap<String, Any> = mutableMapOf()
         val payInput: MutableMap<String, Any> = mutableMapOf()
         val payment: MutableMap<String, Any> = mutableMapOf()
-        val query = "mutation PayMutation(\$payInput: OpenEWalletPaymentPayInput!) {\n" +
+        val query = "mutation MessageMutation(\$payInput: OpenEWalletPaymentPayInput!) {\n" +
                 "  OpenEWallet {\n" +
                 "    Payment {\n" +
                 "      Pay(input: \$payInput) {\n" +
                 "        message\n" +
-                "        succeeded\n" +
                 "        payment {\n" +
                 "          ... on PaymentWalletResponsed {\n" +
-                "            accountId\n" +
                 "            message\n" +
                 "            statePaymentWalletResponsed : state\n" +
                 "          }\n" +
@@ -121,10 +159,12 @@ internal class PaymentApi {
                 "          ... on PaymentLinkedResponsed {\n" +
                 "            html\n" +
                 "            linkedId\n" +
-                "            statePaymentLinkedResponsed : state\n" +
                 "            message\n" +
+                "            statePaymentLinkedResponsed : state\n" +
+                "            transaction\n" +
                 "          }\n" +
                 "        }\n" +
+                "        succeeded\n" +
                 "      }\n" +
                 "    }\n" +
                 "  }\n" +
@@ -152,16 +192,19 @@ internal class PaymentApi {
             payment["bankCard"] = bankCard
         } else if (method.type == TYPE_PAYMENT.LINKED) {
             val linked: MutableMap<String, Any> = mutableMapOf()
-            linked["linkedId"] = method.data?.linkedId!!
-            linked["otp"] = otp!!
+            println("method.data:"+method.data)
+            linked["linkedId"] = method.data?.linkedId!!.toBigInteger().toDouble()
+            if(otp!=null){
+                linked["otp"] = otp
+            }
             linked["envName"] = "MobileApp"
             payment["linked"] = linked
-
         }
-
         payInput["payment"] = payment
+        if(transaction!=null){
+            payInput["transaction"] = transaction
+        }
         variables["payInput"] = payInput
-
         params["variables"] = variables
         val request = NetworkRequest(
             PayME.context!!,

@@ -46,7 +46,8 @@ class MethodAdapter(
             noteMethod.textSize = 12F
             return
         } else if (method.type == TYPE_PAYMENT.NAPAS || method.type == TYPE_PAYMENT.LINKED) {
-            titleText.text = method.label!!
+            titleText.text = method.title!!
+            noteMethod.text = method.label!!
             return
         } else {
             titleText.text = method.title

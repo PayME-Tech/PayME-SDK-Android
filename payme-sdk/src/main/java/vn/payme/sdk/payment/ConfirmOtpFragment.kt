@@ -1,16 +1,12 @@
 package vn.payme.sdk.payment
 
-import android.graphics.Color
-import android.graphics.ColorFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
-import android.widget.EditText
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import com.chaos.view.PinView
 import vn.payme.sdk.PayME
@@ -38,49 +34,15 @@ class ConfirmOtpFragment : Fragment() {
         pinView.isPasswordHidden = false
 
 
+        pinView.addTextChangedListener { text ->
+            if(text?.length==6){
+                checkPassword(text.toString())
+            }
+
+        }
         buttonSubmit.setOnClickListener {
             if (pinView.text?.length === 6 && !buttonSubmit.isLoadingShowing) {
-                buttonSubmit.enableLoading()
-                val paymentApi = PaymentApi()
-                paymentApi.postTransferPVCBVerify(arguments?.getString("transferId")!!,
-                    pinView.text.toString(),
-                    onSuccess = { jsonObject ->
-                        val fragment = fragmentManager?.beginTransaction()
-                        fragment?.replace(R.id.frame_container, ResultPaymentFragment())
-                        fragment?.commit()
-
-                    },
-                    onError = { jsonObject, code, message ->
-                        buttonSubmit.disableLoading()
-                        if (code == 1008) {
-                            pinView.setText("")
-                            val toast: Toast =
-                                Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
-                            toast.view?.setBackgroundColor(
-                                ContextCompat.getColor(
-                                    PayME.context,
-                                    R.color.scarlet
-                                )
-                            )
-                            toast.show()
-
-
-                        } else {
-                            buttonSubmit.disableLoading()
-
-                            val bundle: Bundle = Bundle()
-                            bundle.putString("message", message)
-                            val resultPaymentFragment: ResultPaymentFragment =
-                                ResultPaymentFragment()
-                            resultPaymentFragment.arguments = bundle
-                            val fragment = fragmentManager?.beginTransaction()
-                            fragment?.replace(R.id.frame_container, resultPaymentFragment)
-                            fragment?.commit()
-                        }
-
-
-                    })
-
+                checkPassword(pinView.text.toString())
             }
 
         }
@@ -95,6 +57,92 @@ class ConfirmOtpFragment : Fragment() {
 
 
 
+
         return view
+    }
+
+    fun checkPassword(pass: String) {
+        buttonSubmit.enableLoading()
+        val paymentApi = PaymentApi()
+        val transaction = arguments?.getString("transaction")
+        paymentApi.payment(PayME.methodSelected,
+            null,
+            null,
+            null,
+            null,
+            pass,
+            transaction,
+            onSuccess = { jsonObject ->
+                buttonSubmit.disableLoading()
+                val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
+                val Payment = OpenEWallet.optJSONObject("Payment")
+                val Pay = Payment.optJSONObject("Pay")
+                val succeeded = Pay.optBoolean("succeeded")
+                val payment = Pay.optJSONObject("payment")
+                val message = Pay.optString("message")
+                if (succeeded) {
+                    val fragment = fragmentManager?.beginTransaction()
+                    fragment?.replace(R.id.frame_container, ResultPaymentFragment())
+                    fragment?.commit()
+                } else {
+                    println("payment:"+payment)
+
+                    if (payment != null) {
+                        val statePaymentLinkedResponsed = payment.optString("statePaymentLinkedResponsed")
+                        if(statePaymentLinkedResponsed=="INVALID_OTP"){
+                            println("statePaymentLinkedResponsed=INVALID_OTP")
+                            pinView.setText("")
+                            PayME.showError(message)
+                        }else{
+                            val bundle: Bundle = Bundle()
+                            bundle.putString("message", message)
+                            val resultPaymentFragment = ResultPaymentFragment()
+                            resultPaymentFragment.arguments = bundle
+                            val fragment = fragmentManager?.beginTransaction()
+                            fragment?.replace(R.id.frame_container, resultPaymentFragment)
+                            fragment?.commit()
+                        }
+
+
+                    } else {
+                        val bundle: Bundle = Bundle()
+                        bundle.putString("message", message)
+                        val resultPaymentFragment = ResultPaymentFragment()
+                        resultPaymentFragment.arguments = bundle
+                        val fragment = fragmentManager?.beginTransaction()
+                        fragment?.replace(R.id.frame_container, resultPaymentFragment)
+                        fragment?.commit()
+                    }
+                }
+
+            },
+            onError = { jsonObject, code, message ->
+                buttonSubmit.disableLoading()
+//                        if (code == 1008) {
+//                            pinView.setText("")
+//                            val toast: Toast =
+//                                Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
+//                            toast.view?.setBackgroundColor(
+//                                ContextCompat.getColor(
+//                                    PayME.context,
+//                                    R.color.scarlet
+//                                )
+//                            )
+//                            toast.show()
+//                        } else {
+//                            buttonSubmit.disableLoading()
+//                            val bundle: Bundle = Bundle()
+//                            bundle.putString("message", message)
+//                            val resultPaymentFragment: ResultPaymentFragment =
+//                                ResultPaymentFragment()
+//                            resultPaymentFragment.arguments = bundle
+//                            val fragment = fragmentManager?.beginTransaction()
+//                            fragment?.replace(R.id.frame_container, resultPaymentFragment)
+//                            fragment?.commit()
+//                        }
+
+
+            })
+
     }
 }

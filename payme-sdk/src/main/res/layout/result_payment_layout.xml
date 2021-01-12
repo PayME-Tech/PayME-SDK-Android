@@ -2,80 +2,80 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:background="@drawable/background_radius_gray"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/buttonClose"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="16dp"
-        android:src="@drawable/close"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="16dp"
-        app:layout_constraintRight_toRightOf="parent" />
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:background="@drawable/background_radius_top_white"
         android:layout_marginBottom="16dp"
         android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/buttonClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/close"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/animation_view"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:scaleType="centerCrop"
-            app:lottie_rawRes="@raw/result_thanh_cong"
-            app:lottie_loop="true"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:lottie_autoPlay="true" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/result_thanh_cong" />
 
         <TextView
             android:id="@+id/title_result"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:fontFamily="@font/barlow_medium"
             android:text="@string/payment_success"
             android:textColor="@color/blackFive"
             android:textSize="21dp"
-            android:layout_marginTop="16dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/animation_view"
 
 
             />
+
         <TextView
             android:id="@+id/money"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
             android:fontFamily="@font/barlow_medium"
             android:text="500,000 đ "
             android:textColor="@color/blackFive"
             android:textSize="32dp"
-            android:layout_marginTop="6dp"
-            app:layout_constraintTop_toBottomOf="@id/title_result"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            />
+            app:layout_constraintTop_toBottomOf="@id/title_result" />
+
         <TextView
             android:id="@+id/note_error"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
             android:fontFamily="@font/barlow_medium"
             android:textColor="@color/scarlet"
             android:textSize="16dp"
-            android:layout_marginTop="6dp"
-            app:layout_constraintTop_toBottomOf="@id/money"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            />
+            app:layout_constraintTop_toBottomOf="@id/money" />
 
         <ImageView
             android:id="@+id/dotted"
@@ -85,7 +85,6 @@
             android:layerType="software"
             android:src="@drawable/dotted"
             app:layout_constraintTop_toBottomOf="@id/note_error"
-
             />
 
         <LinearLayout
@@ -105,11 +104,11 @@
                 android:textSize="16dp" />
 
             <TextView
+                android:id="@+id/note"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:layout_weight="1"
-                android:id="@+id/note"
                 android:fontFamily="@font/barlow_medium"
                 android:textAlignment="textEnd"
                 android:textColor="@color/blackFive"
@@ -117,19 +116,153 @@
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/transition_code_container"
+        android:layout_width="match_parent"
+        android:layout_marginTop="16dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:background="@drawable/background_radius"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/content">
+
+        <TextView
+            android:id="@+id/transition_code_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/barlow_regular"
+            android:text="Mã giao dịch"
+            android:textColor="@color/steel"
+            android:textSize="14dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/barlow_regular"
+            android:text="1342445553"
+            android:textColor="@color/blackSeven"
+            android:textSize="16dp"
+            android:id="@+id/transition_code_value"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/transition_code_title" />
+
+        <TextView
+            android:id="@+id/transition_time_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/barlow_regular"
+            android:text="Thời gian giao dịch"
+            android:textColor="@color/steel"
+            android:textSize="14dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/barlow_regular"
+            android:text="15:13 15/09/2020"
+            android:id="@+id/transition_time_value"
+            android:textColor="@color/blackSeven"
+            android:textSize="16dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/transition_code_title" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_marginHorizontal="16dp"
+        android:background="@drawable/background_radius"
+        android:padding="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/method_container"
+        app:layout_constraintTop_toBottomOf="@id/transition_code_container" >
+        <TextView
+            android:id="@+id/method_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Phương thức"
+            android:fontFamily="@font/barlow_medium"
+            android:textColor="@color/blackSeven"
+            android:textSize="15dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/method_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thẻ liên kết"
+            android:fontFamily="@font/barlow_medium"
+            android:textColor="@color/blackSeven"
+            android:textSize="15dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            app:layout_constraintTop_toBottomOf="@id/method_title"
+            android:visibility="visible"
+            android:id="@+id/content_method"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/dotted_method"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:layout_marginVertical="16dp"
+                android:layerType="software"
+                android:src="@drawable/dotted"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+            <TextView
+                android:id="@+id/number_card_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Vietcombank-3111"
+                android:fontFamily="@font/barlow_medium"
+                android:textColor="@color/blackSeven"
+                android:textSize="15dp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dotted_method" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Số thẻ"
+                android:id="@+id/number_card_title"
+                android:fontFamily="@font/barlow_medium"
+                android:textColor="@color/blackSeven"
+                android:textSize="15dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dotted_method" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <Button
         android:id="@+id/buttonSubmit"
-        app:layout_constraintTop_toBottomOf="@id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/background_gradient_radius"
         android:fontFamily="@font/semi_bold"
         android:text="@string/confirm"
         android:textColor="@color/white"
         android:textSize="16dp"
-        android:layout_marginHorizontal="16dp"
-        />
+        app:layout_constraintTop_toBottomOf="@id/method_container" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
