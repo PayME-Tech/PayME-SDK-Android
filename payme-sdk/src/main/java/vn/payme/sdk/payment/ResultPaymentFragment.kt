@@ -50,20 +50,26 @@ class ResultPaymentFragment : Fragment() {
         textNote = view.findViewById(R.id.note)
         textError = view.findViewById(R.id.note_error)
 
-        textTransactionCode = view.findViewById(R.id.transition_code_title)
+        textTransactionCode = view.findViewById(R.id.transition_code_value)
         textTransactionTime = view.findViewById(R.id.transition_time_value)
         textMethodValue = view.findViewById(R.id.method_value)
-        textNumberCard = view.findViewById(R.id.number_card_title)
+        textNumberCard = view.findViewById(R.id.number_card_value)
         containerMethod = view.findViewById(R.id.content_method)
 
 
-        val dateFormat = SimpleDateFormat("HH:mm DD/MM/YYYY")
+        val dateFormat = SimpleDateFormat("HH:mm DD/MM/yyyy")
         val GetDate = Date()
         var DateStr: String? = dateFormat.format(GetDate)
         textTransactionTime.text = DateStr
         textMethodValue.text = PayME.methodSelected.title
-        textNumberCard.text = PayME.methodSelected.label
+        if(PayME.methodSelected.type==TYPE_PAYMENT.BANK_CARD){
+            textNumberCard.text = PayME.numberAtmCard
 
+        }else{
+            textNumberCard.text = PayME.methodSelected.label
+
+        }
+        textTransactionCode.setText(PayME.transaction)
         textResult = view.findViewById(R.id.title_result)
         lottie = view.findViewById(R.id.animation_view)
         textNote.text = PayME.infoPayment?.note

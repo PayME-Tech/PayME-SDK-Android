@@ -118,7 +118,7 @@ internal class NetworkRequest(
                     println("error"+errors)
 
 
-                } catch (error: JSONException) {
+                } catch (error: Exception) {
                     onError(
                         null,
                         -2,

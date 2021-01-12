@@ -159,15 +159,15 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             onSuccess = { jsonObject ->
                 lottie?.visibility = View.GONE
                 val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
-                val Payment = OpenEWallet.optJSONObject("OpenEWallet")
+                val Payment = OpenEWallet.optJSONObject("Payment")
                 val Detect = Payment.optJSONObject("Detect")
-                val action = Detect.optString("Detect")
+                val action = Detect.optString("action")
                 val message = Detect.optString("message")
-                val note = Detect.optString("message")
+                val note = Detect.optString("note")
                 val amount = Detect.optInt("amount")
-                val orderId = Detect.optInt("amount")
-                val storeId = Detect.optInt("amount")
-                val succeeded = Detect.optBoolean("amount")
+                val orderId = Detect.optInt("orderId")
+                val storeId = Detect.optInt("storeId")
+                val succeeded = Detect.optBoolean("succeeded")
                 val type = Detect.optString("type")
 
                 if (!succeeded) {

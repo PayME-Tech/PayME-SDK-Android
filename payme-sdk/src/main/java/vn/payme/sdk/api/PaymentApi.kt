@@ -21,9 +21,8 @@ internal class PaymentApi {
                 "  Setting {\n" +
                 "    banks {\n" +
                 "      cardPrefix\n" +
+                "      cardNumberLength\n" +
                 "      depositable\n" +
-                "      enName\n" +
-                "      id\n" +
                 "      shortName\n" +
                 "      swiftCode\n" +
                 "    }\n" +
@@ -141,10 +140,15 @@ internal class PaymentApi {
         val variables: MutableMap<String, Any> = mutableMapOf()
         val payInput: MutableMap<String, Any> = mutableMapOf()
         val payment: MutableMap<String, Any> = mutableMapOf()
-        val query = "mutation MessageMutation(\$payInput: OpenEWalletPaymentPayInput!) {\n" +
+        val query = "mutation PayMutation(\$payInput: OpenEWalletPaymentPayInput!) {\n" +
                 "  OpenEWallet {\n" +
                 "    Payment {\n" +
                 "      Pay(input: \$payInput) {\n" +
+                "        history {\n" +
+                "          payment {\n" +
+                "            transaction\n" +
+                "          }\n" +
+                "        }\n" +
                 "        message\n" +
                 "        payment {\n" +
                 "          ... on PaymentWalletResponsed {\n" +
@@ -163,6 +167,7 @@ internal class PaymentApi {
                 "            statePaymentLinkedResponsed : state\n" +
                 "            transaction\n" +
                 "          }\n" +
+                "         \n" +
                 "        }\n" +
                 "        succeeded\n" +
                 "      }\n" +
@@ -188,7 +193,7 @@ internal class PaymentApi {
             val bankCard: MutableMap<String, Any> = mutableMapOf()
             bankCard["cardNumber"] = cardNumber!!
             bankCard["cardHolder"] = cardHolder!!
-            bankCard["cardDate"] = cardDate!!
+            bankCard["issuedAt"] = cardDate!!
             payment["bankCard"] = bankCard
         } else if (method.type == TYPE_PAYMENT.LINKED) {
             val linked: MutableMap<String, Any> = mutableMapOf()

@@ -13,6 +13,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.webview_activity.*
+import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 
 class ConfirmOtpNapasFragment :Fragment() {
@@ -48,12 +49,21 @@ class ConfirmOtpNapasFragment :Fragment() {
                 val checkSuccess = url.contains("https://payme.vn/?success=true")
                 val checkError = url.contains("https://payme.vn/?success=false")
                 if(checkSuccess){
+                    val uri: Uri = Uri.parse(url)
+                    val trans_id = uri.getQueryParameter("trans_id")
+                    if(trans_id!=null){
+                        PayME.transaction = trans_id
+                    }
                     val fragment = fragmentManager?.beginTransaction()
                     fragment?.replace(R.id.frame_container, ResultPaymentFragment())
                     fragment?.commit()
                 }else if(checkError){
                     val uri: Uri = Uri.parse(url)
                     val message = uri.getQueryParameter("message")
+                    val trans_id = uri.getQueryParameter("trans_id")
+                    if(trans_id!=null){
+                        PayME.transaction = trans_id
+                    }
                     val bundle: Bundle = Bundle()
                     bundle.putString("message",message)
                     val resultPaymentFragment: ResultPaymentFragment = ResultPaymentFragment()

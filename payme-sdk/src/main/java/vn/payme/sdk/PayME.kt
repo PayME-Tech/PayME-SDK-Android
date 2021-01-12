@@ -32,13 +32,12 @@ public class PayME(
         lateinit var publicKey: String
         var connectToken: String = ""
         lateinit var action: Action
-        var kycInfo: KycInfo = KycInfo()
         var amount: Int = 0
         var balance: Int = 0
         var content: String? = null
         var clientId: String = ""
         var handShake: String? = ""
-        var accessToken: String? = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTk3MDAsImFjY291bnRJZCI6MTE1NTEyMzk5Mywic2NvcGUiOltdLCJjbGllbnRJZCI6IjdiYzRhZTZiYjJmZmUwMDEiLCJhcHBJZCI6MSwiaWF0IjoxNjEwMzcwNDA1fQ.uNnQ2LaXQHrba9Ht6Q0JcIIFQc7y8TY5tqdQT183waA"
+        var accessToken: String? = ""
         var orderId: String? = null
         var extraData: String? = null
         var infoPayment: InfoPayment? = null
@@ -52,6 +51,8 @@ public class PayME(
         lateinit var onClose: (() -> Unit)
         lateinit var colorApp: ColorApp
         lateinit var methodSelected: Method
+         var numberAtmCard = ""
+         var transaction = ""
 
         //KYC
         var kycIdenity = false

@@ -1,10 +1,13 @@
 package vn.payme.sdk.payment
 
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import org.apache.commons.codec.digest.DigestUtils
@@ -20,7 +23,7 @@ import java.util.*
 class ConfirmPassFragment : Fragment() {
     private lateinit var buttonClose: ImageView
     private lateinit var pinView: PinView
-    private var loading: Boolean = false
+    private lateinit var loading: ProgressBar
 
 
     fun SHA256(text: String): String? {
@@ -39,14 +42,18 @@ class ConfirmPassFragment : Fragment() {
         val view: View? = inflater?.inflate(R.layout.confirm_pass, container, false)
         buttonClose = view!!.findViewById(R.id.buttonClose)
         pinView = view!!.findViewById(R.id.otp_view)
+        loading = view!!.findViewById(R.id.loading)
+        loading.getIndeterminateDrawable()
+            .mutate()
+            .setColorFilter(Color.parseColor(PayME.colorApp.startColor), PorterDuff.Mode.SRC_ATOP)
         pinView.setAnimationEnable(true)
         pinView.requestFocus()
         pinView.isPasswordHidden = true
 
         pinView.addTextChangedListener { text ->
             if (text?.length!! >= 6) {
-                if (!loading) {
-                    loading = true
+                if (loading.visibility != View.VISIBLE) {
+                    loading.visibility = View.VISIBLE
                     val paymentApi = PaymentApi()
                     val pass: String? = SHA256(text.toString())
                     paymentApi.getSecuriryCode(pass!!,
@@ -69,16 +76,28 @@ class ConfirmPassFragment : Fragment() {
                                     TYPE_PAYMENT.WALLET
                                 )
                                 val paymentApi = PaymentApi()
-                                paymentApi.payment(method, securityCode, null, null, null, null,null,
+                                paymentApi.payment(method,
+                                    securityCode,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
                                     onSuccess = { jsonObject ->
                                         val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
                                         val Payment = OpenEWallet.optJSONObject("Payment")
                                         val Pay = Payment.optJSONObject("Pay")
+
                                         val succeeded = Pay.optBoolean("succeeded")
                                         val payment = Pay.optJSONObject("OpenEWallet")
                                         val message = Pay.optString("message")
                                         if (succeeded) {
-                                            println("THANH TOAN THANH XONG")
+                                            val history = Pay.optJSONObject("history")
+                                            val payment = history.optJSONObject("payment")
+                                            println("history" + history)
+                                            val transaction = payment.optString("transaction")
+                                            println("transaction" + transaction)
+                                            PayME.transaction = transaction
                                             val fragment = fragmentManager?.beginTransaction()
                                             fragment?.replace(
                                                 R.id.frame_container,
@@ -101,18 +120,18 @@ class ConfirmPassFragment : Fragment() {
                                             )
                                             fragment?.commit()
                                         }
-                                        loading = false
+                                        loading.visibility = View.GONE
 
                                     },
                                     onError = { jsonObject, i, s ->
-                                        loading = false
+                                        loading.visibility = View.GONE
                                         PayME.showError(message)
 
                                     }
                                 )
 
                             } else {
-                                loading = false
+                                loading.visibility = View.GONE
                                 PayME.showError(message)
                             }
                             pinView.setText("")
@@ -120,50 +139,13 @@ class ConfirmPassFragment : Fragment() {
 
                         },
                         onError = { jsonObject, code, message ->
-                            loading = false
+                            loading.visibility = View.GONE
                             PayME.showError(message)
 
                         }
 
                     )
 
-//                    paymentApi.postTransferPVCBVerify(arguments?.getString("transferId")!!,
-//                        pinView.text.toString(),
-//                        onSuccess = { jsonObject ->
-//                            val fragment = fragmentManager?.beginTransaction()
-//                            fragment?.replace(R.id.frame_container, ResultPaymentFragment())
-//                            fragment?.commit()
-//
-//                        },
-//                        onError = { jsonObject, code, message ->
-//                            loading = false
-//                            if (code == 1008) {
-//                                pinView.setText("")
-//                                val toast: Toast =
-//                                    Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
-//                                toast.view?.setBackgroundColor(
-//                                    ContextCompat.getColor(
-//                                        PayME.context,
-//                                        R.color.scarlet
-//                                    )
-//                                )
-//                                toast.show()
-//
-//
-//                            } else {
-//                                loading = false
-//                                val bundle: Bundle = Bundle()
-//                                bundle.putString("message", message)
-//                                val resultPaymentFragment: ResultPaymentFragment =
-//                                    ResultPaymentFragment()
-//                                resultPaymentFragment.arguments = bundle
-//                                val fragment = fragmentManager?.beginTransaction()
-//                                fragment?.replace(R.id.frame_container, resultPaymentFragment)
-//                                fragment?.commit()
-//                            }
-//
-//
-//                        })
                 }
 
             }
@@ -171,16 +153,9 @@ class ConfirmPassFragment : Fragment() {
         }
 
 
-//        buttonSubmit.setOnClickListener {
-//            if (pinView.text?.length === 6 && !buttonSubmit.isLoadingShowing) {
-//                buttonSubmit.enableLoading()
 
-//
-//            }
-//
-//        }
         buttonClose.setOnClickListener {
-            if (!loading) {
+            if (loading.visibility != View.VISIBLE) {
                 val fragment = fragmentManager?.beginTransaction()
                 fragment?.replace(R.id.frame_container, SelectMethodFragment())
                 fragment?.commit()

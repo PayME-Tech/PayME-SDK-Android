@@ -67,7 +67,6 @@
         android:layout_marginHorizontal="16dp"
         android:textColor="@color/blackSeven"
         android:textSize="20dp"
-        android:focusable="true"
         app:lineWidth="1dp"
         android:fontFamily="@font/semi_bold"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -80,6 +79,16 @@
         app:lineColor="@color/line_color_pass"
 
         />
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:id="@+id/loading"
+        android:visibility="gone"
+        android:layout_marginTop="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/otp_view"
+        android:text="@string/enter_the_cardholder_full_name"
+        android:layout_height="wrap_content"/>
 
 
 

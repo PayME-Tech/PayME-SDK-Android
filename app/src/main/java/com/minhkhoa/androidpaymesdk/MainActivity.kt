@@ -93,12 +93,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-
-
-
         context = this
         setContentView(R.layout.activity_main)
         button = findViewById(R.id.button)

@@ -87,6 +87,18 @@
         android:paddingVertical="12dp"
         android:textSize="16dp"
         app:layout_constraintTop_toBottomOf="@id/buttonChangeMethod" />
+    <TextView
+        android:id="@+id/textErrorCard"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:text="Số thẻ không đúng định dạng"
+        android:textColor="@color/scarlet"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textInputCardNumber"
+        />
 
     <TextView
         android:id="@+id/textNoteCard"
@@ -97,9 +109,9 @@
         android:text="@string/enter_the_number_card_on_the_front_of_the_card"
         android:textColor="@color/blackFive"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textInputCardNumber" />
+        app:layout_constraintTop_toBottomOf="@id/textErrorCard" />
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/containerInputCardHolder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -112,6 +124,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:maxLength="50"
+            android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZ "
+            android:inputType="textFilter"
             android:background="@drawable/background_radius_with_boder"
             android:fontFamily="@font/barlow_regular"
             android:hint="@string/enter_the_cardholder_full_name"
@@ -127,9 +143,9 @@
             android:text="@string/please_check_the_correct_name_printed_on_the_card"
             android:textColor="@color/blackFive"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textInputCardNumber" />
+            app:layout_constraintTop_toBottomOf="@id/textInputCardHolder" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <EditText
         android:id="@+id/textInputCardDate"
@@ -137,6 +153,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:inputType="number"
+        android:maxLength="5"
         android:background="@drawable/background_radius_with_boder"
         android:fontFamily="@font/barlow_regular"
         android:hint="@string/release_date_mm_yy"

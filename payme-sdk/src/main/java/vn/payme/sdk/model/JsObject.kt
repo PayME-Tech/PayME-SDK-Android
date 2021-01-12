@@ -60,9 +60,11 @@ public class JsObject(
     }
 
     @JavascriptInterface
-    public fun onError(string: String) {
+    public fun onError(jsonObject: JSONObject) {
         try {
-            PayME.onError(string)
+            println("jsonObject"+jsonObject)
+            back()
+//            PayME.onError(string)
         } catch (e: Exception) {
             println(e)
 

@@ -89,15 +89,16 @@ class ListMethodPaymentFragment : Fragment() {
                                 ChangeTypePayment(TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS, html)
                             even.post(changeFragmentOtp)
                         } else if (statePaymentLinkedResponsed == "REQUIRED_OTP") {
-                                println("REQUIRED_OTP" + "1111111")
-                                val transaction = payment.optString("transaction")
-                                var changeFragmentOtp: ChangeTypePayment =
-                                    ChangeTypePayment(TYPE_PAYMENT.CONFIRM_OTP_BANK, transaction)
-                                even.post(changeFragmentOtp)
-                            } else {
-                                myEven.value = message
-                                even.post(myEven)
-                            }
+                            println("REQUIRED_OTP" + "1111111")
+                            val transaction = payment.optString("transaction")
+                            PayME.transaction = transaction
+                            var changeFragmentOtp: ChangeTypePayment =
+                                ChangeTypePayment(TYPE_PAYMENT.CONFIRM_OTP_BANK, transaction)
+                            even.post(changeFragmentOtp)
+                        } else {
+                            myEven.value = message
+                            even.post(myEven)
+                        }
                     } else {
                         println("THAT BAI ")
                         myEven.value = message
@@ -247,6 +248,8 @@ class ListMethodPaymentFragment : Fragment() {
         this.listView.adapter = methodAdapter
         getBalance()
 
+        PayME.numberAtmCard= ""
+        PayME.transaction= ""
 
 
         this.listView.setOnItemClickListener { adapterView, view, i, l ->
@@ -261,10 +264,10 @@ class ListMethodPaymentFragment : Fragment() {
 
 
                 } else if (method?.type == TYPE_PAYMENT.WALLET) {
-                    println("PayME.balance"+PayME.balance)
-                    println("PayMEayME.amount"+PayME.infoPayment?.amount)
+                    println("PayME.balance" + PayME.balance)
+                    println("PayMEayME.amount" + PayME.infoPayment?.amount)
                     if (PayME.balance < PayME.infoPayment?.amount!!) {
-                       PayME.showError("Số dư trong ví không đủ")
+                        PayME.showError("Số dư trong ví không đủ")
                     } else {
                         var even: EventBus = EventBus.getDefault()
                         var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.WALLET, "")
