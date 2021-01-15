@@ -1,6 +1,7 @@
 package vn.payme.sdk.payment
 
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,13 +16,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.PayME
+import vn.payme.sdk.PaymeWaletActivity
 import vn.payme.sdk.R
 import vn.payme.sdk.enum.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.ChangeTypePayment
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.TypeCallBack
 
-internal class PaymePayment : BottomSheetDialogFragment() {
+internal class PaymePayment : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle)
@@ -31,11 +33,35 @@ internal class PaymePayment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         val bottomSheetDialogFragment: BottomSheetDialog = dialog as BottomSheetDialog
         val fragmentManager: FragmentManager
-        fragmentManager = childFragmentManager
-        val fragment = fragmentManager.beginTransaction()
-        fragment.add(R.id.frame_container, SelectMethodFragment())
-        fragment.commit()
+        val showResult = arguments?.getBoolean("showResult")
+        val message = arguments?.getString("message")
+        if (showResult == true) {
+            val bundle: Bundle = Bundle()
+            println("message"+message)
+            if (message!=null) {
+                bundle.putString("message", message)
+            }
+            val resultPaymentFragment: ResultPaymentFragment =
+                ResultPaymentFragment()
+            resultPaymentFragment.arguments = bundle
+            val fragment = childFragmentManager?.beginTransaction()
+            fragment?.replace(
+                R.id.frame_container,
+                resultPaymentFragment
+            )
+            fragment.commit()
+
+
+        } else {
+            fragmentManager = childFragmentManager
+            val fragment = fragmentManager.beginTransaction()
+            fragment.add(R.id.frame_container, SelectMethodFragment())
+            fragment.commit()
+        }
         bottomSheetDialogFragment.behavior.isDraggable = false
+        dialog?.setCanceledOnTouchOutside(false)
+
+
     }
 
     override fun onCreateView(
@@ -64,16 +90,16 @@ internal class PaymePayment : BottomSheetDialogFragment() {
         println("CHNAG IOTPP" + typePayment.type)
         if (typePayment.type == TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS) {
             println("CHNAG IOTPP")
-            val confirmOtpFragment = ConfirmOtpNapasFragment()
+            this.dialog?.dismiss()
+
+
             val bundle: Bundle = Bundle()
             bundle.putString("html", typePayment.value)
-            val fragment = childFragmentManager?.beginTransaction()
-            confirmOtpFragment.arguments = bundle
-            fragment?.replace(
-                R.id.frame_container,
-                confirmOtpFragment
-            )
-            fragment?.commit()
+            val intent = Intent(PayME.context, WebViewNapasActivity::class.java)
+            intent.putExtras(bundle)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            PayME.context?.startActivity(intent)
+
 
         } else if (typePayment.type == TYPE_PAYMENT.CONFIRM_OTP_BANK) {
             println("CHNAG IOTPP")
@@ -127,8 +153,6 @@ internal class PaymePayment : BottomSheetDialogFragment() {
     }
 
     override fun onDestroy() {
-
-        PayME.onClose()
         EventBus.getDefault().unregister(this);
         super.onDestroy()
     }

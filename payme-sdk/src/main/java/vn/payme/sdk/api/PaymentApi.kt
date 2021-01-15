@@ -44,6 +44,38 @@ internal class PaymentApi {
         )
 
     }
+    fun getSettings(
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        val path = "/graphql"
+        val params: MutableMap<String, Any> = mutableMapOf()
+        val variables: MutableMap<String, Any> = mutableMapOf()
+        val query = "query Query {\n" +
+                "  Setting {\n" +
+                "    configs {\n" +
+                "      key\n" +
+                "      tags\n" +
+                "      value\n" +
+                "    }\n" +
+                "  }\n" +
+                "}"
+        params["query"] = query
+        params["variables"] = variables
+        val request = NetworkRequest(
+            PayME.context!!,
+            ENV_API.API_FE,
+            path,
+            PayME.accessToken!!,
+            params,
+            ENV_API.IS_SECURITY
+        )
+        request.setOnRequestCrypto(
+            onError = onError,
+            onSuccess = onSuccess,
+        )
+
+    }
     fun  detechCardHolder(
         swiftCode:String,
         cardNumber:String,

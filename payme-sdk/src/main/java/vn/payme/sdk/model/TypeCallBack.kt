@@ -4,6 +4,7 @@ enum  class TypeCallBack {
     onError,
     onSuccess,
     onClose,
+    onExpired,
     onReload,
     onScan,
 }

@@ -99,7 +99,7 @@
         app:cameraMode="picture"
         app:cameraAudio="off"
         app:cameraPictureSizeAspectRatio="1:1"
-        app:cameraRequestPermissions="true"
+        app:cameraRequestPermissions="false"
         />
 
 
@@ -265,5 +265,7 @@
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <include layout="@layout/error_camera_layout"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

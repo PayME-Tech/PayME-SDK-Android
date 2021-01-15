@@ -41,13 +41,63 @@ internal class  AccountApi {
         val params: MutableMap<String, Any> = mutableMapOf()
         val variables: MutableMap<String, Any> = mutableMapOf()
         val initInput: MutableMap<String, Any> = mutableMapOf()
-        val query = "mutation InitMutation(\$initInput: CheckInitInput) {\n" +
+        val query = "mutation Mutation(\$initInput: CheckInitInput) {\n" +
                 "  OpenEWallet {\n" +
                 "    Init(input: \$initInput) {\n" +
                 "      accessToken\n" +
+                "      appEnv\n" +
                 "      handShake\n" +
                 "      isExistInMainWallet\n" +
                 "      kyc {\n" +
+                "        details {\n" +
+                "          video {\n" +
+                "            state\n" +
+                "            video\n" +
+                "          }\n" +
+                "          accountId\n" +
+                "          address {\n" +
+                "            city {\n" +
+                "              identifyCode\n" +
+                "              path\n" +
+                "              title\n" +
+                "            }\n" +
+                "            district {\n" +
+                "              path\n" +
+                "              identifyCode\n" +
+                "              title\n" +
+                "            }\n" +
+                "            street\n" +
+                "            ward {\n" +
+                "              identifyCode\n" +
+                "              path\n" +
+                "              title\n" +
+                "            }\n" +
+                "          }\n" +
+                "          approvedTimeExpected\n" +
+                "          birthday\n" +
+                "          face {\n" +
+                "            face\n" +
+                "            state\n" +
+                "          }\n" +
+                "          fullname\n" +
+                "          gender\n" +
+                "          identifyNumber\n" +
+                "          identifyType\n" +
+                "          image {\n" +
+                "            back\n" +
+                "            front\n" +
+                "            state\n" +
+                "          }\n" +
+                "          issuedAt\n" +
+                "          placeOfIssue\n" +
+                "          reason\n" +
+                "          sentAt\n" +
+                "          state\n" +
+                "        }\n" +
+                "        identifyNumber\n" +
+                "        kycId\n" +
+                "        reason\n" +
+                "        sentAt\n" +
                 "        state\n" +
                 "      }\n" +
                 "      message\n" +

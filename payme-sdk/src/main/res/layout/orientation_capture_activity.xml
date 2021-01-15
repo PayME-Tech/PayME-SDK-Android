@@ -109,5 +109,7 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
     </LinearLayout>
+    <include layout="@layout/error_camera_layout"/>
+
 
 </RelativeLayout>

@@ -12,6 +12,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONException
 import org.json.JSONObject
+import vn.payme.sdk.model.ERROR_CODE
 import java.nio.charset.Charset
 import java.util.*
 
@@ -22,9 +23,9 @@ internal class NetworkRequest(
     private val path: String,
     private val token: String,
     private val params: MutableMap<String, Any>?,
-    private val isSecurity:Boolean,
+    private val isSecurity: Boolean,
 
-) {
+    ) {
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun setOnRequestCrypto(
         onSuccess: (response: JSONObject) -> Unit,
@@ -52,20 +53,19 @@ internal class NetworkRequest(
         val xAPIValidate = cryptoAES.getMD5(valueParams)
         var body: MutableMap<String, Any> = mutableMapOf()
 
-        if(isSecurity){
+        if (isSecurity) {
             body["x-api-message"] = xAPIMessage
-        }else{
+        } else {
             body = params
         }
 
         var pathAPi = ""
-        if(isSecurity){
+        if (isSecurity) {
             pathAPi = url
-        }else{
-            pathAPi = url+path
+        } else {
+            pathAPi = url + path
         }
-        println("pathAPi:"+pathAPi)
-
+        println("pathAPi:" + pathAPi)
 
 
         val queue = Volley.newRequestQueue(context)
@@ -75,8 +75,8 @@ internal class NetworkRequest(
             JSONObject(body as Map<*, *>),
             Response.Listener { response ->
                 try {
-                    var finalJSONObject : JSONObject? = null
-                    if(isSecurity){
+                    var finalJSONObject: JSONObject? = null
+                    if (isSecurity) {
                         val jsonObject = JSONObject(response.toString())
                         val xAPIMessageResponse = jsonObject.getString("x-api-message")
                         val headers = jsonObject.getJSONObject("headers")
@@ -94,42 +94,50 @@ internal class NetworkRequest(
                         }
                         validateString += decryptKey
                         val result = cryptoAES.decryptAES(decryptKey, xAPIMessageResponse)
-                        println("Response"+result)
-                        val json = result?.replace("\\\"","'");
-                        finalJSONObject = JSONObject(json?.substring(1,json?.length-1))
-                    }else{
-                        println("Response"+response.toString())
+                        println("Response" + result)
+                        val json = result?.replace("\\\"", "'");
+                        finalJSONObject = JSONObject(json?.substring(1, json?.length - 1))
+                    } else {
+                        println("Response" + response.toString())
 
 
                         finalJSONObject = JSONObject(response.toString())
                     }
-                    val data =  finalJSONObject?.optJSONObject("data")
-                    val errors =  finalJSONObject?.optJSONArray("errors")
+                    val data = finalJSONObject?.optJSONObject("data")
+                    val errors = finalJSONObject?.optJSONArray("errors")
 
-                    if(errors!=null){
+                    if (errors != null) {
                         val error = errors.getJSONObject(0)
-                        val message = error.getString("message")
-                        onError(data,-3,message)
-                    }else if(data!=null){
+                        var code = ERROR_CODE.SYSTEM
+
+                        val extensions = error.getJSONObject("extensions")
+                        if (extensions != null) {
+                            code = extensions.optInt("code")
+                            println("code1111111111"+code)
+
+                        }
+                        val message = error.optString("message")
+                        onError(data, code, message)
+                    } else if (data != null) {
                         onSuccess(data)
                     }
 
-                    println("data"+data)
-                    println("error"+errors)
 
 
                 } catch (error: Exception) {
+                    error.printStackTrace()
                     onError(
                         null,
-                        -2,
+                        ERROR_CODE.SYSTEM,
                         "Không thể kết nối tới server, vui lòng kiểm tra và thử lại. Xin cảm ơn !"
-                    )                }
+                    )
+                }
             },
             Response.ErrorListener { error ->
 
                 onError(
                     null,
-                    -2,
+                    ERROR_CODE.NETWORK,
                     "Kết nối mạng bị sự cố, vui lòng kiểm tra và thử lại. Xin cảm ơn !"
                 )
             }
@@ -139,7 +147,7 @@ internal class NetworkRequest(
                 headers["Authorization"] = token
                 headers["Accept"] = "application/json"
                 headers["Content-Type"] = "application/json"
-                if(isSecurity){
+                if (isSecurity) {
                     headers["x-api-client"] = "app"
                     headers["x-api-key"] = xAPIKey
                     headers["x-api-action"] = xAPIAction

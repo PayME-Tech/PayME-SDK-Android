@@ -2,9 +2,11 @@ package vn.payme.sdk.kyc
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -50,6 +52,12 @@ class TakePictureIdentifyFragment : Fragment() {
     private var typeIdentify = "CMND"
     private var buttonSelectImage: LinearLayout? = null
 
+    private var buttonBackHeaderErrorCamera: ImageView? = null
+    private var enableSetting = false
+    private var containerErrorCamera: ConstraintLayout? = null
+    private var buttonOpenSetting: Button? = null
+
+
     private inner class Listener : CameraListener() {
         override fun onPictureTaken(result: PictureResult) {
             super.onPictureTaken(result)
@@ -88,6 +96,18 @@ class TakePictureIdentifyFragment : Fragment() {
         buttonSelectTypeIdentify = view!!.findViewById(R.id.buttonSelectTypeIdentify)
         buttonSelectImage = view!!.findViewById(R.id.buttonSelectImage)
 
+        containerErrorCamera = view!!.findViewById(R.id.containerErrorCamera)
+        buttonOpenSetting = view!!.findViewById(R.id.buttonOpenSetting)
+        buttonBackHeaderErrorCamera = view!!.findViewById(R.id.buttonBackHeaderErrorCamera)
+        PermisionCamera().requestCamera(requireContext(),requireActivity())
+        buttonOpenSetting!!.setOnClickListener {
+            if (enableSetting) {
+                PermisionCamera().openSetting(requireActivity())
+            } else {
+                PermisionCamera().requestCamera(requireContext(), requireActivity())
+            }
+        }
+
 
         buttonSelectImage?.setOnClickListener {
             CropImage.activity()
@@ -110,32 +130,19 @@ class TakePictureIdentifyFragment : Fragment() {
         buttonNext!!.setOnClickListener {
             if (imageFront != null) {
                 imageBackSide = saveImage
-                val bundle: Bundle = Bundle()
-                bundle.putByteArray("imageFront", imageFront)
-                bundle.putByteArray("imageBackSide", imageBackSide)
+                CameraKycActivity.imageBackSide = imageBackSide
+                CameraKycActivity.imageFront = imageFront
                 if (PayME.kycFace) {
                     val popupTakeFace = PopupTakeFace()
-                    popupTakeFace.arguments = bundle
-                    popupTakeFace.show(parentFragmentManager,"ModalBottomSheet")
+                    popupTakeFace.show(parentFragmentManager, "ModalBottomSheet")
 
-//                    val newFragment = TakePictureAvataFragment()
-//                    newFragment.arguments = bundle
-//                    val fragment = activity?.supportFragmentManager?.beginTransaction()
-//                    fragment?.replace(R.id.content_kyc, newFragment)
-//                    fragment?.commit()
                 } else if (PayME.kycVideo) {
 
                     val popupTakeVideo = PopupTakeVideo()
-                    popupTakeVideo.arguments = bundle
-                    popupTakeVideo.show(parentFragmentManager,"ModalBottomSheet")
-//                    val newFragment = TakeVideoKycFragment()
-//                    newFragment.arguments = bundle
-//                    val fragment = activity?.supportFragmentManager?.beginTransaction()
-//                    fragment?.replace(R.id.content_kyc, newFragment)
-//                    fragment?.commit()
+                    popupTakeVideo.show(parentFragmentManager, "ModalBottomSheet")
+
                 } else {
                     val newFragment = UploadKycFragment()
-                    newFragment.arguments = bundle
                     val fragment = activity?.supportFragmentManager?.beginTransaction()
                     fragment?.add(R.id.content_kyc, newFragment)
                     fragment?.addToBackStack(null)
@@ -170,6 +177,33 @@ class TakePictureIdentifyFragment : Fragment() {
         textTypeIdentify?.text = myEven.title
         typeIdentify = myEven.type
     }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>,
+        grantResults: IntArray
+    ) {
+        val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+        if (valid && !cameraKitView!!.isOpened) {
+            cameraKitView!!.open()
+            containerErrorCamera?.visibility = View.GONE
+        } else {
+            if (Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(
+                    permissions[0]!!
+                )
+            ) {
+                enableSetting = true
+                containerErrorCamera?.visibility = View.VISIBLE
+            } else {
+                containerErrorCamera?.visibility = View.VISIBLE
+            }
+        }
+    }
+
+//    override fun onResume() {
+//        super.onResume()
+//        PermisionCamera().requestCamera(requireContext(), requireActivity())
+//    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         println("data" + data.toString())

@@ -37,7 +37,7 @@ internal class PopupTakeVideo : BottomSheetDialogFragment() {
         buttonNext = view!!.findViewById(R.id.buttonNext)
         buttonNext.setOnClickListener {
             val openKycActivity = arguments?.getBoolean("openKycActivity")
-            if (openKycActivity!!) {
+            if (openKycActivity==true) {
                 val intent = Intent(PayME.context, CameraKycActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 PayME.context?.startActivity(intent)

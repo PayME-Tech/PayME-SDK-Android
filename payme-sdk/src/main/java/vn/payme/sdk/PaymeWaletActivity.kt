@@ -8,11 +8,9 @@ import android.graphics.Color
 import android.hardware.camera2.CameraManager
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.webkit.*
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.airbnb.lottie.LottieAnimationView
 import com.google.zxing.client.android.Intents
@@ -71,6 +69,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         if (resourceId > 0) {
             statusBarHeight = resources.getDimensionPixelSize(resourceId)
         }
+
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         getWindow().setBackgroundDrawable(PayME.colorApp.backgroundColor);
 
@@ -126,6 +125,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                       handShake: '${PayME.handShake}',
                       clientId: '${PayME.clientId}',
                       amount:${PayME.amount},
+                      dataInit:${PayME.dataInit?.toString()},
                       configColor: ['${PayME.configColor?.get(0)}', '${PayME.configColor?.get(1)}'],
                       partner : {
                         type:'ANDROID'
@@ -165,8 +165,8 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                 val message = Detect.optString("message")
                 val note = Detect.optString("note")
                 val amount = Detect.optInt("amount")
-                val orderId = Detect.optInt("orderId")
-                val storeId = Detect.optInt("storeId")
+                val orderId = Detect.optLong("orderId")
+                val storeId = Detect.optLong("storeId")
                 val succeeded = Detect.optBoolean("succeeded")
                 val type = Detect.optString("type")
 
@@ -174,20 +174,13 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                     lottie?.visibility = View.GONE
                     var popup: PayMEQRCodePopup = PayMEQRCodePopup()
                     popup.show(this.supportFragmentManager, "ModalBottomSheet")
+                }else{
+                    val infoPayment = InfoPayment(action, amount, note, orderId, storeId, type)
+
+                    PayME.pay(this.supportFragmentManager, infoPayment,null, null
+                    )
                 }
-                val infoPayment = InfoPayment(action, amount, note, orderId, storeId, type)
 
-                PayME.pay(this.supportFragmentManager, infoPayment,
-                    onSuccess = {
-
-                    }, onError = {
-
-
-                    },
-                    onClose = {
-
-                    }
-                )
 
 
             },
@@ -219,6 +212,9 @@ internal class PaymeWaletActivity : AppCompatActivity() {
     fun onText(myEven: MyEven) {
         if (myEven.type === TypeCallBack.onReload) {
             this.myWebView.reload()
+        }
+        if (myEven.type === TypeCallBack.onExpired) {
+            finish()
         }
         if (myEven.type === TypeCallBack.onScan) {
             myEven.value?.let { checkScanQr(it) }

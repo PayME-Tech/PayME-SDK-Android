@@ -16,6 +16,7 @@ import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.PinView
 import vn.payme.sdk.enum.TYPE_PAYMENT
+import vn.payme.sdk.model.ERROR_CODE
 import vn.payme.sdk.model.Method
 import java.security.MessageDigest
 import java.util.*
@@ -47,8 +48,9 @@ class ConfirmPassFragment : Fragment() {
             .mutate()
             .setColorFilter(Color.parseColor(PayME.colorApp.startColor), PorterDuff.Mode.SRC_ATOP)
         pinView.setAnimationEnable(true)
-        pinView.requestFocus()
         pinView.isPasswordHidden = true
+        pinView.requestFocus()
+
 
         pinView.addTextChangedListener { text ->
             if (text?.length!! >= 6) {
@@ -140,7 +142,13 @@ class ConfirmPassFragment : Fragment() {
                         },
                         onError = { jsonObject, code, message ->
                             loading.visibility = View.GONE
-                            PayME.showError(message)
+                            if (code == ERROR_CODE.EXPIRED) {
+                                PayME.onExpired()
+                                PayME.onError(jsonObject, code, message)
+
+                            } else {
+                                PayME.showError(message)
+                            }
 
                         }
 

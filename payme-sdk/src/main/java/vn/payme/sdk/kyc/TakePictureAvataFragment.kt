@@ -1,32 +1,23 @@
 package vn.payme.sdk.kyc
 
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
+
 import androidx.fragment.app.Fragment
 import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.CameraView
 import com.otaliastudios.cameraview.PictureResult
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
-import vn.payme.sdk.api.UploadKycApi
 import vn.payme.sdk.component.Button
-import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.model.TypeCallBack
-import vn.payme.sdk.payment.PopupTakeFace
-import vn.payme.sdk.payment.PopupTakeIdentify
 import vn.payme.sdk.payment.PopupTakeVideo
 
 
@@ -41,6 +32,14 @@ class TakePictureAvataFragment : Fragment() {
     private var buttonNext: Button? = null
     private var saveImage: ByteArray? = null
     private var cardViewCamera: CardView? = null
+
+    private var buttonBackHeaderErrorCamera: ImageView? = null
+    private var enableSetting = false
+    private var containerErrorCamera: ConstraintLayout? = null
+    private var buttonOpenSetting: Button? = null
+
+
+
 
     private inner class Listener : CameraListener() {
 
@@ -61,6 +60,8 @@ class TakePictureAvataFragment : Fragment() {
         }
     }
 
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -75,13 +76,32 @@ class TakePictureAvataFragment : Fragment() {
         buttonBack = view!!.findViewById(R.id.buttonBack)
         buttonNext = view!!.findViewById(R.id.buttonNext)
         buttonBackHeader = view!!.findViewById(R.id.buttonBackHeader)
+
         buttonBackHeader2 = view!!.findViewById(R.id.buttonBackHeader2)
         cardViewCamera = view!!.findViewById(R.id.cardViewCamera)
+
+        //ErrorCamera
+        containerErrorCamera = view!!.findViewById(R.id.containerErrorCamera)
+        buttonOpenSetting = view!!.findViewById(R.id.buttonOpenSetting)
+        buttonBackHeaderErrorCamera = view!!.findViewById(R.id.buttonBackHeaderErrorCamera)
+
+        PermisionCamera().requestCamera(requireContext(),requireActivity())
+
+        buttonOpenSetting!!.setOnClickListener {
+            if (enableSetting) {
+                PermisionCamera().openSetting(requireActivity())
+            } else {
+                PermisionCamera().requestCamera(requireContext(),requireActivity())
+            }
+        }
 
         buttonBackHeader2!!.setOnClickListener {
             layoutConfirm!!.visibility = View.GONE
         }
         buttonBackHeader!!.setOnClickListener {
+            activity?.finish()
+        }
+        buttonBackHeaderErrorCamera!!.setOnClickListener {
             activity?.finish()
         }
         buttonBack!!.setOnClickListener {
@@ -92,28 +112,18 @@ class TakePictureAvataFragment : Fragment() {
         cameraKitView!!.addCameraListener(Listener())
 
 
-
 //        cardCornerRadius
 
         buttonNext!!.setOnClickListener {
-            val imageFront = arguments?.getByteArray("imageFront")
-            val imageBackSide = arguments?.getByteArray("imageBackSide")
-            val bundle: Bundle = Bundle()
-            bundle.putByteArray("imageFront", imageFront)
-            bundle.putByteArray("imageBackSide", imageBackSide)
-            bundle.putByteArray("imageFace", saveImage)
+
+
+            CameraKycActivity.imageFace = saveImage
             if (PayME.kycVideo) {
                 val popupTakeVideo = PopupTakeVideo()
-                popupTakeVideo.arguments = bundle
                 popupTakeVideo.show(parentFragmentManager, "ModalBottomSheet")
-//                val takePictureAvataFragment = TakeVideoKycFragment()
-//                takePictureAvataFragment.arguments = bundle
-//                val fragment = activity?.supportFragmentManager?.beginTransaction()
-//                fragment?.replace(R.id.content_kyc, takePictureAvataFragment)
-//                fragment?.commit()
+
             } else {
                 val newFragment = UploadKycFragment()
-                newFragment.arguments = bundle
                 val fragment = activity?.supportFragmentManager?.beginTransaction()
                 fragment?.addToBackStack(null)
                 fragment?.add(R.id.content_kyc, newFragment)
@@ -136,12 +146,26 @@ class TakePictureAvataFragment : Fragment() {
         permissions: Array<String?>,
         grantResults: IntArray
     ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
         if (valid && !cameraKitView!!.isOpened) {
             cameraKitView!!.open()
+            containerErrorCamera?.visibility = View.GONE
+        } else {
+            if (Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(
+                    permissions[0]!!
+                )
+            ) {
+                enableSetting = true
+                containerErrorCamera?.visibility = View.VISIBLE
+            } else {
+                containerErrorCamera?.visibility = View.VISIBLE
+            }
         }
     }
+//    override fun onResume() {
+//        super.onResume()
+//        PermisionCamera().requestCamera(requireContext(),requireActivity())
+//    }
 
 
 }

@@ -53,32 +53,58 @@
 
         />
 
-    <vn.payme.sdk.component.PinView
-        android:id="@+id/otp_view"
-        style="@style/PinWidget.PinView"
-        android:layout_marginTop="32dp"
-        android:padding="10dp"
-        android:background="@drawable/background_radius_with_boder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:cursorVisible="false"
-        android:inputType="numberPassword"
-        app:itemCount="6"
-        android:layout_marginHorizontal="16dp"
-        android:textColor="@color/blackSeven"
-        android:textSize="20dp"
-        app:lineWidth="1dp"
-        android:fontFamily="@font/semi_bold"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_note_otp"
-        app:itemHeight="30dp"
-        app:itemRadius="4dp"
-        app:itemSpacing="8dp"
-        app:itemWidth="30dp"
-        app:lineColor="@color/line_color_pass"
+        <vn.payme.sdk.component.PinView
+            android:id="@+id/otp_view"
+            app:layout_constraintTop_toBottomOf="@id/text_note_otp"
+            style="@style/PinWidget.PinView"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:cursorVisible="false"
+            android:paddingHorizontal="40dp"
+            android:background="@drawable/background_radius_with_boder_green"
+            android:fontFamily="@font/semi_bold"
+            android:inputType="numberPassword"
+            android:textColor="@color/blackSeven"
+            android:textSize="14sp"
+            android:layout_marginTop="32dp"
+            app:itemSpacing="0dp"
+            app:itemWidth="35dp"
+            android:itemBackground="@color/white"
+            app:cursorWidth="1dp"
+            app:cursorColor="@color/brownishGrey"
+            app:itemCount="6"
+            app:itemRadius="16dp"
+            app:lineColor="@android:color/transparent" />
 
-        />
+
+<!--    <vn.payme.sdk.component.PinView-->
+<!--        android:id="@+id/otp_view"-->
+<!--        style="@style/PinWidget.PinView"-->
+<!--        android:layout_marginTop="32dp"-->
+<!--        android:padding="10dp"-->
+<!--        android:background="@drawable/background_radius_with_boder"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:cursorVisible="false"-->
+<!--        android:inputType="numberPassword"-->
+<!--        app:itemCount="6"-->
+<!--        android:layout_marginHorizontal="16dp"-->
+<!--        android:textColor="@color/blackSeven"-->
+<!--        android:textSize="20dp"-->
+<!--        app:lineWidth="1dp"-->
+<!--        android:fontFamily="@font/semi_bold"-->
+<!--        app:layout_constraintLeft_toLeftOf="parent"-->
+<!--        app:layout_constraintRight_toRightOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/text_note_otp"-->
+<!--        app:itemHeight="30dp"-->
+<!--        app:itemRadius="4dp"-->
+<!--        app:itemSpacing="8dp"-->
+<!--        app:itemWidth="30dp"-->
+<!--        app:lineColor="@color/line_color_pass"-->
+
+<!--        />-->
     <ProgressBar
         android:layout_width="wrap_content"
         android:id="@+id/loading"

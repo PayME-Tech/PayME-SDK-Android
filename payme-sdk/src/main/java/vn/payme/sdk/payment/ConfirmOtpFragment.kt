@@ -13,6 +13,7 @@ import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.Button
+import vn.payme.sdk.model.ERROR_CODE
 
 class ConfirmOtpFragment : Fragment() {
     private lateinit var buttonSubmit: Button
@@ -118,28 +119,12 @@ class ConfirmOtpFragment : Fragment() {
             },
             onError = { jsonObject, code, message ->
                 buttonSubmit.disableLoading()
-//                        if (code == 1008) {
-//                            pinView.setText("")
-//                            val toast: Toast =
-//                                Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
-//                            toast.view?.setBackgroundColor(
-//                                ContextCompat.getColor(
-//                                    PayME.context,
-//                                    R.color.scarlet
-//                                )
-//                            )
-//                            toast.show()
-//                        } else {
-//                            buttonSubmit.disableLoading()
-//                            val bundle: Bundle = Bundle()
-//                            bundle.putString("message", message)
-//                            val resultPaymentFragment: ResultPaymentFragment =
-//                                ResultPaymentFragment()
-//                            resultPaymentFragment.arguments = bundle
-//                            val fragment = fragmentManager?.beginTransaction()
-//                            fragment?.replace(R.id.frame_container, resultPaymentFragment)
-//                            fragment?.commit()
-//                        }
+                if (code == ERROR_CODE.EXPIRED) {
+                    PayME.onExpired()
+                    PayME.onError(jsonObject, code, message)
+                } else {
+                    PayME.showError(message)
+                }
 
 
             })

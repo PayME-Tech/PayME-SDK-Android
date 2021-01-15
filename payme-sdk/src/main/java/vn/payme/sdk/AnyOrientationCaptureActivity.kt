@@ -3,15 +3,19 @@ package vn.payme.sdk
 import android.app.Activity
 import android.app.Instrumentation
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.KeyEvent
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.zxing.BinaryBitmap
 import com.google.zxing.MultiFormatReader
 import com.google.zxing.NotFoundException
@@ -20,7 +24,9 @@ import com.google.zxing.common.HybridBinarizer
 import com.journeyapps.barcodescanner.CaptureManager
 import kotlinx.android.synthetic.main.orientation_capture_activity.*
 import org.greenrobot.eventbus.EventBus
+import vn.payme.sdk.component.Button
 import vn.payme.sdk.evenbus.MyEven
+import vn.payme.sdk.kyc.PermisionCamera
 import vn.payme.sdk.model.TypeCallBack
 
 
@@ -33,6 +39,11 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
     private var buttonBack: ImageView? = null
     private var popup: PayMEQRCodePopup = PayMEQRCodePopup()
 
+    private var buttonBackHeaderErrorCamera: ImageView? = null
+    private var enableSetting = false
+    private var containerErrorCamera: ConstraintLayout? = null
+    private var buttonOpenSetting: Button? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.orientation_capture_activity)
@@ -42,6 +53,8 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
         eventPress()
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         getWindow().setBackgroundDrawable(PayME.colorApp.backgroundColor);
+        PermisionCamera().requestCamera(this, this)
+
 
 //        popup.show(this.supportFragmentManager, "ModalBottomSheet")
     }
@@ -78,6 +91,17 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
         btnPicker = findViewById(R.id.button_picker)
         btnTorch = findViewById(R.id.button_torch)
         buttonBack = findViewById(R.id.button_back)
+        containerErrorCamera = findViewById(R.id.containerErrorCamera)
+        buttonOpenSetting = findViewById(R.id.buttonOpenSetting)
+        buttonBackHeaderErrorCamera = findViewById(R.id.buttonBackHeaderErrorCamera)
+
+        buttonOpenSetting!!.setOnClickListener {
+            if (enableSetting) {
+                PermisionCamera().openSetting(this)
+            } else {
+                PermisionCamera().requestCamera(this, this)
+            }
+        }
     }
 
     private fun initScanner(savedInstanceState: Bundle?) {
@@ -89,10 +113,9 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
     }
 
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        println("requestCode"+requestCode)
+        println("requestCode" + requestCode)
         if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
             val selectedImage: Uri? = data.data
             val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, selectedImage)
@@ -120,10 +143,6 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        capture.onResume()
-    }
 
     override fun onPause() {
         super.onPause()
@@ -142,11 +161,36 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
-        permissions: Array<out String>,
+        permissions: Array<String?>,
         grantResults: IntArray
     ) {
         capture.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+        if (valid) {
+            containerErrorCamera?.visibility = View.GONE
+            capture.onResume()
+        } else {
+            if (Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(
+                    permissions[0]!!
+                )
+            ) {
+                enableSetting = true
+                containerErrorCamera?.visibility = View.VISIBLE
+            } else {
+                containerErrorCamera?.visibility = View.VISIBLE
+            }
+        }
     }
+
+    override fun onResume() {
+        super.onResume()
+        if(PermisionCamera().isGrantedCamera(this)){
+            capture.onResume()
+        }
+    }
+
+
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         return bcScanner.onKeyDown(keyCode, event) || super.onKeyDown(keyCode, event)

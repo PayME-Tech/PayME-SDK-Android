@@ -45,14 +45,15 @@ class MainActivity : AppCompatActivity() {
     lateinit var moneyPay: EditText
     lateinit var moneyWithdraw: EditText
     lateinit var buttonChangeEnv: Button
-     var env= Env.DEV
+    var env = Env.DEV
     val AppToken: String =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MX0.wNtHVZ-olKe7OAkgLigkTSsLVQKv_YL9fHKzX9mn9II"
     val PublicKey: String = "-----BEGIN PUBLIC KEY-----\n" +
             "   MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKi\n" +
             "   wIhTJpAi1XnbfOSrW/Ebw6h1485GOAvuG/OwB+ScsfPJBoNJeNFU6J0CAwEAAQ==\n" +
             "   -----END PUBLIC KEY-----"
-    var ConnectToken: String ="Wg6/5DKn0Cz2POaTJaSDVAKxnUwh0ufV7l8VIkrOhqJ91EMkC+LzA155acuiKGe2xo+0+iA7gS9POxYsvTIoc/gBHjypVn5Jauy5QpDsep0="
+    var ConnectToken: String =
+        "Wg6/5DKn0Cz2POaTJaSDVAKxnUwh0ufV7l8VIkrOhqJ91EMkC+LzA155acuiKGe2xo+0+iA7gS9POxYsvTIoc/gBHjypVn5Jauy5QpDsep0="
 //    var ConnectToken: String =""
 //    var ConnectToken: String =
 //        "8T/jAlhqHz14QDV0kx2M/Rf+9hY55ojZwUJA2fQVoPY9kIQLWtcajE11A7bh5FMbXGH9UM+pOd0IEW8l/hMWL0eI2/FKTN67i7arcr89fHU="
@@ -77,6 +78,7 @@ class MainActivity : AppCompatActivity() {
         val hash = digest.digest(byteArray)
         return hash.fold("", { str, it -> str + "%02x".format(it) })
     }
+
     fun updateWalletInfo() {
 
         payme.getWalletInfo(onSuccess = { jsonObject ->
@@ -115,11 +117,11 @@ class MainActivity : AppCompatActivity() {
         buttonChangeEnv = findViewById(R.id.buttonChangeENV)
         var configColor = arrayOf<String>("#75255b", "#9d455f")
         buttonChangeEnv.setOnClickListener {
-            if(env == Env.DEV){
-                env= Env.SANDBOX
+            if (env == Env.DEV) {
+                env = Env.SANDBOX
                 buttonChangeEnv.text = Env.SANDBOX.toString()
-            }else{
-                env= Env.DEV
+            } else {
+                env = Env.DEV
                 buttonChangeEnv.text = Env.DEV.toString()
 
             }
@@ -173,6 +175,13 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
+        val pref = context.getSharedPreferences("SAVE_APP", Context.MODE_PRIVATE)
+        val userId = pref.getString("userId","1001")
+        val phoneNumber = pref.getString("phoneNumber","0929000200")
+        inputUserId.setText(userId)
+        inputPhoneNumber.setText(phoneNumber)
+
+
         buttonSubmit.setOnClickListener {
             val tz = TimeZone.getTimeZone("UTC")
             val df: DateFormat =
@@ -198,6 +207,8 @@ class MainActivity : AppCompatActivity() {
                 )
             this.payme.initAccount(onSuccess = { jsonObject ->
                 loading.visibility = View.GONE
+                pref.edit().putString("userId", inputUserId.text.toString()).commit()
+                pref.edit().putString("phoneNumber", inputPhoneNumber.text.toString()).commit()
 
                 Toast.makeText(
                     context,
@@ -207,12 +218,8 @@ class MainActivity : AppCompatActivity() {
             },
                 onError = { jsonObject, code, message ->
                     loading.visibility = View.GONE
+                    PayME.showError(message)
 
-                    Toast.makeText(
-                        context,
-                        message,
-                        Toast.LENGTH_LONG
-                    ).show()
                 })
         }
         button.setOnClickListener {
@@ -222,8 +229,8 @@ class MainActivity : AppCompatActivity() {
                     onSuccess = { json: JSONObject ->
                         println("onSuccess2222" + json.toString())
                     },
-                    onError = { message: String ->
-                        println("onError" + message)
+                    onError = {jsonObject, code, message ->
+                        PayME.showError(message)
                     })
             }
 
@@ -237,8 +244,8 @@ class MainActivity : AppCompatActivity() {
                     onSuccess = { json: JSONObject ->
                         println("onSuccess2222" + json.toString())
                     },
-                    onError = { message: String ->
-                        println("onError" + message)
+                    onError = { jsonObject, code, message ->
+                        PayME.showError(message)
                     })
             }
 
@@ -250,25 +257,25 @@ class MainActivity : AppCompatActivity() {
                     onSuccess = { json: JSONObject ->
                         println("onSuccess2222" + json.toString())
                     },
-                    onError = { message: String ->
-                        println("onError" + message)
+                    onError = {jsonObject, code, message ->
+                        PayME.showError(message)
                     })
             }
         }
         buttonPay.setOnClickListener {
             if (ConnectToken.length > 0) {
                 val amount = convertInt(moneyPay.text.toString())
-                val infoPayment = InfoPayment("PAY", 200000, "Thành công.", 4323, 1, "OpenEWallet")
+
+                val infoPayment = InfoPayment("PAY", amount, "Thành công.", 4323, 1, "OpenEWallet")
                 payme.pay(this.supportFragmentManager, infoPayment,
                     onSuccess = { json: JSONObject ->
                         println("onSuccess2222" + json.toString())
                     },
-                    onError = { message: String ->
+                    onError = { jsonObject, code, message ->
+                        PayME.showError(message)
                         println("onError" + message)
-                    },
-                    onClose = {
-                        println("CLOSE")
                     }
+
                 )
 
             }

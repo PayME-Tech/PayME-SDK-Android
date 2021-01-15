@@ -36,11 +36,18 @@ public class JsObject(
     }
 
     @JavascriptInterface
-    public fun onRegisterSuccess(accessToken: String, handShake: String) {
+    public fun onRegisterSuccess(dataInitString: String) {
         try {
-            println("accessToken"+accessToken)
-            println("handShake"+handShake)
-            PayME.accessToken = accessToken
+            val dataInt = JSONObject(dataInitString)
+            val Init = dataInt.getJSONObject("Init")
+            PayME.dataInit = Init
+            val accessToken = Init.optString("accessToken")
+            val handShake = Init.optString("handShake")
+            if (!accessToken.equals("null")) {
+                PayME.accessToken = accessToken
+            } else {
+                PayME.accessToken = ""
+            }
             PayME.handShake = handShake
 
         } catch (e: Exception) {
@@ -60,11 +67,16 @@ public class JsObject(
     }
 
     @JavascriptInterface
-    public fun onError(jsonObject: JSONObject) {
+    public fun onError(data: String?) {
         try {
+            val jsonObject = JSONObject(data)
+            val code = jsonObject.optInt("code")
+            val data = jsonObject.optJSONObject("data")
+            val message = jsonObject.optString("message")
+            val type = jsonObject.optString("type")
             println("jsonObject"+jsonObject)
             back()
-//            PayME.onError(string)
+            PayME.onError(data,code,message)
         } catch (e: Exception) {
             println(e)
 

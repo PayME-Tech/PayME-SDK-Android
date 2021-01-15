@@ -23,22 +23,16 @@ class UploadKycFragment : Fragment() {
     private var loadingUploadKycApi = false
     suspend fun uploadKYC() {
         val uploadKycApi = UploadKycApi()
-        val imageFront = arguments?.getByteArray("imageFront")
-        val imageBackSide = arguments?.getByteArray("imageBackSide")
-        val imageFace = arguments?.getByteArray("imageFace")
-        val video = arguments?.getByteArray("video")
-        uploadKycApi.upLoadKYC(imageFront, imageBackSide, imageFace, video,
+        uploadKycApi.upLoadKYC(CameraKycActivity.imageFront, CameraKycActivity.imageBackSide, CameraKycActivity.imageFace, CameraKycActivity.video,
             onSuccess = {
                 loadingUploadKycApi = false
                 activity?.finish()
                 var even: EventBus = EventBus.getDefault()
                 var myEven: MyEven = MyEven(TypeCallBack.onReload, "")
                 even.post(myEven)
-
             },
             onError = { jsonObject, code, message ->
                 loadingUploadKycApi = false
-
                 parentFragmentManager.popBackStack()
                 val toast: Toast =
                     Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)

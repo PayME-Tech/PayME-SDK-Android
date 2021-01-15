@@ -64,7 +64,7 @@
         android:layout_marginTop="8dp"
         android:background="@drawable/background_input"
         android:hint="required"
-        android:text="10001"
+        android:text="291995"
         android:padding="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/titleUser" />
@@ -85,7 +85,7 @@
         android:background="@drawable/background_input"
         android:hint="optional"
         android:padding="8dp"
-        android:text="0929000200"
+        android:text="0901770095"
         android:inputType="number"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/titleUser" />

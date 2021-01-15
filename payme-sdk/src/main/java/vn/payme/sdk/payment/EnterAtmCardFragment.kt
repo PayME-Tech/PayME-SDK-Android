@@ -21,6 +21,7 @@ import vn.payme.sdk.component.Button
 import vn.payme.sdk.enum.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.ChangeTypePayment
 import vn.payme.sdk.model.BankInfo
+import vn.payme.sdk.model.ERROR_CODE
 import java.util.*
 
 
@@ -65,8 +66,13 @@ class EnterAtmCardFragment : Fragment() {
 
 
             },
-            onError = { jsonObject, i, message ->
-                PayME.showError(message)
+            onError = { jsonObject, code, message ->
+                if (code == ERROR_CODE.EXPIRED) {
+                    PayME.onExpired()
+                    PayME.onError(jsonObject, code, message)
+                } else {
+                    PayME.showError(message)
+                }
 
             }
         )
@@ -292,10 +298,15 @@ class EnterAtmCardFragment : Fragment() {
                         buttonSubmit.disableLoading()
 
                     },
-                    onError = { jsonObject, i, s ->
+                    onError = {jsonObject, code, message ->
                         buttonSubmit.disableLoading()
-                        PayME.showError(s)
 
+                        if (code == ERROR_CODE.EXPIRED) {
+                            PayME.onExpired()
+                            PayME.onError(jsonObject, code, message)
+                        } else {
+                            PayME.showError(message)
+                        }
                     }
 
                 )
@@ -327,8 +338,12 @@ class EnterAtmCardFragment : Fragment() {
 
         },
             onError = { jsonObject, code, message ->
-                PayME.showError(message)
-
+                if (code == ERROR_CODE.EXPIRED) {
+                    PayME.onExpired()
+                    PayME.onError(jsonObject, code, message)
+                } else {
+                    PayME.showError(message)
+                }
             }
         )
         return view

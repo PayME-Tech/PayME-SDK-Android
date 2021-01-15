@@ -1,5 +1,6 @@
 package vn.payme.sdk.payment
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
@@ -12,15 +13,18 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import okhttp3.internal.http2.ErrorCode
 
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
+import vn.payme.sdk.PaymeWaletActivity
 import vn.payme.sdk.R
 import vn.payme.sdk.adapter.MethodAdapter
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.enum.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.ChangeTypePayment
 import vn.payme.sdk.model.DataMethod
+import vn.payme.sdk.model.ERROR_CODE
 import vn.payme.sdk.model.Method
 import java.text.DecimalFormat
 
@@ -49,10 +53,15 @@ class ListMethodPaymentFragment : Fragment() {
             getListMethod()
 
         }, onError = { jsonObject, code, message ->
-            disableLoading()
+            if (code == ERROR_CODE.EXPIRED) {
+                PayME.onExpired()
+                PayME.onError(jsonObject, code, message)
 
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-            println("onError=" + message)
+            } else {
+                disableLoading()
+                loading = false
+                PayME.showError(message)
+            }
         })
     }
 
@@ -73,8 +82,12 @@ class ListMethodPaymentFragment : Fragment() {
                 val succeeded = Pay.optBoolean("succeeded")
                 val payment = Pay.optJSONObject("payment")
                 val message = Pay.optString("message")
+                val history = Pay.optJSONObject("history")
                 if (succeeded) {
-                    println("THANH CONG")
+
+                    val payment = history.optJSONObject("payment")
+                    val transaction = payment.optString("transaction")
+                    PayME.transaction = transaction
 
                     even.post(myEven)
                 } else {
@@ -100,7 +113,6 @@ class ListMethodPaymentFragment : Fragment() {
                             even.post(myEven)
                         }
                     } else {
-                        println("THAT BAI ")
                         myEven.value = message
                         even.post(myEven)
                     }
@@ -109,10 +121,17 @@ class ListMethodPaymentFragment : Fragment() {
                 loading = false
 
             },
-            onError = { jsonObject, i, s ->
-                disableLoading()
-                loading = false
-                PayME.showError(s)
+            onError = { jsonObject, code, s ->
+                if (code == ERROR_CODE.EXPIRED) {
+                    PayME.onExpired()
+                    PayME.onError(jsonObject, code, s)
+
+                } else {
+                    disableLoading()
+                    loading = false
+                    PayME.showError(s)
+                }
+
 
             }
         )
@@ -169,32 +188,22 @@ class ListMethodPaymentFragment : Fragment() {
                 setListViewHeightBasedOnChildren(listView)
 
             } else {
-                val toast: Toast =
-                    Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
-                toast.view?.setBackgroundColor(
-                    ContextCompat.getColor(
-                        PayME.context,
-                        R.color.scarlet
-                    )
-                )
-                toast.show()
+                PayME.showError(message)
             }
 
         },
             onError = { jsonObject, code, message ->
-                println("onError" + jsonObject)
                 disableLoading()
 
+                if (code == ERROR_CODE.EXPIRED) {
+                    PayME.onExpired()
+                    PayME.onError(jsonObject, code, message)
 
-                val toast: Toast =
-                    Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
-                toast.view?.setBackgroundColor(
-                    ContextCompat.getColor(
-                        PayME.context,
-                        R.color.scarlet
-                    )
-                )
-                toast.show()
+                } else {
+                    PayME.showError(message)
+                }
+
+
             }
         )
     }
@@ -248,8 +257,8 @@ class ListMethodPaymentFragment : Fragment() {
         this.listView.adapter = methodAdapter
         getBalance()
 
-        PayME.numberAtmCard= ""
-        PayME.transaction= ""
+        PayME.numberAtmCard = ""
+        PayME.transaction = ""
 
 
         this.listView.setOnItemClickListener { adapterView, view, i, l ->

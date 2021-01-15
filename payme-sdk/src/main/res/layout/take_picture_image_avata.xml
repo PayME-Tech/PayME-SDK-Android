@@ -63,7 +63,7 @@
         app:cameraMode="picture"
         app:cameraAudio="off"
         app:cameraPictureSizeAspectRatio="1:1"
-        app:cameraRequestPermissions="true"
+        app:cameraRequestPermissions="false"
          />
 </androidx.cardview.widget.CardView>
 
@@ -77,16 +77,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
-
-<!--    <RelativeLayout-->
-<!--        android:id="@+id/rel_layout"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent">-->
-
-<!--        &lt;!&ndash;-Customize your views and button&ndash;&gt;-->
-
-<!--    </RelativeLayout>-->
-
     <TextView
         android:id="@+id/iuhiu"
         android:layout_width="match_parent"
@@ -198,7 +188,10 @@
         </LinearLayout>
 
 
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <include layout="@layout/error_camera_layout"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

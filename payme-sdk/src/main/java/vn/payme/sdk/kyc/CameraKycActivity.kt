@@ -11,6 +11,12 @@ import vn.payme.sdk.R
 import vn.payme.sdk.enum.KEY_KYC
 
 class CameraKycActivity : AppCompatActivity(R.layout.camera_kyc_activity) {
+    companion object{
+        var video :ByteArray? = null
+        var imageFace :ByteArray? = null
+        var imageFront :ByteArray? = null
+        var imageBackSide :ByteArray? = null
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getWindow().setStatusBarColor(Color.TRANSPARENT);
