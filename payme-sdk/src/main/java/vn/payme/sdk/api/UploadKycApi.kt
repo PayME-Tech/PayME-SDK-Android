@@ -42,19 +42,9 @@ class UploadKycApi {
             var urlImageBack: String? = null
             var urlImageFace: String? = null
             var urlVideo: String? = null
-            println("imageFront"+imageFront)
-            println("imageBackSide"+imageBackSide)
-            println("imageFace"+imageFace)
-
-            println("urlImageFront"+urlImageFront)
-            println("urlImageBack"+urlImageBack)
-            println("urlImageFace"+urlImageFace)
-            println("urlVideo"+urlVideo)
-            println("CALLREPONSE1")
             if (imageFront != null) {
 
                 val responseImageFront = uploadFileCoroutine(imageFront!!)
-                println("REPONSE1" + responseImageFront.status)
                 if (responseImageFront.status) {
                     urlImageFront = responseImageFront.path
 
@@ -71,7 +61,6 @@ class UploadKycApi {
             if (imageBackSide != null) {
 
                 val responseImageBack = uploadFileCoroutine(imageBackSide!!)
-                println("REPONSE2" + responseImageBack.status)
 
                 if (responseImageBack.status) {
                     urlImageBack = responseImageBack.path
@@ -84,15 +73,12 @@ class UploadKycApi {
                     )
 
                 }
-                println("responseImageBack" + responseImageBack.toString())
 
 
             }
             if (video != null) {
-                println("GOI 3")
 
                 val responseVideo = uploadFileCoroutine(video!!)
-                println("REPONSE3" + responseVideo.status)
 
                 if (responseVideo.status) {
                     urlVideo = responseVideo.path
@@ -103,10 +89,8 @@ class UploadKycApi {
 
             }
             if (imageFace != null) {
-                println("GOI 4")
 
                 val responseImageFace = uploadFileCoroutine(imageFace!!)
-                println("REPONSE4" + responseImageFace.status)
 
                 if (responseImageFace.status) {
                     urlImageFace = responseImageFace.path
@@ -120,10 +104,7 @@ class UploadKycApi {
                 }
 
             }
-            println("urlImageFront"+urlImageFront)
-            println("urlImageBack"+urlImageBack)
-            println("urlImageFace"+urlImageFace)
-            println("urlVideo"+urlVideo)
+
 
             uploadKycInfo(urlImageFront, urlImageBack, urlImageFace, urlVideo, onSuccess, onError)
         }
@@ -147,7 +128,6 @@ class UploadKycApi {
                 val a = response.data
                 val b = String(a, StandardCharsets.UTF_8)
                 val jsonObject = JSONObject(b)
-                println("REPONSE" + jsonObject.toString())
                 val code = jsonObject.getInt("code")
                 if (jsonObject.getInt("code") == 1000) {
                     responseHander.code = code
@@ -221,10 +201,7 @@ class UploadKycApi {
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        println("imageFront" + imageFront)
-        println("imageBackSide" + imageBackSide)
-        println("face" + face)
-        println("video" + video)
+
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
         val variables: MutableMap<String, Any> = mutableMapOf()

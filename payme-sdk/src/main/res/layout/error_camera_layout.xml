@@ -49,7 +49,7 @@
         android:layout_marginTop="16dp"
         android:fontFamily="@font/barlow_medium"
         android:paddingHorizontal="32dp"
-        android:text="Bạn hãy cho phép Payme truy cập máy ảnh trong phần Cài Đặt của hệ thống để tiếp tục"
+        android:text="Bạn hãy cho phép truy cập máy ảnh trong phần Cài Đặt của hệ thống để tiếp tục"
         android:textAlignment="center"
         android:textColor="@color/brownishGrey"
         android:textSize="16dp"

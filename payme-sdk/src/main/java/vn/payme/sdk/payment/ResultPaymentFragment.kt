@@ -12,7 +12,6 @@ import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
-import kotlinx.android.synthetic.main.result_payment_layout.*
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R

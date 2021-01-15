@@ -14,7 +14,6 @@ import org.json.JSONException
 import org.json.JSONObject
 import vn.payme.sdk.model.ERROR_CODE
 import java.nio.charset.Charset
-import java.util.*
 
 
 internal class NetworkRequest(
@@ -31,7 +30,6 @@ internal class NetworkRequest(
         onSuccess: (response: JSONObject) -> Unit,
         onError: (data: JSONObject?, code: Int?, message: String) -> Unit,
     ) {
-        println("REQUESSSSSSSSSSSSSSSSSSSS1${params.toString()}")
         val cryptoAES = CryptoAES()
         val cryptoRSA = CryptoRSA()
         val encryptKey = "10000000"
@@ -65,8 +63,6 @@ internal class NetworkRequest(
         } else {
             pathAPi = url + path
         }
-        println("pathAPi:" + pathAPi)
-
 
         val queue = Volley.newRequestQueue(context)
         val request = object : JsonObjectRequest(
@@ -94,18 +90,13 @@ internal class NetworkRequest(
                         }
                         validateString += decryptKey
                         val result = cryptoAES.decryptAES(decryptKey, xAPIMessageResponse)
-                        println("Response" + result)
-                        val json = result?.replace("\\\"", "'");
-                        finalJSONObject = JSONObject(json?.substring(1, json?.length - 1))
+                        var dataRaw = ConvertJSON().toString(result)
+                        finalJSONObject = JSONObject(dataRaw?.substring(1, dataRaw?.length - 1))
                     } else {
-                        println("Response" + response.toString())
-
-
                         finalJSONObject = JSONObject(response.toString())
                     }
                     val data = finalJSONObject?.optJSONObject("data")
                     val errors = finalJSONObject?.optJSONArray("errors")
-
                     if (errors != null) {
                         val error = errors.getJSONObject(0)
                         var code = ERROR_CODE.SYSTEM
@@ -113,15 +104,12 @@ internal class NetworkRequest(
                         val extensions = error.getJSONObject("extensions")
                         if (extensions != null) {
                             code = extensions.optInt("code")
-                            println("code1111111111"+code)
-
                         }
                         val message = error.optString("message")
                         onError(data, code, message)
                     } else if (data != null) {
                         onSuccess(data)
                     }
-
 
 
                 } catch (error: Exception) {

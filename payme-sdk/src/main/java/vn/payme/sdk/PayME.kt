@@ -15,6 +15,7 @@ import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.*
 import vn.payme.sdk.payment.PaymePayment
 import java.security.Security
+import java.text.DecimalFormat
 
 
 public class PayME(
@@ -41,6 +42,7 @@ public class PayME(
         var orderId: String? = null
         var extraData: String? = null
         var infoPayment: InfoPayment? = null
+        var limintPayment: MaxminPayment = MaxminPayment(2000, 100000)
         var clientInfo: ClientInfo = ClientInfo()
         var env: Env? = null
         var configColor: Array<String>? = null
@@ -49,7 +51,7 @@ public class PayME(
         lateinit var onSuccess: ((JSONObject) -> Unit)
         lateinit var onError: (JSONObject?, Int?, String) -> Unit
         lateinit var onClose: (() -> Unit)
-        var colorApp: ColorApp = ColorApp("#08941f","#0eb92a")
+        var colorApp: ColorApp = ColorApp("#08941f", "#0eb92a")
         lateinit var methodSelected: Method
         lateinit var fragmentManager: FragmentManager
         var numberAtmCard = ""
@@ -91,30 +93,65 @@ public class PayME(
             } else {
                 Companion.amount = 0
             }
-            val paymePayment: PaymePayment = PaymePayment()
-            paymePayment.show(
-                fragmentManager,
-                "ModalBottomSheet"
-            )
+
+            val decimal = DecimalFormat("#,###")
+
+            if (infoPayment.amount!! < limintPayment.min) {
+                onError(
+                    null,
+                    ERROR_CODE.LITMIT,
+                    "Số tiền giao dịch tối thiểu ${decimal.format(limintPayment.min)} VND"
+                )
+            } else if (infoPayment.amount!! > limintPayment.max) {
+                onError(
+                    null,
+                    ERROR_CODE.LITMIT,
+                    "Số tiền giao dịch tối đa ${decimal.format(limintPayment.max)} VND"
+                )
+            } else {
+
+                val paymePayment: PaymePayment = PaymePayment()
+                paymePayment.show(
+                    fragmentManager,
+                    "ModalBottomSheet"
+                )
+            }
+
 
         }
 
     }
 
-    public fun initAccount(
+    public fun loggin(
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
         val accountApi = AccountApi()
-        val paymentApi  = PaymentApi()
+        val paymentApi = PaymentApi()
         val pref = PayME.context.getSharedPreferences("PayME_SDK", Context.MODE_PRIVATE)
         val clientId = pref.getString("clientId", "")
 
         val dataRegisterClientInfo = pref.getString("dataRegisterClientInfo", "")
-        paymentApi.getSettings(onSuccess={jsonObject ->
+        paymentApi.getSettings(onSuccess = { jsonObject ->
+            val Setting = jsonObject.getJSONObject("Setting")
+            val configs = Setting.getJSONArray("configs")
+
+            for (i in 0 until configs.length()) {
+                val config = configs.optJSONObject(i)
+                val key = config.optString("key")
+                if (key == "limit.param.amount.all") {
+                    val value = JSONObject(config.getString("value"))
+                    val max = Integer.parseInt(value.optString("max"))
+                    val min = Integer.parseInt(value.optString("min"))
+                    limintPayment.min = min
+                    limintPayment.max = max
+                }
+
+
+            }
 
         },
-            onError={ jsonObject, code, message->
+            onError = { jsonObject, code, message ->
 
             }
         )
@@ -134,7 +171,7 @@ public class PayME(
                         "dataRegisterClientInfo",
                         PayME.clientInfo.getClientInfo().toString() + PayME.env.toString()
                     ).commit()
-                    this.getAccountInfo(onSuccess = { jsonObject ->
+                    this.loggin(onSuccess = { jsonObject ->
                         onSuccess(jsonObject)
                     }, onError = { jsonObject, code, message ->
                         onError(jsonObject, code, message)
@@ -146,7 +183,7 @@ public class PayME(
             )
         } else {
             PayME.clientId = clientId
-            this.getAccountInfo(onSuccess = { jsonObject ->
+            this.loggin(onSuccess = { jsonObject ->
                 onSuccess(jsonObject)
             }, onError = { jsonObject, code, message ->
                 onError(jsonObject, code, message)
@@ -182,22 +219,23 @@ public class PayME(
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-
-        Companion.action = action
-        Companion.content = content
-        Companion.extraData = extraData
-        if (amount != null) {
-            Companion.amount = amount
-        } else {
-            Companion.amount = 0
+        if (connectToken.length > 0) {
+            Companion.action = action
+            Companion.content = content
+            Companion.extraData = extraData
+            if (amount != null) {
+                Companion.amount = amount
+            } else {
+                Companion.amount = 0
+            }
+            val intent = Intent(context, PaymeWaletActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context?.startActivity(intent)
+            Companion.onSuccess = onSuccess
+            Companion.onError = onError
         }
 
-        val intent = Intent(context, PaymeWaletActivity::class.java)
 
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        context?.startActivity(intent)
-        Companion.onSuccess = onSuccess
-        Companion.onError = onError
     }
 
 
@@ -249,39 +287,23 @@ public class PayME(
         PayME.pay(fragmentManager, infoPayment, onSuccess, onError)
 
     }
+    public fun getAccountInfo(): JSONObject? {
+        return PayME.dataInit
+    }
+    fun closeOpenWallet() {
+        var even: EventBus = EventBus.getDefault()
+        var myEven: MyEven = MyEven(TypeCallBack.onClose, "")
+        even.post(myEven)
+        var closeWebview: MyEven = MyEven(TypeCallBack.onExpired, "")
+        even.post(myEven)
+        even.post(closeWebview)
+    }
 
 
-    public fun getAccountInfo(
-        onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
-    ) {
-        val accountApi = AccountApi()
-        accountApi.intAccount(onSuccess = { jsonObject ->
-            onSuccess(jsonObject)
-            val OpenEWallet = jsonObject.getJSONObject("OpenEWallet")
-            val Init = OpenEWallet.getJSONObject("Init")
-            PayME.dataInit = Init
-            val kyc = Init.optJSONObject("kyc")
-            val appEnv = Init.optString("appEnv")
-            if(appEnv==Env.DEV.toString()||appEnv==Env.SANDBOX.toString() ){
-                openPayAndKyc = false
-            }else{
-                openPayAndKyc = true
-            }
-            if (kyc != null) {
-                val state = kyc.optString("kyc")
-            }
-            val accessToken = Init.optString("accessToken")
-            val handShake = Init.optString("handShake")
-            if (!accessToken.equals("null")) {
-                PayME.accessToken = accessToken
-            } else {
-                PayME.accessToken = ""
-            }
-            PayME.handShake = handShake
-        }, onError = { jsonObject, code, message ->
-            onError(jsonObject, code, message)
-        })
+    public fun logout() {
+        PayME.accessToken = ""
+        PayME.connectToken = ""
+        PayME.handShake = ""
     }
 
     public fun getWalletInfo(

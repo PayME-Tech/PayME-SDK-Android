@@ -5,6 +5,7 @@ class ERROR_CODE {
        val  EXPIRED = 401
        val  NETWORK = -1
        val  SYSTEM = -2
+       val  LITMIT = -3
     }
 
 }

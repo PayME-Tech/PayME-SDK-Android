@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
@@ -105,7 +106,11 @@ class EnterAtmCardFragment : Fragment() {
                 cardHolder = ""
                 cardNumberValue = ""
                 textNoteCard.setText(R.string.enter_the_number_card_on_the_front_of_the_card)
-                containerInputCardHolder.visibility = View.GONE
+                if (containerInputCardHolder.visibility != View.GONE) {
+                    textInputCardHolder.setText("")
+                    containerInputCardHolder.visibility = View.GONE
+                }
+
 
                 if (cardNumber?.length!! >= 6) {
                     val cardPrefix = cardNumber.substring(0, 6)
@@ -192,6 +197,9 @@ class EnterAtmCardFragment : Fragment() {
             }
         })
         textInputCardHolder.setFilters(arrayOf<InputFilter>(AllCaps()))
+        textInputCardHolder.addTextChangedListener { text ->
+            cardHolder = text.toString()
+        }
 
 
         textInputCardDate.addTextChangedListener(object : TextWatcher {
@@ -250,7 +258,7 @@ class EnterAtmCardFragment : Fragment() {
                 var even: EventBus = EventBus.getDefault()
 
                 var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.PAYMENT_RESULT, "")
-                val method  = PayME.methodSelected
+                val method = PayME.methodSelected
                 paymentApi.payment(method, null, cardNumberValue, cardHolder, cardDate, null, null,
                     onSuccess = { jsonObject ->
                         buttonSubmit.disableLoading()
@@ -258,15 +266,25 @@ class EnterAtmCardFragment : Fragment() {
                         val Payment = OpenEWallet.optJSONObject("Payment")
                         val Pay = Payment.optJSONObject("Pay")
                         val succeeded = Pay.optBoolean("succeeded")
+                        val history = Pay.optJSONObject("history")
+                        if (history != null) {
+                            val payment = history.optJSONObject("payment")
+                            if (payment != null) {
+                                val transaction = payment.optString("transaction")
+                                PayME.transaction = transaction
+                            }
+
+                        }
                         val payment = Pay.optJSONObject("payment")
                         val message = Pay.optString("message")
-                        PayME.numberAtmCard = bankSelected?.shortName+"-"+cardNumberValue.substring(cardNumberValue.length-4)
+                        PayME.numberAtmCard =
+                            bankSelected?.shortName + "-" + cardNumberValue.substring(
+                                cardNumberValue.length - 4
+                            )
                         if (succeeded) {
-                            println("THANH CONG")
 
                             even.post(myEven)
                         } else {
-                            println("payment" + payment)
                             if (payment != null) {
                                 val statePaymentBankCardResponsed =
                                     payment.optString("statePaymentBankCardResponsed")
@@ -276,7 +294,6 @@ class EnterAtmCardFragment : Fragment() {
                                         ChangeTypePayment(TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS, html)
                                     even.post(changeFragmentOtp)
                                 } else if (statePaymentBankCardResponsed == "REQUIRED_OTP") {
-                                    println("REQUIRED_OTP" + "1111111")
                                     val transaction = payment.optString("transaction")
                                     var changeFragmentOtp: ChangeTypePayment =
                                         ChangeTypePayment(
@@ -298,7 +315,7 @@ class EnterAtmCardFragment : Fragment() {
                         buttonSubmit.disableLoading()
 
                     },
-                    onError = {jsonObject, code, message ->
+                    onError = { jsonObject, code, message ->
                         buttonSubmit.disableLoading()
 
                         if (code == ERROR_CODE.EXPIRED) {

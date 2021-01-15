@@ -6,18 +6,22 @@ import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
 import android.hardware.camera2.CameraManager
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.KeyEvent
 import android.view.View
 import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.airbnb.lottie.LottieAnimationView
 import com.google.zxing.client.android.Intents
+import kotlinx.android.synthetic.main.webview_activity.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.json.JSONObject
 import vn.payme.sdk.api.PaymentApi
+import vn.payme.sdk.component.Button
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.Env
 import vn.payme.sdk.model.InfoPayment
@@ -30,6 +34,9 @@ internal class PaymeWaletActivity : AppCompatActivity() {
     private var lottie: LottieAnimationView? = null
     private lateinit var cameraManager: CameraManager
     private lateinit var myWebView: WebView
+    private var buttonBack: Button? = null
+    private var buttonNext: Button? = null
+    private var containerErrorNetwork: ConstraintLayout? = null
 
     private fun backScreen(): Unit {
         runOnUiThread {
@@ -47,6 +54,11 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             val metrics = Resources.getSystem().displayMetrics
             px / (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
         }
+    }
+
+    private fun isNetworkConnected(): Boolean {
+        val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        return cm.activeNetworkInfo != null && cm.activeNetworkInfo!!.isConnected
     }
 
 
@@ -73,17 +85,48 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         getWindow().setBackgroundDrawable(PayME.colorApp.backgroundColor);
 
+
         myWebView = findViewById(R.id.webview)
         lottie = findViewById(R.id.loadingWeb)
+
+        buttonBack = findViewById(R.id.buttonBack)
+        buttonNext = findViewById(R.id.buttonNext)
+        containerErrorNetwork = findViewById(R.id.containerErrorNetwork)
+
         myWebView.clearCache(true);
         myWebView.clearFormData();
         myWebView.clearHistory();
         myWebView.clearSslPreferences();
         val cookieManager = CookieManager.getInstance()
         cookieManager.setAcceptCookie(true)
+        buttonBack?.setOnClickListener {
+            finish()
+        }
+        buttonNext?.setOnClickListener {
+            lottie?.visibility = View.VISIBLE
+            containerErrorNetwork?.visibility = View.GONE
+            myWebView.reload()
 
+        }
+        buttonBack?.background = PayME.colorApp.backgroundColorRadiusAlpha
 
         myWebView.setWebViewClient(object : WebViewClient() {
+            override fun onReceivedError(
+                view: WebView?,
+                errorCode: Int,
+                description: String?,
+                failingUrl: String?
+            ) {
+                println("errorCode" + errorCode)
+                if (errorCode == -2) {
+                    println("BAT LOI <LANG")
+                    loadingWeb.visibility = View.GONE
+                    containerErrorNetwork?.visibility = View.VISIBLE
+                }
+
+                super.onReceivedError(view, errorCode, description, failingUrl)
+            }
+
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 lottie?.visibility = View.GONE
@@ -109,24 +152,23 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         webSettings.loadWithOverviewMode = true
         webSettings.allowFileAccess = true
         webSettings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-
-
         val jsObject: JsObject =
             JsObject(this, back = { backScreen() }, this.supportFragmentManager, cameraManager)
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
         var action: String = PayME.action.toString()
+        //                      dataInit:${PayME.dataInit?.toString()},
+//        handShake: '${PayME.handShake}',
+
         var data: JSONObject = JSONObject(
             """{
                       connectToken:  '${PayME.connectToken}',
                       appToken: '${PayME.appToken}',
-                      accessToken: '${PayME.accessToken}',
                       env: '${PayME.env.toString()}',
                       showLog: '1',
-                      handShake: '${PayME.handShake}',
                       clientId: '${PayME.clientId}',
                       amount:${PayME.amount},
-                      dataInit:${PayME.dataInit?.toString()},
                       configColor: ['${PayME.configColor?.get(0)}', '${PayME.configColor?.get(1)}'],
+                      dataInit:${PayME.dataInit?.toString()},
                       partner : {
                         type:'ANDROID'
                       },
@@ -147,6 +189,9 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
         } else {
             myWebView.loadUrl("https://sdk.payme.com.vn/active/${encode}")
+        }
+        if (!isNetworkConnected()) {
+            containerErrorNetwork?.visibility = View.VISIBLE
         }
 
 
@@ -174,13 +219,13 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                     lottie?.visibility = View.GONE
                     var popup: PayMEQRCodePopup = PayMEQRCodePopup()
                     popup.show(this.supportFragmentManager, "ModalBottomSheet")
-                }else{
+                } else {
                     val infoPayment = InfoPayment(action, amount, note, orderId, storeId, type)
 
-                    PayME.pay(this.supportFragmentManager, infoPayment,null, null
+                    PayME.pay(
+                        this.supportFragmentManager, infoPayment, null, null
                     )
                 }
-
 
 
             },

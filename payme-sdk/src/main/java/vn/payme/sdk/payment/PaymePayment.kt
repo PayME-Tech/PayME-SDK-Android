@@ -12,11 +12,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.PayME
-import vn.payme.sdk.PaymeWaletActivity
 import vn.payme.sdk.R
 import vn.payme.sdk.enum.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.ChangeTypePayment
@@ -37,7 +35,6 @@ internal class PaymePayment : DialogFragment() {
         val message = arguments?.getString("message")
         if (showResult == true) {
             val bundle: Bundle = Bundle()
-            println("message"+message)
             if (message!=null) {
                 bundle.putString("message", message)
             }
@@ -87,9 +84,7 @@ internal class PaymePayment : DialogFragment() {
 
     @Subscribe
     fun onChangeFragment(typePayment: ChangeTypePayment) {
-        println("CHNAG IOTPP" + typePayment.type)
         if (typePayment.type == TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS) {
-            println("CHNAG IOTPP")
             this.dialog?.dismiss()
 
 
@@ -102,7 +97,6 @@ internal class PaymePayment : DialogFragment() {
 
 
         } else if (typePayment.type == TYPE_PAYMENT.CONFIRM_OTP_BANK) {
-            println("CHNAG IOTPP")
             val confirmOtpFragment: ConfirmOtpFragment =
                 ConfirmOtpFragment()
             val bundle: Bundle = Bundle()

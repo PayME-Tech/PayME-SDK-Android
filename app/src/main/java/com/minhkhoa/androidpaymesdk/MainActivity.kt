@@ -205,7 +205,7 @@ class MainActivity : AppCompatActivity() {
                     configColor,
                     env
                 )
-            this.payme.initAccount(onSuccess = { jsonObject ->
+            this.payme.loggin(onSuccess = { jsonObject ->
                 loading.visibility = View.GONE
                 pref.edit().putString("userId", inputUserId.text.toString()).commit()
                 pref.edit().putString("phoneNumber", inputPhoneNumber.text.toString()).commit()
@@ -266,7 +266,7 @@ class MainActivity : AppCompatActivity() {
             if (ConnectToken.length > 0) {
                 val amount = convertInt(moneyPay.text.toString())
 
-                val infoPayment = InfoPayment("PAY", amount, "Thành công.", 4323, 1, "OpenEWallet")
+                val infoPayment = InfoPayment("PAY", amount, "Nội dung đơn hàng", 4323, 1, "OpenEWallet")
                 payme.pay(this.supportFragmentManager, infoPayment,
                     onSuccess = { json: JSONObject ->
                         println("onSuccess2222" + json.toString())

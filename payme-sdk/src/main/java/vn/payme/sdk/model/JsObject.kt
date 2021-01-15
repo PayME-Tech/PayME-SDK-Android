@@ -34,11 +34,13 @@ public class JsObject(
             println(e)
         }
     }
-
-    @JavascriptInterface
-    public fun onRegisterSuccess(dataInitString: String) {
+ @JavascriptInterface
+    public fun onCommunicate(string: String) {
         try {
-            val dataInt = JSONObject(dataInitString)
+            println("onCommunicate"+string)
+            val json: JSONObject = JSONObject(string)
+            val type = json.optString("type")
+            val dataInt = json.optJSONObject("data")
             val Init = dataInt.getJSONObject("Init")
             PayME.dataInit = Init
             val accessToken = Init.optString("accessToken")
@@ -50,10 +52,15 @@ public class JsObject(
             }
             PayME.handShake = handShake
 
+
+//            PayME.onSuccess(json)
+
         } catch (e: Exception) {
-            println(e)
+            e.printStackTrace()
         }
     }
+
+
 
     @JavascriptInterface
     public fun onFlash(status: Boolean) {

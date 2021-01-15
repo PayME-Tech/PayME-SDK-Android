@@ -1,6 +1,5 @@
 package vn.payme.sdk.payment
 
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
@@ -10,14 +9,10 @@ import android.view.ViewGroup
 import android.widget.ListAdapter
 import android.widget.ListView
 import android.widget.ProgressBar
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import okhttp3.internal.http2.ErrorCode
 
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
-import vn.payme.sdk.PaymeWaletActivity
 import vn.payme.sdk.R
 import vn.payme.sdk.adapter.MethodAdapter
 import vn.payme.sdk.api.PaymentApi
@@ -26,7 +21,6 @@ import vn.payme.sdk.evenbus.ChangeTypePayment
 import vn.payme.sdk.model.DataMethod
 import vn.payme.sdk.model.ERROR_CODE
 import vn.payme.sdk.model.Method
-import java.text.DecimalFormat
 
 class ListMethodPaymentFragment : Fragment() {
     private var loading: Boolean = false
@@ -71,7 +65,6 @@ class ListMethodPaymentFragment : Fragment() {
         var even: EventBus = EventBus.getDefault()
 
         var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.PAYMENT_RESULT, "")
-        println("method111111" + method.data?.linkedId)
 
         paymentApi.payment(method, null, null, null, null, null, null,
             onSuccess = { jsonObject ->
@@ -91,18 +84,15 @@ class ListMethodPaymentFragment : Fragment() {
 
                     even.post(myEven)
                 } else {
-                    println("payment" + payment)
                     if (payment != null) {
                         val statePaymentLinkedResponsed =
                             payment.optString("statePaymentLinkedResponsed")
-                        println("statePaymentLinkedResponsed" + statePaymentLinkedResponsed)
                         if (statePaymentLinkedResponsed == "REQUIRED_VERIFY") {
                             val html = payment.optString("html")
                             var changeFragmentOtp: ChangeTypePayment =
                                 ChangeTypePayment(TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS, html)
                             even.post(changeFragmentOtp)
                         } else if (statePaymentLinkedResponsed == "REQUIRED_OTP") {
-                            println("REQUIRED_OTP" + "1111111")
                             val transaction = payment.optString("transaction")
                             PayME.transaction = transaction
                             var changeFragmentOtp: ChangeTypePayment =
@@ -143,7 +133,6 @@ class ListMethodPaymentFragment : Fragment() {
 
 
         paymentApi.getTransferMethods(onSuccess = { jsonObject ->
-            println("onSuccessFFFFFFFFFFFF" + jsonObject)
             disableLoading()
 
             val Utility = jsonObject.optJSONObject("Utility")
@@ -154,7 +143,6 @@ class ListMethodPaymentFragment : Fragment() {
             if (succeeded) {
                 for (i in 0 until methods.length()) {
                     val jsonObject = methods.getJSONObject(i)
-                    println("jsonObject11111111" + jsonObject)
                     var data = jsonObject.optJSONObject("data")
                     var dataMethod = DataMethod(null, "")
                     if (data != null) {
@@ -224,10 +212,8 @@ class ListMethodPaymentFragment : Fragment() {
     fun setListViewHeightBasedOnChildren(listView: ListView) {
         val mAdapter: ListAdapter = listView.adapter
         var totalHeight = 0
-        println("Adapter $mAdapter")
         for (i in 0 until mAdapter.getCount()) {
             val mView: View = mAdapter.getView(i, null, listView)
-            println("M View $mView")
             mView.measure(
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
@@ -266,15 +252,7 @@ class ListMethodPaymentFragment : Fragment() {
                 val paymentApi = PaymentApi()
                 val method = this.listMethod[i]
                 PayME.methodSelected = method!!
-                if (method.type == TYPE_PAYMENT.BANK_CARD) {
-                    val fragment = fragmentManager?.beginTransaction()
-                    fragment?.replace(R.id.frame_container_select_method, EnterAtmCardFragment())
-                    fragment?.commit()
-
-
-                } else if (method?.type == TYPE_PAYMENT.WALLET) {
-                    println("PayME.balance" + PayME.balance)
-                    println("PayMEayME.amount" + PayME.infoPayment?.amount)
+                if (method?.type == TYPE_PAYMENT.WALLET) {
                     if (PayME.balance < PayME.infoPayment?.amount!!) {
                         PayME.showError("Số dư trong ví không đủ")
                     } else {
@@ -283,11 +261,22 @@ class ListMethodPaymentFragment : Fragment() {
                         even.post(myEven)
                     }
 
-                } else if (method?.type == TYPE_PAYMENT.LINKED) {
-                    paymentLinkedBank(method)
-                } else {
+                } else if(PayME.openPayAndKyc){
+                    if (method.type == TYPE_PAYMENT.BANK_CARD) {
+                        val fragment = fragmentManager?.beginTransaction()
+                        fragment?.replace(R.id.frame_container_select_method, EnterAtmCardFragment())
+                        fragment?.commit()
 
+
+                    } else if (method?.type == TYPE_PAYMENT.LINKED) {
+                        paymentLinkedBank(method)
+                    } else {
+
+                    }
+                }else{
+                    PayME.showError("Chức năng chỉ có thể thao tác môi trường production")
                 }
+
             }
 
 
