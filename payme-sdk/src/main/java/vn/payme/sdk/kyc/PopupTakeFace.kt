@@ -34,7 +34,7 @@ internal class PopupTakeFace : BottomSheetDialogFragment() {
             R.layout.popup_take_face,
             container, false
         )
-        buttonNext = view!!.findViewById(R.id.buttonNext)
+        buttonNext = view.findViewById(R.id.buttonNext)
         buttonNext.setOnClickListener {
             val openKycActivity = arguments?.getBoolean("openKycActivity")
             if(openKycActivity==true){

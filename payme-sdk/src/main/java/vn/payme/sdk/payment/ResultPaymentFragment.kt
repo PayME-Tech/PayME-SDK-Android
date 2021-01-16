@@ -41,10 +41,10 @@ class ResultPaymentFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        val view: View? = inflater?.inflate(R.layout.result_payment_layout, container, false)
+        val view: View = inflater?.inflate(R.layout.result_payment_layout, container, false)
 
-        buttonSubmit = view!!.findViewById(R.id.buttonSubmit)
-        buttonClose = view!!.findViewById(R.id.buttonClose)
+        buttonSubmit = view.findViewById(R.id.buttonSubmit)
+        buttonClose = view.findViewById(R.id.buttonClose)
         textAmount = view.findViewById(R.id.money)
         textNote = view.findViewById(R.id.note)
         textError = view.findViewById(R.id.note_error)
@@ -65,7 +65,12 @@ class ResultPaymentFragment : Fragment() {
             textNumberCard.text = PayME.numberAtmCard
 
         }else{
-            textNumberCard.text = PayME.methodSelected.label
+            if(PayME.methodSelected.type==TYPE_PAYMENT.LINKED){
+                textMethodValue.text = "Tài khoản liên kết"
+                textNumberCard.text =PayME.methodSelected.title+PayME.methodSelected.label
+            }else{
+                textNumberCard.text = PayME.methodSelected.label
+            }
 
         }
         textTransactionCode.setText(PayME.transaction)

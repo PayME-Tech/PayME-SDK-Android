@@ -232,10 +232,10 @@ class ListMethodPaymentFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View? = inflater?.inflate(R.layout.list_method_payme_fragment, container, false)
+        val view: View = inflater?.inflate(R.layout.list_method_payme_fragment, container, false)
 
-        listView = view!!.findViewById(R.id.recipe_list_view)
-        loadingProcess = view!!.findViewById(R.id.loadingListMethodPayment)
+        listView = view.findViewById(R.id.recipe_list_view)
+        loadingProcess = view.findViewById(R.id.loadingListMethodPayment)
         loadingProcess.getIndeterminateDrawable()
             .mutate()
             .setColorFilter(Color.parseColor(PayME.colorApp.startColor), PorterDuff.Mode.SRC_ATOP)

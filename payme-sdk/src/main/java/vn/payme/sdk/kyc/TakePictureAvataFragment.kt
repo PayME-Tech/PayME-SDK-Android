@@ -68,22 +68,22 @@ class TakePictureAvataFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        val view: View? = inflater?.inflate(R.layout.take_picture_image_avata, container, false)
-        cameraKitView = view!!.findViewById(R.id.previewCamera)
-        buttonTakePicture = view!!.findViewById(R.id.btn_takepicture)
-        layoutConfirm = view!!.findViewById(R.id.confirm_screen)
-        imagePreView = view!!.findViewById(R.id.previewImage)
-        buttonBack = view!!.findViewById(R.id.buttonBack)
-        buttonNext = view!!.findViewById(R.id.buttonNext)
-        buttonBackHeader = view!!.findViewById(R.id.buttonBackHeader)
+        val view: View = inflater?.inflate(R.layout.take_picture_image_avata, container, false)
+        cameraKitView = view.findViewById(R.id.previewCamera)
+        buttonTakePicture = view.findViewById(R.id.btn_takepicture)
+        layoutConfirm = view.findViewById(R.id.confirm_screen)
+        imagePreView = view.findViewById(R.id.previewImage)
+        buttonBack = view.findViewById(R.id.buttonBack)
+        buttonNext = view.findViewById(R.id.buttonNext)
+        buttonBackHeader = view.findViewById(R.id.buttonBackHeader)
 
-        buttonBackHeader2 = view!!.findViewById(R.id.buttonBackHeader2)
-        cardViewCamera = view!!.findViewById(R.id.cardViewCamera)
+        buttonBackHeader2 = view.findViewById(R.id.buttonBackHeader2)
+        cardViewCamera = view.findViewById(R.id.cardViewCamera)
 
         //ErrorCamera
-        containerErrorCamera = view!!.findViewById(R.id.containerErrorCamera)
-        buttonOpenSetting = view!!.findViewById(R.id.buttonOpenSetting)
-        buttonBackHeaderErrorCamera = view!!.findViewById(R.id.buttonBackHeaderErrorCamera)
+        containerErrorCamera = view.findViewById(R.id.containerErrorCamera)
+        buttonOpenSetting = view.findViewById(R.id.buttonOpenSetting)
+        buttonBackHeaderErrorCamera = view.findViewById(R.id.buttonBackHeaderErrorCamera)
 
         PermisionCamera().requestCamera(requireContext(),requireActivity())
 

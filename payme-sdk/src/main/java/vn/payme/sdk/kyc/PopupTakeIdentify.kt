@@ -33,7 +33,7 @@ internal class PopupTakeIdentify : BottomSheetDialogFragment() {
             R.layout.popup_take_identify,
             container, false
         )
-        buttonNext = view!!.findViewById(R.id.buttonNext)
+        buttonNext = view.findViewById(R.id.buttonNext)
         buttonNext.setOnClickListener {
             val intent = Intent(PayME.context, CameraKycActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK

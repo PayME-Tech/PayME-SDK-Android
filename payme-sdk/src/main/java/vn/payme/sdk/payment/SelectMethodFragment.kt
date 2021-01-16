@@ -36,12 +36,12 @@ class SelectMethodFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        val view: View? = inflater?.inflate(R.layout.select_method_layout, container, false)
+        val view: View = inflater?.inflate(R.layout.select_method_layout, container, false)
 
-        buttonClose = view!!.findViewById(R.id.buttonClose)
-        textAmount = view!!.findViewById(R.id.money)
-        textNote = view!!.findViewById(R.id.note)
-        layout = view!!.findViewById(R.id.content)
+        buttonClose = view.findViewById(R.id.buttonClose)
+        textAmount = view.findViewById(R.id.money)
+        textNote = view.findViewById(R.id.note)
+        layout = view.findViewById(R.id.content)
         layout.background = PayME.colorApp.backgroundColor
         textNote.text = PayME.infoPayment?.note
         val decimal = DecimalFormat("#,###")

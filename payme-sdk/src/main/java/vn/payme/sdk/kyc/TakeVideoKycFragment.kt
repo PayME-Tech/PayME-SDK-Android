@@ -47,16 +47,16 @@ class TakeVideoKycFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View? = inflater?.inflate(R.layout.take_video_kyc, container, false)
+        val view: View = inflater?.inflate(R.layout.take_video_kyc, container, false)
 
-        cameraKitView = view!!.findViewById(R.id.previewCamera)
-        buttonTakePicture = view!!.findViewById(R.id.btn_takepicture)
-        buttonBackHeader = view!!.findViewById(R.id.buttonBackHeader)
-        cardViewCamera = view!!.findViewById(R.id.cardViewCamera)
+        cameraKitView = view.findViewById(R.id.previewCamera)
+        buttonTakePicture = view.findViewById(R.id.btn_takepicture)
+        buttonBackHeader = view.findViewById(R.id.buttonBackHeader)
+        cardViewCamera = view.findViewById(R.id.cardViewCamera)
 
-        containerErrorCamera = view!!.findViewById(R.id.containerErrorCamera)
-        buttonOpenSetting = view!!.findViewById(R.id.buttonOpenSetting)
-        buttonBackHeaderErrorCamera = view!!.findViewById(R.id.buttonBackHeaderErrorCamera)
+        containerErrorCamera = view.findViewById(R.id.containerErrorCamera)
+        buttonOpenSetting = view.findViewById(R.id.buttonOpenSetting)
+        buttonBackHeaderErrorCamera = view.findViewById(R.id.buttonBackHeaderErrorCamera)
         PermisionCamera().requestCamera(requireContext(),requireActivity())
         buttonOpenSetting!!.setOnClickListener {
             if (enableSetting) {

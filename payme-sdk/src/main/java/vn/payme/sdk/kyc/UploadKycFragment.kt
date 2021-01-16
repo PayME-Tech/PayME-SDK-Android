@@ -51,8 +51,8 @@ class UploadKycFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View? = inflater?.inflate(R.layout.upload_kyc_fragment, container, false)
-        layoutUpload = view!!.findViewById(R.id.upLoadKyc)
+        val view: View = inflater?.inflate(R.layout.upload_kyc_fragment, container, false)
+        layoutUpload = view.findViewById(R.id.upLoadKyc)
         layoutUpload!!.background = PayME.colorApp.backgroundColor
         GlobalScope.launch(Dispatchers.Main) {
             if (!loadingUploadKycApi) {

@@ -85,20 +85,20 @@ class EnterAtmCardFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View? = inflater?.inflate(R.layout.enter_atm_card_fragment, container, false)
-        buttonSubmit = view!!.findViewById(R.id.buttonSubmit)
-        contentButtonChangeMethod = view!!.findViewById(R.id.contentButtonChangeMethod)
-        buttonChangeMethod = view!!.findViewById(R.id.buttonChangeMethod)
+        val view: View = inflater?.inflate(R.layout.enter_atm_card_fragment, container, false)
+        buttonSubmit = view.findViewById(R.id.buttonSubmit)
+        contentButtonChangeMethod = view.findViewById(R.id.contentButtonChangeMethod)
+        buttonChangeMethod = view.findViewById(R.id.buttonChangeMethod)
 
-        textInputCardNumber = view!!.findViewById(R.id.textInputCardNumber)
-        textInputCardHolder = view!!.findViewById(R.id.textInputCardHolder)
-        textInputCardDate = view!!.findViewById(R.id.textInputCardDate)
+        textInputCardNumber = view.findViewById(R.id.textInputCardNumber)
+        textInputCardHolder = view.findViewById(R.id.textInputCardHolder)
+        textInputCardDate = view.findViewById(R.id.textInputCardDate)
 
-        textErrorCard = view!!.findViewById(R.id.textErrorCard)
-        textNoteCard = view!!.findViewById(R.id.textNoteCard)
-        textErrorDate = view!!.findViewById(R.id.textErrorDate)
+        textErrorCard = view.findViewById(R.id.textErrorCard)
+        textNoteCard = view.findViewById(R.id.textNoteCard)
+        textErrorDate = view.findViewById(R.id.textErrorDate)
 
-        containerInputCardHolder = view!!.findViewById(R.id.containerInputCardHolder)
+        containerInputCardHolder = view.findViewById(R.id.containerInputCardHolder)
 
         textInputCardNumber.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {

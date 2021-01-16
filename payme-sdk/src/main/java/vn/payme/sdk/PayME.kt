@@ -25,7 +25,8 @@ public class PayME(
     connectToken: String,
     appPrivateKey: String,
     configColor: Array<String>,
-    env: Env
+    env: Env,
+    showLog: Boolean,
 ) {
     companion object {
         lateinit var appPrivateKey: String
@@ -38,8 +39,11 @@ public class PayME(
         var content: String? = null
         var clientId: String = ""
         var handShake: String? = ""
+        var accountKycSuccess: Boolean = false
+        var accountActive: Boolean = false
         var accessToken: String? = ""
         var orderId: String? = null
+        var showLog: Boolean = false
         var extraData: String? = null
         var infoPayment: InfoPayment? = null
         var limintPayment: MaxminPayment = MaxminPayment(2000, 100000)
@@ -80,42 +84,49 @@ public class PayME(
             onSuccess: ((JSONObject) -> Unit)?,
             onError: ((JSONObject?, Int?, String) -> Unit)?,
         ) {
-            PayME.fragmentManager = fragmentManager
-            Companion.infoPayment = infoPayment
             if (onSuccess != null) {
                 Companion.onSuccess = onSuccess
             }
             if (onError != null) {
                 Companion.onError = onError
             }
-            if (amount != null) {
-                Companion.amount = amount
-            } else {
-                Companion.amount = 0
+            if(!accountActive){
+                onError(null,ERROR_CODE.ACCOUNT_NOT_ACTIVETES,"Tài khoản chưa kích hoạt")
+            }else if(!accountKycSuccess){
+                onError(null,ERROR_CODE.ACCOUNT_NOT_KYC,"Tài khoản chưa định danh")
+            }else{
+                PayME.fragmentManager = fragmentManager
+                Companion.infoPayment = infoPayment
+
+                if (amount != null) {
+                    Companion.amount = amount
+                } else {
+                    Companion.amount = 0
+                }
+
+                val decimal = DecimalFormat("#,###")
+
+                if (infoPayment.amount!! < limintPayment.min) {
+                    onError(
+                        null,
+                        ERROR_CODE.LITMIT,
+                        "Số tiền giao dịch tối thiểu ${decimal.format(limintPayment.min)} VND"
+                    )
+                } else if (infoPayment.amount!! > limintPayment.max) {
+                    onError(
+                        null,
+                        ERROR_CODE.LITMIT,
+                        "Số tiền giao dịch tối đa ${decimal.format(limintPayment.max)} VND"
+                    )
+                } else {
+                    val paymePayment: PaymePayment = PaymePayment()
+                    paymePayment.show(
+                        fragmentManager,
+                        "ModalBottomSheet"
+                    )
+                }
             }
 
-            val decimal = DecimalFormat("#,###")
-
-            if (infoPayment.amount!! < limintPayment.min) {
-                onError(
-                    null,
-                    ERROR_CODE.LITMIT,
-                    "Số tiền giao dịch tối thiểu ${decimal.format(limintPayment.min)} VND"
-                )
-            } else if (infoPayment.amount!! > limintPayment.max) {
-                onError(
-                    null,
-                    ERROR_CODE.LITMIT,
-                    "Số tiền giao dịch tối đa ${decimal.format(limintPayment.max)} VND"
-                )
-            } else {
-
-                val paymePayment: PaymePayment = PaymePayment()
-                paymePayment.show(
-                    fragmentManager,
-                    "ModalBottomSheet"
-                )
-            }
 
 
         }
@@ -155,6 +166,8 @@ public class PayME(
 
             }
         )
+        PayME.accountActive = false
+        PayME.accountKycSuccess = false
 
         if (clientId?.length!! <= 0 || !dataRegisterClientInfo.equals(
                 PayME.clientInfo.getClientInfo().toString() + PayME.env.toString()
@@ -171,7 +184,7 @@ public class PayME(
                         "dataRegisterClientInfo",
                         PayME.clientInfo.getClientInfo().toString() + PayME.env.toString()
                     ).commit()
-                    this.loggin(onSuccess = { jsonObject ->
+                    loginAccount(onSuccess = { jsonObject ->
                         onSuccess(jsonObject)
                     }, onError = { jsonObject, code, message ->
                         onError(jsonObject, code, message)
@@ -183,7 +196,7 @@ public class PayME(
             )
         } else {
             PayME.clientId = clientId
-            this.loggin(onSuccess = { jsonObject ->
+            loginAccount(onSuccess = { jsonObject ->
                 onSuccess(jsonObject)
             }, onError = { jsonObject, code, message ->
                 onError(jsonObject, code, message)
@@ -202,12 +215,14 @@ public class PayME(
         PayME.configColor = configColor
         PayME.env = env
         PayME.context = context
+        println("showLog2"+showLog)
+        PayME.showLog = showLog
         Companion.colorApp = ColorApp(configColor[0], configColor[1])
         Companion.clientInfo = ClientInfo(context)
         Security.insertProviderAt(BouncyCastleProvider(), 1)
         ENV_API.updateEnv()
-
-
+        PayME.accountActive = false
+        PayME.accountKycSuccess = false
     }
 
 
@@ -253,8 +268,15 @@ public class PayME(
         } else {
             Companion.amount = 0
         }
+        if(!accountActive){
+            onError(null,ERROR_CODE.ACCOUNT_NOT_ACTIVETES,"Tài khoản chưa kích hoạt")
+        }else if(!accountKycSuccess){
+            onError(null,ERROR_CODE.ACCOUNT_NOT_KYC,"Tài khoản chưa định danh")
+        }else{
+            this.openWallet(Action.DEPOSIT, amount, content, extraData, onSuccess, onError)
+        }
 
-        this.openWallet(Action.DEPOSIT, amount, content, extraData, onSuccess, onError)
+
 
     }
 
@@ -273,10 +295,17 @@ public class PayME(
         } else {
             Companion.amount = 0
         }
-        this.openWallet(Action.WITHDRAW, amount, content, extraData, onSuccess, onError)
+        if(!accountActive){
+            onError(null,ERROR_CODE.ACCOUNT_NOT_ACTIVETES,"Tài khoản chưa kích hoạt")
+        }else if(!accountKycSuccess){
+            onError(null,ERROR_CODE.ACCOUNT_NOT_KYC,"Tài khoản chưa định danh")
+        }else{
+            this.openWallet(Action.WITHDRAW, amount, content, extraData, onSuccess, onError)
+        }
 
 
     }
+
 
     public fun pay(
         fragmentManager: FragmentManager,
@@ -284,12 +313,16 @@ public class PayME(
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit,
     ) {
-        PayME.pay(fragmentManager, infoPayment, onSuccess, onError)
+        if(!accountActive){
+            onError(null,ERROR_CODE.ACCOUNT_NOT_ACTIVETES,"Tài khoản chưa kích hoạt")
+        }else if(!accountKycSuccess){
+            onError(null,ERROR_CODE.ACCOUNT_NOT_KYC,"Tài khoản chưa định danh")
+        }else{
+            PayME.pay(fragmentManager, infoPayment, onSuccess, onError)
+        }
 
     }
-    public fun getAccountInfo(): JSONObject? {
-        return PayME.dataInit
-    }
+
     fun closeOpenWallet() {
         var even: EventBus = EventBus.getDefault()
         var myEven: MyEven = MyEven(TypeCallBack.onClose, "")
@@ -297,6 +330,52 @@ public class PayME(
         var closeWebview: MyEven = MyEven(TypeCallBack.onExpired, "")
         even.post(myEven)
         even.post(closeWebview)
+    }
+    public fun getAccountInfo() : AccountInfo{
+        return  AccountInfo(PayME.accountKycSuccess,PayME.accountKycSuccess)
+    }
+
+    private fun loginAccount(
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        val accountApi = AccountApi()
+        accountApi.intAccount(onSuccess = { jsonObject ->
+            println("jsonObject"+jsonObject)
+            onSuccess(jsonObject)
+            val OpenEWallet = jsonObject.getJSONObject("OpenEWallet")
+            val Init = OpenEWallet.getJSONObject("Init")
+            PayME.dataInit = Init
+            val kyc = Init.optJSONObject("kyc")
+            val appEnv = Init.optString("appEnv")
+            val succeeded = Init.optBoolean("succeeded")
+            PayME.accountActive = succeeded
+            if(appEnv==Env.SANDBOX.toString() ){
+                openPayAndKyc = false
+            }else{
+                openPayAndKyc = true
+            }
+            if (kyc != null) {
+                val state = kyc.optString("state")
+                if(state == "APPROVED"){
+                    PayME.accountKycSuccess = true
+                }else{
+                    PayME.accountKycSuccess = false
+                }
+            }else{
+                PayME.accountKycSuccess = false
+            }
+            val accessToken = Init.optString("accessToken")
+            val handShake = Init.optString("handShake")
+            if (!accessToken.equals("null")) {
+                PayME.accessToken = accessToken
+            } else {
+                PayME.accessToken = ""
+            }
+            PayME.handShake = handShake
+        }, onError = { jsonObject, code, message ->
+            onError(jsonObject, code, message)
+        })
     }
 
 
@@ -306,12 +385,17 @@ public class PayME(
         PayME.handShake = ""
     }
 
+
     public fun getWalletInfo(
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        val paymentApi = PaymentApi()
-        paymentApi.getBalance(onSuccess, onError)
+        if(!PayME.accountActive){
+            onError(null,ERROR_CODE.ACCOUNT_NOT_ACTIVETES,"Tài khoản chưa kích hoạt")
+        }else{
+            val paymentApi = PaymentApi()
+            paymentApi.getBalance(onSuccess, onError)
+        }
     }
 }
 

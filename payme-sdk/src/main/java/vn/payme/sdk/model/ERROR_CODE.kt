@@ -6,6 +6,8 @@ class ERROR_CODE {
        val  NETWORK = -1
        val  SYSTEM = -2
        val  LITMIT = -3
+       val  ACCOUNT_NOT_ACTIVETES = -4
+       val  ACCOUNT_NOT_KYC = -5
     }
 
 }

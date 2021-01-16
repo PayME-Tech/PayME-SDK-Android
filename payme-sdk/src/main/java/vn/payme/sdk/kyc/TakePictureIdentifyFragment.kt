@@ -78,27 +78,27 @@ class TakePictureIdentifyFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        val view: View? = inflater?.inflate(R.layout.take_picture_image_identify, container, false)
+        val view: View = inflater?.inflate(R.layout.take_picture_image_identify, container, false)
 
         EventBus.getDefault().register(this)
 
-        cameraKitView = view!!.findViewById(R.id.previewCamera)
-        buttonTakePicture = view!!.findViewById(R.id.btn_takepicture)
-        layoutConfirm = view!!.findViewById(R.id.confirm_screen)
+        cameraKitView = view.findViewById(R.id.previewCamera)
+        buttonTakePicture = view.findViewById(R.id.btn_takepicture)
+        layoutConfirm = view.findViewById(R.id.confirm_screen)
 
-        imagePreView = view!!.findViewById(R.id.previewImage)
-        buttonBack = view!!.findViewById(R.id.buttonBack)
-        buttonNext = view!!.findViewById(R.id.buttonNext)
-        buttonBackHeader = view!!.findViewById(R.id.buttonBackHeader)
-        buttonBackHeader2 = view!!.findViewById(R.id.buttonBackHeader2)
-        textGuiTakePicture = view!!.findViewById(R.id.textGuiTakePicture)
-        textTypeIdentify = view!!.findViewById(R.id.title_type_identify)
-        buttonSelectTypeIdentify = view!!.findViewById(R.id.buttonSelectTypeIdentify)
-        buttonSelectImage = view!!.findViewById(R.id.buttonSelectImage)
+        imagePreView = view.findViewById(R.id.previewImage)
+        buttonBack = view.findViewById(R.id.buttonBack)
+        buttonNext = view.findViewById(R.id.buttonNext)
+        buttonBackHeader = view.findViewById(R.id.buttonBackHeader)
+        buttonBackHeader2 = view.findViewById(R.id.buttonBackHeader2)
+        textGuiTakePicture = view.findViewById(R.id.textGuiTakePicture)
+        textTypeIdentify = view.findViewById(R.id.title_type_identify)
+        buttonSelectTypeIdentify = view.findViewById(R.id.buttonSelectTypeIdentify)
+        buttonSelectImage = view.findViewById(R.id.buttonSelectImage)
 
-        containerErrorCamera = view!!.findViewById(R.id.containerErrorCamera)
-        buttonOpenSetting = view!!.findViewById(R.id.buttonOpenSetting)
-        buttonBackHeaderErrorCamera = view!!.findViewById(R.id.buttonBackHeaderErrorCamera)
+        containerErrorCamera = view.findViewById(R.id.containerErrorCamera)
+        buttonOpenSetting = view.findViewById(R.id.buttonOpenSetting)
+        buttonBackHeaderErrorCamera = view.findViewById(R.id.buttonBackHeaderErrorCamera)
         PermisionCamera().requestCamera(requireContext(),requireActivity())
         buttonOpenSetting!!.setOnClickListener {
             if (enableSetting) {

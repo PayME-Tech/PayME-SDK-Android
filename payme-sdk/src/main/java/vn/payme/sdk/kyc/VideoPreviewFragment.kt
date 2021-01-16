@@ -40,14 +40,14 @@ class VideoPreviewFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View? = inflater?.inflate(R.layout.video_pewview_fragment, container, false)
+        val view: View = inflater?.inflate(R.layout.video_pewview_fragment, container, false)
 
-        imagePreView = view!!.findViewById(R.id.previewImage)
-        buttonBack = view!!.findViewById(R.id.buttonBack)
-        buttonNext = view!!.findViewById(R.id.buttonNext)
-        buttonBackHeader2 = view!!.findViewById(R.id.buttonBackHeader2)
-        containerVideo = view!!.findViewById(R.id.containerPreviewVideo)
-        buttonPlay = view!!.findViewById(R.id.buttonPlay)
+        imagePreView = view.findViewById(R.id.previewImage)
+        buttonBack = view.findViewById(R.id.buttonBack)
+        buttonNext = view.findViewById(R.id.buttonNext)
+        buttonBackHeader2 = view.findViewById(R.id.buttonBackHeader2)
+        containerVideo = view.findViewById(R.id.containerPreviewVideo)
+        buttonPlay = view.findViewById(R.id.buttonPlay)
 
         val controller = MediaController(context)
         controller.setAnchorView(imagePreView)

@@ -24,10 +24,16 @@ class ConfirmOtpFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View? = inflater?.inflate(R.layout.confirm_otp_layout, container, false)
-        buttonSubmit = view!!.findViewById(R.id.buttonSubmit)
-        buttonClose = view!!.findViewById(R.id.buttonClose)
-        pinView = view!!.findViewById(R.id.otp_view)
+        val view: View = inflater?.inflate(R.layout.confirm_otp_layout, container, false)
+        if (view != null) {
+            buttonSubmit = view.findViewById(R.id.buttonSubmit)
+        }
+        if (view != null) {
+            buttonClose = view.findViewById(R.id.buttonClose)
+        }
+        if (view != null) {
+            pinView = view.findViewById(R.id.otp_view)
+        }
         buttonSubmit.background = PayME.colorApp.backgroundColorRadius
         pinView.setItemBackgroundColor(ContextCompat.getColor(PayME.context, R.color.ice))
         pinView.setAnimationEnable(true)

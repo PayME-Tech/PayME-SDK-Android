@@ -44,8 +44,8 @@ internal class PopupSelectTypeIdentify : BottomSheetDialogFragment() {
             R.layout.popup_select_type_indentify,
             container, false
         )
-        listView = view!!.findViewById(R.id.recipe_list_type_identify)
-        buttonClose = view!!.findViewById(R.id.buttonClose)
+        listView = view.findViewById(R.id.recipe_list_type_identify)
+        buttonClose = view.findViewById(R.id.buttonClose)
         val methodAdapter: TypeIndentifyAdapter =
             TypeIndentifyAdapter(PayME.context, this.listMethod!!)
         listView.adapter = methodAdapter

@@ -34,7 +34,7 @@ internal class PopupTakeVideo : BottomSheetDialogFragment() {
             R.layout.popup_take_video,
             container, false
         )
-        buttonNext = view!!.findViewById(R.id.buttonNext)
+        buttonNext = view.findViewById(R.id.buttonNext)
         buttonNext.setOnClickListener {
             val openKycActivity = arguments?.getBoolean("openKycActivity")
             if (openKycActivity==true) {

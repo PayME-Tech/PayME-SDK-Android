@@ -40,10 +40,10 @@ class ConfirmPassFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View? = inflater?.inflate(R.layout.confirm_pass, container, false)
-        buttonClose = view!!.findViewById(R.id.buttonClose)
-        pinView = view!!.findViewById(R.id.otp_view)
-        loading = view!!.findViewById(R.id.loading)
+        val view: View = inflater?.inflate(R.layout.confirm_pass, container, false)
+        buttonClose = view.findViewById(R.id.buttonClose)
+        pinView = view.findViewById(R.id.otp_view)
+        loading = view.findViewById(R.id.loading)
         loading.getIndeterminateDrawable()
             .mutate()
             .setColorFilter(Color.parseColor(PayME.colorApp.startColor), PorterDuff.Mode.SRC_ATOP)
@@ -96,9 +96,7 @@ class ConfirmPassFragment : Fragment() {
                                         if (succeeded) {
                                             val history = Pay.optJSONObject("history")
                                             val payment = history.optJSONObject("payment")
-                                            println("history" + history)
                                             val transaction = payment.optString("transaction")
-                                            println("transaction" + transaction)
                                             PayME.transaction = transaction
                                             val fragment = fragmentManager?.beginTransaction()
                                             fragment?.replace(

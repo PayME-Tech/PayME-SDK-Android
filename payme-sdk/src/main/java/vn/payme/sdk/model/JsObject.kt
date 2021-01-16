@@ -34,10 +34,11 @@ public class JsObject(
             println(e)
         }
     }
- @JavascriptInterface
+
+    @JavascriptInterface
     public fun onCommunicate(string: String) {
         try {
-            println("onCommunicate"+string)
+
             val json: JSONObject = JSONObject(string)
             val type = json.optString("type")
             val dataInt = json.optJSONObject("data")
@@ -45,21 +46,29 @@ public class JsObject(
             PayME.dataInit = Init
             val accessToken = Init.optString("accessToken")
             val handShake = Init.optString("handShake")
+            val kyc = Init.optJSONObject("kyc")
             if (!accessToken.equals("null")) {
                 PayME.accessToken = accessToken
             } else {
                 PayME.accessToken = ""
             }
+            if (kyc != null) {
+                val state = kyc.optString("state")
+                if (state == "APPROVED") {
+                    PayME.accountKycSuccess = true
+                } else {
+                    PayME.accountKycSuccess = false
+                }
+            } else {
+                PayME.accountKycSuccess = false
+            }
+            PayME.accountActive = true
             PayME.handShake = handShake
-
-
-//            PayME.onSuccess(json)
 
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
-
 
 
     @JavascriptInterface
@@ -81,9 +90,9 @@ public class JsObject(
             val data = jsonObject.optJSONObject("data")
             val message = jsonObject.optString("message")
             val type = jsonObject.optString("type")
-            println("jsonObject"+jsonObject)
+            println("jsonObject" + jsonObject)
             back()
-            PayME.onError(data,code,message)
+            PayME.onError(data, code, message)
         } catch (e: Exception) {
             println(e)
 

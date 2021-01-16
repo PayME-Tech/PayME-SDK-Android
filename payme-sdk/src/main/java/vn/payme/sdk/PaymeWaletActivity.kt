@@ -156,15 +156,13 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             JsObject(this, back = { backScreen() }, this.supportFragmentManager, cameraManager)
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
         var action: String = PayME.action.toString()
-        //                      dataInit:${PayME.dataInit?.toString()},
-//        handShake: '${PayME.handShake}',
-
+        val showLog = if (PayME.showLog) 1 else 0
         var data: JSONObject = JSONObject(
             """{
                       connectToken:  '${PayME.connectToken}',
                       appToken: '${PayME.appToken}',
                       env: '${PayME.env.toString()}',
-                      showLog: '1',
+                      showLog: '${showLog}',
                       clientId: '${PayME.clientId}',
                       amount:${PayME.amount},
                       configColor: ['${PayME.configColor?.get(0)}', '${PayME.configColor?.get(1)}'],

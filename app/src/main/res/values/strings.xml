@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">AndroidPayMESDK</string>
+    <string name="app_name">TESTAPP</string>
+    <string-array name="environment_arrays">
+        <item>DEV</item>
+        <item>Sandbox</item>
+        <item>Production</item>
+    </string-array>
 </resources>

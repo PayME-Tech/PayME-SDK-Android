@@ -67,6 +67,7 @@
         android:textColor="@color/blackSeven"
         app:itemRadius="16dp"
         android:textSize="26dp"
+        android:importantForAutofill="no"
         app:lineWidth="1dp"
         android:fontFamily="@font/semi_bold"
         app:layout_constraintLeft_toLeftOf="parent"
