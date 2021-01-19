@@ -58,8 +58,15 @@ class EnterAtmCardFragment : Fragment() {
                 val message = GetBankName.optString("message")
                 val succeeded = GetBankName.optBoolean("succeeded")
                 if (succeeded) {
-                    textNoteCard.setText(bankSelected?.shortName + " " + accountName.toUpperCase())
-                    cardHolder = accountName
+                    if (accountName.length >= 19) {
+                        containerInputCardHolder.visibility = View.VISIBLE
+                        textInputCardHolder.setText(accountName)
+                        cardHolder = accountName
+                    } else {
+                        textNoteCard.setText(bankSelected?.shortName + " " + accountName.toUpperCase())
+                        cardHolder = accountName
+                    }
+
                 } else {
                     containerInputCardHolder.visibility = View.VISIBLE
 //                    PayME.showError(message)
@@ -259,74 +266,79 @@ class EnterAtmCardFragment : Fragment() {
 
                 var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.PAYMENT_RESULT, "")
                 val method = PayME.methodSelected
-                paymentApi.payment(method, null, cardNumberValue, cardHolder, cardDate, null, null,
-                    onSuccess = { jsonObject ->
-                        buttonSubmit.disableLoading()
-                        val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
-                        val Payment = OpenEWallet.optJSONObject("Payment")
-                        val Pay = Payment.optJSONObject("Pay")
-                        val succeeded = Pay.optBoolean("succeeded")
-                        val history = Pay.optJSONObject("history")
-                        if (history != null) {
-                            val payment = history.optJSONObject("payment")
-                            if (payment != null) {
-                                val transaction = payment.optString("transaction")
-                                PayME.transaction = transaction
-                            }
-
-                        }
-                        val payment = Pay.optJSONObject("payment")
-                        val message = Pay.optString("message")
-                        PayME.numberAtmCard =
-                            bankSelected?.shortName + "-" + cardNumberValue.substring(
-                                cardNumberValue.length - 4
-                            )
-                        if (succeeded) {
-
-                            even.post(myEven)
-                        } else {
-                            if (payment != null) {
-                                val statePaymentBankCardResponsed =
-                                    payment.optString("statePaymentBankCardResponsed")
-                                if (statePaymentBankCardResponsed == "REQUIRED_VERIFY") {
-                                    val html = payment.optString("html")
-                                    var changeFragmentOtp: ChangeTypePayment =
-                                        ChangeTypePayment(TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS, html)
-                                    even.post(changeFragmentOtp)
-                                } else if (statePaymentBankCardResponsed == "REQUIRED_OTP") {
+                method?.let { it1 ->
+                    paymentApi.payment(it1, null, cardNumberValue, cardHolder, cardDate, null, null,
+                        onSuccess = { jsonObject ->
+                            buttonSubmit.disableLoading()
+                            val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
+                            val Payment = OpenEWallet.optJSONObject("Payment")
+                            val Pay = Payment.optJSONObject("Pay")
+                            val succeeded = Pay.optBoolean("succeeded")
+                            val history = Pay.optJSONObject("history")
+                            if (history != null) {
+                                val payment = history.optJSONObject("payment")
+                                if (payment != null) {
                                     val transaction = payment.optString("transaction")
-                                    var changeFragmentOtp: ChangeTypePayment =
-                                        ChangeTypePayment(
-                                            TYPE_PAYMENT.CONFIRM_OTP_BANK,
-                                            transaction
-                                        )
-                                    even.post(changeFragmentOtp)
+                                    PayME.transaction = transaction
+                                }
+
+                            }
+                            val payment = Pay.optJSONObject("payment")
+                            val message = Pay.optString("message")
+                            PayME.numberAtmCard =
+                                bankSelected?.shortName + "-" + cardNumberValue.substring(
+                                    cardNumberValue.length - 4
+                                )
+                            if (succeeded) {
+
+                                even.post(myEven)
+                            } else {
+                                if (payment != null) {
+                                    val statePaymentBankCardResponsed =
+                                        payment.optString("statePaymentBankCardResponsed")
+                                    if (statePaymentBankCardResponsed == "REQUIRED_VERIFY") {
+                                        val html = payment.optString("html")
+                                        var changeFragmentOtp: ChangeTypePayment =
+                                            ChangeTypePayment(
+                                                TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS,
+                                                html
+                                            )
+                                        even.post(changeFragmentOtp)
+                                    } else if (statePaymentBankCardResponsed == "REQUIRED_OTP") {
+                                        val transaction = payment.optString("transaction")
+                                        var changeFragmentOtp: ChangeTypePayment =
+                                            ChangeTypePayment(
+                                                TYPE_PAYMENT.CONFIRM_OTP_BANK,
+                                                transaction
+                                            )
+                                        even.post(changeFragmentOtp)
+                                    } else {
+                                        myEven.value = message
+                                        even.post(myEven)
+                                    }
                                 } else {
+                                    println("THAT BAI ")
                                     myEven.value = message
                                     even.post(myEven)
                                 }
-                            } else {
-                                println("THAT BAI ")
-                                myEven.value = message
-                                even.post(myEven)
+
                             }
+                            buttonSubmit.disableLoading()
 
+                        },
+                        onError = { jsonObject, code, message ->
+                            buttonSubmit.disableLoading()
+
+                            if (code == ERROR_CODE.EXPIRED) {
+                                PayME.onExpired()
+                                PayME.onError(jsonObject, code, message)
+                            } else {
+                                PayME.showError(message)
+                            }
                         }
-                        buttonSubmit.disableLoading()
 
-                    },
-                    onError = { jsonObject, code, message ->
-                        buttonSubmit.disableLoading()
-
-                        if (code == ERROR_CODE.EXPIRED) {
-                            PayME.onExpired()
-                            PayME.onError(jsonObject, code, message)
-                        } else {
-                            PayME.showError(message)
-                        }
-                    }
-
-                )
+                    )
+                }
             }
         }
         val paymentApi = PaymentApi()

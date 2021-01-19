@@ -2,6 +2,7 @@ package vn.payme.sdk.api
 
 import android.content.Context
 import android.os.Build
+import android.util.Base64
 import androidx.annotation.RequiresApi
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.NetworkResponse
@@ -12,6 +13,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONException
 import org.json.JSONObject
+import vn.payme.sdk.PayME
 import vn.payme.sdk.model.ERROR_CODE
 import java.nio.charset.Charset
 
@@ -25,11 +27,24 @@ internal class NetworkRequest(
     private val isSecurity: Boolean,
 
     ) {
+
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun setOnRequestCrypto(
         onSuccess: (response: JSONObject) -> Unit,
         onError: (data: JSONObject?, code: Int?, message: String) -> Unit,
     ) {
+        var checkErrorRSA =  false
+        try {
+            val cryptoAES = CryptoAES()
+            val cryptoRSA = CryptoRSA()
+        }catch (e:Exception){
+            e.printStackTrace()
+            checkErrorRSA = true
+        }
+
+        if(checkErrorRSA){
+            onError(null,ERROR_CODE.ERROR_KEY_ENCODE,"Vui lòng kiểm tra lại key mã hóa")
+        }else{
         val cryptoAES = CryptoAES()
         val cryptoRSA = CryptoRSA()
         val encryptKey = "10000000"
@@ -42,6 +57,8 @@ internal class NetworkRequest(
         objectValidateRequest["method"] = "POST"
         objectValidateRequest["accessToken"] = token
         objectValidateRequest["x-api-message"] = xAPIMessage
+
+        println("REQUEST"+params)
 
         var valueParams = ""
         for (key in objectValidateRequest.keys) {
@@ -73,11 +90,13 @@ internal class NetworkRequest(
                 try {
                     var finalJSONObject: JSONObject? = null
                     if (isSecurity) {
+                        println("response.toString()"+response.toString())
                         val jsonObject = JSONObject(response.toString())
                         val xAPIMessageResponse = jsonObject.getString("x-api-message")
                         val headers = jsonObject.getJSONObject("headers")
                         val xAPIActionResponse = headers.getString("x-api-action")
                         val xAPIKeyResponse = headers.getString("x-api-key")
+                        println("xAPIKeyResponse"+xAPIKeyResponse)
                         val decryptKey = cryptoRSA.decrypt(xAPIKeyResponse)
                         val objectValidateResponse: MutableMap<String, String> = mutableMapOf()
                         objectValidateResponse["x-api-action"] = xAPIActionResponse
@@ -91,7 +110,9 @@ internal class NetworkRequest(
                         validateString += decryptKey
                         val result = cryptoAES.decryptAES(decryptKey, xAPIMessageResponse)
                         var dataRaw = ConvertJSON().toString(result)
+                        println("dataRaw"+dataRaw)
                         finalJSONObject = JSONObject(dataRaw?.substring(1, dataRaw?.length - 1))
+                        println("RESPONSE"+finalJSONObject)
                     } else {
                         finalJSONObject = JSONObject(response.toString())
                     }
@@ -136,7 +157,8 @@ internal class NetworkRequest(
                 headers["Accept"] = "application/json"
                 headers["Content-Type"] = "application/json"
                 if (isSecurity) {
-                    headers["x-api-client"] = "app"
+                    println("PayME.appID.toString()"+PayME.appID.toString())
+                    headers["x-api-client"] = PayME.appID.toString()
                     headers["x-api-key"] = xAPIKey
                     headers["x-api-action"] = xAPIAction
                     headers["x-api-validate"] = xAPIValidate
@@ -173,6 +195,8 @@ internal class NetworkRequest(
         request.retryPolicy = defaultRetryPolicy
         queue.add(request)
     }
+    }
+
 
 
 }

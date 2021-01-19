@@ -1,25 +1,28 @@
 package vn.payme.sdk.payment
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import org.apache.commons.codec.digest.DigestUtils
+import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.PinView
 import vn.payme.sdk.enum.TYPE_PAYMENT
+import vn.payme.sdk.evenbus.ChangeTypePayment
 import vn.payme.sdk.model.ERROR_CODE
 import vn.payme.sdk.model.Method
 import java.security.MessageDigest
-import java.util.*
 
 class ConfirmPassFragment : Fragment() {
     private lateinit var buttonClose: ImageView
@@ -49,7 +52,6 @@ class ConfirmPassFragment : Fragment() {
             .setColorFilter(Color.parseColor(PayME.colorApp.startColor), PorterDuff.Mode.SRC_ATOP)
         pinView.setAnimationEnable(true)
         pinView.isPasswordHidden = true
-        pinView.requestFocus()
 
 
         pinView.addTextChangedListener { text ->

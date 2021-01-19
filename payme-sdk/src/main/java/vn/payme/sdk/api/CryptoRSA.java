@@ -28,7 +28,6 @@ class CryptoRSA {
     private final static String CRYPTO_METHOD = "RSA";
     private final static int CRYPTO_BITS = 512;
     private static final String PUBLIC_KEY_BASE64_ENCODED = PayME.publicKey;
-
     private static final String PRIVATE_KEY_BASE64_ENCODED_1 = PayME.appPrivateKey;
 
     public CryptoRSA() throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -38,7 +37,6 @@ class CryptoRSA {
 
     private void generateKeyPair()
             throws NoSuchAlgorithmException, InvalidKeySpecException {
-
         privateKey = stringToPrivateKey(PRIVATE_KEY_BASE64_ENCODED_1);
         publicKey =stringToPublicKey(PUBLIC_KEY_BASE64_ENCODED);
     }
@@ -88,6 +86,8 @@ class CryptoRSA {
     public static PrivateKey stringToPrivateKey(String privateKeyPEM) throws NoSuchAlgorithmException, InvalidKeySpecException {
         privateKeyPEM = privateKeyPEM.replace("-----BEGIN PRIVATE KEY-----", "");
         privateKeyPEM = privateKeyPEM.replace("-----END PRIVATE KEY-----", "");
+        privateKeyPEM = privateKeyPEM.replace("-----BEGIN RSA PRIVATE KEY-----", "");
+        privateKeyPEM = privateKeyPEM.replace("-----END RSA PRIVATE KEY-----", "");
         byte[] encoded = Base64.decode(privateKeyPEM,Base64.DEFAULT);
         KeyFactory kf = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);

@@ -17,6 +17,7 @@ import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.enum.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.MyEven
+import vn.payme.sdk.model.ERROR_CODE
 import vn.payme.sdk.model.TypeCallBack
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -42,7 +43,6 @@ class ResultPaymentFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val view: View = inflater?.inflate(R.layout.result_payment_layout, container, false)
-
         buttonSubmit = view.findViewById(R.id.buttonSubmit)
         buttonClose = view.findViewById(R.id.buttonClose)
         textAmount = view.findViewById(R.id.money)
@@ -55,21 +55,20 @@ class ResultPaymentFragment : Fragment() {
         textNumberCard = view.findViewById(R.id.number_card_value)
         containerMethod = view.findViewById(R.id.content_method)
 
-
         val dateFormat = SimpleDateFormat("HH:mm DD/MM/yyyy")
         val GetDate = Date()
         var DateStr: String? = dateFormat.format(GetDate)
         textTransactionTime.text = DateStr
-        textMethodValue.text = PayME.methodSelected.title
-        if(PayME.methodSelected.type==TYPE_PAYMENT.BANK_CARD){
+        textMethodValue.text = PayME.methodSelected?.title
+        if(PayME.methodSelected?.type==TYPE_PAYMENT.BANK_CARD){
             textNumberCard.text = PayME.numberAtmCard
 
         }else{
-            if(PayME.methodSelected.type==TYPE_PAYMENT.LINKED){
+            if(PayME.methodSelected?.type==TYPE_PAYMENT.LINKED){
                 textMethodValue.text = "Tài khoản liên kết"
-                textNumberCard.text =PayME.methodSelected.title+PayME.methodSelected.label
+                textNumberCard.text =PayME.methodSelected?.title+PayME.methodSelected?.label
             }else{
-                textNumberCard.text = PayME.methodSelected.label
+                textNumberCard.text = PayME.methodSelected?.label
             }
 
         }
@@ -83,10 +82,11 @@ class ResultPaymentFragment : Fragment() {
             textError.text = message
             lottie.setAnimation(R.raw.result_that_bai)
             textResult.text = getString(R.string.payment_fail)
-
+            PayME.onError(null,ERROR_CODE.PAYMENT_ERROR,message)
         }
-        if(PayME.methodSelected.type == TYPE_PAYMENT.WALLET){
+        if(PayME.methodSelected?.type == TYPE_PAYMENT.WALLET){
             containerMethod.visibility = View.GONE
+            PayME.onSuccess(null)
         }
         val decimal = DecimalFormat("#,###")
         textAmount.text = "${decimal.format(PayME.infoPayment?.amount)} đ"

@@ -161,6 +161,9 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             """{
                       connectToken:  '${PayME.connectToken}',
                       appToken: '${PayME.appToken}',
+                      publicKey: '${PayME.publicKey}',
+                      privateKey: '${PayME.appPrivateKey}',
+                      xApi: '${PayME.appID}',
                       env: '${PayME.env.toString()}',
                       showLog: '${showLog}',
                       clientId: '${PayME.clientId}',
@@ -180,11 +183,12 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         val encode: String = URLEncoder.encode(data.toString(), "utf-8")
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
         if (PayME.env == Env.DEV) {
-            println("https://sbx-sdk.payme.com.vn/active/${encode}")
+            println("https://sbx-sdk2.payme.com.vn/active/${encode}")
             myWebView.loadUrl("https://sbx-sdk2.payme.com.vn/active/${encode}")
         } else if (PayME.env == Env.SANDBOX) {
-            println("https://sbx-sdk.payme.com.vn/active/${encode}")
             myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
+            println("https://sbx-sdk.payme.com.vn/active/${encode}")
+
         } else {
             myWebView.loadUrl("https://sdk.payme.com.vn/active/${encode}")
         }
@@ -208,7 +212,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                 val message = Detect.optString("message")
                 val note = Detect.optString("note")
                 val amount = Detect.optInt("amount")
-                val orderId = Detect.optLong("orderId")
+                val orderId = Detect.optString("orderId")
                 val storeId = Detect.optLong("storeId")
                 val succeeded = Detect.optBoolean("succeeded")
                 val type = Detect.optString("type")
@@ -224,8 +228,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                         this.supportFragmentManager, infoPayment, null, null
                     )
                 }
-
-
             },
             onError = { jsonObject, code, message ->
                 lottie?.visibility = View.GONE

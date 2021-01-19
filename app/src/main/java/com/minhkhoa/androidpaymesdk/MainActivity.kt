@@ -20,20 +20,37 @@ import java.util.*
 
 
 val APP_TOKEN = "APP_TOKEN"
-val SECRET_KEY = "SECRET_KEY"
 val PUBLIC_KEY = "PUBLIC_KEY"
 val ON_LOG = "ON_LOG"
 val APP_SECRET_KEY = "APP_SECRET_KEY"
+val PRIVATE_KEY = "APP_SECRET_KEY"
 val APP_PHONE = "APP_PHONE"
 val APP_USER_ID = "APP_USER_ID"
 
 class MainActivity : AppCompatActivity() {
     companion object {
-        lateinit var AppToken: String
-        lateinit var PrivateKey: String
-        lateinit var AppSecretKey: String
-        lateinit var PublicKey: String
-        lateinit var payme: PayME
+
+        var AppToken: String =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NH0.U60jaOwKcaQ6bUX-6O21RMOoFR_5ZkjpGgj6rus0r60"
+        var PrivateKey: String = "-----BEGIN RSA PRIVATE KEY-----\n" +
+                "MIIBOgIBAAJBAIpXByu/SQKImCFT5xTyqLe6zcqDAL/aapD4kYueJiSTFQYzobNx\n" +
+                "UA7wRqsljHGfouFXB0gguiPjtoRWgY9XMpMCAwEAAQJALQVFgCcwS3LIj5AOk/Kk\n" +
+                "laZlcpJPnCAoriU2uIkvQJdijzoz6baxQDY5xfxwBh7wExmKGvUWxR/qt7ULVf1a\n" +
+                "AQIhAMVtGD6vc0zVBuIoWFE2RDYt28WN37p5zC1NtpRebnzjAiEAs2I4WSyUQSzD\n" +
+                "P0yR0P+khUI/8oy/iZ/VSASAxzmjkpECIQCTRaZoXIkuL1tLKb14F3saz2q6G/Nh\n" +
+                "L6pXwTkJxMe28QIgTiPG7/FfU1SwaG5uRmBVxkapnHp7JPQe8BQmFKKjAkECIBM4\n" +
+                "Hel54r1RnKQVUtiLphlZgesayKzrtK2kAgssWKi1\n" +
+                "-----END RSA PRIVATE KEY-----"
+        var AppSecretKey: String = "zfQpwE6iHbOeAfgX"
+        var PublicKey: String = "-----BEGIN PUBLIC KEY-----\n" +
+                "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMwvSFz/mOfxBSVkGeqfRv3oQaCsx9V2\n" +
+                "hqdL4Y0PK+r2P+8Jd9pOS61uehd1gsjU1/xMFHWFGKrH6lO8+TSLGukCAwEAAQ==\n" +
+                "-----END PUBLIC KEY-----"
+
+
+
+
+        var payme: PayME? = null
         lateinit var context: Context
         var env = Env.DEV
         lateinit var paymePref: SharedPreferences
@@ -53,15 +70,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun openWallet() {
-        payme.openWallet(
+        payme?.openWallet(
             Action.OPEN, null, null, null,
-            onSuccess = { json: JSONObject ->
+            onSuccess = { json: JSONObject? ->
             },
             onError = { jsonObject, code, message ->
                 PayME.showError(message)
                 if (code == ERROR_CODE.EXPIRED) {
                     walletView.setVisibility(View.GONE)
-                    payme.logout()
+                    payme?.logout()
                 }
 
             })
@@ -91,7 +108,7 @@ class MainActivity : AppCompatActivity() {
 
     fun updateWalletInfo() {
 
-        payme.getWalletInfo(onSuccess = { jsonObject ->
+        payme?.getWalletInfo(onSuccess = { jsonObject ->
             println("onSuccess=" + jsonObject.toString())
             val walletBalance = jsonObject.getJSONObject("Wallet")
             val balance = walletBalance.get("balance")
@@ -113,32 +130,8 @@ class MainActivity : AppCompatActivity() {
         context = this
         setContentView(R.layout.activity_main)
         paymePref = getSharedPreferences("PaymePref", MODE_PRIVATE)
-        AppSecretKey = paymePref.getString(APP_SECRET_KEY, "3zA9HDejj1GnyVK0")!!
+        AppSecretKey = paymePref.getString(APP_SECRET_KEY, AppSecretKey)!!
         showLog = paymePref.getBoolean(ON_LOG, false)!!
-        println("showLog" + showLog)
-
-        AppToken = paymePref.getString(
-            APP_TOKEN,
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MX0.wNtHVZ-olKe7OAkgLigkTSsLVQKv_YL9fHKzX9mn9II"
-        )!!
-        println("AppToken" + AppToken)
-        PrivateKey = paymePref.getString(
-            SECRET_KEY, "-----BEGIN PRIVATE KEY-----\n" +
-                    "    MIIBPAIBAAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKiwIhTJpAi1XnbfOSrW/Eb\n" +
-                    "    w6h1485GOAvuG/OwB+ScsfPJBoNJeNFU6J0CAwEAAQJBAJSfTrSCqAzyAo59Ox+m\n" +
-                    "    Q1ZdsYWBhxc2084DwTHM8QN/TZiyF4fbVYtjvyhG8ydJ37CiG7d9FY1smvNG3iDC\n" +
-                    "    dwECIQDygv2UOuR1ifLTDo4YxOs2cK3+dAUy6s54mSuGwUeo4QIhAK7SiYDyGwGo\n" +
-                    "    CwqjOdgOsQkJTGoUkDs8MST0MtmPAAs9AiEAjLT1/nBhJ9V/X3f9eF+g/bhJK+8T\n" +
-                    "    KSTV4WE1wP0Z3+ECIA9E3DWi77DpWG2JbBfu0I+VfFMXkLFbxH8RxQ8zajGRAiEA\n" +
-                    "    8Ly1xJ7UW3up25h9aa9SILBpGqWtJlNQgfVKBoabzsU=\n" +
-                    "    -----END PRIVATE KEY-----"
-        )!!
-        PublicKey = paymePref.getString(
-            PUBLIC_KEY, "-----BEGIN PUBLIC KEY-----\n" +
-                    "   MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKi\n" +
-                    "   wIhTJpAi1XnbfOSrW/Ebw6h1485GOAvuG/OwB+ScsfPJBoNJeNFU6J0CAwEAAQ==\n" +
-                    "   -----END PUBLIC KEY-----"
-        )!!
 
         val userId = paymePref.getString(APP_USER_ID, "1001")
         val phoneNumber = paymePref.getString(APP_PHONE, "0929000200")
@@ -214,7 +207,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
         buttonLogin.setOnClickListener {
-            if (inputUserId.text.toString().length > 0 && inputPhoneNumber.text.toString().length >= 10 && loading.visibility != View.VISIBLE) {
+            if (inputUserId.text.toString().length > 0 && (inputPhoneNumber.text.toString().length == 10 || inputPhoneNumber.text.toString().length == 0) && loading.visibility != View.VISIBLE) {
                 val params: MutableMap<String, Any> = mutableMapOf()
                 val tz = TimeZone.getTimeZone("UTC")
                 val df: DateFormat =
@@ -226,7 +219,7 @@ class MainActivity : AppCompatActivity() {
                 val dataExample =
                     "{\"userId\":\"${inputUserId.text.toString()}\",\"timestamp\":\"${nowAsISO}\",\"phone\":\"${inputPhoneNumber.text.toString()}\"}"
 
-                val connectToken = CryptoAES.encrypt(dataExample, "3zA9HDejj1GnyVK0")
+                val connectToken = CryptoAES.encrypt(dataExample, AppSecretKey)
                 ConnectToken = connectToken
                 loading.visibility = View.VISIBLE
                 payme =
@@ -240,8 +233,7 @@ class MainActivity : AppCompatActivity() {
                         env,
                         showLog
                     )
-                payme.loggin(onSuccess = { jsonObject ->
-
+                payme?.login(onSuccess = { jsonObject ->
                     loading.visibility = View.GONE
                     paymePref.edit().putString(APP_USER_ID, inputUserId.text.toString()).commit()
                     paymePref.edit().putString(APP_PHONE, inputPhoneNumber.text.toString())
@@ -267,23 +259,26 @@ class MainActivity : AppCompatActivity() {
 
 
         buttonLogout.setOnClickListener {
-            payme.logout()
-            inputPhoneNumber.text = null
-            inputUserId.text = null
-            walletView.setVisibility(View.GONE)
+            if (payme != null) {
+                payme?.logout()
+                inputPhoneNumber.text = null
+                inputUserId.text = null
+                walletView.setVisibility(View.GONE)
+            }
+
         }
 
         button.setOnClickListener {
             if (ConnectToken.length > 0) {
-                payme.openWallet(
+                payme?.openWallet(
                     Action.OPEN, null, null, null,
-                    onSuccess = { json: JSONObject ->
+                    onSuccess = { json: JSONObject? ->
                     },
                     onError = { jsonObject, code, message ->
                         PayME.showError(message)
                         if (code == ERROR_CODE.EXPIRED) {
                             walletView.setVisibility(View.GONE)
-                            payme.logout()
+                            payme?.logout()
                         }
                     })
             }
@@ -295,14 +290,14 @@ class MainActivity : AppCompatActivity() {
 
 
             val amount = convertInt(moneyDeposit.text.toString())
-            payme.deposit(amount, null, "",
-                onSuccess = { json: JSONObject ->
+            payme?.deposit(amount, null, "",
+                onSuccess = { json: JSONObject? ->
                 },
                 onError = { jsonObject, code, message ->
                     PayME.showError(message)
                     if (code == ERROR_CODE.EXPIRED) {
                         walletView.setVisibility(View.GONE)
-                        payme.logout()
+                        payme?.logout()
                     }
                     if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
                         openWallet()
@@ -315,14 +310,14 @@ class MainActivity : AppCompatActivity() {
 
             val amount = convertInt(moneyWithdraw.text.toString())
 
-            payme.withdraw(amount, null, "",
-                onSuccess = { json: JSONObject ->
+            payme?.withdraw(amount, null, "",
+                onSuccess = { json: JSONObject? ->
                 },
                 onError = { jsonObject, code, message ->
                     PayME.showError(message)
                     if (code == ERROR_CODE.EXPIRED) {
                         walletView.setVisibility(View.GONE)
-                        payme.logout()
+                        payme?.logout()
                     }
                     if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
                         openWallet()
@@ -333,16 +328,15 @@ class MainActivity : AppCompatActivity() {
 
             val amount = convertInt(moneyPay.text.toString())
             val infoPayment =
-                InfoPayment("PAY", amount, "Nội dung đơn hàng", 4323, 1, "OpenEWallet")
-            payme.pay(this.supportFragmentManager, infoPayment,
-                onSuccess = { json: JSONObject ->
-                    println("onSuccess2222" + json.toString())
+                InfoPayment("PAY", amount, "Nội dung đơn hàng", "4323", 1, "OpenEWallet")
+            payme?.pay(this.supportFragmentManager, infoPayment,
+                onSuccess = { json: JSONObject? ->
                 },
                 onError = { jsonObject, code, message ->
                     PayME.showError(message)
                     if (code == ERROR_CODE.EXPIRED) {
                         walletView.setVisibility(View.GONE)
-                        payme.logout()
+                        payme?.logout()
                     }
                     if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
                         openWallet()

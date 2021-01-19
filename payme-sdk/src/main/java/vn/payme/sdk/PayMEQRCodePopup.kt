@@ -2,15 +2,11 @@ package vn.payme.sdk
 
 import android.app.Dialog
 import android.os.Bundle
-import android.text.Layout
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.zxing.integration.android.IntentIntegrator
 import vn.payme.sdk.component.Button
 
 class PayMEQRCodePopup : BottomSheetDialogFragment() {
@@ -32,16 +28,6 @@ class PayMEQRCodePopup : BottomSheetDialogFragment() {
         )
         btnSubmit = view.findViewById(R.id.buttonSubmit)
         btnSubmit?.setOnClickListener {
-            IntentIntegrator(activity).apply {
-                setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
-                captureActivity = AnyOrientationCaptureActivity::class.java
-                setPrompt("")
-                setCameraId(0)
-                setRequestCode(5)
-                setBeepEnabled(true)
-                setOrientationLocked(false)
-                initiateScan()
-            }
             dialog?.dismiss()
         }
         return view
@@ -58,5 +44,6 @@ class PayMEQRCodePopup : BottomSheetDialogFragment() {
         val contentView = View.inflate(context, R.layout.modal_qr_layout, null)
         dialog.setContentView(contentView)
         (contentView.parent as View).setBackgroundColor(resources.getColor(android.R.color.transparent))
+
     }
 }

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 
 import androidx.annotation.Nullable
 import androidx.fragment.app.DialogFragment
@@ -84,10 +85,9 @@ internal class PaymePayment : DialogFragment() {
 
     @Subscribe
     fun onChangeFragment(typePayment: ChangeTypePayment) {
+
         if (typePayment.type == TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS) {
             this.dialog?.dismiss()
-
-
             val bundle: Bundle = Bundle()
             bundle.putString("html", typePayment.value)
             val intent = Intent(PayME.context, WebViewNapasActivity::class.java)

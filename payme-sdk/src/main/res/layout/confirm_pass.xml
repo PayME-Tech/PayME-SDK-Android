@@ -2,7 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:clickable="false"
+    android:clickable="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:layout_height="match_parent">
 
 
@@ -77,35 +79,11 @@
             app:cursorColor="@color/brownishGrey"
             app:itemCount="6"
             app:itemRadius="16dp"
-            app:lineColor="@android:color/transparent" />
+            app:lineColor="@android:color/transparent" >
+            <requestFocus/>
+        </vn.payme.sdk.component.PinView>
 
 
-<!--    <vn.payme.sdk.component.PinView-->
-<!--        android:id="@+id/otp_view"-->
-<!--        style="@style/PinWidget.PinView"-->
-<!--        android:layout_marginTop="32dp"-->
-<!--        android:padding="10dp"-->
-<!--        android:background="@drawable/background_radius_with_boder"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:cursorVisible="false"-->
-<!--        android:inputType="numberPassword"-->
-<!--        app:itemCount="6"-->
-<!--        android:layout_marginHorizontal="16dp"-->
-<!--        android:textColor="@color/blackSeven"-->
-<!--        android:textSize="20dp"-->
-<!--        app:lineWidth="1dp"-->
-<!--        android:fontFamily="@font/semi_bold"-->
-<!--        app:layout_constraintLeft_toLeftOf="parent"-->
-<!--        app:layout_constraintRight_toRightOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/text_note_otp"-->
-<!--        app:itemHeight="30dp"-->
-<!--        app:itemRadius="4dp"-->
-<!--        app:itemSpacing="8dp"-->
-<!--        app:itemWidth="30dp"-->
-<!--        app:lineColor="@color/line_color_pass"-->
-
-<!--        />-->
     <ProgressBar
         android:layout_width="wrap_content"
         android:id="@+id/loading"

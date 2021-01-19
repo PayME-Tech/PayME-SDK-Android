@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="16dp"
-            app:pbText="@string/confirm" />
+            app:pbText="ĐÓNG" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
