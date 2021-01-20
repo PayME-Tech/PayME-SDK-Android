@@ -83,10 +83,11 @@ class ResultPaymentFragment : Fragment() {
             lottie.setAnimation(R.raw.result_that_bai)
             textResult.text = getString(R.string.payment_fail)
             PayME.onError(null,ERROR_CODE.PAYMENT_ERROR,message)
+        }else{
+            PayME.onSuccess(null)
         }
         if(PayME.methodSelected?.type == TYPE_PAYMENT.WALLET){
             containerMethod.visibility = View.GONE
-            PayME.onSuccess(null)
         }
         val decimal = DecimalFormat("#,###")
         textAmount.text = "${decimal.format(PayME.infoPayment?.amount)} đ"

@@ -248,7 +248,7 @@ class ListMethodPaymentFragment : Fragment() {
 
 
         this.listView.setOnItemClickListener { adapterView, view, i, l ->
-            if (!loading) {
+            if (loadingProcess.visibility!=View.VISIBLE) {
                 val paymentApi = PaymentApi()
                 val method = this.listMethod[i]
                 PayME.methodSelected = method!!

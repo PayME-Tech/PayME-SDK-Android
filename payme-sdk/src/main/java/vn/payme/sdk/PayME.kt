@@ -249,7 +249,6 @@ public class PayME(
         PayME.configColor = configColor
         PayME.env = env
         PayME.context = context
-        println("showLog2" + showLog)
         PayME.showLog = showLog
         Companion.colorApp = ColorApp(configColor[0], configColor[1])
         Companion.clientInfo = ClientInfo(context)

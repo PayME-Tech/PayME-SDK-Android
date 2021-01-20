@@ -20,6 +20,7 @@ import kotlinx.android.synthetic.main.webview_activity.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.json.JSONObject
+import vn.payme.sdk.api.CryptoAES
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.evenbus.MyEven
@@ -157,6 +158,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
         var action: String = PayME.action.toString()
         val showLog = if (PayME.showLog) 1 else 0
+
         var data: JSONObject = JSONObject(
             """{
                       connectToken:  '${PayME.connectToken}',
@@ -180,10 +182,11 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                     }"""
         )
 
-        val encode: String = URLEncoder.encode(data.toString(), "utf-8")
+        val cryptoAES = CryptoAES()
+        val xAPIData = cryptoAES.encrytAESDataWebview("LkaWasflkjfqr2g3", data.toString())
+        val encode: String = URLEncoder.encode(xAPIData, "utf-8")
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
         if (PayME.env == Env.DEV) {
-            println("https://sbx-sdk2.payme.com.vn/active/${encode}")
             myWebView.loadUrl("https://sbx-sdk2.payme.com.vn/active/${encode}")
         } else if (PayME.env == Env.SANDBOX) {
             myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")

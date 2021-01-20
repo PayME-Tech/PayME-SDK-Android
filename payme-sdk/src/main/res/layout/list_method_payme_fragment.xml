@@ -8,6 +8,7 @@
 
     <ListView
         app:layout_constraintTop_toTopOf="parent"
+        android:listSelector="@android:color/transparent"
         android:id="@+id/recipe_list_view"
         android:layout_width="match_parent"
         android:fillViewport="true"

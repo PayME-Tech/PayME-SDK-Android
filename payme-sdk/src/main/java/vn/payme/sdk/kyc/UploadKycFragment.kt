@@ -34,15 +34,8 @@ class UploadKycFragment : Fragment() {
             onError = { jsonObject, code, message ->
                 loadingUploadKycApi = false
                 parentFragmentManager.popBackStack()
-                val toast: Toast =
-                    Toast.makeText(PayME.context, message, Toast.LENGTH_SHORT)
-                toast.view?.setBackgroundColor(
-                    ContextCompat.getColor(
-                        PayME.context,
-                        R.color.scarlet
-                    )
-                )
-                toast.show()
+                PayME.showError(message)
+
             })
     }
 

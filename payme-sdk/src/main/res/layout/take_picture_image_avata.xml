@@ -77,11 +77,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
-    <TextView
-        android:id="@+id/iuhiu"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
+
 
     <!--    ConfirmScreen-->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -118,7 +114,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:fontFamily="@font/semi_bold"
-                android:text="@string/confirm_take_photography"
+                android:text="@string/confirm_take_face"
                 android:textColor="@color/darkBlueGrey"
                 android:textSize="18dp"
                 app:layout_constraintBottom_toBottomOf="parent"

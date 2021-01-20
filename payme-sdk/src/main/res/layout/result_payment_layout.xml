@@ -79,6 +79,7 @@
                     android:fontFamily="@font/barlow_medium"
                     android:textColor="@color/scarlet"
                     android:textSize="16dp"
+                    android:textAlignment="center"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/money" />

@@ -54,6 +54,7 @@ class UploadKycApi {
                         responseImageFront?.code,
                         responseImageFront?.message!!
                     )
+                    return@launch
 
                 }
 
@@ -71,6 +72,8 @@ class UploadKycApi {
                         responseImageBack.code,
                         responseImageBack.message!!
                     )
+                    return@launch
+
 
                 }
 
@@ -84,6 +87,8 @@ class UploadKycApi {
                     urlVideo = responseVideo.path
                 } else {
                     onError(responseVideo.data, responseVideo.code, responseVideo.message!!)
+                    return@launch
+
                 }
 
 
@@ -100,6 +105,8 @@ class UploadKycApi {
                         responseImageFace.code,
                         responseImageFace.message!!
                     )
+                    return@launch
+
 
                 }
 

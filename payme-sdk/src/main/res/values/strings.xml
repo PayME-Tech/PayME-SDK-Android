@@ -28,6 +28,7 @@
     <string name="please_take_video">Giữ gương mặt và mặt trước giấy tờ tuỳ thân trước ống kính máy quay</string>
     <string name="confirm_take_photography">Xác nhận hình chụp</string>
     <string name="confirm_take_video">Xác nhận video</string>
+    <string name="confirm_take_face">Xác nhận ảnh</string>
     <string name="select_identity">Chọn loại giấy tờ</string>
     <string name="identity_card">Chứng minh nhân dân</string>
     <string name="citizen_identity">Căn cước công dân</string>
@@ -35,7 +36,7 @@
     <string name="front">Mặt trước</string>
     <string name="backside">Mặt sau</string>
     <string name="please_take_pictures_center">Vui lòng cân chỉnh giấy tờ tùy thân vào giữa khung</string>
-    <string name="confirm_image_take_pictures_identify">Vui lòng xác nhận hình ảnh rõ ràng và dễ đọc, trước khi tiếp tục </string>
+    <string name="confirm_image_take_pictures_identify">Vui lòng xác nhận ảnh đã rõ nét, gương mặt của bạn đã có trong khung hình.</string>
     <string name="confirm_image_take_video_identify">Vui lòng xác nhận video đã rõ nét, gương mặt và giấy tờ tùy thân của bạn đã có trong khung hình.</string>
     <string name="confirm_payment">Xác nhận thanh toán</string>
     <string name="payment">Thanh toán</string>

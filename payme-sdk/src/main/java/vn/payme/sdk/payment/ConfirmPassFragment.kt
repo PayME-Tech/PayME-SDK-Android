@@ -58,6 +58,7 @@ class ConfirmPassFragment : Fragment() {
             if (text?.length!! >= 6) {
                 if (loading.visibility != View.VISIBLE) {
                     loading.visibility = View.VISIBLE
+                    pinView.visibility = View.GONE
                     val paymentApi = PaymentApi()
                     val pass: String? = SHA256(text.toString())
                     paymentApi.getSecuriryCode(pass!!,
@@ -122,17 +123,24 @@ class ConfirmPassFragment : Fragment() {
                                             )
                                             fragment?.commit()
                                         }
+                                        pinView.visibility = View.VISIBLE
+                                        pinView.requestFocus()
                                         loading.visibility = View.GONE
+
 
                                     },
                                     onError = { jsonObject, i, s ->
                                         loading.visibility = View.GONE
+                                        pinView.visibility = View.VISIBLE
+                                        pinView.requestFocus()
                                         PayME.showError(message)
 
                                     }
                                 )
 
                             } else {
+                                pinView.visibility = View.VISIBLE
+                                pinView.requestFocus()
                                 loading.visibility = View.GONE
                                 PayME.showError(message)
                             }
@@ -141,6 +149,8 @@ class ConfirmPassFragment : Fragment() {
 
                         },
                         onError = { jsonObject, code, message ->
+                            pinView.visibility = View.VISIBLE
+                            pinView.requestFocus()
                             loading.visibility = View.GONE
                             if (code == ERROR_CODE.EXPIRED) {
                                 PayME.onExpired()
