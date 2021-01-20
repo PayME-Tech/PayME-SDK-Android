@@ -124,7 +124,6 @@ class ConfirmPassFragment : Fragment() {
                                             fragment?.commit()
                                         }
                                         pinView.visibility = View.VISIBLE
-                                        pinView.requestFocus()
                                         loading.visibility = View.GONE
 
 

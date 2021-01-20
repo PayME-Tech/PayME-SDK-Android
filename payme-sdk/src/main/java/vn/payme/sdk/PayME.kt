@@ -376,7 +376,6 @@ public class PayME(
         val accountApi = AccountApi()
         accountApi.intAccount(onSuccess = { jsonObject ->
             println("jsonObject" + jsonObject)
-            onSuccess(jsonObject)
             val OpenEWallet = jsonObject.getJSONObject("OpenEWallet")
             val Init = OpenEWallet.getJSONObject("Init")
             PayME.dataInit = Init
@@ -407,6 +406,7 @@ public class PayME(
                 PayME.accessToken = ""
             }
             PayME.handShake = handShake
+            onSuccess(jsonObject)
         }, onError = { jsonObject, code, message ->
             onError(jsonObject, code, message)
         })

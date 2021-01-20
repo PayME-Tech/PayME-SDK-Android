@@ -1,18 +1,14 @@
 package vn.payme.sdk.model
 
 import android.app.Activity
-import android.content.Intent
 import android.hardware.camera2.CameraManager
 import android.os.Bundle
 import android.webkit.JavascriptInterface
-import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import com.google.zxing.integration.android.IntentIntegrator
 import org.json.JSONObject
 import vn.payme.sdk.AnyOrientationCaptureActivity
 import vn.payme.sdk.PayME
-import vn.payme.sdk.kyc.CameraKycActivity
-import vn.payme.sdk.kyc.TakePictureIdentifyFragment
 import vn.payme.sdk.payment.PopupTakeFace
 import vn.payme.sdk.payment.PopupTakeIdentify
 import vn.payme.sdk.payment.PopupTakeVideo

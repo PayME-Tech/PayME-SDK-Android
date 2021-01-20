@@ -19,6 +19,10 @@ class CameraKycActivity : AppCompatActivity(R.layout.camera_kyc_activity) {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        video = null
+        imageFace = null
+        imageFront= null
+        imageBackSide = null
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         getWindow().setBackgroundDrawable(PayME.colorApp.backgroundColor);
         if (savedInstanceState == null) {

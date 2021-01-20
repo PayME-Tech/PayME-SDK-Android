@@ -121,7 +121,6 @@ class TakePictureAvataFragment : Fragment() {
             if (PayME.kycVideo) {
                 val popupTakeVideo = PopupTakeVideo()
                 popupTakeVideo.show(parentFragmentManager, "ModalBottomSheet")
-
             } else {
                 val newFragment = UploadKycFragment()
                 val fragment = activity?.supportFragmentManager?.beginTransaction()
