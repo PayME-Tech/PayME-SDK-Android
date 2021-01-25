@@ -7,19 +7,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.PinView
 import vn.payme.sdk.enum.TYPE_PAYMENT
-import vn.payme.sdk.evenbus.ChangeTypePayment
 import vn.payme.sdk.model.ERROR_CODE
 import vn.payme.sdk.model.Method
 import java.security.MessageDigest
@@ -37,6 +34,11 @@ class ConfirmPassFragment : Fragment() {
         val hash = digest.digest(byteArray)
         return hash.fold("", { str, it -> str + "%02x".format(it) })
     }
+    fun showKeyboard() {
+        val inputMethodManager =
+           requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,7 +53,9 @@ class ConfirmPassFragment : Fragment() {
             .mutate()
             .setColorFilter(Color.parseColor(PayME.colorApp.startColor), PorterDuff.Mode.SRC_ATOP)
         pinView.setAnimationEnable(true)
+        pinView.requestFocus()
         pinView.isPasswordHidden = true
+        showKeyboard()
 
 
         pinView.addTextChangedListener { text ->

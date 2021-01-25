@@ -64,6 +64,7 @@ public class PayME(
         var numberAtmCard = ""
         var transaction = ""
         internal var openPayAndKyc: Boolean = true
+
         //KYC
         var kycIdenity = false
         var kycVideo = false
@@ -131,15 +132,16 @@ public class PayME(
         }
 
     }
-    private fun getAppID() :Int{
+
+    private fun getAppID(): Int {
         try {
             val listId = PayME.appToken.split(".")
             val appID = Base64.decode(listId[1], Base64.DEFAULT)
             val appID_UTF_8 = String(appID, StandardCharsets.UTF_8)
             val jsonObject = JSONObject(appID_UTF_8)
             return jsonObject.getInt("appId")
-        }catch (e:Exception){
-            return  0
+        } catch (e: Exception) {
+            return 0
         }
 
     }
@@ -162,9 +164,9 @@ public class PayME(
             for (i in 0 until configs.length()) {
                 val config = configs.optJSONObject(i)
                 val key = config.optString("key")
-                val valueString =config.optString("value")
+                val valueString = config.optString("value")
 
-                if (key == "limit.param.amount.payment" && valueString!=null) {
+                if (key == "limit.param.amount.payment" && valueString != null) {
                     val value = JSONObject(valueString)
                     val max = Integer.parseInt(value.optString("max"))
                     val min = Integer.parseInt(value.optString("min"))
@@ -180,8 +182,8 @@ public class PayME(
                 for (i in 0 until configs.length()) {
                     val config = configs.optJSONObject(i)
                     val key = config.optString("key")
-                    val valueString =config.optString("value")
-                    if (key == "limit.param.amount.all" && valueString!=null) {
+                    val valueString = config.optString("value")
+                    if (key == "limit.param.amount.all" && valueString != null) {
                         val value = JSONObject(valueString)
                         val max = Integer.parseInt(value.optString("max"))
                         val min = Integer.parseInt(value.optString("min"))
@@ -365,8 +367,11 @@ public class PayME(
         even.post(closeWebview)
     }
 
-    public fun getAccountInfo(): AccountInfo {
-        return AccountInfo(PayME.accountKycSuccess, PayME.accountKycSuccess)
+    public fun getAccountInfo(
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        loginAccount(onSuccess,onError)
     }
 
     private fun loginAccount(
@@ -375,7 +380,6 @@ public class PayME(
     ) {
         val accountApi = AccountApi()
         accountApi.intAccount(onSuccess = { jsonObject ->
-            println("jsonObject" + jsonObject)
             val OpenEWallet = jsonObject.getJSONObject("OpenEWallet")
             val Init = OpenEWallet.getJSONObject("Init")
             PayME.dataInit = Init

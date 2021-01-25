@@ -10,19 +10,21 @@
         android:id="@+id/webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/loadingWeb"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:visibility="visible"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:id="@id/loading"
+        android:background="@color/white"
+        android:layout_height="match_parent">
+    <ProgressBar
+        android:id="@+id/loadingProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:lottie_autoPlay="true"
-        app:lottie_loop="true"
-        app:lottie_rawRes="@raw/loading_payme_fi" />
+       />
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:visibility="gone"

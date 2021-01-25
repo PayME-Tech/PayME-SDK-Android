@@ -4,7 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
+import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.hardware.camera2.CameraManager
 import android.net.ConnectivityManager
 import android.os.Bundle
@@ -12,10 +14,12 @@ import android.util.DisplayMetrics
 import android.view.KeyEvent
 import android.view.View
 import android.webkit.*
+import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.airbnb.lottie.LottieAnimationView
 import com.google.zxing.client.android.Intents
+import com.otaliastudios.cameraview.engine.action.Actions.timeout
 import kotlinx.android.synthetic.main.webview_activity.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -32,13 +36,14 @@ import java.net.URLEncoder
 
 
 internal class PaymeWaletActivity : AppCompatActivity() {
-    private var lottie: LottieAnimationView? = null
+    lateinit private var loading: ConstraintLayout
+    lateinit private var loadingProgressBar: ProgressBar
     private lateinit var cameraManager: CameraManager
     private lateinit var myWebView: WebView
     private var buttonBack: Button? = null
     private var buttonNext: Button? = null
-    private var containerErrorNetwork: ConstraintLayout? = null
-
+    lateinit var containerErrorNetwork: ConstraintLayout
+    private var checkTimeoutLoadWebView = false
     private fun backScreen(): Unit {
         runOnUiThread {
             onBackPressed()
@@ -69,8 +74,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         EventBus.getDefault().register(this)
 
         cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
-
-
         WebView(applicationContext).clearCache(true)
         WebStorage.getInstance().deleteAllData();
         CookieManager.getInstance().removeAllCookies(null);
@@ -88,7 +91,8 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
 
         myWebView = findViewById(R.id.webview)
-        lottie = findViewById(R.id.loadingWeb)
+        loadingProgressBar = findViewById(R.id.loadingProgressBar)
+        loading = findViewById(R.id.loading)
 
         buttonBack = findViewById(R.id.buttonBack)
         buttonNext = findViewById(R.id.buttonNext)
@@ -98,17 +102,22 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         myWebView.clearFormData();
         myWebView.clearHistory();
         myWebView.clearSslPreferences();
+        loadingProgressBar.getIndeterminateDrawable()
+            .mutate()
+            .setColorFilter(Color.parseColor(PayME.colorApp.startColor), PorterDuff.Mode.SRC_ATOP)
+
         val cookieManager = CookieManager.getInstance()
         cookieManager.setAcceptCookie(true)
         buttonBack?.setOnClickListener {
             finish()
         }
         buttonNext?.setOnClickListener {
-            lottie?.visibility = View.VISIBLE
-            containerErrorNetwork?.visibility = View.GONE
+            containerErrorNetwork.visibility = View.GONE
+            loading?.visibility = View.VISIBLE
             myWebView.reload()
 
         }
+
         buttonBack?.background = PayME.colorApp.backgroundColorRadiusAlpha
 
         myWebView.setWebViewClient(object : WebViewClient() {
@@ -118,19 +127,37 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                 description: String?,
                 failingUrl: String?
             ) {
-                println("errorCode" + errorCode)
                 if (errorCode == -2) {
-                    println("BAT LOI <LANG")
-                    loadingWeb.visibility = View.GONE
+                    loading.visibility = View.GONE
                     containerErrorNetwork?.visibility = View.VISIBLE
                 }
-
                 super.onReceivedError(view, errorCode, description, failingUrl)
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                lottie?.visibility = View.GONE
+                if (loading?.visibility != View.GONE) {
+                    loading?.visibility = View.GONE
+                }
+                checkTimeoutLoadWebView = true
+
+            }
+
+            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                super.onPageStarted(view, url, favicon)
+                Thread {
+                    try {
+                        Thread.sleep(30000)
+                    } catch (e: InterruptedException) {
+                        e.printStackTrace()
+                    }
+                    if (!checkTimeoutLoadWebView) {
+                        runOnUiThread {
+                            loading.visibility = View.GONE
+                            containerErrorNetwork?.visibility = View.VISIBLE
+                        }
+                    }
+                }.start()
             }
         })
 
@@ -153,6 +180,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         webSettings.loadWithOverviewMode = true
         webSettings.allowFileAccess = true
         webSettings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+
         val jsObject: JsObject =
             JsObject(this, back = { backScreen() }, this.supportFragmentManager, cameraManager)
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
@@ -188,9 +216,9 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
         if (PayME.env == Env.DEV) {
             myWebView.loadUrl("https://sbx-sdk2.payme.com.vn/active/${encode}")
+
         } else if (PayME.env == Env.SANDBOX) {
             myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
-            println("https://sbx-sdk.payme.com.vn/active/${encode}")
 
         } else {
             myWebView.loadUrl("https://sdk.payme.com.vn/active/${encode}")
@@ -204,10 +232,10 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
     fun checkScanQr(contents: String) {
         val paymentApi = PaymentApi()
-        lottie?.visibility = View.VISIBLE
+        loading?.visibility = View.VISIBLE
         paymentApi.postCheckDataQr(contents,
             onSuccess = { jsonObject ->
-                lottie?.visibility = View.GONE
+                loading?.visibility = View.GONE
                 val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
                 val Payment = OpenEWallet.optJSONObject("Payment")
                 val Detect = Payment.optJSONObject("Detect")
@@ -221,7 +249,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                 val type = Detect.optString("type")
 
                 if (!succeeded) {
-                    lottie?.visibility = View.GONE
+                    loading?.visibility = View.GONE
                     var popup: PayMEQRCodePopup = PayMEQRCodePopup()
                     popup.show(this.supportFragmentManager, "ModalBottomSheet")
                 } else {
@@ -233,7 +261,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                 }
             },
             onError = { jsonObject, code, message ->
-                lottie?.visibility = View.GONE
+                loading?.visibility = View.GONE
                 var popup: PayMEQRCodePopup = PayMEQRCodePopup()
                 popup.show(this.supportFragmentManager, "ModalBottomSheet")
             }

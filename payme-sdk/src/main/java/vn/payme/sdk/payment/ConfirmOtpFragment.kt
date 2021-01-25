@@ -1,9 +1,11 @@
 package vn.payme.sdk.payment
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
@@ -19,6 +21,11 @@ class ConfirmOtpFragment : Fragment() {
     private lateinit var buttonSubmit: Button
     private lateinit var buttonClose: ImageView
     private lateinit var pinView: PinView
+    fun showKeyboard() {
+        val inputMethodManager =
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -33,13 +40,11 @@ class ConfirmOtpFragment : Fragment() {
         pinView.setAnimationEnable(true)
         pinView.requestFocus()
         pinView.isPasswordHidden = false
-
-
+        showKeyboard()
         pinView.addTextChangedListener { text ->
             if (text?.length == 6) {
                 checkPassword(text.toString())
             }
-
         }
         buttonSubmit.setOnClickListener {
             if (pinView.text?.length === 6 && !buttonSubmit.isLoadingShowing) {

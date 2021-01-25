@@ -24,12 +24,21 @@ class UploadKycFragment : Fragment() {
     suspend fun uploadKYC() {
         val uploadKycApi = UploadKycApi()
         uploadKycApi.upLoadKYC(CameraKycActivity.imageFront, CameraKycActivity.imageBackSide, CameraKycActivity.imageFace, CameraKycActivity.video,
-            onSuccess = {
-                loadingUploadKycApi = false
-                activity?.finish()
-                var even: EventBus = EventBus.getDefault()
-                var myEven: MyEven = MyEven(TypeCallBack.onReload, "")
-                even.post(myEven)
+            onSuccess = {jsonObject->
+                val Account = jsonObject.optJSONObject("Account")
+                val KYC = Account.optJSONObject("KYC")
+                val message = KYC.optString("message")
+                val succeeded = KYC.optBoolean("succeeded")
+                if(succeeded){
+                    loadingUploadKycApi = false
+                    activity?.finish()
+                    var even: EventBus = EventBus.getDefault()
+                    var myEven: MyEven = MyEven(TypeCallBack.onReload, "")
+                    even.post(myEven)
+                }else{
+                    parentFragmentManager.popBackStack()
+                    PayME.showError(message)
+                }
             },
             onError = { jsonObject, code, message ->
                 loadingUploadKycApi = false
