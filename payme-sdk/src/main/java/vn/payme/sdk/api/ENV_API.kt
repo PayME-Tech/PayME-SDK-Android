@@ -1,7 +1,7 @@
 package vn.payme.sdk.api
 
 import vn.payme.sdk.PayME
-import vn.payme.sdk.model.Env
+import vn.payme.sdk.enums.Env
 
 class ENV_API() {
     companion object {

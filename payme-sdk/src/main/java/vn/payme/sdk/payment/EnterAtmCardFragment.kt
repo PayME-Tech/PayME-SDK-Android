@@ -19,10 +19,10 @@ import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.Button
-import vn.payme.sdk.enum.TYPE_PAYMENT
+import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.ChangeTypePayment
 import vn.payme.sdk.model.BankInfo
-import vn.payme.sdk.model.ERROR_CODE
+import vn.payme.sdk.enums.ERROR_CODE
 import java.util.*
 
 

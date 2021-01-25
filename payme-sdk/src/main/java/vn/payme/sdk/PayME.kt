@@ -12,6 +12,10 @@ import org.spongycastle.jce.provider.BouncyCastleProvider
 import vn.payme.sdk.api.AccountApi
 import vn.payme.sdk.api.ENV_API
 import vn.payme.sdk.api.PaymentApi
+import vn.payme.sdk.enums.Action
+import vn.payme.sdk.enums.ERROR_CODE
+import vn.payme.sdk.enums.Env
+import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.*
 import vn.payme.sdk.payment.PaymePayment

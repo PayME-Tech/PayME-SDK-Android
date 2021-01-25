@@ -1,31 +1,29 @@
 package vn.payme.sdk.payment
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.component.PinView
-import vn.payme.sdk.model.ERROR_CODE
+import vn.payme.sdk.evenbus.MyEven
+import vn.payme.sdk.hepper.Keyboard
+import vn.payme.sdk.enums.ERROR_CODE
+import vn.payme.sdk.enums.TypeCallBack
 
 class ConfirmOtpFragment : Fragment() {
     private lateinit var buttonSubmit: Button
     private lateinit var buttonClose: ImageView
     private lateinit var pinView: PinView
-    fun showKeyboard() {
-        val inputMethodManager =
-            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
-    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -40,7 +38,7 @@ class ConfirmOtpFragment : Fragment() {
         pinView.setAnimationEnable(true)
         pinView.requestFocus()
         pinView.isPasswordHidden = false
-        showKeyboard()
+        Keyboard.showKeyboard(requireContext())
         pinView.addTextChangedListener { text ->
             if (text?.length == 6) {
                 checkPassword(text.toString())
@@ -54,16 +52,13 @@ class ConfirmOtpFragment : Fragment() {
         }
         buttonClose.setOnClickListener {
             if (!buttonSubmit.isLoadingShowing) {
-                val fragment = fragmentManager?.beginTransaction()
-                fragment?.replace(R.id.frame_container, SelectMethodFragment())
-                fragment?.commit()
+                Keyboard.closeKeyboard(requireContext())
+                PayME.onError(null, ERROR_CODE.USER_CANCELLED,"")
+                var even: EventBus = EventBus.getDefault()
+                var myEven: MyEven = MyEven(TypeCallBack.onClose, "")
+                even.post(myEven)
             }
-
         }
-
-
-
-
         return view
     }
 
@@ -99,10 +94,10 @@ class ConfirmOtpFragment : Fragment() {
                             val statePaymentLinkedResponsed =
                                 payment.optString("statePaymentLinkedResponsed")
                             if (statePaymentLinkedResponsed == "INVALID_OTP") {
-                                println("statePaymentLinkedResponsed=INVALID_OTP")
                                 pinView.setText("")
                                 PayME.showError(message)
                             } else {
+                                Keyboard.closeKeyboard(requireContext())
                                 val bundle: Bundle = Bundle()
                                 bundle.putString("message", message)
                                 val resultPaymentFragment = ResultPaymentFragment()
@@ -114,6 +109,7 @@ class ConfirmOtpFragment : Fragment() {
 
 
                         } else {
+                            Keyboard.closeKeyboard(requireContext())
                             val bundle: Bundle = Bundle()
                             bundle.putString("message", message)
                             val resultPaymentFragment = ResultPaymentFragment()

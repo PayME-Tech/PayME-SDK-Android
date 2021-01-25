@@ -1,4 +1,4 @@
-package vn.payme.sdk.enum
+package vn.payme.sdk.enums
 
 class KEY_KYC {
     companion object{

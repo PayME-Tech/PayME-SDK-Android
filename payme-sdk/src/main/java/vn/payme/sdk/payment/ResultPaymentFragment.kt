@@ -15,10 +15,11 @@ import com.airbnb.lottie.LottieAnimationView
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
-import vn.payme.sdk.enum.TYPE_PAYMENT
+import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.model.ERROR_CODE
-import vn.payme.sdk.model.TypeCallBack
+import vn.payme.sdk.hepper.Keyboard
+import vn.payme.sdk.enums.ERROR_CODE
+import vn.payme.sdk.enums.TypeCallBack
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -39,9 +40,7 @@ class ResultPaymentFragment : Fragment() {
     private lateinit var lottie: LottieAnimationView
 
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
         val view: View = inflater?.inflate(R.layout.result_payment_layout, container, false)
         buttonSubmit = view.findViewById(R.id.buttonSubmit)
         buttonClose = view.findViewById(R.id.buttonClose)
@@ -82,7 +81,7 @@ class ResultPaymentFragment : Fragment() {
             textError.text = message
             lottie.setAnimation(R.raw.result_that_bai)
             textResult.text = getString(R.string.payment_fail)
-            PayME.onError(null,ERROR_CODE.PAYMENT_ERROR,message)
+            PayME.onError(null, ERROR_CODE.PAYMENT_ERROR,message)
         }else{
             PayME.onSuccess(null)
         }

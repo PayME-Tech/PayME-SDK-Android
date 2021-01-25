@@ -16,10 +16,10 @@ import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.adapter.MethodAdapter
 import vn.payme.sdk.api.PaymentApi
-import vn.payme.sdk.enum.TYPE_PAYMENT
+import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.ChangeTypePayment
 import vn.payme.sdk.model.DataMethod
-import vn.payme.sdk.model.ERROR_CODE
+import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.model.Method
 
 class ListMethodPaymentFragment : Fragment() {

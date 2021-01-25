@@ -27,7 +27,7 @@ import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.kyc.PermisionCamera
-import vn.payme.sdk.model.TypeCallBack
+import vn.payme.sdk.enums.TypeCallBack
 
 
 class AnyOrientationCaptureActivity : AppCompatActivity() {

@@ -2,7 +2,6 @@ package vn.payme.sdk.api
 
 import org.json.JSONObject
 import vn.payme.sdk.PayME
-import vn.payme.sdk.model.Env
 
 internal class  AccountApi {
 

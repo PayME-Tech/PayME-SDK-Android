@@ -4,36 +4,19 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
-import vn.payme.sdk.enum.TYPE_PAYMENT
-import vn.payme.sdk.evenbus.ChangeTypePayment
+import vn.payme.sdk.enums.ERROR_CODE
 
 class WebViewNapasActivity : AppCompatActivity() {
     private lateinit var buttonClose: ImageView
     private  var message : String? = null
     private  var trans_id : String? = null
     private  var onResult : Boolean? = false
-    fun gotoResult(){
-        GlobalScope.launch(Dispatchers.Main) {
-            delay(300)
-            var even: EventBus = EventBus.getDefault()
-            var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.PAYMENT_RESULT, "")
-
-        }
-
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -42,6 +25,7 @@ class WebViewNapasActivity : AppCompatActivity() {
         myWebView.settings.javaScriptEnabled = true
         buttonClose = findViewById(R.id.buttonClose)
         buttonClose.setOnClickListener {
+            PayME.onError(null, ERROR_CODE.USER_CANCELLED,"")
             finish()
         }
         getWindow().setStatusBarColor(Color.TRANSPARENT);

@@ -1,4 +1,4 @@
-package vn.payme.sdk.model
+package vn.payme.sdk.enums
 
 class ERROR_CODE {
     companion object{
@@ -10,6 +10,7 @@ class ERROR_CODE {
        val  ACCOUNT_NOT_KYC = -5
         val PAYMENT_ERROR = -6
         val ERROR_KEY_ENCODE = -7
+        val USER_CANCELLED = -8
 
     }
 

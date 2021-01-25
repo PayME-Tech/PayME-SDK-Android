@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 
 import androidx.annotation.Nullable
 import androidx.fragment.app.DialogFragment
@@ -17,10 +16,10 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
-import vn.payme.sdk.enum.TYPE_PAYMENT
+import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.ChangeTypePayment
 import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.model.TypeCallBack
+import vn.payme.sdk.enums.TypeCallBack
 
 internal class PaymePayment : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {

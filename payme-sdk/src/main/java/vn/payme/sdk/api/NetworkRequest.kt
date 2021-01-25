@@ -2,7 +2,6 @@ package vn.payme.sdk.api
 
 import android.content.Context
 import android.os.Build
-import android.util.Base64
 import androidx.annotation.RequiresApi
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.NetworkResponse
@@ -13,8 +12,9 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONException
 import org.json.JSONObject
+import vn.payme.sdk.BuildConfig
 import vn.payme.sdk.PayME
-import vn.payme.sdk.model.ERROR_CODE
+import vn.payme.sdk.enums.ERROR_CODE
 import java.nio.charset.Charset
 
 
@@ -57,8 +57,9 @@ internal class NetworkRequest(
             objectValidateRequest["method"] = "POST"
             objectValidateRequest["accessToken"] = token
             objectValidateRequest["x-api-message"] = xAPIMessage
-
-            println("REQUEST" + params)
+            if(BuildConfig.DEBUG){
+                println("REQUEST" + params)
+            }
 
             var valueParams = ""
             for (key in objectValidateRequest.keys) {
@@ -90,13 +91,11 @@ internal class NetworkRequest(
                     try {
                         var finalJSONObject: JSONObject? = null
                         if (isSecurity) {
-                            println("response.toString()" + response.toString())
                             val jsonObject = JSONObject(response.toString())
                             val xAPIMessageResponse = jsonObject.getString("x-api-message")
                             val headers = jsonObject.getJSONObject("headers")
                             val xAPIActionResponse = headers.getString("x-api-action")
                             val xAPIKeyResponse = headers.getString("x-api-key")
-                            println("xAPIKeyResponse" + xAPIKeyResponse)
                             val decryptKey = cryptoRSA.decrypt(xAPIKeyResponse)
                             val objectValidateResponse: MutableMap<String, String> = mutableMapOf()
                             objectValidateResponse["x-api-action"] = xAPIActionResponse
@@ -110,9 +109,10 @@ internal class NetworkRequest(
                             validateString += decryptKey
                             val result = cryptoAES.decryptAES(decryptKey, xAPIMessageResponse)
                             var dataRaw = ConvertJSON().toString(result)
-                            println("dataRaw" + dataRaw)
                             finalJSONObject = JSONObject(dataRaw?.substring(1, dataRaw?.length - 1))
-                            println("RESPONSE" + finalJSONObject)
+                            if (BuildConfig.DEBUG){
+                                println("RESPONSE" + finalJSONObject)
+                            }
                         } else {
                             finalJSONObject = JSONObject(response.toString())
                         }

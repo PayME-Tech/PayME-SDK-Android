@@ -17,10 +17,7 @@ import android.webkit.*
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.airbnb.lottie.LottieAnimationView
 import com.google.zxing.client.android.Intents
-import com.otaliastudios.cameraview.engine.action.Actions.timeout
-import kotlinx.android.synthetic.main.webview_activity.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.json.JSONObject
@@ -28,10 +25,10 @@ import vn.payme.sdk.api.CryptoAES
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.model.Env
+import vn.payme.sdk.enums.Env
 import vn.payme.sdk.model.InfoPayment
 import vn.payme.sdk.model.JsObject
-import vn.payme.sdk.model.TypeCallBack
+import vn.payme.sdk.enums.TypeCallBack
 import java.net.URLEncoder
 
 
@@ -253,7 +250,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                     var popup: PayMEQRCodePopup = PayMEQRCodePopup()
                     popup.show(this.supportFragmentManager, "ModalBottomSheet")
                 } else {
-                    val infoPayment = InfoPayment(action, amount, note, orderId, storeId, type)
+                    val infoPayment = InfoPayment(action, amount, note, orderId, storeId, type,PayME.extraData)
 
                     PayME.pay(
                         this.supportFragmentManager, infoPayment, null, null

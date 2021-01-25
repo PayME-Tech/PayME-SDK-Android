@@ -13,14 +13,10 @@ import androidx.fragment.app.DialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.zxing.integration.android.IntentIntegrator
 import org.greenrobot.eventbus.EventBus
-import vn.payme.sdk.AnyOrientationCaptureActivity
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.adapter.TypeIndentifyAdapter
-import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.model.TypeCallBack
 import vn.payme.sdk.model.TypeIdentify
 
 internal class PopupSelectTypeIdentify : BottomSheetDialogFragment() {

@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
@@ -12,6 +11,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import org.json.JSONObject
 import vn.payme.sdk.PayME
+import vn.payme.sdk.enums.Action
+import vn.payme.sdk.enums.ERROR_CODE
+import vn.payme.sdk.enums.Env
 import vn.payme.sdk.model.*
 import java.text.DateFormat
 import java.text.DecimalFormat
@@ -347,13 +349,16 @@ class MainActivity : AppCompatActivity() {
                     "Nội dung đơn hàng",
                     Date().time.toString(),
                     6868,
-                    "OpenEWallet"
+                    "OpenEWallet",""
                 )
             payme?.pay(this.supportFragmentManager, infoPayment,
                 onSuccess = { json: JSONObject? ->
                 },
                 onError = { jsonObject, code, message ->
-                    PayME.showError(message)
+                    println("code"+code)
+                    if(message!=null && message.length>0){
+                        PayME.showError(message)
+                    }
                     if (code == ERROR_CODE.EXPIRED) {
                         walletView.setVisibility(View.GONE)
                         payme?.logout()

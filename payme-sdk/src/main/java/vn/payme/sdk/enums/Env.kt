@@ -1,4 +1,4 @@
-package vn.payme.sdk.model
+package vn.payme.sdk.enums
 
 enum class Env {
     PRODUCTION,

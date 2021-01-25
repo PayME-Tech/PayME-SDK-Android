@@ -1,13 +1,9 @@
 package vn.payme.sdk.api
 
 import org.json.JSONObject
-import org.spongycastle.util.Integers
 import vn.payme.sdk.PayME
-import vn.payme.sdk.enum.TYPE_PAYMENT
+import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.model.Method
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.*
 
 internal class PaymentApi {
     fun getListBanks(
@@ -212,8 +208,8 @@ internal class PaymentApi {
         payInput["amount"] = PayME.infoPayment?.amount!!
         payInput["orderId"] = PayME.infoPayment?.orderId!!
         payInput["note"] = PayME.infoPayment?.note!!
-        if (PayME.extraData != null) {
-            payInput["referExtraData"] = PayME.extraData!!
+        if (PayME.infoPayment?.referExtraData != null) {
+            payInput["referExtraData"] = PayME.infoPayment?.referExtraData!!
         }
         if (method.type == TYPE_PAYMENT.WALLET) {
             val wallet: MutableMap<String, Any> = mutableMapOf()

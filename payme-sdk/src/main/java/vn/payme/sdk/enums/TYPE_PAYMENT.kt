@@ -1,4 +1,4 @@
-package vn.payme.sdk.enum
+package vn.payme.sdk.enums
 
 class TYPE_PAYMENT {
     companion object{

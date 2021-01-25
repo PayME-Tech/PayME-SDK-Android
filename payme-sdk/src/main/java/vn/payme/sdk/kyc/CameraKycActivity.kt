@@ -8,7 +8,6 @@ import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
-import vn.payme.sdk.enum.KEY_KYC
 
 class CameraKycActivity : AppCompatActivity(R.layout.camera_kyc_activity) {
     companion object{

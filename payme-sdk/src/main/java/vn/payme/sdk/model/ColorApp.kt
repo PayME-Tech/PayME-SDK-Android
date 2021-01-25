@@ -2,7 +2,6 @@ package vn.payme.sdk.model
 
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
-import vn.payme.sdk.PayME
 
 class ColorApp {
     var startColor:String = "#08941f"

@@ -36,14 +36,10 @@ class SettingAcitivity : AppCompatActivity(), LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onEnterForeground() {
-//        Toast.makeText(this, "hihi", Toast.LENGTH_SHORT).show()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onEnterBackground() {
-//        paymePref.edit().putBoolean(ON_LOG, false).commit()
-//        wm.removeViewImmediate(containerButtonShowLog)
-//        Toast.makeText(this, "haha", Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,23 +67,12 @@ class SettingAcitivity : AppCompatActivity(), LifecycleObserver {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true)
         }
-
-//        checkboxShowLog.isChecked = paymePref.getBoolean(ON_LOG, false)
-
         buttonSave.setOnClickListener {
             val token = inputToken.text.toString()
             val secretKey = inputSecretKey.text.toString()
             val publicKey = inputPublicKey.text.toString()
             if(token.length > 0 && secretKey.length > 0 && publicKey.length > 0){
                 finish()
-//                MainActivity.AppToken= token
-//                MainActivity.AppSecretKey = secretKey
-//                MainActivity.PublicKey = publicKey
-//                paymePref.edit().putString(APP_TOKEN, token).commit()
-//                paymePref.edit().putString(APP_SECRET_KEY, secretKey).commit()
-//                paymePref.edit().putString(PUBLIC_KEY, publicKey).commit()
-//                val intent = Intent(this, MainActivity::class.java)
-//                startActivity(intent)
             }
         }
 
@@ -105,25 +90,10 @@ class SettingAcitivity : AppCompatActivity(), LifecycleObserver {
             Log.d("Show log", log.toString())
 
         }
-        //Bắt sự kiện thay đổi trạng thái
         checkboxShowLog.isChecked = MainActivity.showLog
         checkboxShowLog.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { compoundButton, b -> //Code khi trạng thái check thay đổi
             paymePref.edit().putBoolean(ON_LOG, b).commit()
             MainActivity.showLog= b
-//            if (b) {
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-//                    val settingIntent = Intent(
-//                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse(
-//                            "package:$packageName"
-//                        )
-//                    )
-//                    startActivityForResult(settingIntent, REQUEST_OVERLAY_PERMISSION)
-//                } else {
-//                    initWindowLayer()
-//                }
-//            } else {
-//                wm.removeViewImmediate(containerButtonShowLog)
-//            }
 
         })
 

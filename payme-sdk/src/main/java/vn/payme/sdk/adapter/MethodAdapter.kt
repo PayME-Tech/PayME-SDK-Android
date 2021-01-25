@@ -10,7 +10,7 @@ import android.widget.TextView
 import com.squareup.picasso.Picasso
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
-import vn.payme.sdk.enum.TYPE_PAYMENT
+import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.model.Method
 import java.text.DecimalFormat
 
