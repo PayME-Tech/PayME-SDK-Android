@@ -1,37 +1,28 @@
 package vn.payme.sdk.kyc
 
-import android.app.Activity.RESULT_OK
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.CameraView
 import com.otaliastudios.cameraview.PictureResult
-import com.theartofdev.edmodo.cropper.CropImage
-import com.theartofdev.edmodo.cropper.CropImageView
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.model.TypeIdentify
-import vn.payme.sdk.payment.*
 import vn.payme.sdk.payment.PopupSelectTypeIdentify
 import vn.payme.sdk.payment.PopupTakeFace
 import vn.payme.sdk.payment.PopupTakeVideo
-import java.io.ByteArrayOutputStream
 
 
 class TakePictureIdentifyFragment : Fragment() {
@@ -50,7 +41,6 @@ class TakePictureIdentifyFragment : Fragment() {
     private var textTypeIdentify: TextView? = null
     private var buttonSelectTypeIdentify: ConstraintLayout? = null
     private var typeIdentify = "CMND"
-    private var buttonSelectImage: LinearLayout? = null
 
     private var buttonBackHeaderErrorCamera: ImageView? = null
     private var enableSetting = false
@@ -94,7 +84,6 @@ class TakePictureIdentifyFragment : Fragment() {
         textGuiTakePicture = view.findViewById(R.id.textGuiTakePicture)
         textTypeIdentify = view.findViewById(R.id.title_type_identify)
         buttonSelectTypeIdentify = view.findViewById(R.id.buttonSelectTypeIdentify)
-        buttonSelectImage = view.findViewById(R.id.buttonSelectImage)
 
         containerErrorCamera = view.findViewById(R.id.containerErrorCamera)
         buttonOpenSetting = view.findViewById(R.id.buttonOpenSetting)
@@ -109,12 +98,7 @@ class TakePictureIdentifyFragment : Fragment() {
         }
 
 
-        buttonSelectImage?.setOnClickListener {
-            CropImage.activity()
-                .setGuidelines(CropImageView.Guidelines.ON)
-                .start(requireActivity());
 
-        }
 
         buttonBackHeader2!!.setOnClickListener {
             layoutConfirm!!.visibility = View.GONE
@@ -200,37 +184,7 @@ class TakePictureIdentifyFragment : Fragment() {
         }
     }
 
-//    override fun onResume() {
-//        super.onResume()
-//        PermisionCamera().requestCamera(requireContext(), requireActivity())
-//    }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        println("data" + data.toString())
-
-        if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            val result = CropImage.getActivityResult(data)
-            println("result" + result.toString())
-            if (resultCode === RESULT_OK) {
-                val resultUri: Uri = result.uri
-                val bitmapImage = BitmapFactory.decodeFile(resultUri.path)
-                imagePreView!!.setImageBitmap(
-                    bitmapImage
-                )
-
-                layoutConfirm?.visibility = View.VISIBLE
-                val stream = ByteArrayOutputStream()
-                bitmapImage?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-                val byteArray: ByteArray = stream.toByteArray()
-                saveImage = byteArray
-
-            } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                val error = result.error
-            }
-        }
-
-
-    }
 
 
 }
