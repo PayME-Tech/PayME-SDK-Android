@@ -34,32 +34,37 @@ public class JsObject(
     @JavascriptInterface
     public fun onCommunicate(string: String) {
         try {
-
             val json: JSONObject = JSONObject(string)
             val type = json.optString("type")
-            val dataInt = json.optJSONObject("data")
-            val Init = dataInt.getJSONObject("Init")
-            PayME.dataInit = Init
-            val accessToken = Init.optString("accessToken")
-            val handShake = Init.optString("handShake")
-            val kyc = Init.optJSONObject("kyc")
-            if (!accessToken.equals("null")) {
-                PayME.accessToken = accessToken
-            } else {
-                PayME.accessToken = ""
-            }
-            if (kyc != null) {
-                val state = kyc.optString("state")
-                if (state == "APPROVED") {
-                    PayME.accountKycSuccess = true
+            val actions = json.optString("actions")
+            if(actions=="onRegisterSuccess"){
+                val dataInt = json.optJSONObject("data")
+                val Init = dataInt.getJSONObject("Init")
+                PayME.dataInit = Init
+                val accessToken = Init.optString("accessToken")
+                val handShake = Init.optString("handShake")
+                val kyc = Init.optJSONObject("kyc")
+                if (!accessToken.equals("null")) {
+                    PayME.accessToken = accessToken
+                } else {
+                    PayME.accessToken = ""
+                }
+                if (kyc != null) {
+                    val state = kyc.optString("state")
+                    if (state == "APPROVED") {
+                        PayME.accountKycSuccess = true
+                    } else {
+                        PayME.accountKycSuccess = false
+                    }
                 } else {
                     PayME.accountKycSuccess = false
                 }
-            } else {
-                PayME.accountKycSuccess = false
+                PayME.accountActive = true
+                PayME.handShake = handShake
+            }else if(actions=="onNetworkError"){
+
             }
-            PayME.accountActive = true
-            PayME.handShake = handShake
+
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -113,9 +118,6 @@ public class JsObject(
 
     @JavascriptInterface
     public fun onKyc(kycVideo: Boolean, kycIdentity: Boolean, kycFace: Boolean) {
-        println("kycVideo" + kycVideo)
-        println("kycIdenity" + kycIdentity)
-        println("kycFace" + kycFace)
         PayME.kycVideo = kycVideo
         PayME.kycIdenity = kycIdentity
         PayME.kycFace = kycFace
@@ -145,7 +147,6 @@ public class JsObject(
         try {
             back()
         } catch (e: Exception) {
-            println(e)
         }
     }
 }

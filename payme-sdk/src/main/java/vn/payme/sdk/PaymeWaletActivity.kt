@@ -43,7 +43,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
     private var checkTimeoutLoadWebView = false
     private fun backScreen(): Unit {
         runOnUiThread {
-            onBackPressed()
+            finish()
         }
     }
 
