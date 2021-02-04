@@ -202,6 +202,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                       },
                       actions:{
                         type:${action},
+                        serviceCode:${PayME.service?.code},
                         amount:${PayME.amount}
                       }
                     }"""
@@ -213,7 +214,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
         if (PayME.env == Env.DEV) {
             myWebView.loadUrl("https://sbx-sdk2.payme.com.vn/active/${encode}")
-
+            println("https://sbx-sdk2.payme.com.vn/active/${encode}")
         } else if (PayME.env == Env.SANDBOX) {
             myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
 
@@ -253,7 +254,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                     val infoPayment = InfoPayment(action, amount, note, orderId, storeId, type,PayME.extraData)
 
                     PayME.pay(
-                        this.supportFragmentManager, infoPayment, null, null
+                        this.supportFragmentManager, infoPayment, true, null,null
                     )
                 }
             },

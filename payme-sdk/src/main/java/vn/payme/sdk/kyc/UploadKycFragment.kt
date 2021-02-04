@@ -21,7 +21,7 @@ class UploadKycFragment : Fragment() {
     private var loadingUploadKycApi = false
     suspend fun uploadKYC() {
         val uploadKycApi = UploadKycApi()
-        uploadKycApi.upLoadKYC(CameraKycActivity.imageFront, CameraKycActivity.imageBackSide, CameraKycActivity.imageFace, CameraKycActivity.video,
+        uploadKycApi.upLoadKYC(CameraKycActivity.imageFront, CameraKycActivity.imageBackSide, CameraKycActivity.imageFace, CameraKycActivity.video,CameraKycActivity.typeIdentify,
             onSuccess = {jsonObject->
                 val Account = jsonObject.optJSONObject("Account")
                 val KYC = Account.optJSONObject("KYC")

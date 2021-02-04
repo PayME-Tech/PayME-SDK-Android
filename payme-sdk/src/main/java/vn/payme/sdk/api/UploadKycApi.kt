@@ -5,6 +5,7 @@ import com.android.volley.toolbox.Volley
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import vn.payme.sdk.PayME
+import vn.payme.sdk.kyc.CameraKycActivity
 import java.nio.charset.StandardCharsets
 import java.util.HashMap
 import kotlin.coroutines.resume
@@ -24,7 +25,7 @@ class ResponseHander() {
 }
 
 class UploadKycApi {
-    suspend fun uploadFileCoroutine(file: ByteArray): ResponseHander = suspendCoroutine { cont ->
+   private suspend fun uploadFileCoroutine(file: ByteArray): ResponseHander = suspendCoroutine { cont ->
         uploadFile(file, { responseHander ->
             cont.resume(responseHander)
         })
@@ -34,6 +35,7 @@ class UploadKycApi {
         imageBackSide: ByteArray?,
         imageFace: ByteArray?,
         video: ByteArray?,
+        identifyType: String?,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
@@ -113,7 +115,7 @@ class UploadKycApi {
             }
 
 
-            uploadKycInfo(urlImageFront, urlImageBack, urlImageFace, urlVideo, onSuccess, onError)
+            uploadKycInfo(urlImageFront, urlImageBack, urlImageFace, urlVideo,identifyType, onSuccess, onError)
         }
 
     }
@@ -205,6 +207,7 @@ class UploadKycApi {
         imageBackSide: String?,
         face: String?,
         video: String?,
+        identifyType: String?,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
@@ -232,6 +235,9 @@ class UploadKycApi {
         }
         if (face != null) {
             kycInput["face"] = face!!
+        }
+        if(identifyType!=null){
+            kycInput["identifyType"] = identifyType!!
         }
         kycInput["clientId"] = PayME.clientId
         variables["kycInput"] = kycInput

@@ -23,11 +23,11 @@ if (project.hasProperty('publish') && project.getProperty('publish')) {
     libraryDescription = 'Thư viện tích hợp tính năng của ví PayME'
 
     // Your github repo link
-    siteUrl = 'https://gitlab.com/paymesdk/paymesdk-android' //rootProject.ext.libPomUrl
+    siteUrl = 'https://github.com/PayME-Tech/PayME-SDK-Android' //rootProject.ext.libPomUrl
     gitUrl = siteUrl + '.git'
     githubRepository = gitUrl //rootProject.ext.libGithubRepo
 
-    libraryVersion = '0.2.8' //rootProject.ext.libVersionName
+    libraryVersion = '0.3.4' //rootProject.ext.libVersionName
 
     developerId = 'payme'
     developerName = 'PayME'

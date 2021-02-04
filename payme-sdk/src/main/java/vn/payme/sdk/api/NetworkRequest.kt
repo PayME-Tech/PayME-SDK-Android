@@ -115,6 +115,10 @@ internal class NetworkRequest(
                             }
                         } else {
                             finalJSONObject = JSONObject(response.toString())
+                            if (BuildConfig.DEBUG) {
+                                println("RESPONSE" + response.toString())
+                            }
+
                         }
                         val data = finalJSONObject?.optJSONObject("data")
                         val errors = finalJSONObject?.optJSONArray("errors")

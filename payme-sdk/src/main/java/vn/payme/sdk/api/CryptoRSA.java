@@ -27,8 +27,7 @@ class CryptoRSA {
 
     private final static String CRYPTO_METHOD = "RSA";
     private final static int CRYPTO_BITS = 512;
-    private static final String PUBLIC_KEY_BASE64_ENCODED = PayME.publicKey;
-    private static final String PRIVATE_KEY_BASE64_ENCODED_1 = PayME.appPrivateKey;
+
 
     public CryptoRSA() throws NoSuchAlgorithmException, InvalidKeySpecException {
             generateKeyPair();
@@ -37,8 +36,8 @@ class CryptoRSA {
 
     private void generateKeyPair()
             throws NoSuchAlgorithmException, InvalidKeySpecException {
-        privateKey = stringToPrivateKey(PRIVATE_KEY_BASE64_ENCODED_1);
-        publicKey =stringToPublicKey(PUBLIC_KEY_BASE64_ENCODED);
+        privateKey = stringToPrivateKey(PayME.appPrivateKey);
+        publicKey =stringToPublicKey(PayME.publicKey);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)

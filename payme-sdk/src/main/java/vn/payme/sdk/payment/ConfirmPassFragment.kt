@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
@@ -33,6 +34,7 @@ class ConfirmPassFragment : Fragment() {
         val hash = digest.digest(byteArray)
         return hash.fold("", { str, it -> str + "%02x".format(it) })
     }
+
 
 
     override fun onCreateView(
@@ -89,7 +91,6 @@ class ConfirmPassFragment : Fragment() {
                                         val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
                                         val Payment = OpenEWallet.optJSONObject("Payment")
                                         val Pay = Payment.optJSONObject("Pay")
-
                                         val succeeded = Pay.optBoolean("succeeded")
                                         val payment = Pay.optJSONObject("OpenEWallet")
                                         val message = Pay.optString("message")
@@ -99,26 +100,12 @@ class ConfirmPassFragment : Fragment() {
                                             val payment = history.optJSONObject("payment")
                                             val transaction = payment.optString("transaction")
                                             PayME.transaction = transaction
-                                            val fragment = fragmentManager?.beginTransaction()
-                                            fragment?.replace(
-                                                R.id.frame_container,
-                                                ResultPaymentFragment()
-                                            )
-                                            fragment?.commit()
+                                            Keyboard.closeKeyboard(requireContext())
+                                            PaymePayment.onPaymentSuccess(null,requireContext(),requireFragmentManager())
 
                                         } else {
                                             Keyboard.closeKeyboard(requireContext())
-                                            val bundle: Bundle = Bundle()
-                                            bundle.putString("message", message)
-                                            val resultPaymentFragment: ResultPaymentFragment =
-                                                ResultPaymentFragment()
-                                            resultPaymentFragment.arguments = bundle
-                                            val fragment = fragmentManager?.beginTransaction()
-                                            fragment?.replace(
-                                                R.id.frame_container,
-                                                resultPaymentFragment
-                                            )
-                                            fragment?.commit()
+                                            PaymePayment.onPaymentError(message,requireContext(),requireFragmentManager())
                                         }
                                         pinView.visibility = View.VISIBLE
                                         loading.visibility = View.GONE
@@ -171,12 +158,8 @@ class ConfirmPassFragment : Fragment() {
         buttonClose.setOnClickListener {
             if (loading.visibility != View.VISIBLE) {
                 Keyboard.closeKeyboard(requireContext())
-                val fragment = fragmentManager?.beginTransaction()
-                fragment?.replace(R.id.frame_container, SelectMethodFragment())
-                fragment?.commit()
-
+                PaymePayment.backPopup(requireFragmentManager())
             }
-
         }
 
 

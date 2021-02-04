@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import org.greenrobot.eventbus.EventBus
+import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
@@ -52,15 +53,13 @@ class ConfirmOtpFragment : Fragment() {
         }
         buttonClose.setOnClickListener {
             if (!buttonSubmit.isLoadingShowing) {
-                Keyboard.closeKeyboard(requireContext())
                 PayME.onError(null, ERROR_CODE.USER_CANCELLED,"")
-                var even: EventBus = EventBus.getDefault()
-                var myEven: MyEven = MyEven(TypeCallBack.onClose, "")
-                even.post(myEven)
+                PaymePayment.closePopup(requireContext())
             }
         }
         return view
     }
+
 
     fun checkPassword(pass: String) {
         buttonSubmit.enableLoading()
@@ -84,12 +83,10 @@ class ConfirmOtpFragment : Fragment() {
                     val payment = Pay.optJSONObject("payment")
                     val message = Pay.optString("message")
                     if (succeeded) {
-                        val fragment = fragmentManager?.beginTransaction()
-                        fragment?.replace(R.id.frame_container, ResultPaymentFragment())
-                        fragment?.commit()
-                    } else {
-                        println("payment:" + payment)
+                        Keyboard.closeKeyboard(requireContext())
+                        PaymePayment.onPaymentSuccess(null,requireContext(), requireFragmentManager())
 
+                    } else {
                         if (payment != null) {
                             val statePaymentLinkedResponsed =
                                 payment.optString("statePaymentLinkedResponsed")
@@ -98,25 +95,12 @@ class ConfirmOtpFragment : Fragment() {
                                 PayME.showError(message)
                             } else {
                                 Keyboard.closeKeyboard(requireContext())
-                                val bundle: Bundle = Bundle()
-                                bundle.putString("message", message)
-                                val resultPaymentFragment = ResultPaymentFragment()
-                                resultPaymentFragment.arguments = bundle
-                                val fragment = fragmentManager?.beginTransaction()
-                                fragment?.replace(R.id.frame_container, resultPaymentFragment)
-                                fragment?.commit()
+                                PaymePayment.onPaymentError(message,requireContext(), requireFragmentManager())
                             }
-
-
                         } else {
                             Keyboard.closeKeyboard(requireContext())
-                            val bundle: Bundle = Bundle()
-                            bundle.putString("message", message)
-                            val resultPaymentFragment = ResultPaymentFragment()
-                            resultPaymentFragment.arguments = bundle
-                            val fragment = fragmentManager?.beginTransaction()
-                            fragment?.replace(R.id.frame_container, resultPaymentFragment)
-                            fragment?.commit()
+                            PaymePayment.onPaymentError(message,requireContext(), requireFragmentManager())
+
                         }
                     }
 

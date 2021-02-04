@@ -7,79 +7,113 @@
     android:padding="16dp"
     tools:context=".SettingAcitivity">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/titleToken"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="App Token"
-            android:textSize="16dp" />
-
-        <EditText
-            android:id="@+id/inputToken"
+        android:layout_height="wrap_content">
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/background_input"
-            android:padding="8dp" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/titleSerectKey"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="App Secret key"
-            android:textSize="16dp" />
+            <TextView
+                android:id="@+id/titleToken"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="App Token"
+                android:textSize="16dp" />
 
-        <EditText
-            android:id="@+id/inputSecretKey"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/background_input"
-            android:padding="8dp" />
+            <EditText
+                android:id="@+id/inputToken"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/background_input"
+                android:padding="8dp" />
 
-        <TextView
-            android:id="@+id/titlePublicKey"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="App Public key"
-            android:textSize="16dp" />
+            <TextView
+                android:id="@+id/titlePrivateKey"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="App Private key"
+                android:textSize="16dp" />
 
-        <EditText
-            android:id="@+id/inputPublicKey"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/background_input"
-            android:padding="8dp" />
+            <EditText
+                android:id="@+id/inputPrivateKey"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/background_input"
+                android:padding="8dp" />
 
-        <CheckBox
-            android:id="@+id/checkboxShowLog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:checked="false"
-            android:text="Show console log" />
+            <TextView
+                android:id="@+id/titlePublicKey"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="App Public key"
+                android:textSize="16dp" />
 
-        <Button
-            android:id="@+id/buttonSave"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/background_button"
-            android:paddingHorizontal="60dp"
-            android:text="Save"
+            <EditText
+                android:id="@+id/inputPublicKey"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/background_input"
+                android:padding="8dp" />
 
-            />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/titleSerectKey"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="App Secret key"
+                android:textSize="16dp" />
+
+            <EditText
+                android:id="@+id/inputSecretKey"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/background_input"
+                android:padding="8dp" />
+
+            <CheckBox
+                android:id="@+id/checkboxShowLog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:checked="false"
+                android:text="Show console log" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/buttonRestore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/background_button"
+                    android:layout_weight="1"
+                    android:text="Restore default"
+                    />
+                <Button
+                    android:id="@+id/buttonSave"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/background_button"
+                    android:paddingHorizontal="40dp"
+                    android:text="Save"
+                    android:layout_marginLeft="20dp"
+                    />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
 
 </RelativeLayout>

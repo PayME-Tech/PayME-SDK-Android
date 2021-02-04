@@ -2,8 +2,14 @@ package vn.payme.sdk
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
+import android.os.Build
+import android.os.Handler
 import android.util.Base64
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.provider.FontRequest
+import androidx.core.provider.FontsContractCompat
 import androidx.fragment.app.FragmentManager
 import es.dmoral.toasty.Toasty
 import org.greenrobot.eventbus.EventBus
@@ -12,10 +18,8 @@ import org.spongycastle.jce.provider.BouncyCastleProvider
 import vn.payme.sdk.api.AccountApi
 import vn.payme.sdk.api.ENV_API
 import vn.payme.sdk.api.PaymentApi
-import vn.payme.sdk.enums.Action
-import vn.payme.sdk.enums.ERROR_CODE
-import vn.payme.sdk.enums.Env
-import vn.payme.sdk.enums.TypeCallBack
+import vn.payme.sdk.api.QueryBuilder
+import vn.payme.sdk.enums.*
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.*
 import vn.payme.sdk.payment.PaymePayment
@@ -31,6 +35,7 @@ public class PayME(
     connectToken: String,
     appPrivateKey: String,
     configColor: Array<String>,
+    language: LANGUAGES,
     env: Env,
     showLog: Boolean,
 ) {
@@ -49,11 +54,11 @@ public class PayME(
         var accountKycSuccess: Boolean = false
         var accountActive: Boolean = false
         var accessToken: String? = ""
-        var orderId: String? = null
         var showLog: Boolean = false
         var extraData: String? = null
         var infoPayment: InfoPayment? = null
         var limitPayment: MaxminPayment = MaxminPayment(2000, 100000)
+        var limitAll: MaxminPayment = MaxminPayment(2000, 100000)
         var clientInfo: ClientInfo = ClientInfo()
         var env: Env? = null
         var configColor: Array<String>? = null
@@ -61,13 +66,17 @@ public class PayME(
         var dataInit: JSONObject? = null
         lateinit var onSuccess: ((JSONObject?) -> Unit)
         lateinit var onError: (JSONObject?, Int?, String) -> Unit
-        lateinit var onClose: (() -> Unit)
         var colorApp: ColorApp = ColorApp("#08941f", "#0eb92a")
         var methodSelected: Method? = null
         lateinit var fragmentManager: FragmentManager
         var numberAtmCard = ""
         var transaction = ""
         internal var openPayAndKyc: Boolean = true
+        private lateinit var listService: ArrayList<Service>
+        internal var service: Service? = null
+        internal var language = LANGUAGES.VN
+        internal var isShowResultUI = true
+
 
         //KYC
         var kycIdenity = false
@@ -88,9 +97,12 @@ public class PayME(
         internal fun pay(
             fragmentManager: FragmentManager,
             infoPayment: InfoPayment,
+            isShowResultUI: Boolean,
             onSuccess: ((JSONObject?) -> Unit)?,
             onError: ((JSONObject?, Int?, String) -> Unit)?,
         ) {
+            PayME.isShowResultUI = isShowResultUI
+
             if (onSuccess != null) {
                 Companion.onSuccess = onSuccess
             }
@@ -150,8 +162,41 @@ public class PayME(
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun requestDownload(familyName: String) {
+        val queryBuilder = QueryBuilder(
+            familyName,
+            width = 0f,
+            weight = 0,
+            italic = 0f,
+            besteffort = false
+        )
+        val query = queryBuilder.build()
+        val mHandler = Handler()
+
+
+        val request = FontRequest(
+            "com.google.android.gms.fonts",
+            "com.google.android.gms",
+            query,
+            R.array.com_google_android_gms_fonts_certs
+        )
+
+        val callback = object : FontsContractCompat.FontRequestCallback() {
+            override fun onTypefaceRetrieved(typeface: Typeface) {
+
+            }
+
+            override fun onTypefaceRequestFailed(reason: Int) {
+
+            }
+        }
+        FontsContractCompat
+            .requestFont(PayME.context, request, callback, mHandler)
+    }
+
     public fun login(
-        onSuccess: (JSONObject) -> Unit,
+        onSuccess: (AccountStatus) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
         val accountApi = AccountApi()
@@ -163,7 +208,7 @@ public class PayME(
         paymentApi.getSettings(onSuccess = { jsonObject ->
             val Setting = jsonObject.getJSONObject("Setting")
             val configs = Setting.getJSONArray("configs")
-            var checkValue = false
+            var checkValuePayment = false
 
             for (i in 0 until configs.length()) {
                 val config = configs.optJSONObject(i)
@@ -174,32 +219,37 @@ public class PayME(
                     val value = JSONObject(valueString)
                     val max = Integer.parseInt(value.optString("max"))
                     val min = Integer.parseInt(value.optString("min"))
+                    checkValuePayment = true
                     limitPayment.min = min
                     limitPayment.max = max
-                    checkValue = true
-                    break
                 }
-
-
-            }
-            if (checkValue == false) {
-                for (i in 0 until configs.length()) {
-                    val config = configs.optJSONObject(i)
-                    val key = config.optString("key")
-                    val valueString = config.optString("value")
-                    if (key == "limit.param.amount.all" && valueString != null) {
-                        val value = JSONObject(valueString)
-                        val max = Integer.parseInt(value.optString("max"))
-                        val min = Integer.parseInt(value.optString("min"))
-                        limitPayment.min = min
-                        limitPayment.max = max
-                        checkValue = true
-                        break
+                if (key == "limit.param.amount.all" && valueString != null) {
+                    val value = JSONObject(valueString)
+                    val max = Integer.parseInt(value.optString("max"))
+                    val min = Integer.parseInt(value.optString("min"))
+                    limitAll.min = min
+                    limitAll.max = max
+                }
+                if (key == "service.main.visible" && valueString != null) {
+                    val value = JSONObject(valueString)
+                    PayME.listService = arrayListOf()
+                    val listService = value.optJSONArray("listService")
+                    for (i in 0 until listService.length()) {
+                        val json = listService.getJSONObject(i)
+                        val code = json.optString("code")
+                        val description = json.optString("description")
+                        val disable = json.optBoolean("disable")
+                        val enable = json.optBoolean("enable")
+                        if (enable == true && disable == false) {
+                            PayME.listService.add(Service(code, description, disable, enable))
+                        }
                     }
                 }
-
             }
-
+            if (!checkValuePayment) {
+                limitPayment.max = limitAll.max
+                limitPayment.min = limitAll.min
+            }
 
         },
             onError = { jsonObject, code, message ->
@@ -236,8 +286,8 @@ public class PayME(
             )
         } else {
             PayME.clientId = clientId
-            loginAccount(onSuccess = { jsonObject ->
-                onSuccess(jsonObject)
+            loginAccount(onSuccess = { accountInfo ->
+                onSuccess(accountInfo)
             }, onError = { jsonObject, code, message ->
                 onError(jsonObject, code, message)
 
@@ -263,17 +313,30 @@ public class PayME(
         PayME.accountActive = false
         PayME.accountKycSuccess = false
         PayME.appID = getAppID()
+        PayME.language = language
     }
 
 
     public fun openWallet(
+        onSuccess: (JSONObject?) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        if (connectToken.length > 0) {
+            openWalletActivity(Action.OPEN, 0, null, null, null, onSuccess, onError)
+        }
+
+    }
+
+    private fun openWalletActivity(
         action: Action,
         amount: Int?,
         content: String?,
         extraData: String?,
+        service: Service?,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
+        PayME.service = service
         if (connectToken.length > 0) {
             Companion.action = action
             Companion.content = content
@@ -313,10 +376,45 @@ public class PayME(
         } else if (!accountKycSuccess) {
             onError(null, ERROR_CODE.ACCOUNT_NOT_KYC, "Tài khoản chưa định danh")
         } else {
-            this.openWallet(Action.DEPOSIT, amount, content, extraData, onSuccess, onError)
+            this.openWalletActivity(
+                Action.DEPOSIT,
+                amount,
+                content,
+                extraData,
+                null,
+                onSuccess,
+                onError
+            )
         }
+    }
 
-
+    public fun openService(
+        service: Service,
+        onSuccess: (JSONObject?) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        Companion.content = content
+        Companion.extraData = extraData
+        if (amount != null) {
+            Companion.amount = amount
+        } else {
+            Companion.amount = 0
+        }
+        if (!accountActive) {
+            onError(null, ERROR_CODE.ACCOUNT_NOT_ACTIVETES, "Tài khoản chưa kích hoạt")
+        } else if (!accountKycSuccess) {
+            onError(null, ERROR_CODE.ACCOUNT_NOT_KYC, "Tài khoản chưa định danh")
+        } else {
+            this.openWalletActivity(
+                Action.UTILITY,
+                amount,
+                content,
+                extraData,
+                service,
+                onSuccess,
+                onError
+            )
+        }
     }
 
 
@@ -339,7 +437,15 @@ public class PayME(
         } else if (!accountKycSuccess) {
             onError(null, ERROR_CODE.ACCOUNT_NOT_KYC, "Tài khoản chưa định danh")
         } else {
-            this.openWallet(Action.WITHDRAW, amount, content, extraData, onSuccess, onError)
+            this.openWalletActivity(
+                Action.WITHDRAW,
+                amount,
+                content,
+                extraData,
+                null,
+                onSuccess,
+                onError
+            )
         }
 
 
@@ -349,6 +455,7 @@ public class PayME(
     public fun pay(
         fragmentManager: FragmentManager,
         infoPayment: InfoPayment,
+        isShowResultUI: Boolean,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit,
     ) {
@@ -357,7 +464,7 @@ public class PayME(
         } else if (!accountKycSuccess) {
             onError(null, ERROR_CODE.ACCOUNT_NOT_KYC, "Tài khoản chưa định danh")
         } else {
-            PayME.pay(fragmentManager, infoPayment, onSuccess, onError)
+            PayME.pay(fragmentManager, infoPayment, isShowResultUI, onSuccess, onError)
         }
 
     }
@@ -372,14 +479,14 @@ public class PayME(
     }
 
     public fun getAccountInfo(
-        onSuccess: (JSONObject) -> Unit,
+        onSuccess: (AccountStatus) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        loginAccount(onSuccess,onError)
+        loginAccount(onSuccess, onError)
     }
 
     private fun loginAccount(
-        onSuccess: (JSONObject) -> Unit,
+        onSuccess: (AccountStatus) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
         val accountApi = AccountApi()
@@ -414,7 +521,15 @@ public class PayME(
                 PayME.accessToken = ""
             }
             PayME.handShake = handShake
-            onSuccess(jsonObject)
+            if(PayME.accountActive){
+                if(PayME.accountKycSuccess){
+                    onSuccess(AccountStatus.KYC_OK)
+                }else{
+                    onSuccess(AccountStatus.NOT_KYC)
+                }
+            }else{
+                onSuccess(AccountStatus.NOT_ACTIVED)
+            }
         }, onError = { jsonObject, code, message ->
             onError(jsonObject, code, message)
         })
@@ -425,8 +540,12 @@ public class PayME(
         PayME.accessToken = ""
         PayME.connectToken = ""
         PayME.handShake = ""
+        this.closeOpenWallet()
     }
 
+    public fun getListService(): ArrayList<Service> {
+        return PayME.listService
+    }
 
     public fun getWalletInfo(
         onSuccess: (JSONObject) -> Unit,

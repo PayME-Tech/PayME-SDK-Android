@@ -72,16 +72,6 @@ public class JsObject(
     }
 
 
-    @JavascriptInterface
-    public fun onFlash(status: Boolean) {
-        try {
-            val cameraId = cameraManager.cameraIdList[0]
-            cameraManager.setTorchMode(cameraId, status)
-        } catch (e: java.lang.Exception) {
-        }
-
-
-    }
 
     @JavascriptInterface
     public fun onError(data: String?) {

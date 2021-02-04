@@ -40,7 +40,6 @@ class TakePictureIdentifyFragment : Fragment() {
     private var textGuiTakePicture: TextView? = null
     private var textTypeIdentify: TextView? = null
     private var buttonSelectTypeIdentify: ConstraintLayout? = null
-    private var typeIdentify = "CMND"
 
     private var buttonBackHeaderErrorCamera: ImageView? = null
     private var enableSetting = false
@@ -70,6 +69,7 @@ class TakePictureIdentifyFragment : Fragment() {
 
         val view: View = inflater?.inflate(R.layout.take_picture_image_identify, container, false)
 
+        CameraKycActivity.typeIdentify = "CMND"
         EventBus.getDefault().register(this)
 
         cameraKitView = view.findViewById(R.id.previewCamera)
@@ -141,8 +141,11 @@ class TakePictureIdentifyFragment : Fragment() {
             }
         }
         buttonSelectTypeIdentify?.setOnClickListener {
-            val popupSelectTypeIdentify = PopupSelectTypeIdentify()
-            popupSelectTypeIdentify.show(childFragmentManager, "ModalBottomSheet")
+            if(imageFront==null){
+                val popupSelectTypeIdentify = PopupSelectTypeIdentify()
+                popupSelectTypeIdentify.show(childFragmentManager, "ModalBottomSheet")
+            }
+
         }
         cameraKitView!!.setLifecycleOwner(this)
         cameraKitView!!.addCameraListener(Listener())
@@ -159,7 +162,7 @@ class TakePictureIdentifyFragment : Fragment() {
     @Subscribe
     fun onChange(myEven: TypeIdentify) {
         textTypeIdentify?.text = myEven.title
-        typeIdentify = myEven.type
+        CameraKycActivity.typeIdentify = myEven.type
     }
 
     override fun onRequestPermissionsResult(

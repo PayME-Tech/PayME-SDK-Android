@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:id="@+id/logItem">
+    <TextView
+        android:id="@+id/textTitleLog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:padding="5dp"
+        android:text="Title"
+        android:background="@color/logBackgroud2"
+        />
+    <TextView
+        android:id="@+id/textContentLog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:padding="5dp"
+        android:text="Content"
+        android:background="@color/logBackgroud1"
+        />
+</LinearLayout>

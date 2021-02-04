@@ -64,15 +64,22 @@ class WebViewNapasActivity : AppCompatActivity() {
                 PayME.transaction = trans_id!!
             }
             if(message!=null){
+                PayME.onError(null,ERROR_CODE.PAYMENT_ERROR, message!!)
                 bundle.putString("message", message)
+            }else{
+                PayME.onSuccess(null)
+
             }
-            bundle.putBoolean("showResult", true)
-            val paymePayment: PaymePayment = PaymePayment()
-            paymePayment.arguments = bundle
-            paymePayment.show(
-                PayME.fragmentManager,
-                "ModalBottomSheet"
-            )
+            if(PayME.isShowResultUI){
+                bundle.putBoolean("showResult", true)
+                val paymePayment: PaymePayment = PaymePayment()
+                paymePayment.arguments = bundle
+                paymePayment.show(
+                    PayME.fragmentManager,
+                    "ModalBottomSheet"
+                )
+            }
+
 
         }
 

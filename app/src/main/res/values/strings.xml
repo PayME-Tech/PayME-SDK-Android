@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PAYME SDK EXAMPLE</string>
+    <string name="app_name">TESTAPP</string>
     <string-array name="environment_arrays">
         <item>DEV</item>
         <item>Sandbox</item>

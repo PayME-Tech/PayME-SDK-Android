@@ -47,17 +47,19 @@ internal class PaymentApi {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
         val variables: MutableMap<String, Any> = mutableMapOf()
-        val query = "query Query {\n" +
+        val listKey = arrayListOf<String>("limit.param.amount.payment","limit.param.amount.all","service.main.visible")
+        val query = "query Query(\$configsAppId: String, \$configsKeys: [String]) {\n" +
                 "  Setting {\n" +
-                "    configs {\n" +
+                "    configs(appId: \$configsAppId, keys: \$configsKeys) {\n" +
                 "      key\n" +
-                "      tags\n" +
                 "      value\n" +
                 "    }\n" +
                 "  }\n" +
                 "}"
         params["query"] = query
         params["variables"] = variables
+        variables["configsAppId"] = PayME.appID.toString()
+        variables["configsKeys"] = listKey
         val request = NetworkRequest(
             PayME.context!!,
             ENV_API.API_FE,
@@ -385,35 +387,5 @@ internal class PaymentApi {
     }
 
 
-    fun postTransferPVCBVerify(
-        transferId: String,
-        OTP: String,
-        onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
-    ) {
-        val path = "/v1/Transfer/PVCBank/Verify"
-        val params: MutableMap<String, Any> = mutableMapOf()
-        val data: MutableMap<String, Any> = mutableMapOf()
-        data["orderId"] = PayME.orderId!!
-        data["content"] = PayME.content!!
-        params["connectToken"] = PayME.connectToken
-        params["transferId"] = transferId
-        params["OTP"] = OTP
-        params["destination"] = "AppPartner"
-        params["clientInfo"] = PayME.clientInfo.getClientInfo()
-        params["data"] = data
-        val request = NetworkRequest(
-            PayME.context!!,
-            ENV_API.API_FE,
-            path,
-            PayME.accessToken!!,
-            params,
-            ENV_API.IS_SECURITY
-        )
-        request.setOnRequestCrypto(
-            onError = onError,
-            onSuccess = onSuccess,
-        )
 
-    }
 }

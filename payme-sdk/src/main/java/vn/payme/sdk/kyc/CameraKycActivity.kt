@@ -15,6 +15,7 @@ class CameraKycActivity : AppCompatActivity(R.layout.camera_kyc_activity) {
         var imageFace :ByteArray? = null
         var imageFront :ByteArray? = null
         var imageBackSide :ByteArray? = null
+        var typeIdentify :String? = null
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +23,7 @@ class CameraKycActivity : AppCompatActivity(R.layout.camera_kyc_activity) {
         imageFace = null
         imageFront= null
         imageBackSide = null
+        typeIdentify = null
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         getWindow().setBackgroundDrawable(PayME.colorApp.backgroundColor);
         if (savedInstanceState == null) {

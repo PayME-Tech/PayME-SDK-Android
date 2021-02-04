@@ -48,9 +48,7 @@ class SelectMethodFragment : Fragment() {
         buttonClose.setOnClickListener {
             if (!loading) {
                 PayME.onError(null, ERROR_CODE.USER_CANCELLED,"")
-                var even: EventBus = EventBus.getDefault()
-                var myEven: MyEven = MyEven(TypeCallBack.onClose, "")
-                even.post(myEven)
+                PaymePayment.closePopup(requireContext())
             }
         }
 
