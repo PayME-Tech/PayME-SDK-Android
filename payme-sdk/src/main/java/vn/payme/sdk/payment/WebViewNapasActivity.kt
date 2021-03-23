@@ -36,8 +36,8 @@ class WebViewNapasActivity : AppCompatActivity() {
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
                 println("url:"+url)
                 // Here you can check your new URL.
-                val checkSuccess = url.contains("https://payme.vn/?success=true")
-                val checkError = url.contains("https://payme.vn/?success=false")
+                val checkSuccess = url.contains("https://payme.vn/web/?success=true")
+                val checkError = url.contains("https://payme.vn/web/?success=false")
                 if(checkSuccess || checkError){
                     val uri: Uri = Uri.parse(url)
                     val messageResult = uri.getQueryParameter("message")

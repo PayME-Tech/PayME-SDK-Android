@@ -7,17 +7,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="16dp"
+    android:paddingTop="8dp"
     android:paddingHorizontal="16dp">
     <!--        ButtonChange-->
+    <TextView
+        android:id="@+id/title_select_method"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:fontFamily="@font/barlow_medium"
+        android:text="@string/select_method_payment"
+        android:textAlignment="textEnd"
+        android:textColor="@color/steel"
+        android:textSize="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/buttonChangeMethod"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:background="@drawable/background_radius_with_boder"
         android:paddingHorizontal="10dp"
         android:paddingVertical="8dp"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/title_select_method">
 
         <ViewAnimator
             android:id="@+id/wrap_image_method"

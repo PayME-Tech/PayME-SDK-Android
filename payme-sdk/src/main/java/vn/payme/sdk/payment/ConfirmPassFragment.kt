@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
@@ -18,6 +19,7 @@ import vn.payme.sdk.component.PinView
 import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.enums.ERROR_CODE
+import vn.payme.sdk.evenbus.ChangeTypePayment
 import vn.payme.sdk.model.Method
 import java.security.MessageDigest
 
@@ -25,8 +27,6 @@ class ConfirmPassFragment : Fragment() {
     private lateinit var buttonClose: ImageView
     private lateinit var pinView: PinView
     private lateinit var loading: ProgressBar
-
-
     fun SHA256(text: String): String? {
         val charset = Charsets.UTF_8
         val byteArray = text.toByteArray(charset)
@@ -34,7 +34,77 @@ class ConfirmPassFragment : Fragment() {
         val hash = digest.digest(byteArray)
         return hash.fold("", { str, it -> str + "%02x".format(it) })
     }
+   fun showLoading(){
+       loading.visibility = View.VISIBLE
+       pinView.visibility = View.GONE
+    }
+    fun  disableLoading(){
+        pinView.visibility = View.VISIBLE
+        pinView.requestFocus()
+        loading.visibility = View.GONE
+    }
+    private fun paymentLinkedBank(method: Method) {
+        val paymentApi = PaymentApi()
+        showLoading()
+        var even: EventBus = EventBus.getDefault()
+        var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.PAYMENT_RESULT, "")
+        paymentApi.payment(method, null, null, null, null, null, null,
+            onSuccess = { jsonObject ->
+                disableLoading()
+                val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
+                val Payment = OpenEWallet.optJSONObject("Payment")
+                val Pay = Payment.optJSONObject("Pay")
+                val succeeded = Pay.optBoolean("succeeded")
+                val payment = Pay.optJSONObject("payment")
+                val message = Pay.optString("message")
+                val history = Pay.optJSONObject("history")
+                if (succeeded) {
+                    Keyboard.closeKeyboard(requireContext())
+                    val payment = history.optJSONObject("payment")
+                    val transaction = payment.optString("transaction")
+                    PayME.transaction = transaction
+                    even.post(myEven)
+                } else {
+                    if (payment != null) {
+                        val statePaymentLinkedResponsed =
+                            payment.optString("statePaymentLinkedResponsed")
+                        if (statePaymentLinkedResponsed == "REQUIRED_VERIFY") {
+                            val html = payment.optString("html")
+                            var changeFragmentOtp: ChangeTypePayment =
+                                ChangeTypePayment(TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS, html)
+                            even.post(changeFragmentOtp)
+                        } else if (statePaymentLinkedResponsed == "REQUIRED_OTP") {
+                            val transaction = payment.optString("transaction")
+                            PayME.transaction = transaction
+                            var changeFragmentOtp: ChangeTypePayment =
+                                ChangeTypePayment(TYPE_PAYMENT.CONFIRM_OTP_BANK, transaction)
+                            even.post(changeFragmentOtp)
+                        } else {
+                            myEven.value = message
+                            even.post(myEven)
+                        }
+                    } else {
+                        myEven.value = message
+                        even.post(myEven)
+                    }
 
+                }
+
+            },
+            onError = { jsonObject, code, s ->
+                if (code == ERROR_CODE.EXPIRED) {
+                    PayME.onExpired()
+                    PayME.onError(jsonObject, code, s)
+
+                } else {
+                    disableLoading()
+                    PayME.showError(s)
+                }
+
+
+            }
+        )
+    }
 
 
     override fun onCreateView(
@@ -70,17 +140,12 @@ class ConfirmPassFragment : Fragment() {
                             val securityCode = CreateCodeByPassword.optString("securityCode")
                             val succeeded = CreateCodeByPassword.optBoolean("succeeded")
                             if (succeeded) {
-                                val method = Method(
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    TYPE_PAYMENT.WALLET
-                                )
                                 val paymentApi = PaymentApi()
-                                paymentApi.payment(method,
+                                if(PayME.methodSelected?.type!=TYPE_PAYMENT.WALLET){
+                                    paymentLinkedBank(PayME.methodSelected!!)
+                                }else{
+
+                                paymentApi.payment(PayME.methodSelected!!,
                                     securityCode,
                                     null,
                                     null,
@@ -120,6 +185,8 @@ class ConfirmPassFragment : Fragment() {
 
                                     }
                                 )
+                                }
+
 
                             } else {
                                 pinView.visibility = View.VISIBLE
@@ -152,18 +219,12 @@ class ConfirmPassFragment : Fragment() {
             }
 
         }
-
-
-
         buttonClose.setOnClickListener {
             if (loading.visibility != View.VISIBLE) {
-                Keyboard.closeKeyboard(requireContext())
-                PaymePayment.backPopup(requireFragmentManager())
+                PayME.onError(null, ERROR_CODE.USER_CANCELLED,"")
+                PaymePayment.closePopup(requireContext())
             }
         }
-
-
-
         return view
     }
 }

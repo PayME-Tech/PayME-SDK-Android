@@ -91,12 +91,26 @@ internal class PaymePayment : DialogFragment() {
             )
             fragment.commit()
 
-
         } else {
-            fragmentManager = childFragmentManager
-            val fragment = fragmentManager.beginTransaction()
-            fragment.add(R.id.frame_container, SelectMethodFragment())
-            fragment.commit()
+            if(PayME.methodSelected!==null){
+                if(PayME.methodSelected?.type!=TYPE_PAYMENT.BANK_CARD){
+                    fragmentManager = childFragmentManager
+                    val fragment = fragmentManager.beginTransaction()
+                    fragment.add(R.id.frame_container, ConfirmPassFragment())
+                    fragment.commit()
+                }else{
+                    fragmentManager = childFragmentManager
+                    val fragment = fragmentManager.beginTransaction()
+                    fragment.add(R.id.frame_container, SelectMethodFragment())
+                    fragment.commit()
+                }
+            }else{
+                fragmentManager = childFragmentManager
+                val fragment = fragmentManager.beginTransaction()
+                fragment.add(R.id.frame_container, SelectMethodFragment())
+                fragment.commit()
+            }
+
         }
         bottomSheetDialogFragment.behavior.isDraggable = false
         dialog?.setCanceledOnTouchOutside(false)

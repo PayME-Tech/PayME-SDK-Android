@@ -37,6 +37,7 @@ class EnterAtmCardFragment : Fragment() {
     private lateinit var textErrorCard: TextView
     private lateinit var textNoteCard: TextView
     private lateinit var textErrorDate: TextView
+    private lateinit var textTitle: TextView
     private lateinit var containerInputCardHolder: ConstraintLayout
     private var bankSelected: BankInfo? = null
     private var cardHolder: String = ""
@@ -104,6 +105,7 @@ class EnterAtmCardFragment : Fragment() {
         textErrorCard = view.findViewById(R.id.textErrorCard)
         textNoteCard = view.findViewById(R.id.textNoteCard)
         textErrorDate = view.findViewById(R.id.textErrorDate)
+        textTitle = view.findViewById(R.id.title_select_method)
 
         containerInputCardHolder = view.findViewById(R.id.containerInputCardHolder)
 
@@ -253,11 +255,21 @@ class EnterAtmCardFragment : Fragment() {
 
 
         buttonChangeMethod.setOnClickListener {
+            PayME.methodSelected = null
             val fragment = fragmentManager?.beginTransaction()
             fragment?.replace(R.id.frame_container_select_method, ListMethodPaymentFragment())
             fragment?.commit()
         }
+       val  showChangeMethod  = arguments?.getBoolean("showChangeMethod")
         contentButtonChangeMethod.background = PayME.colorApp.backgroundColorRadiusAlpha
+
+        if(showChangeMethod== true){
+            buttonChangeMethod.visibility = View.VISIBLE
+            textTitle.visibility = View.VISIBLE
+        }else {
+            textTitle.visibility = View.GONE
+            buttonChangeMethod.visibility = View.GONE
+        }
         buttonSubmit.setOnClickListener {
             if (!buttonSubmit.isLoadingShowing && cardDate.length > 0 && cardHolder.length > 0 && cardNumberValue.length > 0) {
                 buttonSubmit.enableLoading()

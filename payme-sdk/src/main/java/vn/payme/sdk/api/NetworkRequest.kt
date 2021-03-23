@@ -92,6 +92,7 @@ internal class NetworkRequest(
                         var finalJSONObject: JSONObject? = null
                         if (isSecurity) {
                             val jsonObject = JSONObject(response.toString())
+                            println("jsonObject"+jsonObject)
                             val xAPIMessageResponse = jsonObject.getString("x-api-message")
                             val headers = jsonObject.getJSONObject("headers")
                             val xAPIActionResponse = headers.getString("x-api-action")

@@ -5,11 +5,10 @@ class Service {
     lateinit var description: String
     var disable: Boolean = false
     var enable: Boolean = false
-    constructor(code: String,description: String,disable: Boolean,enable: Boolean){
+    constructor(code: String,description: String){
         this.code = code
         this.description = description
-        this.disable = disable
-        this.enable = enable
+
 
     }
 

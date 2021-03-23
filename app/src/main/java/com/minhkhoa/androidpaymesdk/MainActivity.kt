@@ -18,6 +18,7 @@ import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 
@@ -29,38 +30,42 @@ val PRIVATE_KEY = "PRIVATE_KEY"
 val APP_PHONE = "APP_PHONE"
 val APP_USER_ID = "APP_USER_ID"
 
-val APP_TOKEN_DEFAULT_DEV = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NH0.U60jaOwKcaQ6bUX-6O21RMOoFR_5ZkjpGgj6rus0r60"
-val PUBLIC_KEY_DEFAULT_DEV = "-----BEGIN PUBLIC KEY-----\n" +
-        "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMwvSFz/mOfxBSVkGeqfRv3oQaCsx9V2\n" +
-        "hqdL4Y0PK+r2P+8Jd9pOS61uehd1gsjU1/xMFHWFGKrH6lO8+TSLGukCAwEAAQ==\n" +
-        "-----END PUBLIC KEY-----"
-val SECRET_KEY_DEFAULT_DEV = "zfQpwE6iHbOeAfgX"
+val APP_TOKEN_DEFAULT_DEV =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTIsImlhdCI6MTYxMzk5MDU5Nn0.donBYzgUyZ2qJwg2TVu43qCQBmYRkbPCsJwdbmLulQ8"
+val PUBLIC_KEY_DEFAULT_DEV =
+    "-----BEGIN PUBLIC KEY----- MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIXbBm3mTT7Ovlo9LNJK7noshpk8g+zm ueFTyrU7muUuXKboD7cg1h/K9zMW4qHFG+3LTo4Cc8fjoqbUm4UILgMCAwEAAQ== -----END PUBLIC KEY-----"
+val SECRET_KEY_DEFAULT_DEV = "ecd336c200e96265e00e312c6ca28d22"
 val PRIVATE_KEY_DEFAULT_DEV = "-----BEGIN RSA PRIVATE KEY-----\n" +
-        "MIIBOgIBAAJBAIpXByu/SQKImCFT5xTyqLe6zcqDAL/aapD4kYueJiSTFQYzobNx\n" +
-        "UA7wRqsljHGfouFXB0gguiPjtoRWgY9XMpMCAwEAAQJALQVFgCcwS3LIj5AOk/Kk\n" +
-        "laZlcpJPnCAoriU2uIkvQJdijzoz6baxQDY5xfxwBh7wExmKGvUWxR/qt7ULVf1a\n" +
-        "AQIhAMVtGD6vc0zVBuIoWFE2RDYt28WN37p5zC1NtpRebnzjAiEAs2I4WSyUQSzD\n" +
-        "P0yR0P+khUI/8oy/iZ/VSASAxzmjkpECIQCTRaZoXIkuL1tLKb14F3saz2q6G/Nh\n" +
-        "L6pXwTkJxMe28QIgTiPG7/FfU1SwaG5uRmBVxkapnHp7JPQe8BQmFKKjAkECIBM4\n" +
-        "Hel54r1RnKQVUtiLphlZgesayKzrtK2kAgssWKi1\n" +
+        "MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL\n" +
+        "yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF\n" +
+        "5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB\n" +
+        "AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA\n" +
+        "ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK\n" +
+        "xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd\n" +
+        "A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=\n" +
         "-----END RSA PRIVATE KEY-----"
-var AppToken: String =""
+
+var AppToken: String = ""
 var PrivateKey: String = ""
 var AppSecretKey: String = ""
 var PublicKey: String = ""
 
-val APP_TOKEN_DEFAULT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NSwiaWF0IjoxNjEyNDMzNDI0fQ.rNl0i-yAEk4MOjcT5OAk7gxnxyAzPQVx9dHCiiH86rM"
-val PUBLIC_KEY_DEFAULT = "-----BEGIN PUBLIC KEY----- MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIwGH/c+jndwseq5JCU9SuRSbrT8IMiZ DFyA26aX6xkz42keW2sLRkHo4miAHvc+q91omHJEQXIfcAj2cA1AC6MCAwEAAQ== -----END PUBLIC KEY-----"
-val SECRET_KEY_DEFAULT = "27d616faf57ae6db2f052f561de80e83"
+val APP_TOKEN_DEFAULT =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NywiaWF0IjoxNjE0OTExMDE0fQ.PJ0ke0Ky_0BoMPi45Cu803VlR8F3e8kOMoNh9I07AR4"
+val PUBLIC_KEY_DEFAULT = "-----BEGIN PUBLIC KEY-----\n" +
+        "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJQKJge1dTHz6Qkyz95X92QnsgDqerCB\n" +
+        "UzBmt/Qg+5E/oKpw7RBfni3SlCDGotBJH437YvsDBMx8OMCP8ROd7McCAwEAAQ==\n" +
+        "-----END PUBLIC KEY-----"
+val SECRET_KEY_DEFAULT = "bda4d9de88f37efb93342d8764ac9b84"
 val PRIVATE_KEY_DEFAULT = "-----BEGIN RSA PRIVATE KEY-----\n" +
-"MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL\n" +
-"yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF\n" +
-"5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB\n" +
-"AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA\n" +
-"ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK\n" +
-"xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd\n" +
-"A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=\n" +
-"-----END RSA PRIVATE KEY-----"
+        "MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL\n" +
+        "yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF\n" +
+        "5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB\n" +
+        "AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA\n" +
+        "ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK\n" +
+        "xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd\n" +
+        "A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=\n" +
+        "-----END RSA PRIVATE KEY-----"
 
 
 class MainActivity : AppCompatActivity() {
@@ -180,7 +185,6 @@ class MainActivity : AppCompatActivity() {
         spinnerEnvironment = findViewById(R.id.enviromentSpiner)
         inputUserId.setText(userId)
         inputPhoneNumber.setText(phoneNumber)
-
         inputUserId.addTextChangedListener {
             if (walletView.visibility == View.VISIBLE) {
                 walletView.visibility = View.GONE
@@ -244,29 +248,32 @@ class MainActivity : AppCompatActivity() {
                 val dataExample =
                     "{\"userId\":\"${inputUserId.text.toString()}\",\"timestamp\":\"${nowAsISO}\",\"phone\":\"${inputPhoneNumber.text.toString()}\"}"
 
-                val connectToken = CryptoAES.encrypt(dataExample,if(env==Env.PRODUCTION) SecretKey else SECRET_KEY_DEFAULT_DEV)
+                val connectToken = CryptoAES.encrypt(
+                    dataExample,
+                    if (env == Env.PRODUCTION) SecretKey else SECRET_KEY_DEFAULT_DEV
+                )
                 ConnectToken = connectToken
                 loading.visibility = View.VISIBLE
                 payme =
                     PayME(
                         this,
-                        if(env==Env.PRODUCTION) AppToken else APP_TOKEN_DEFAULT_DEV,
-                        if(env==Env.PRODUCTION) PublicKey else PUBLIC_KEY_DEFAULT_DEV ,
-                    ConnectToken  ,
-                        if(env==Env.PRODUCTION) PrivateKey else PRIVATE_KEY_DEFAULT_DEV  ,
+                        if (env == Env.PRODUCTION) AppToken else APP_TOKEN_DEFAULT_DEV,
+                        if (env == Env.PRODUCTION) PublicKey else PUBLIC_KEY_DEFAULT_DEV,
+                        ConnectToken,
+                        if (env == Env.PRODUCTION) PrivateKey else PRIVATE_KEY_DEFAULT_DEV,
                         configColor,
                         LANGUAGES.VN,
                         env,
                         showLog
                     )
                 payme?.login(onSuccess = { accountStatus ->
-                    if(accountStatus == AccountStatus.NOT_ACTIVED){
+                    if (accountStatus == AccountStatus.NOT_ACTIVED) {
                         //Tài khoản chưa kich hoạt
                     }
-                    if(accountStatus == AccountStatus.NOT_KYC){
+                    if (accountStatus == AccountStatus.NOT_KYC) {
                         //Tài khoản chưa định danh
                     }
-                    if(accountStatus == AccountStatus.KYC_OK){
+                    if (accountStatus == AccountStatus.KYC_OK) {
                         //Tài khoản đã
                     }
                     loading.visibility = View.GONE
@@ -363,24 +370,76 @@ class MainActivity : AppCompatActivity() {
             val nextValues = List(10) { Random.nextInt(0, 100000) }
 
             val amount = convertInt(moneyPay.text.toString())
+
+            val storeId: Long = if (env == Env.PRODUCTION) 57956431 else 37048160
             val infoPayment =
-                InfoPayment("PAY", amount, "Nội dung đơn hàng", nextValues.toString(), 4, "OpenEWallet","")
-            payme?.pay(this.supportFragmentManager, infoPayment,true,
-                onSuccess = { json: JSONObject? ->
-                },
-                onError = { jsonObject, code, message ->
-                    if(message!=null && message.length>0){
-                        PayME.showError(message)
+                InfoPayment(
+                    "PAY",
+                    amount,
+                    "Nội dung đơn hàng",
+                    nextValues.toString(),
+                    storeId,
+                    "OpenEWallet",
+                    ""
+                )
+            payme?.getPaymentMethods(onSuccess = {list ->
+                payme?.pay(this.supportFragmentManager, infoPayment, true,list[0],
+                    onSuccess = { json: JSONObject? ->
+                    },
+                    onError = { jsonObject, code, message ->
+                        if (message != null && message.length > 0) {
+                            PayME.showError(message)
+                        }
+                        if (code == ERROR_CODE.EXPIRED) {
+                            walletView.setVisibility(View.GONE)
+                            payme?.logout()
+                        }
+                        if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
+                            openWallet()
+                        }
                     }
-                    if (code == ERROR_CODE.EXPIRED) {
-                        walletView.setVisibility(View.GONE)
-                        payme?.logout()
-                    }
-                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
-                        openWallet()
-                    }
-                }
-            )
+                )
+            },
+        onError = {jsonObject, code, message ->})
+//                            payme?.pay(this.supportFragmentManager, infoPayment, true,null,
+//                    onSuccess = { json: JSONObject? ->
+//                    },
+//                    onError = { jsonObject, code, message ->
+//                        if (message != null && message.length > 0) {
+//                            PayME.showError(message)
+//                        }
+//                        if (code == ERROR_CODE.EXPIRED) {
+//                            walletView.setVisibility(View.GONE)
+//                            payme?.logout()
+//                        }
+//                        if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
+//                            openWallet()
+//                        }
+//                    }
+//                )
+//            payme?.getPaymentMethods(onSuccess = { arrayMT ->
+//                payme?.pay(this.supportFragmentManager, infoPayment, true, arrayMT[2],
+//                    onSuccess = { json: JSONObject? ->
+//                    },
+//                    onError = { jsonObject, code, message ->
+//                        if (message != null && message.length > 0) {
+//                            PayME.showError(message)
+//                        }
+//                        if (code == ERROR_CODE.EXPIRED) {
+//                            walletView.setVisibility(View.GONE)
+//                            payme?.logout()
+//                        }
+//                        if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
+//                            openWallet()
+//                        }
+//                    }
+//                )
+//
+//
+//            },
+//                onError = { jsonObject, code, message -> })
+
+
         }
 
         buttonSetting.setOnClickListener {

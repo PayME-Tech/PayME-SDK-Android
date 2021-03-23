@@ -98,11 +98,11 @@ public class PayME(
             fragmentManager: FragmentManager,
             infoPayment: InfoPayment,
             isShowResultUI: Boolean,
+            method: Method?,
             onSuccess: ((JSONObject?) -> Unit)?,
             onError: ((JSONObject?, Int?, String) -> Unit)?,
         ) {
             PayME.isShowResultUI = isShowResultUI
-
             if (onSuccess != null) {
                 Companion.onSuccess = onSuccess
             }
@@ -122,9 +122,7 @@ public class PayME(
                 } else {
                     Companion.amount = 0
                 }
-
                 val decimal = DecimalFormat("#,###")
-
                 if (infoPayment.amount!! < limitPayment.min) {
                     onError(
                         null,
@@ -138,6 +136,7 @@ public class PayME(
                         "Số tiền giao dịch tối đa ${decimal.format(limitPayment.max)} VND"
                     )
                 } else {
+                    PayME.methodSelected = method
                     val paymePayment: PaymePayment = PaymePayment()
                     paymePayment.show(
                         fragmentManager,
@@ -241,7 +240,7 @@ public class PayME(
                         val disable = json.optBoolean("disable")
                         val enable = json.optBoolean("enable")
                         if (enable == true && disable == false) {
-                            PayME.listService.add(Service(code, description, disable, enable))
+                            PayME.listService.add(Service(code, description))
                         }
                     }
                 }
@@ -456,6 +455,7 @@ public class PayME(
         fragmentManager: FragmentManager,
         infoPayment: InfoPayment,
         isShowResultUI: Boolean,
+        method: Method?,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit,
     ) {
@@ -464,7 +464,7 @@ public class PayME(
         } else if (!accountKycSuccess) {
             onError(null, ERROR_CODE.ACCOUNT_NOT_KYC, "Tài khoản chưa định danh")
         } else {
-            PayME.pay(fragmentManager, infoPayment, isShowResultUI, onSuccess, onError)
+            PayME.pay(fragmentManager, infoPayment, isShowResultUI, method, onSuccess, onError)
         }
 
     }
@@ -521,13 +521,13 @@ public class PayME(
                 PayME.accessToken = ""
             }
             PayME.handShake = handShake
-            if(PayME.accountActive){
-                if(PayME.accountKycSuccess){
+            if (PayME.accountActive) {
+                if (PayME.accountKycSuccess) {
                     onSuccess(AccountStatus.KYC_OK)
-                }else{
+                } else {
                     onSuccess(AccountStatus.NOT_KYC)
                 }
-            }else{
+            } else {
                 onSuccess(AccountStatus.NOT_ACTIVED)
             }
         }, onError = { jsonObject, code, message ->
@@ -543,8 +543,65 @@ public class PayME(
         this.closeOpenWallet()
     }
 
-    public fun getListService(): ArrayList<Service> {
+    public fun getSupportedServices(): ArrayList<Service> {
         return PayME.listService
+    }
+
+    public fun getPaymentMethods(
+        onSuccess: (ArrayList<Method>) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        if (!accountActive) {
+            onError(null, ERROR_CODE.ACCOUNT_NOT_ACTIVETES, "Tài khoản chưa kích hoạt")
+        } else if (!accountKycSuccess) {
+            onError(null, ERROR_CODE.ACCOUNT_NOT_KYC, "Tài khoản chưa định danh")
+        } else {
+            val paymentApi = PaymentApi()
+            val listMethod: ArrayList<Method> = ArrayList<Method>()
+            paymentApi.getTransferMethods(
+                onSuccess = { jsonObject ->
+                    val Utility = jsonObject.optJSONObject("Utility")
+                    val GetPaymentMethod = Utility.optJSONObject("GetPaymentMethod")
+                    val message = GetPaymentMethod.optString("message")
+                    val succeeded = GetPaymentMethod.optBoolean("succeeded")
+                    val methods = GetPaymentMethod.optJSONArray("methods")
+                    if (succeeded) {
+                        for (i in 0 until methods.length()) {
+                            val jsonObject = methods.getJSONObject(i)
+                            var data = jsonObject.optJSONObject("data")
+                            var dataMethod = DataMethod(null, "")
+                            if (data != null) {
+                                val linkedId = data.optString("linkedId")
+                                val swiftCode = data.optString("swiftCode")
+                                dataMethod = DataMethod(linkedId, swiftCode)
+                            }
+                            var fee = jsonObject.optInt("fee")
+                            var label = jsonObject.optString("label")
+                            var methodId = jsonObject.optInt("methodId")
+                            var minFee = jsonObject.optInt("minFee")
+                            var title = jsonObject.optString("title")
+                            var type = jsonObject.optString("type")
+                            listMethod.add(
+                                Method(
+                                    dataMethod,
+                                    fee,
+                                    label,
+                                    methodId,
+                                    minFee,
+                                    title,
+                                    type,
+                                )
+                            )
+                        }
+                        onSuccess(listMethod)
+                    } else {
+                        onError(null, null, message)
+                    }
+                },
+                onError
+            )
+        }
+
     }
 
     public fun getWalletInfo(

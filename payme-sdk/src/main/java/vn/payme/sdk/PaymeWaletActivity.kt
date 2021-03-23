@@ -66,16 +66,13 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-//        checkCamera()
         super.onCreate(savedInstanceState)
         EventBus.getDefault().register(this)
-
         cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
         WebView(applicationContext).clearCache(true)
         WebStorage.getInstance().deleteAllData();
         CookieManager.getInstance().removeAllCookies(null);
         CookieManager.getInstance().flush();
-
         setContentView(R.layout.webview_activity)
         var statusBarHeight = 0
         val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
@@ -254,7 +251,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                     val infoPayment = InfoPayment(action, amount, note, orderId, storeId, type,PayME.extraData)
 
                     PayME.pay(
-                        this.supportFragmentManager, infoPayment, true, null,null
+                        this.supportFragmentManager, infoPayment, true, null,null,null
                     )
                 }
             },
