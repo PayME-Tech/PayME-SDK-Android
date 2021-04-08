@@ -7,4 +7,5 @@ enum  class TypeCallBack {
     onExpired,
     onReload,
     onScan,
+    onTakeImageResult,
 }

@@ -115,11 +115,9 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        println("requestCode" + requestCode)
         if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
             val selectedImage: Uri? = data.data
             val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, selectedImage)
-            Log.d("RRR", bitmap.toString())
             if (bitmap != null) {
                 val width: Int = bitmap.width
                 val height: Int = bitmap.height

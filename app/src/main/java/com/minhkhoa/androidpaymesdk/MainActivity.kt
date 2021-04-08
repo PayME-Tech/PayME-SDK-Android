@@ -30,12 +30,12 @@ val PRIVATE_KEY = "PRIVATE_KEY"
 val APP_PHONE = "APP_PHONE"
 val APP_USER_ID = "APP_USER_ID"
 
-val APP_TOKEN_DEFAULT_DEV =
+val APP_TOKEN_DEFAULT_SANDBOX =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTIsImlhdCI6MTYxMzk5MDU5Nn0.donBYzgUyZ2qJwg2TVu43qCQBmYRkbPCsJwdbmLulQ8"
-val PUBLIC_KEY_DEFAULT_DEV =
+val PUBLIC_KEY_DEFAULT_SANDBOX =
     "-----BEGIN PUBLIC KEY----- MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIXbBm3mTT7Ovlo9LNJK7noshpk8g+zm ueFTyrU7muUuXKboD7cg1h/K9zMW4qHFG+3LTo4Cc8fjoqbUm4UILgMCAwEAAQ== -----END PUBLIC KEY-----"
-val SECRET_KEY_DEFAULT_DEV = "ecd336c200e96265e00e312c6ca28d22"
-val PRIVATE_KEY_DEFAULT_DEV = "-----BEGIN RSA PRIVATE KEY-----\n" +
+val SECRET_KEY_DEFAULT_SANDBOX = "ecd336c200e96265e00e312c6ca28d22"
+val PRIVATE_KEY_DEFAULT_SANDBOX = "-----BEGIN RSA PRIVATE KEY-----\n" +
         "MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL\n" +
         "yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF\n" +
         "5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB\n" +
@@ -44,6 +44,24 @@ val PRIVATE_KEY_DEFAULT_DEV = "-----BEGIN RSA PRIVATE KEY-----\n" +
         "xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd\n" +
         "A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=\n" +
         "-----END RSA PRIVATE KEY-----"
+
+val APP_TOKEN_DEFAULT_DEV =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6Njg2OH0.JyIdhQEX_Lx9CXRH4iHM8DqamLrMQJk5rhbslNW4GzY"
+val PUBLIC_KEY_DEFAULT_DEV =
+            "-----BEGIN PUBLIC KEY-----\n" +
+            "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKi\n" +
+            "wIhTJpAi1XnbfOSrW/Ebw6h1485GOAvuG/OwB+ScsfPJBoNJeNFU6J0CAwEAAQ==\n" +
+            "-----END PUBLIC KEY-----\n"
+val SECRET_KEY_DEFAULT_DEV = "zfQpwE6iHbOeAfgX"
+val PRIVATE_KEY_DEFAULT_DEV = "-----BEGIN RSA PRIVATE KEY-----\n" +
+        "MIIBOwIBAAJBAOkNeYrZOhKTS6OcPEmbdRGDRgMHIpSpepulZJGwfg1IuRM+ZFBm\n" +
+        "F6NgzicQDNXLtaO5DNjVw1o29BFoK0I6+sMCAwEAAQJAVCsGq2vaulyyI6vIZjkb\n" +
+        "5bBId8164r/2xQHNuYRJchgSJahHGk46ukgBdUKX9IEM6dAQcEUgQH+45ARSSDor\n" +
+        "mQIhAPt81zvT4oK1txaWEg7LRymY2YzB6PihjLPsQUo1DLf3AiEA7Tv005jvNbNC\n" +
+        "pRyXcfFIy70IHzVgUiwPORXQDqJhWJUCIQDeDiZR6k4n0eGe7NV3AKCOJyt4cMOP\n" +
+        "vb1qJOKlbmATkwIhALKSJfi8rpraY3kLa4fuGmCZ2qo7MFTKK29J1wGdAu99AiAQ\n" +
+        "dx6DtFyY8hoo0nuEC/BXQYPUjqpqgNOx33R4ANzm9w==\n" +
+        "-----END RSA PRIVATE KEY-----\n"
 
 var AppToken: String = ""
 var PrivateKey: String = ""
@@ -382,8 +400,8 @@ class MainActivity : AppCompatActivity() {
                     "OpenEWallet",
                     ""
                 )
-            payme?.getPaymentMethods(onSuccess = {list ->
-                payme?.pay(this.supportFragmentManager, infoPayment, true,list[0],
+            payme?.getPaymentMethods(onSuccess = { list ->
+                payme?.pay(this.supportFragmentManager, infoPayment, true, list[0],
                     onSuccess = { json: JSONObject? ->
                     },
                     onError = { jsonObject, code, message ->
@@ -400,7 +418,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 )
             },
-        onError = {jsonObject, code, message ->})
+                onError = { jsonObject, code, message -> })
 //                            payme?.pay(this.supportFragmentManager, infoPayment, true,null,
 //                    onSuccess = { json: JSONObject? ->
 //                    },

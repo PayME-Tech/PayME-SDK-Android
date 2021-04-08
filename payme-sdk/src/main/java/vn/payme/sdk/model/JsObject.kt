@@ -9,6 +9,7 @@ import com.google.zxing.integration.android.IntentIntegrator
 import org.json.JSONObject
 import vn.payme.sdk.AnyOrientationCaptureActivity
 import vn.payme.sdk.PayME
+import vn.payme.sdk.PaymeWaletActivity
 import vn.payme.sdk.payment.PopupTakeFace
 import vn.payme.sdk.payment.PopupTakeIdentify
 import vn.payme.sdk.payment.PopupTakeVideo
@@ -17,6 +18,7 @@ import vn.payme.sdk.payment.PopupTakeVideo
 public class JsObject(
     val activity: Activity,
     val back: () -> Unit,
+    val takeImage: () -> Unit,
     val fragmentManager: FragmentManager,
     val cameraManager: CameraManager
 ) {
@@ -32,12 +34,25 @@ public class JsObject(
     }
 
     @JavascriptInterface
+    public fun onTakeImageDocument() {
+        try {
+            takeImage()
+        } catch (e: Exception) {
+            println(e)
+        }
+    }
+    @JavascriptInterface
+    public fun getImage(): String {
+       return "data:image/png;base64," +PaymeWaletActivity.image
+    }
+
+    @JavascriptInterface
     public fun onCommunicate(string: String) {
         try {
             val json: JSONObject = JSONObject(string)
             val type = json.optString("type")
             val actions = json.optString("actions")
-            if(actions=="onRegisterSuccess"){
+            if (actions == "onRegisterSuccess") {
                 val dataInt = json.optJSONObject("data")
                 val Init = dataInt.getJSONObject("Init")
                 PayME.dataInit = Init
@@ -61,7 +76,7 @@ public class JsObject(
                 }
                 PayME.accountActive = true
                 PayME.handShake = handShake
-            }else if(actions=="onNetworkError"){
+            } else if (actions == "onNetworkError") {
 
             }
 
@@ -70,7 +85,6 @@ public class JsObject(
             e.printStackTrace()
         }
     }
-
 
 
     @JavascriptInterface

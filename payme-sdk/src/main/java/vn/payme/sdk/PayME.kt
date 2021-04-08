@@ -464,7 +464,12 @@ public class PayME(
         } else if (!accountKycSuccess) {
             onError(null, ERROR_CODE.ACCOUNT_NOT_KYC, "Tài khoản chưa định danh")
         } else {
-            PayME.pay(fragmentManager, infoPayment, isShowResultUI, method, onSuccess, onError)
+            if (method != null && method?.type != TYPE_PAYMENT.WALLET && !PayME.openPayAndKyc) {
+                PayME.showError("Chức năng chỉ có thể thao tác môi trường production")
+            } else {
+                PayME.pay(fragmentManager, infoPayment, isShowResultUI, method, onSuccess, onError)
+
+            }
         }
 
     }

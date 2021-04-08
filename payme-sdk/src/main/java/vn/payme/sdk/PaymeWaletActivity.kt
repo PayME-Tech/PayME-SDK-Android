@@ -9,26 +9,30 @@ import android.graphics.Color
 import android.graphics.PorterDuff
 import android.hardware.camera2.CameraManager
 import android.net.ConnectivityManager
+import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.KeyEvent
 import android.view.View
 import android.webkit.*
 import android.widget.ProgressBar
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.zxing.client.android.Intents
+import kotlinx.android.synthetic.main.webview_activity.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.json.JSONObject
 import vn.payme.sdk.api.CryptoAES
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.Button
-import vn.payme.sdk.evenbus.MyEven
+import vn.payme.sdk.credit.CameraTakeProfileCreditActivity
 import vn.payme.sdk.enums.Env
+import vn.payme.sdk.enums.TypeCallBack
+import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.InfoPayment
 import vn.payme.sdk.model.JsObject
-import vn.payme.sdk.enums.TypeCallBack
 import java.net.URLEncoder
 
 
@@ -41,12 +45,21 @@ internal class PaymeWaletActivity : AppCompatActivity() {
     private var buttonNext: Button? = null
     lateinit var containerErrorNetwork: ConstraintLayout
     private var checkTimeoutLoadWebView = false
+    private val REQUEST_CODE_TAKE_PICKTURE = 321
+
+    companion object {
+        var image: String = ""
+    }
+
     private fun backScreen(): Unit {
         runOnUiThread {
             finish()
         }
     }
-
+    fun takeImage(): Unit {
+        val intent = Intent(this, CameraTakeProfileCreditActivity::class.java)
+        this?.startActivity(intent)
+    }
 
     fun convertPixelsToDp(px: Float): Float {
         return if (PayME.context != null) {
@@ -66,6 +79,8 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+
         super.onCreate(savedInstanceState)
         EventBus.getDefault().register(this)
         cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
@@ -135,6 +150,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                 }
                 checkTimeoutLoadWebView = true
 
+
             }
 
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
@@ -176,7 +192,13 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         webSettings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
 
         val jsObject: JsObject =
-            JsObject(this, back = { backScreen() }, this.supportFragmentManager, cameraManager)
+            JsObject(
+                this,
+                back = { backScreen() },
+                takeImage = { takeImage() },
+                this.supportFragmentManager,
+                cameraManager
+            )
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
         var action: String = PayME.action.toString()
         val showLog = if (PayME.showLog) 1 else 0
@@ -211,7 +233,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
         if (PayME.env == Env.DEV) {
             myWebView.loadUrl("https://sbx-sdk2.payme.com.vn/active/${encode}")
-            println("https://sbx-sdk2.payme.com.vn/active/${encode}")
         } else if (PayME.env == Env.SANDBOX) {
             myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
 
@@ -248,10 +269,11 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                     var popup: PayMEQRCodePopup = PayMEQRCodePopup()
                     popup.show(this.supportFragmentManager, "ModalBottomSheet")
                 } else {
-                    val infoPayment = InfoPayment(action, amount, note, orderId, storeId, type,PayME.extraData)
+                    val infoPayment =
+                        InfoPayment(action, amount, note, orderId, storeId, type, PayME.extraData)
 
                     PayME.pay(
-                        this.supportFragmentManager, infoPayment, true, null,null,null
+                        this.supportFragmentManager, infoPayment, true, null, null, null
                     )
                 }
             },
@@ -261,14 +283,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                 popup.show(this.supportFragmentManager, "ModalBottomSheet")
             }
         )
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 5 && resultCode == Activity.RESULT_OK && data != null) {
-            val contents = data.getStringExtra(Intents.Scan.RESULT)
-            checkScanQr(contents.toString())
-        }
     }
 
     override fun onDestroy() {
@@ -286,6 +300,19 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         }
         if (myEven.type === TypeCallBack.onExpired) {
             finish()
+        }
+        if (myEven.type === TypeCallBack.onTakeImageResult) {
+
+                if (myEven.value != null) {
+                    image = myEven.value.toString()
+                }
+                val injectedJS = "       const script = document.createElement('script');\n" +
+                        "          script.type = 'text/javascript';\n" +
+                        "          script.async = true;\n" +
+                        "          script.text = 'nativeAndroidSendBase64Image()';\n" +
+                        "          document.body.appendChild(script);\n" +
+                        "          true; // note: this is required, or you'll sometimes get silent failures\n"
+                myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
         }
         if (myEven.type === TypeCallBack.onScan) {
             myEven.value?.let { checkScanQr(it) }
