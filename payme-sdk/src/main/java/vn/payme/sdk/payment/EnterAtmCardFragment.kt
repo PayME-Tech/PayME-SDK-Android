@@ -276,7 +276,7 @@ class EnterAtmCardFragment : Fragment() {
                 val paymentApi = PaymentApi()
                 var even: EventBus = EventBus.getDefault()
 
-                var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.PAYMENT_RESULT, "")
+                var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.PAYMENT_RESULT, "",null)
                 val method = PayME.methodSelected
                 method?.let { it1 ->
                     paymentApi.payment(it1, null, cardNumberValue, cardHolder, cardDate, null, null,
@@ -313,7 +313,7 @@ class EnterAtmCardFragment : Fragment() {
                                         var changeFragmentOtp: ChangeTypePayment =
                                             ChangeTypePayment(
                                                 TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS,
-                                                html
+                                                html,history
                                             )
                                         even.post(changeFragmentOtp)
                                     } else if (statePaymentBankCardResponsed == "REQUIRED_OTP") {
@@ -321,7 +321,7 @@ class EnterAtmCardFragment : Fragment() {
                                         var changeFragmentOtp: ChangeTypePayment =
                                             ChangeTypePayment(
                                                 TYPE_PAYMENT.CONFIRM_OTP_BANK,
-                                                transaction
+                                                transaction,history
                                             )
                                         even.post(changeFragmentOtp)
                                     } else {

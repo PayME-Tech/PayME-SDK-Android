@@ -47,7 +47,7 @@ class ConfirmPassFragment : Fragment() {
         val paymentApi = PaymentApi()
         showLoading()
         var even: EventBus = EventBus.getDefault()
-        var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.PAYMENT_RESULT, "")
+        var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.PAYMENT_RESULT, "",null)
         paymentApi.payment(method, null, null, null, null, null, null,
             onSuccess = { jsonObject ->
                 disableLoading()
@@ -58,6 +58,7 @@ class ConfirmPassFragment : Fragment() {
                 val payment = Pay.optJSONObject("payment")
                 val message = Pay.optString("message")
                 val history = Pay.optJSONObject("history")
+                myEven.data = history
                 if (succeeded) {
                     Keyboard.closeKeyboard(requireContext())
                     val payment = history.optJSONObject("payment")
@@ -71,13 +72,13 @@ class ConfirmPassFragment : Fragment() {
                         if (statePaymentLinkedResponsed == "REQUIRED_VERIFY") {
                             val html = payment.optString("html")
                             var changeFragmentOtp: ChangeTypePayment =
-                                ChangeTypePayment(TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS, html)
+                                ChangeTypePayment(TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS, html,null)
                             even.post(changeFragmentOtp)
                         } else if (statePaymentLinkedResponsed == "REQUIRED_OTP") {
                             val transaction = payment.optString("transaction")
                             PayME.transaction = transaction
                             var changeFragmentOtp: ChangeTypePayment =
-                                ChangeTypePayment(TYPE_PAYMENT.CONFIRM_OTP_BANK, transaction)
+                                ChangeTypePayment(TYPE_PAYMENT.CONFIRM_OTP_BANK, transaction,null)
                             even.post(changeFragmentOtp)
                         } else {
                             myEven.value = message
@@ -166,7 +167,7 @@ class ConfirmPassFragment : Fragment() {
                                             val transaction = payment.optString("transaction")
                                             PayME.transaction = transaction
                                             Keyboard.closeKeyboard(requireContext())
-                                            PaymePayment.onPaymentSuccess(null,requireContext(),requireFragmentManager())
+                                            PaymePayment.onPaymentSuccess(history,requireContext(),requireFragmentManager())
 
                                         } else {
                                             Keyboard.closeKeyboard(requireContext())

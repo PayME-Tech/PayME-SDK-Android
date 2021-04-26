@@ -48,6 +48,7 @@ public class JsObject(
 
     @JavascriptInterface
     public fun onCommunicate(string: String) {
+//        println("onCommunicate"+string)
         try {
             val json: JSONObject = JSONObject(string)
             val type = json.optString("type")
@@ -95,7 +96,7 @@ public class JsObject(
             val data = jsonObject.optJSONObject("data")
             val message = jsonObject.optString("message")
             val type = jsonObject.optString("type")
-            println("jsonObject" + jsonObject)
+//            println("onError" + jsonObject)
             back()
             PayME.onError(data, code, message)
         } catch (e: Exception) {
@@ -122,6 +123,7 @@ public class JsObject(
 
     @JavascriptInterface
     public fun onKyc(kycVideo: Boolean, kycIdentity: Boolean, kycFace: Boolean) {
+//        println("onKyc")
         PayME.kycVideo = kycVideo
         PayME.kycIdenity = kycIdentity
         PayME.kycFace = kycFace
@@ -149,6 +151,8 @@ public class JsObject(
     @JavascriptInterface
     public fun onClose() {
         try {
+//            println("onClose")
+
             back()
         } catch (e: Exception) {
         }

@@ -40,7 +40,7 @@ internal class  AccountApi {
         val params: MutableMap<String, Any> = mutableMapOf()
         val variables: MutableMap<String, Any> = mutableMapOf()
         val initInput: MutableMap<String, Any> = mutableMapOf()
-        val query = "mutation Mutation(\$initInput: CheckInitInput) {\n" +
+        val query = "mutation InitMutation(\$initInput: CheckInitInput) {\n" +
                 "  OpenEWallet {\n" +
                 "    Init(input: \$initInput) {\n" +
                 "      accessToken\n" +
@@ -50,20 +50,39 @@ internal class  AccountApi {
                 "      kyc {\n" +
                 "        details {\n" +
                 "          video {\n" +
-                "            state\n" +
                 "            video\n" +
+                "            state\n" +
                 "          }\n" +
-                "          accountId\n" +
+                "          state\n" +
+                "          sentAt\n" +
+                "          reason\n" +
+                "          placeOfIssue\n" +
+                "          issuedAt\n" +
+                "          image {\n" +
+                "            back\n" +
+                "            front\n" +
+                "            state\n" +
+                "          }\n" +
+                "          identifyType\n" +
+                "          identifyNumber\n" +
+                "          gender\n" +
+                "          fullname\n" +
+                "          face {\n" +
+                "            face\n" +
+                "            state\n" +
+                "          }\n" +
+                "          birthday\n" +
+                "          approvedTimeExpected\n" +
                 "          address {\n" +
                 "            city {\n" +
-                "              identifyCode\n" +
                 "              path\n" +
                 "              title\n" +
+                "              identifyCode\n" +
                 "            }\n" +
                 "            district {\n" +
-                "              path\n" +
-                "              identifyCode\n" +
                 "              title\n" +
+                "              identifyCode\n" +
+                "              path\n" +
                 "            }\n" +
                 "            street\n" +
                 "            ward {\n" +
@@ -72,26 +91,7 @@ internal class  AccountApi {
                 "              title\n" +
                 "            }\n" +
                 "          }\n" +
-                "          approvedTimeExpected\n" +
-                "          birthday\n" +
-                "          face {\n" +
-                "            face\n" +
-                "            state\n" +
-                "          }\n" +
-                "          fullname\n" +
-                "          gender\n" +
-                "          identifyNumber\n" +
-                "          identifyType\n" +
-                "          image {\n" +
-                "            back\n" +
-                "            front\n" +
-                "            state\n" +
-                "          }\n" +
-                "          issuedAt\n" +
-                "          placeOfIssue\n" +
-                "          reason\n" +
-                "          sentAt\n" +
-                "          state\n" +
+                "          accountId\n" +
                 "        }\n" +
                 "        identifyNumber\n" +
                 "        kycId\n" +
@@ -99,9 +99,11 @@ internal class  AccountApi {
                 "        sentAt\n" +
                 "        state\n" +
                 "      }\n" +
+                "      linkedFlow\n" +
                 "      message\n" +
                 "      phone\n" +
                 "      succeeded\n" +
+                "      updateToken\n" +
                 "    }\n" +
                 "  }\n" +
                 "}"

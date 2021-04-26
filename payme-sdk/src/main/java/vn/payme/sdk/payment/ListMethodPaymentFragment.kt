@@ -186,7 +186,7 @@ class ListMethodPaymentFragment : Fragment() {
                         PayME.showError("Số dư trong ví không đủ")
                     } else {
                         var even: EventBus = EventBus.getDefault()
-                        var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.WALLET, "")
+                        var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.WALLET, "",null)
                         even.post(myEven)
                     }
 
@@ -201,7 +201,7 @@ class ListMethodPaymentFragment : Fragment() {
                         fragment?.commit()
                     } else if (method?.type == TYPE_PAYMENT.LINKED) {
                         var even: EventBus = EventBus.getDefault()
-                        var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.WALLET, "")
+                        var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.WALLET, "",null)
                         even.post(myEven)
                     } else {
 

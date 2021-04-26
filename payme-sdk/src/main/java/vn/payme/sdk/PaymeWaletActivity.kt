@@ -232,7 +232,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         val encode: String = URLEncoder.encode(xAPIData, "utf-8")
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
         if (PayME.env == Env.DEV) {
-            myWebView.loadUrl("https://sbx-sdk2.payme.com.vn/active/${encode}")
+            myWebView.loadUrl("https://dev-sdk.payme.com.vn/active/${encode}")
         } else if (PayME.env == Env.SANDBOX) {
             myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
 

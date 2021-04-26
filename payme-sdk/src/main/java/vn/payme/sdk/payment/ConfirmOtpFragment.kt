@@ -81,10 +81,11 @@ class ConfirmOtpFragment : Fragment() {
                     val Pay = Payment.optJSONObject("Pay")
                     val succeeded = Pay.optBoolean("succeeded")
                     val payment = Pay.optJSONObject("payment")
+                    val history = Pay.optJSONObject("history")
                     val message = Pay.optString("message")
                     if (succeeded) {
                         Keyboard.closeKeyboard(requireContext())
-                        PaymePayment.onPaymentSuccess(null,requireContext(), requireFragmentManager())
+                        PaymePayment.onPaymentSuccess(history,requireContext(), requireFragmentManager())
 
                     } else {
                         if (payment != null) {

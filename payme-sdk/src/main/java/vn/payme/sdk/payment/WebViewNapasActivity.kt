@@ -8,6 +8,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.enums.ERROR_CODE
@@ -67,8 +68,9 @@ class WebViewNapasActivity : AppCompatActivity() {
                 PayME.onError(null,ERROR_CODE.PAYMENT_ERROR, message!!)
                 bundle.putString("message", message)
             }else{
-                PayME.onSuccess(null)
-
+                val history = intent.extras?.getString("history")
+                val data = JSONObject(history)
+                PayME.onSuccess(data)
             }
             if(PayME.isShowResultUI){
                 bundle.putBoolean("showResult", true)

@@ -27,7 +27,7 @@ if (project.hasProperty('publish') && project.getProperty('publish')) {
     gitUrl = siteUrl + '.git'
     githubRepository = gitUrl //rootProject.ext.libGithubRepo
 
-    libraryVersion = '0.3.7' //rootProject.ext.libVersionName
+    libraryVersion = '0.3.9' //rootProject.ext.libVersionName
 
     developerId = 'payme'
     developerName = 'PayME'

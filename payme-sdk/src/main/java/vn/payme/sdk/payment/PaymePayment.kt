@@ -146,6 +146,7 @@ internal class PaymePayment : DialogFragment() {
             this.dialog?.dismiss()
             val bundle: Bundle = Bundle()
             bundle.putString("html", typePayment.value)
+            bundle.putString("history", typePayment.data.toString())
             val intent = Intent(PayME.context, WebViewNapasActivity::class.java)
             intent.putExtras(bundle)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -170,7 +171,7 @@ internal class PaymePayment : DialogFragment() {
             if (message?.length!! > 0) {
                 onPaymentError(message,requireContext(),childFragmentManager)
             }else{
-                onPaymentSuccess(null,requireContext(),childFragmentManager)
+                onPaymentSuccess(typePayment.data,requireContext(),childFragmentManager)
             }
         } else if (typePayment.type == TYPE_PAYMENT.WALLET) {
             val confirmPassFragment: ConfirmPassFragment = ConfirmPassFragment()

@@ -2,6 +2,7 @@ package vn.payme.sdk
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Typeface
 import android.os.Build
 import android.os.Handler
@@ -26,7 +27,6 @@ import vn.payme.sdk.payment.PaymePayment
 import java.nio.charset.StandardCharsets
 import java.security.Security
 import java.text.DecimalFormat
-
 
 public class PayME(
     context: Context,
@@ -459,11 +459,18 @@ public class PayME(
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit,
     ) {
+        println("Vao pay")
+
         if (!accountActive) {
+            println("Tài khoản chưa kích hoạt")
             onError(null, ERROR_CODE.ACCOUNT_NOT_ACTIVETES, "Tài khoản chưa kích hoạt")
         } else if (!accountKycSuccess) {
+            println("Tài khoản chưa định danh")
+
             onError(null, ERROR_CODE.ACCOUNT_NOT_KYC, "Tài khoản chưa định danh")
         } else {
+            println("con lai")
+
             if (method != null && method?.type != TYPE_PAYMENT.WALLET && !PayME.openPayAndKyc) {
                 PayME.showError("Chức năng chỉ có thể thao tác môi trường production")
             } else {

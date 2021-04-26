@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import org.json.JSONObject
 import vn.payme.sdk.PayME
+import vn.payme.sdk.api.ENV_API
 import vn.payme.sdk.enums.*
 import vn.payme.sdk.model.*
 import java.text.DateFormat
@@ -254,7 +255,7 @@ class MainActivity : AppCompatActivity() {
         })
         buttonLogin.setOnClickListener {
 
-            if (inputUserId.text.toString().length > 0 && (inputPhoneNumber.text.toString().length == 10 || inputPhoneNumber.text.toString().length == 0) && loading.visibility != View.VISIBLE) {
+            if (inputPhoneNumber.text.toString().length >= 10 && inputUserId.text.toString().length > 0 && (inputPhoneNumber.text.toString().length == 10 || inputPhoneNumber.text.toString().length == 0) && loading.visibility != View.VISIBLE) {
                 val params: MutableMap<String, Any> = mutableMapOf()
                 val tz = TimeZone.getTimeZone("UTC")
                 val df: DateFormat =
@@ -268,17 +269,17 @@ class MainActivity : AppCompatActivity() {
 
                 val connectToken = CryptoAES.encrypt(
                     dataExample,
-                    if (env == Env.PRODUCTION) SecretKey else SECRET_KEY_DEFAULT_DEV
+                    if (env == Env.PRODUCTION) SecretKey else if(env==Env.DEV)  SECRET_KEY_DEFAULT_DEV else SECRET_KEY_DEFAULT_SANDBOX
                 )
                 ConnectToken = connectToken
                 loading.visibility = View.VISIBLE
                 payme =
                     PayME(
                         this,
-                        if (env == Env.PRODUCTION) AppToken else APP_TOKEN_DEFAULT_DEV,
-                        if (env == Env.PRODUCTION) PublicKey else PUBLIC_KEY_DEFAULT_DEV,
+                        if (env == Env.PRODUCTION) AppToken else if(env== Env.DEV) APP_TOKEN_DEFAULT_DEV else APP_TOKEN_DEFAULT_SANDBOX,
+                        if (env == Env.PRODUCTION) PublicKey else if(env==Env.DEV) PUBLIC_KEY_DEFAULT_DEV else PUBLIC_KEY_DEFAULT_SANDBOX,
                         ConnectToken,
-                        if (env == Env.PRODUCTION) PrivateKey else PRIVATE_KEY_DEFAULT_DEV,
+                        if (env == Env.PRODUCTION) PrivateKey else if(env==Env.DEV) PRIVATE_KEY_DEFAULT_DEV else PRIVATE_KEY_DEFAULT_SANDBOX,
                         configColor,
                         LANGUAGES.VN,
                         env,
@@ -389,7 +390,7 @@ class MainActivity : AppCompatActivity() {
 
             val amount = convertInt(moneyPay.text.toString())
 
-            val storeId: Long = if (env == Env.PRODUCTION) 57956431 else 37048160
+            val storeId: Long = if (env == Env.PRODUCTION) 57956431 else if(env == Env.SANDBOX) 37048160 else 6868
             val infoPayment =
                 InfoPayment(
                     "PAY",
@@ -400,11 +401,31 @@ class MainActivity : AppCompatActivity() {
                     "OpenEWallet",
                     ""
                 )
+
+//            payme?.pay(this.supportFragmentManager, infoPayment, true, null,
+//                onSuccess = { json: JSONObject? ->
+//                    println("jsononSuccess"+json.toString())
+//                },
+//                onError = { jsonObject, code, message ->
+//                    println("co loi")
+//                    if (message != null && message.length > 0) {
+//                        PayME.showError(message)
+//                    }
+//                    if (code == ERROR_CODE.EXPIRED) {
+//                        walletView.setVisibility(View.GONE)
+//                        payme?.logout()
+//                    }
+//                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
+//                        openWallet()
+//                    }
+//                }
+//            )
             payme?.getPaymentMethods(onSuccess = { list ->
-                payme?.pay(this.supportFragmentManager, infoPayment, true, list[0],
+                payme?.pay(this.supportFragmentManager, infoPayment, true, list[1],
                     onSuccess = { json: JSONObject? ->
                     },
                     onError = { jsonObject, code, message ->
+                        println("co loi")
                         if (message != null && message.length > 0) {
                             PayME.showError(message)
                         }
@@ -418,44 +439,8 @@ class MainActivity : AppCompatActivity() {
                     }
                 )
             },
+
                 onError = { jsonObject, code, message -> })
-//                            payme?.pay(this.supportFragmentManager, infoPayment, true,null,
-//                    onSuccess = { json: JSONObject? ->
-//                    },
-//                    onError = { jsonObject, code, message ->
-//                        if (message != null && message.length > 0) {
-//                            PayME.showError(message)
-//                        }
-//                        if (code == ERROR_CODE.EXPIRED) {
-//                            walletView.setVisibility(View.GONE)
-//                            payme?.logout()
-//                        }
-//                        if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
-//                            openWallet()
-//                        }
-//                    }
-//                )
-//            payme?.getPaymentMethods(onSuccess = { arrayMT ->
-//                payme?.pay(this.supportFragmentManager, infoPayment, true, arrayMT[2],
-//                    onSuccess = { json: JSONObject? ->
-//                    },
-//                    onError = { jsonObject, code, message ->
-//                        if (message != null && message.length > 0) {
-//                            PayME.showError(message)
-//                        }
-//                        if (code == ERROR_CODE.EXPIRED) {
-//                            walletView.setVisibility(View.GONE)
-//                            payme?.logout()
-//                        }
-//                        if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
-//                            openWallet()
-//                        }
-//                    }
-//                )
-//
-//
-//            },
-//                onError = { jsonObject, code, message -> })
 
 
         }
