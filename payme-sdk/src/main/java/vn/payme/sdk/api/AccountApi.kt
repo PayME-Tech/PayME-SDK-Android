@@ -32,6 +32,63 @@ internal class  AccountApi {
         )
 
     }
+    fun getAccountInfo(
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        val path = "/graphql"
+        val params: MutableMap<String, Any> = mutableMapOf()
+        val variables: MutableMap<String, Any> = mutableMapOf()
+        val query = "query GetAccountInfo(\$accountPhone: String) {\n" +
+                "    Account(phone: \$accountPhone) {\n" +
+                "      accountId\n" +
+                "      fullname\n" +
+                "      alias\n" +
+                "      phone\n" +
+                "      avatar\n" +
+                "      email\n" +
+                "      gender\n" +
+                "      isVerifiedEmail\n" +
+                "      isWaitingEmailVerification\n" +
+                "      birthday\n" +
+                "      address {\n" +
+                "        street\n" +
+                "        city {\n" +
+                "          title\n" +
+                "          identifyCode\n" +
+                "        }\n" +
+                "        district {\n" +
+                "          title\n" +
+                "          identifyCode\n" +
+                "        }\n" +
+                "        ward {\n" +
+                "          title\n" +
+                "          identifyCode\n" +
+                "        }\n" +
+                "      }\n" +
+                "      kyc {\n" +
+                "        kycId\n" +
+                "        state\n" +
+                "        reason\n" +
+                "        identifyNumber\n" +
+                "        details {\n" +
+                "          identifyNumber\n" +
+                "          issuedAt\n" +
+                "        }\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }"
+        params["query"] = query
+        val phone = PayME.dataInit?.getString("phone")
+        variables["accountPhone"] = phone.toString()
+        params["variables"] = variables
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.accessToken!!, params,ENV_API.IS_SECURITY)
+        request.setOnRequestCrypto(
+            onError = onError,
+            onSuccess = onSuccess,
+        )
+
+    }
     fun intAccount(
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit

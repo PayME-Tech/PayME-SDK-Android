@@ -295,6 +295,12 @@ class MainActivity : AppCompatActivity() {
                     if (accountStatus == AccountStatus.KYC_OK) {
                         //Tài khoản đã
                     }
+                    payme?.getAccountInfo(onSuccess = {data->
+                                                      println("getAccountInfo"+data)
+
+                    },onError = { jsonObject, i, s ->
+
+                    })
                     loading.visibility = View.GONE
                     paymePref.edit().putString(APP_USER_ID, inputUserId.text.toString()).commit()
                     paymePref.edit().putString(APP_PHONE, inputPhoneNumber.text.toString())

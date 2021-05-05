@@ -491,10 +491,15 @@ public class PayME(
     }
 
     public fun getAccountInfo(
-        onSuccess: (AccountStatus) -> Unit,
+        onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        loginAccount(onSuccess, onError)
+        if (!PayME.accountActive) {
+            onError(null, ERROR_CODE.ACCOUNT_NOT_ACTIVETES, "Tài khoản chưa kích hoạt")
+        } else {
+            val accountApi = AccountApi()
+            accountApi.getAccountInfo(onSuccess, onError)
+        }
     }
 
     private fun loginAccount(
