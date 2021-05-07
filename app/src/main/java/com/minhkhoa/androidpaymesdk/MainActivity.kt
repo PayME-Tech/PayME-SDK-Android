@@ -32,19 +32,21 @@ val APP_PHONE = "APP_PHONE"
 val APP_USER_ID = "APP_USER_ID"
 
 val APP_TOKEN_DEFAULT_SANDBOX =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTIsImlhdCI6MTYxMzk5MDU5Nn0.donBYzgUyZ2qJwg2TVu43qCQBmYRkbPCsJwdbmLulQ8"
-val PUBLIC_KEY_DEFAULT_SANDBOX =
-    "-----BEGIN PUBLIC KEY----- MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIXbBm3mTT7Ovlo9LNJK7noshpk8g+zm ueFTyrU7muUuXKboD7cg1h/K9zMW4qHFG+3LTo4Cc8fjoqbUm4UILgMCAwEAAQ== -----END PUBLIC KEY-----"
-val SECRET_KEY_DEFAULT_SANDBOX = "ecd336c200e96265e00e312c6ca28d22"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTgsImlhdCI6MTYxNjc0NDc5OX0.G3YOOap-NwYstxiRRyFOuhcKFaOlRhzf2VDgIv1WG1M"
+val PUBLIC_KEY_DEFAULT_SANDBOX ="-----BEGIN PUBLIC KEY-----\n" +
+        "    MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIO5BEw44Izh74J6p5lBcIX/JcED7X1V\n" +
+        "    MATeUN5+iIjo3u0kIMVpVhg/h5FaQ+3K6L8gVVDQvaRoXNwt6dJjcIcCAwEAAQ==\n" +
+        "    -----END PUBLIC KEY-----"
+val SECRET_KEY_DEFAULT_SANDBOX = "575fe35891e830b6ade1415e770fb4ae"
 val PRIVATE_KEY_DEFAULT_SANDBOX = "-----BEGIN RSA PRIVATE KEY-----\n" +
-        "MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL\n" +
-        "yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF\n" +
-        "5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB\n" +
-        "AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA\n" +
-        "ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK\n" +
-        "xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd\n" +
-        "A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=\n" +
-        "-----END RSA PRIVATE KEY-----"
+        "    MIIBOwIBAAJBAO1yM2bttpRQ72m1kENcCNzhWasw87K1X4iKZx2mUkNfEtkmkXnY\n" +
+        "    OcU356Pj0F7TFIObA57+qZVe/w+r1HVEaEkCAwEAAQJBANgkcagLUX0XY6g9T3IR\n" +
+        "    sDuoouBTsjKGKc139z+lLBMIElanw9xz9SyWjMmY2lF4OBhs6gmwkOMyyp5A/Pqg\n" +
+        "    R5ECIQD/JvADOJd1wms+2HBtFz5GKdk+sszM2ON5RaJ3y/tznQIhAO48M08vrDgH\n" +
+        "    m1WvvEUW83wQan9FBR2OSgUn830c6zWdAiADm+pjMUa7LK/VqLwWXvDLj0X6ZA8P\n" +
+        "    irXU/k4pAaKh5QIgBWuDM1L/VQr/QrTL0LqT8YeiFKEqW6DIGFPvWzJUO5UCIQDz\n" +
+        "    42wuBeDgq6e4H41U3ug3lkkgg/vQYPHqsCaxvxZbDA==\n" +
+        "    -----END RSA PRIVATE KEY-----"
 
 val APP_TOKEN_DEFAULT_DEV =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6Njg2OH0.JyIdhQEX_Lx9CXRH4iHM8DqamLrMQJk5rhbslNW4GzY"
@@ -396,7 +398,7 @@ class MainActivity : AppCompatActivity() {
 
             val amount = convertInt(moneyPay.text.toString())
 
-            val storeId: Long = if (env == Env.PRODUCTION) 57956431 else if(env == Env.SANDBOX) 37048160 else 6868
+            val storeId: Long = if (env == Env.PRODUCTION) 57956431 else if(env == Env.SANDBOX) 46 else 6868
             val infoPayment =
                 InfoPayment(
                     "PAY",
@@ -408,45 +410,45 @@ class MainActivity : AppCompatActivity() {
                     ""
                 )
 
-//            payme?.pay(this.supportFragmentManager, infoPayment, true, null,
-//                onSuccess = { json: JSONObject? ->
-//                    println("jsononSuccess"+json.toString())
-//                },
-//                onError = { jsonObject, code, message ->
-//                    println("co loi")
-//                    if (message != null && message.length > 0) {
-//                        PayME.showError(message)
-//                    }
-//                    if (code == ERROR_CODE.EXPIRED) {
-//                        walletView.setVisibility(View.GONE)
-//                        payme?.logout()
-//                    }
-//                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
-//                        openWallet()
-//                    }
-//                }
-//            )
-            payme?.getPaymentMethods(onSuccess = { list ->
-                payme?.pay(this.supportFragmentManager, infoPayment, true, list[1],
-                    onSuccess = { json: JSONObject? ->
-                    },
-                    onError = { jsonObject, code, message ->
-                        println("co loi")
-                        if (message != null && message.length > 0) {
-                            PayME.showError(message)
-                        }
-                        if (code == ERROR_CODE.EXPIRED) {
-                            walletView.setVisibility(View.GONE)
-                            payme?.logout()
-                        }
-                        if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
-                            openWallet()
-                        }
+            payme?.pay(this.supportFragmentManager, infoPayment, true, null,
+                onSuccess = { json: JSONObject? ->
+                    println("jsononSuccess"+json.toString())
+                },
+                onError = { jsonObject, code, message ->
+                    println("co loi")
+                    if (message != null && message.length > 0) {
+                        PayME.showError(message)
                     }
-                )
-            },
-
-                onError = { jsonObject, code, message -> })
+                    if (code == ERROR_CODE.EXPIRED) {
+                        walletView.setVisibility(View.GONE)
+                        payme?.logout()
+                    }
+                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
+                        openWallet()
+                    }
+                }
+            )
+//            payme?.getPaymentMethods(onSuccess = { list ->
+//                payme?.pay(this.supportFragmentManager, infoPayment, true, list[1],
+//                    onSuccess = { json: JSONObject? ->
+//                    },
+//                    onError = { jsonObject, code, message ->
+//                        println("co loi")
+//                        if (message != null && message.length > 0) {
+//                            PayME.showError(message)
+//                        }
+//                        if (code == ERROR_CODE.EXPIRED) {
+//                            walletView.setVisibility(View.GONE)
+//                            payme?.logout()
+//                        }
+//                        if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
+//                            openWallet()
+//                        }
+//                    }
+//                )
+//            },
+//
+//                onError = { jsonObject, code, message -> })
 
 
         }
