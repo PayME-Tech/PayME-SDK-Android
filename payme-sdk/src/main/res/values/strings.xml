@@ -6,7 +6,7 @@
     <string name="next">TIẾP TỤC</string>
     <string name="enter_number_card">Nhập số thẻ</string>
     <string name="enter_the_number_card_on_the_front_of_the_card">Nhập thẻ số ở mặt trước thẻ</string>
-    <string name="release_date_mm_yy">Ngày phát hành (MM / YY)</string>
+    <string name="release_date_mm_yy">Ngày phát hành</string>
     <string name="please_check_the_correct_name_printed_on_the_card">Vui lòng kiểm tra đúng tên in trên thẻ</string>
     <string name="enter_the_cardholder_full_name">Nhập họ tên chủ thẻ</string>
     <string name="done">Hoàn tất</string>
@@ -38,16 +38,24 @@
     <string name="please_take_pictures_center">Vui lòng cân chỉnh giấy tờ tùy thân vào giữa khung</string>
     <string name="confirm_image_take_pictures_identify">Vui lòng xác nhận ảnh đã rõ nét, gương mặt của bạn đã có trong khung hình.</string>
     <string name="confirm_image_take_video_identify">Vui lòng xác nhận video đã rõ nét, gương mặt và giấy tờ tùy thân của bạn đã có trong khung hình.</string>
-    <string name="confirm_payment">Xác nhận thanh toán</string>
+    <string name="confirm_payment">Thanh toán</string>
     <string name="payment">Thanh toán</string>
     <string name="confirm_otp">Xác thực OTP</string>
     <string name="confirm_pass">XÁC THỰC GIAO DỊCH</string>
+    <string name="confirm_payment_2">Xác nhận thanh toán</string>
     <string name="content">Nội dung</string>
     <string name="file_browser">File Browser</string>
     <string name="cannot_open_file_chooser">Cannot Open File Chooser</string>
     <string name="payment_success">Thanh toán thành công</string>
     <string name="payment_fail">Thanh toán thất bại</string>
-    <string name="select_method_payment">Chọn nguồn thanh toán</string>
+    <string name="select_method_payment">Nguồn thanh toán</string>
     <string name="please_enter_otp_from_phone_number">Vui lòng nhập mã OTP được gửi tới số</string>
     <string name="please_enter_pass">Nhập mật khẩu ví PayME  để xác thực</string>
+
+    <string name="active_now">Kích hoạt ngay</string>
+    <string name="kyc_now">Định danh ngay</string>
+    <string name="deposit_now">Nạp tiền</string>
+    <string name="description_active_now">(*) Vui lòng kích hoạt tài khoản ví trước khi sử dụng</string>
+    <string name="description_kyc_now">(*) Vui lòng định danh tài khoản ví trước khi sử dụng</string>
+    <string name="description_deposit_now">(*) Chọn phương thức khác hoặc nạp thêm để thanh toán</string>
 </resources>

@@ -6,10 +6,10 @@ class Method {
     var label : String? = null
     var methodId : Number? = null
     var minFee : Number? = null
-    var title : String? = null
+    var title : String = ""
     var type : String? = null
 
-    constructor(data : DataMethod?,fee : Number?,label : String?,methodId : Number?,minFee : Number?,title : String?,type : String?){
+    constructor(data : DataMethod?,fee : Number?,label : String?,methodId : Number?,minFee : Number?,title : String,type : String?){
         this.data= data
         this.fee = fee
         this.label = label

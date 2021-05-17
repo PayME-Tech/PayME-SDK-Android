@@ -4,6 +4,7 @@ import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.model.Method
+import vn.payme.sdk.store.Store
 
 internal class PaymentApi {
     fun getListBanks(
@@ -26,14 +27,42 @@ internal class PaymentApi {
                 "}"
         params["query"] = query
         params["variables"] = variables
-        val request = NetworkRequest(
-            PayME.context!!,
-            ENV_API.API_FE,
-            path,
-            PayME.accessToken!!,
-            params,
-            ENV_API.IS_SECURITY
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+        request.setOnRequestCrypto(
+            onError = onError,
+            onSuccess = onSuccess,
         )
+
+    }
+    fun getFee(
+        amount:Int,
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        val path = "/graphql"
+        val params: MutableMap<String, Any> = mutableMapOf()
+        val variables: MutableMap<String, Any> = mutableMapOf()
+        val getFeeInput: MutableMap<String, Any> = mutableMapOf()
+        val query = "mutation GetFeeMutation(\$getFeeInput: GetFeeInput) {\n" +
+                "  Utility {\n" +
+                "    GetFee(input: \$getFeeInput) {\n" +
+                "      fee {\n" +
+                "        ... on GeneralFee {\n" +
+                "          fee\n" +
+                "        }\n" +
+                "      }\n" +
+                "      message\n" +
+                "      succeeded\n" +
+                "    }\n" +
+                "  }\n" +
+                "}"
+        params["query"] = query
+        params["variables"] = variables
+        getFeeInput["clientId"] = Store.config.clientId
+        getFeeInput["serviceType"] = "OPEN_EWALLET_PAYMENT"
+        getFeeInput["amount"] = amount
+        variables["getFeeInput"] = getFeeInput
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -58,16 +87,9 @@ internal class PaymentApi {
                 "}"
         params["query"] = query
         params["variables"] = variables
-        variables["configsAppId"] = PayME.appID.toString()
+        variables["configsAppId"] = Store.config.appID.toString()
         variables["configsKeys"] = listKey
-        val request = NetworkRequest(
-            PayME.context!!,
-            ENV_API.API_FE,
-            path,
-            PayME.accessToken!!,
-            params,
-            ENV_API.IS_SECURITY
-        )
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -99,14 +121,7 @@ internal class PaymentApi {
         getBankNameInput["type"] = "CARD"
         variables["getBankNameInput"] = getBankNameInput
         params["variables"] = variables
-        val request = NetworkRequest(
-            PayME.context!!,
-            ENV_API.API_FE,
-            path,
-            PayME.accessToken!!,
-            params,
-            ENV_API.IS_SECURITY
-        )
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -134,19 +149,13 @@ internal class PaymentApi {
                     "    }\n" +
                     "  }\n" +
                     "}"
-        createCodeByPasswordInput["clientId"] = PayME.clientId
+        createCodeByPasswordInput["clientId"] = Store.config.clientId
         createCodeByPasswordInput["password"] = password
         variables["createCodeByPasswordInput"] = createCodeByPasswordInput
         params["query"] = query
         params["variables"] = variables
-        val request = NetworkRequest(
-            PayME.context!!,
-            ENV_API.API_FE,
-            path,
-            PayME.accessToken!!,
-            params,
-            ENV_API.IS_SECURITY
-        )
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -205,13 +214,13 @@ internal class PaymentApi {
                 "  }\n" +
                 "}"
         params["query"] = query
-        payInput["clientId"] = PayME.clientId
-        payInput["storeId"] = PayME.infoPayment?.storeId!!
-        payInput["amount"] = PayME.infoPayment?.amount!!
-        payInput["orderId"] = PayME.infoPayment?.orderId!!
-        payInput["note"] = PayME.infoPayment?.note!!
-        if (PayME.infoPayment?.referExtraData != null) {
-            payInput["referExtraData"] = PayME.infoPayment?.referExtraData!!
+        payInput["clientId"] = Store.config.clientId
+        payInput["storeId"] = Store.paymentInfo.infoPayment?.storeId!!
+        payInput["amount"] = Store.paymentInfo.infoPayment?.amount!!
+        payInput["orderId"] = Store.paymentInfo.infoPayment?.orderId!!
+        payInput["note"] = Store.paymentInfo.infoPayment?.note!!
+        if (Store.paymentInfo.infoPayment?.referExtraData != null) {
+            payInput["referExtraData"] = Store.paymentInfo.infoPayment?.referExtraData!!
         }
         if (method.type == TYPE_PAYMENT.WALLET) {
             val wallet: MutableMap<String, Any> = mutableMapOf()
@@ -241,14 +250,7 @@ internal class PaymentApi {
         }
         variables["payInput"] = payInput
         params["variables"] = variables
-        val request = NetworkRequest(
-            PayME.context!!,
-            ENV_API.API_FE,
-            path,
-            PayME.accessToken!!,
-            params,
-            ENV_API.IS_SECURITY
-        )
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -294,14 +296,8 @@ internal class PaymentApi {
         variables["getPaymentMethodInput"] = getPaymentMethodInput
         params["query"] = query
         params["variables"] = variables
-        val request = NetworkRequest(
-            PayME.context!!,
-            ENV_API.API_FE,
-            path,
-            PayME.accessToken!!,
-            params,
-            ENV_API.IS_SECURITY
-        )
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -325,14 +321,7 @@ internal class PaymentApi {
                 "}"
         params["query"] = query
         params["variables"] = variables
-        val request = NetworkRequest(
-            PayME.context!!,
-            ENV_API.API_FE,
-            path,
-            PayME.accessToken!!,
-            params,
-            ENV_API.IS_SECURITY
-        )
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -366,19 +355,12 @@ internal class PaymentApi {
                 "    }\n" +
                 "  }\n" +
                 "}"
-        detectInput["clientId"] = PayME.clientId
+        detectInput["clientId"] = Store.config.clientId
         detectInput["qrContent"] = dataQR
         variables["detectInput"] = detectInput
         params["query"] = query
         params["variables"] = variables
-        val request = NetworkRequest(
-            PayME.context!!,
-            ENV_API.API_FE,
-            path,
-            PayME.accessToken!!,
-            params,
-            ENV_API.IS_SECURITY
-        )
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,

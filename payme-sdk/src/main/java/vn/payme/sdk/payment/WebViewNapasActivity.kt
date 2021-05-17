@@ -12,6 +12,7 @@ import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.enums.ERROR_CODE
+import vn.payme.sdk.store.Store
 
 class WebViewNapasActivity : AppCompatActivity() {
     private lateinit var buttonClose: ImageView
@@ -30,13 +31,11 @@ class WebViewNapasActivity : AppCompatActivity() {
             finish()
         }
         getWindow().setStatusBarColor(Color.TRANSPARENT);
-        getWindow().setBackgroundDrawable(PayME.colorApp.backgroundColor);
+        getWindow().setBackgroundDrawable(Store.config.colorApp.backgroundColor);
         val form = intent.extras?.getString("html")
         myWebView.loadDataWithBaseURL("x-data://base", form!!, "text/html", "UTF-8", null);
         myWebView.setWebViewClient(object : WebViewClient() {
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-                println("url:"+url)
-                // Here you can check your new URL.
                 val checkSuccess = url.contains("https://payme.vn/web/?success=true")
                 val checkError = url.contains("https://payme.vn/web/?success=false")
                 if(checkSuccess || checkError){
@@ -62,17 +61,16 @@ class WebViewNapasActivity : AppCompatActivity() {
         if(onResult == true){
             val bundle: Bundle = Bundle()
             if(trans_id!=null){
-                PayME.transaction = trans_id!!
+                Store.paymentInfo.transaction = trans_id!!
             }
             if(message!=null){
                 PayME.onError(null,ERROR_CODE.PAYMENT_ERROR, message!!)
                 bundle.putString("message", message)
             }else{
-                val history = intent.extras?.getString("history")
-                val data = JSONObject(history)
+                val data = JSONObject("""{transaction:${Store.paymentInfo.transaction}}""")
                 PayME.onSuccess(data)
             }
-            if(PayME.isShowResultUI){
+            if(Store.paymentInfo.isShowResultUI){
                 bundle.putBoolean("showResult", true)
                 val paymePayment: PaymePayment = PaymePayment()
                 paymePayment.arguments = bundle

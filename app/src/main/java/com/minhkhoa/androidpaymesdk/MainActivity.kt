@@ -49,22 +49,21 @@ val PRIVATE_KEY_DEFAULT_SANDBOX = "-----BEGIN RSA PRIVATE KEY-----\n" +
         "    -----END RSA PRIVATE KEY-----"
 
 val APP_TOKEN_DEFAULT_DEV =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6Njg2OH0.JyIdhQEX_Lx9CXRH4iHM8DqamLrMQJk5rhbslNW4GzY"
-val PUBLIC_KEY_DEFAULT_DEV =
-            "-----BEGIN PUBLIC KEY-----\n" +
-            "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKi\n" +
-            "wIhTJpAi1XnbfOSrW/Ebw6h1485GOAvuG/OwB+ScsfPJBoNJeNFU6J0CAwEAAQ==\n" +
-            "-----END PUBLIC KEY-----\n"
-val SECRET_KEY_DEFAULT_DEV = "zfQpwE6iHbOeAfgX"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTIsImlhdCI6MTYyMDg4MjQ2NH0.DJfi52Dc66IETflV2dQ8G_q4oUAVw_eG4TzrqkL0jLU"
+val PUBLIC_KEY_DEFAULT_DEV ="-----BEGIN PUBLIC KEY-----\n" +
+        "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJi70XBS5+LtaCrNsrnWlVG6xec+J9M1\n" +
+        "DzzvsmDfqRgTIw7RQ94SnEBBcTXhaIAZ8IW7OIWkVU0OXcybQEoLsdUCAwEAAQ==\n" +
+        "-----END PUBLIC KEY-----"
+val SECRET_KEY_DEFAULT_DEV = "34cfcd29432cdd5feaecb87519046e2d"
 val PRIVATE_KEY_DEFAULT_DEV = "-----BEGIN RSA PRIVATE KEY-----\n" +
-        "MIIBOwIBAAJBAOkNeYrZOhKTS6OcPEmbdRGDRgMHIpSpepulZJGwfg1IuRM+ZFBm\n" +
-        "F6NgzicQDNXLtaO5DNjVw1o29BFoK0I6+sMCAwEAAQJAVCsGq2vaulyyI6vIZjkb\n" +
-        "5bBId8164r/2xQHNuYRJchgSJahHGk46ukgBdUKX9IEM6dAQcEUgQH+45ARSSDor\n" +
-        "mQIhAPt81zvT4oK1txaWEg7LRymY2YzB6PihjLPsQUo1DLf3AiEA7Tv005jvNbNC\n" +
-        "pRyXcfFIy70IHzVgUiwPORXQDqJhWJUCIQDeDiZR6k4n0eGe7NV3AKCOJyt4cMOP\n" +
-        "vb1qJOKlbmATkwIhALKSJfi8rpraY3kLa4fuGmCZ2qo7MFTKK29J1wGdAu99AiAQ\n" +
-        "dx6DtFyY8hoo0nuEC/BXQYPUjqpqgNOx33R4ANzm9w==\n" +
-        "-----END RSA PRIVATE KEY-----\n"
+        "MIIBOgIBAAJBAIA7GmDWkjuOQsx99tACXhOlJ4atsBN0YMPEmKhi9Ewk6bNBPvaX\n" +
+        "pRMWjn7c8GfWrFUIVqlrvSlMYxmW/XaATjcCAwEAAQJAKZ6FPj8GcWwIBEUyEWtj\n" +
+        "S28EODMxfe785S1u+uA7OGcerljPNOTme6iTuhooO5pB9Q5N7nB2KzoWOADwPOS+\n" +
+        "uQIhAN2S5dxxadDL0wllNGeux7ltES0z2UfW9+RViByX/fAbAiEAlCd86Hy6otfd\n" +
+        "k9K2YeylsdDwZfmkKq7p27ZcNqVUlBUCIQCxzEfRHdzoZDZjKqfjrzerTp7i4+Eu\n" +
+        "KYzf19aSA1ENEwIgAnyXMB/H0ivlYDHNNd+O+GkVX+DMzJqa+kEZUyF7RfECICtK\n" +
+        "rkcDyRzI6EtUFG+ALQOUliRRh7aiGXXZYb2KnlKy\n" +
+        "-----END RSA PRIVATE KEY-----"
 
 var AppToken: String = ""
 var PrivateKey: String = ""
@@ -379,7 +378,7 @@ class MainActivity : AppCompatActivity() {
 
             val amount = convertInt(moneyWithdraw.text.toString())
 
-            payme?.withdraw(amount, null, "",
+            payme?.withdraw(amount,
                 onSuccess = { json: JSONObject? ->
                 },
                 onError = { jsonObject, code, message ->
@@ -398,7 +397,7 @@ class MainActivity : AppCompatActivity() {
 
             val amount = convertInt(moneyPay.text.toString())
 
-            val storeId: Long = if (env == Env.PRODUCTION) 57956431 else if(env == Env.SANDBOX) 46 else 6868
+            val storeId: Long = if (env == Env.PRODUCTION) 57956431 else if(env == Env.SANDBOX) 46 else 9
             val infoPayment =
                 InfoPayment(
                     "PAY",

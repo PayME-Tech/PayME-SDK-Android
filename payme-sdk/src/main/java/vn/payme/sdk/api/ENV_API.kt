@@ -1,38 +1,38 @@
 package vn.payme.sdk.api
 
-import vn.payme.sdk.PayME
 import vn.payme.sdk.enums.Env
+import vn.payme.sdk.store.Store
 
 class ENV_API() {
     companion object {
         private fun getAPIStatic(): String {
-            if (PayME.env == Env.SANDBOX) {
+            if (Store.config.env == Env.SANDBOX) {
                 return "https://sbx-static.payme.vn/Upload"
-            } else if (PayME.env == Env.PRODUCTION) {
+            } else if (Store.config.env == Env.PRODUCTION) {
                 return "https://static.payme.vn/Upload"
-            } else if (PayME.env == Env.DEV) {
+            } else if (Store.config.env == Env.DEV) {
                 return "https://sbx-static.payme.vn/Upload"
             }
             return "https://sbx-static.payme.vn/Upload"
         }
 
         private fun getAPIfe(): String {
-            if (PayME.env == Env.SANDBOX) {
+            if (Store.config.env == Env.SANDBOX) {
                 return "https://sbx-fe.payme.vn/"
-            } else if (PayME.env == Env.PRODUCTION) {
+            } else if (Store.config.env == Env.PRODUCTION) {
                 return "https://fe.payme.vn/"
-            } else if (PayME.env == Env.DEV) {
+            } else if (Store.config.env == Env.DEV) {
                 return "https://dev-fe.payme.net.vn"
             }
             return "https://dev-fe.payme.net.vn/"
         }
 
         private fun getSecurity(): Boolean {
-            if (PayME.env == Env.SANDBOX) {
+            if (Store.config.env == Env.SANDBOX) {
                 return true
-            } else if (PayME.env == Env.PRODUCTION) {
+            } else if (Store.config.env == Env.PRODUCTION) {
                 return true
-            } else if (PayME.env == Env.DEV) {
+            } else if (Store.config.env == Env.DEV) {
                 return false
             }
             return false

@@ -6,6 +6,7 @@ import kotlinx.coroutines.*
 import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.kyc.CameraKycActivity
+import vn.payme.sdk.store.Store
 import java.nio.charset.StandardCharsets
 import java.util.HashMap
 import kotlin.coroutines.resume
@@ -239,11 +240,11 @@ class UploadKycApi {
         if(identifyType!=null){
             kycInput["identifyType"] = identifyType!!
         }
-        kycInput["clientId"] = PayME.clientId
+        kycInput["clientId"] = Store.config.clientId
         variables["kycInput"] = kycInput
         params["query"] = query
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, PayME.accessToken!!, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,

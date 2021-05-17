@@ -15,6 +15,7 @@ import org.json.JSONObject
 import vn.payme.sdk.BuildConfig
 import vn.payme.sdk.PayME
 import vn.payme.sdk.enums.ERROR_CODE
+import vn.payme.sdk.store.Store
 import java.nio.charset.Charset
 
 
@@ -92,7 +93,6 @@ internal class NetworkRequest(
                         var finalJSONObject: JSONObject? = null
                         if (isSecurity) {
                             val jsonObject = JSONObject(response.toString())
-                            println("jsonObject"+jsonObject)
                             val xAPIMessageResponse = jsonObject.getString("x-api-message")
                             val headers = jsonObject.getJSONObject("headers")
                             val xAPIActionResponse = headers.getString("x-api-action")
@@ -117,7 +117,7 @@ internal class NetworkRequest(
                         } else {
                             finalJSONObject = JSONObject(response.toString())
                             if (BuildConfig.DEBUG) {
-                                println("RESPONSE" + response.toString())
+                                println("RESPONSE  " + response.toString() + "params" + params)
                             }
 
                         }
@@ -162,8 +162,8 @@ internal class NetworkRequest(
                     headers["Accept"] = "application/json"
                     headers["Content-Type"] = "application/json"
                     if (isSecurity) {
-                        println("PayME.appID.toString()" + PayME.appID.toString())
-                        headers["x-api-client"] = PayME.appID.toString()
+                        println("PayME.appID.toString()" + Store.config.appID.toString())
+                        headers["x-api-client"] = Store.config.appID.toString()
                         headers["x-api-key"] = xAPIKey
                         headers["x-api-action"] = xAPIAction
                         headers["x-api-validate"] = xAPIValidate

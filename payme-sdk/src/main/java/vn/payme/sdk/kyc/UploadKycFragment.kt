@@ -15,6 +15,7 @@ import vn.payme.sdk.R
 import vn.payme.sdk.api.UploadKycApi
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.enums.TypeCallBack
+import vn.payme.sdk.store.Store
 
 class UploadKycFragment : Fragment() {
     private var layoutUpload: ConstraintLayout? = null
@@ -53,12 +54,11 @@ class UploadKycFragment : Fragment() {
     ): View? {
         val view: View = inflater?.inflate(R.layout.upload_kyc_fragment, container, false)
         layoutUpload = view.findViewById(R.id.upLoadKyc)
-        layoutUpload!!.background = PayME.colorApp.backgroundColor
+        layoutUpload!!.background = Store.config.colorApp.backgroundColor
         GlobalScope.launch(Dispatchers.Main) {
             if (!loadingUploadKycApi) {
                 loadingUploadKycApi = true
                 uploadKYC()
-
             }
         }
 

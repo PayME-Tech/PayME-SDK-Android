@@ -8,13 +8,10 @@ import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
-import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.enums.ERROR_CODE
-import vn.payme.sdk.enums.TypeCallBack
+import vn.payme.sdk.store.Store
 import java.text.DecimalFormat
 
 class SelectMethodFragment : Fragment() {
@@ -35,10 +32,10 @@ class SelectMethodFragment : Fragment() {
         textAmount = view.findViewById(R.id.money)
         textNote = view.findViewById(R.id.note)
         layout = view.findViewById(R.id.content)
-        layout.background = PayME.colorApp.backgroundColor
-        textNote.text = PayME.infoPayment?.note
+        layout.background = Store.config.colorApp.backgroundColor
+        textNote.text = Store.paymentInfo.infoPayment?.note
         val decimal = DecimalFormat("#,###")
-        textAmount.text = "${decimal.format(PayME.infoPayment?.amount)} đ"
+        textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
         val fragmentManager: FragmentManager
         fragmentManager = childFragmentManager
         val fragment = fragmentManager.beginTransaction()

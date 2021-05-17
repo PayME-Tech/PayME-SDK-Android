@@ -19,6 +19,7 @@ import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.payment.PopupTakeVideo
+import vn.payme.sdk.store.Store
 
 
 class TakePictureAvataFragment : Fragment() {
@@ -118,7 +119,7 @@ class TakePictureAvataFragment : Fragment() {
 
 
             CameraKycActivity.imageFace = saveImage
-            if (PayME.kycVideo) {
+            if (Store.config.kycVideo) {
                 val popupTakeVideo = PopupTakeVideo()
                 popupTakeVideo.show(parentFragmentManager, "ModalBottomSheet")
             } else {

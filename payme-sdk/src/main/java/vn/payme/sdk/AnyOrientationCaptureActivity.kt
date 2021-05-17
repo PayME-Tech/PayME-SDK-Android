@@ -28,6 +28,7 @@ import vn.payme.sdk.component.Button
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.kyc.PermisionCamera
 import vn.payme.sdk.enums.TypeCallBack
+import vn.payme.sdk.store.Store
 
 
 class AnyOrientationCaptureActivity : AppCompatActivity() {
@@ -52,7 +53,7 @@ class AnyOrientationCaptureActivity : AppCompatActivity() {
         initScanner(savedInstanceState)
         eventPress()
         getWindow().setStatusBarColor(Color.TRANSPARENT);
-        getWindow().setBackgroundDrawable(PayME.colorApp.backgroundColor);
+        getWindow().setBackgroundDrawable(Store.config.colorApp.backgroundColor);
         PermisionCamera().requestCamera(this, this)
 
 

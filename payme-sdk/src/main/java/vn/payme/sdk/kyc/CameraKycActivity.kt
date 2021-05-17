@@ -8,6 +8,7 @@ import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
+import vn.payme.sdk.store.Store
 
 class CameraKycActivity : AppCompatActivity(R.layout.camera_kyc_activity) {
     companion object{
@@ -25,19 +26,19 @@ class CameraKycActivity : AppCompatActivity(R.layout.camera_kyc_activity) {
         imageBackSide = null
         typeIdentify = null
         getWindow().setStatusBarColor(Color.TRANSPARENT);
-        getWindow().setBackgroundDrawable(PayME.colorApp.backgroundColor);
+        getWindow().setBackgroundDrawable(Store.config.colorApp.backgroundColor);
         if (savedInstanceState == null) {
-                if (PayME.kycIdenity) {
+                if (Store.config.kycIdenity) {
                     supportFragmentManager.commit {
                         setReorderingAllowed(true)
                         add<TakePictureIdentifyFragment>(R.id.content_kyc)
                     }
-                } else if (PayME.kycFace) {
+                } else if (Store.config.kycFace) {
                     supportFragmentManager.commit {
                         setReorderingAllowed(true)
                         add<TakePictureAvataFragment>(R.id.content_kyc)
                     }
-                } else if (PayME.kycVideo) {
+                } else if (Store.config.kycVideo) {
                     supportFragmentManager.commit {
                         setReorderingAllowed(true)
                         add<TakeVideoKycFragment>(R.id.content_kyc)

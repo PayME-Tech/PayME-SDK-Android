@@ -21,6 +21,7 @@ import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.evenbus.ChangeTypePayment
 import vn.payme.sdk.model.Method
+import vn.payme.sdk.store.Store
 import java.security.MessageDigest
 
 class ConfirmPassFragment : Fragment() {
@@ -63,7 +64,7 @@ class ConfirmPassFragment : Fragment() {
                     Keyboard.closeKeyboard(requireContext())
                     val payment = history.optJSONObject("payment")
                     val transaction = payment.optString("transaction")
-                    PayME.transaction = transaction
+                    Store.paymentInfo.transaction = transaction
                     even.post(myEven)
                 } else {
                     if (payment != null) {
@@ -76,7 +77,7 @@ class ConfirmPassFragment : Fragment() {
                             even.post(changeFragmentOtp)
                         } else if (statePaymentLinkedResponsed == "REQUIRED_OTP") {
                             val transaction = payment.optString("transaction")
-                            PayME.transaction = transaction
+                            Store.paymentInfo.transaction = transaction
                             var changeFragmentOtp: ChangeTypePayment =
                                 ChangeTypePayment(TYPE_PAYMENT.CONFIRM_OTP_BANK, transaction,null)
                             even.post(changeFragmentOtp)
@@ -119,7 +120,7 @@ class ConfirmPassFragment : Fragment() {
         loading = view.findViewById(R.id.loading)
         loading.getIndeterminateDrawable()
             .mutate()
-            .setColorFilter(Color.parseColor(PayME.colorApp.startColor), PorterDuff.Mode.SRC_ATOP)
+            .setColorFilter(Color.parseColor(Store.config.colorApp.startColor), PorterDuff.Mode.SRC_ATOP)
         pinView.setAnimationEnable(true)
         pinView.requestFocus()
         pinView.isPasswordHidden = true
@@ -133,6 +134,7 @@ class ConfirmPassFragment : Fragment() {
                     val pass: String? = SHA256(text.toString())
                     paymentApi.getSecuriryCode(pass!!,
                         onSuccess = { jsonObject ->
+                            Keyboard.closeKeyboard(requireContext())
                             val Account = jsonObject.optJSONObject("Account")
                             val SecurityCode = Account.optJSONObject("SecurityCode")
                             val CreateCodeByPassword =
@@ -142,11 +144,11 @@ class ConfirmPassFragment : Fragment() {
                             val succeeded = CreateCodeByPassword.optBoolean("succeeded")
                             if (succeeded) {
                                 val paymentApi = PaymentApi()
-                                if(PayME.methodSelected?.type!=TYPE_PAYMENT.WALLET){
-                                    paymentLinkedBank(PayME.methodSelected!!)
+                                if(Store.paymentInfo.methodSelected?.type!=TYPE_PAYMENT.WALLET){
+                                    paymentLinkedBank(Store.paymentInfo.methodSelected!!)
                                 }else{
 
-                                paymentApi.payment(PayME.methodSelected!!,
+                                paymentApi.payment(Store.paymentInfo.methodSelected!!,
                                     securityCode,
                                     null,
                                     null,
@@ -165,7 +167,7 @@ class ConfirmPassFragment : Fragment() {
                                             val history = Pay.optJSONObject("history")
                                             val payment = history.optJSONObject("payment")
                                             val transaction = payment.optString("transaction")
-                                            PayME.transaction = transaction
+                                            Store.paymentInfo.transaction = transaction
                                             Keyboard.closeKeyboard(requireContext())
                                             PaymePayment.onPaymentSuccess(history,requireContext(),requireFragmentManager())
 

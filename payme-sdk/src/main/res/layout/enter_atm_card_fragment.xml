@@ -23,16 +23,23 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
+    <androidx.cardview.widget.CardView
+        android:layout_marginTop="16dp"
+        android:id="@+id/wrapButtonChangeMethod"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@color/paleGrey"
+        app:layout_constraintTop_toBottomOf="@id/title_select_method"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/buttonChangeMethod"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/background_radius_with_boder"
+        android:layout_height="match_parent"
         android:paddingHorizontal="10dp"
         android:paddingVertical="8dp"
-        app:layout_constraintTop_toBottomOf="@id/title_select_method">
+       >
 
         <ViewAnimator
             android:id="@+id/wrap_image_method"
@@ -84,26 +91,74 @@
                 android:fontFamily="@font/barlow_medium"
                 android:text="@string/change"
                 android:textSize="13dp"
+                android:id="@+id/txtChangeMethod"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <EditText
-        android:id="@+id/textInputCardNumber"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="number"
+    </androidx.cardview.widget.CardView>
+
+<!--    Nhap so the-->
+    <androidx.cardview.widget.CardView
+        app:layout_constraintTop_toBottomOf="@id/wrapButtonChangeMethod"
         android:layout_marginTop="16dp"
-        android:background="@drawable/background_radius_with_boder"
-        android:fontFamily="@font/barlow_regular"
-        android:hint="@string/enter_number_card"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="12dp"
-        android:textSize="16dp"
-        app:layout_constraintTop_toBottomOf="@id/buttonChangeMethod" />
+        app:cardElevation="0dp"
+        app:cardCornerRadius="15dp"
+        android:id="@+id/containerInputCardNumber"
+        app:cardBackgroundColor="@color/paleGrey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:layout_height="match_parent">
+            <TextView
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="wrap_content"
+                android:textColor="@color/nb40"
+                android:textAllCaps="true"
+                android:id="@+id/titleEnterNumberAtm"
+                android:fontFamily="@font/barlow_regular"
+                android:textSize="12dp"
+                android:text="@string/enter_number_card"
+                android:layout_height="wrap_content"/>
+            <TextView
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="wrap_content"
+                android:textColor="@color/blackSeven"
+                android:textAllCaps="true"
+                android:id="@+id/txtCardHolderDetect"
+                android:fontFamily="@font/barlow_regular"
+                android:textSize="12dp"
+                android:text=""
+                android:layout_height="wrap_content"/>
+            <EditText
+                app:layout_constraintTop_toBottomOf="@id/titleEnterNumberAtm"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:id="@+id/inputCardNumber"
+                android:layout_width="match_parent"
+
+                android:textColor="@color/blackSeven"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="21"
+                android:fontFamily="@font/barlow_medium"
+                android:background="@color/paleGrey"
+
+                android:textSize="16dp"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
     <TextView
-        android:id="@+id/textErrorCard"
+        android:id="@+id/txtErrorCard"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginLeft="16dp"
@@ -113,75 +168,112 @@
         android:textColor="@color/scarlet"
         android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textInputCardNumber"
+        app:layout_constraintTop_toBottomOf="@id/containerInputCardNumber"
         />
 
+<!--Nhap ho ten chu the-->
+    <androidx.cardview.widget.CardView
+        android:layout_marginTop="16dp"
+        android:id="@+id/containerInputCardHolder"
+        app:cardCornerRadius="15dp"
+        app:layout_constraintTop_toBottomOf="@id/txtErrorCard"
+        app:cardElevation="0dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="@color/paleGrey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:layout_height="match_parent">
+        <TextView
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="wrap_content"
+            android:textColor="@color/nb40"
+            android:textAllCaps="true"
+            android:id="@+id/titleEnterCardholder"
+            android:fontFamily="@font/barlow_regular"
+            android:textSize="12dp"
+            android:text="@string/enter_the_cardholder_full_name"
+            android:layout_height="wrap_content"/>
+        <EditText
+            app:layout_constraintTop_toBottomOf="@id/titleEnterCardholder"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:id="@+id/inputCardHolder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textFilter"
+            android:maxLength="50"
+            android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZ "
+            android:fontFamily="@font/barlow_medium"
+            android:background="@color/paleGrey"
+
+            android:textSize="16dp"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
     <TextView
-        android:id="@+id/textNoteCard"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginLeft="16dp"
-        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        android:layout_marginTop="5dp"
+        android:id="@+id/txtNoteInputCardDate"
         android:fontFamily="@font/barlow_regular"
-        android:text="@string/enter_the_number_card_on_the_front_of_the_card"
+        android:text="@string/please_check_the_correct_name_printed_on_the_card"
         android:textColor="@color/blackFive"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textErrorCard" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/containerInputCardHolder"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/textNoteCard">
-
-        <EditText
-            android:id="@+id/textInputCardHolder"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toTopOf="parent"
-            android:maxLength="50"
-            android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZ "
-            android:inputType="textFilter"
-            android:background="@drawable/background_radius_with_boder"
-            android:fontFamily="@font/barlow_regular"
-            android:hint="@string/enter_the_cardholder_full_name"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="12dp"
-            android:textSize="16dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="12dp"
-            android:fontFamily="@font/barlow_regular"
-            android:text="@string/please_check_the_correct_name_printed_on_the_card"
-            android:textColor="@color/blackFive"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textInputCardHolder" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <EditText
-        android:id="@+id/textInputCardDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:inputType="number"
-        android:maxLength="5"
-        android:background="@drawable/background_radius_with_boder"
-        android:fontFamily="@font/barlow_regular"
-        android:hint="@string/release_date_mm_yy"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="12dp"
-        android:textSize="16dp"
         app:layout_constraintTop_toBottomOf="@id/containerInputCardHolder" />
 
+<!--Nhap ngay phat hanh-->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/containerInputCardDate"
+        app:cardCornerRadius="15dp"
+        app:layout_constraintTop_toBottomOf="@id/txtNoteInputCardDate"
+        app:cardElevation="0dp"
+        android:layout_marginTop="10dp"
+        app:cardBackgroundColor="@color/paleGrey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:layout_height="match_parent">
+            <TextView
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="wrap_content"
+                android:textColor="@color/nb40"
+                android:textAllCaps="true"
+                android:id="@+id/titleEnterCardDate"
+                android:fontFamily="@font/barlow_regular"
+                android:textSize="12dp"
+                android:text="@string/release_date_mm_yy"
+                android:layout_height="wrap_content"/>
+            <EditText
+                app:layout_constraintTop_toBottomOf="@id/titleEnterCardDate"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:id="@+id/inputCardDate"
+                android:hint="MM / YY"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:textColor="@color/blackSeven"
+                android:maxLength="21"
+                android:fontFamily="@font/barlow_medium"
+                android:background="@color/paleGrey"
+
+                android:textSize="16dp"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
     <TextView
-        android:id="@+id/textErrorDate"
+        android:id="@+id/txtErrorDate"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginLeft="16dp"
@@ -189,16 +281,19 @@
         android:text="Định dạng tháng/năm không đúng"
         android:textColor="@color/scarlet"
         android:visibility="gone"
+
         android:fontFamily="@font/barlow_regular"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textInputCardDate" />
+        app:layout_constraintTop_toBottomOf="@id/containerInputCardDate" />
+
+
 
     <vn.payme.sdk.component.Button
         android:id="@+id/buttonSubmit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/textErrorDate"
+        app:layout_constraintTop_toBottomOf="@id/txtErrorDate"
         app:pbText="@string/payment">
 
     </vn.payme.sdk.component.Button>

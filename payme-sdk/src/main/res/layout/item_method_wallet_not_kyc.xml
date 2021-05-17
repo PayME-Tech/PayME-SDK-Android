@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingHorizontal="12dp"
+    android:paddingBottom="12dp"
+    android:background="@android:color/transparent"
+    android:layout_height="match_parent"
+    >
+    <androidx.cardview.widget.CardView
+        app:cardElevation="0dp"
+        android:layout_width="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:cardCornerRadius="15dp"
+        app:cardBackgroundColor="@color/paleGrey"
+        android:layout_height="wrap_content">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:paddingVertical="8dp"
+            android:layout_height="match_parent">
+
+            <ImageView
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    android:id="@+id/imageWallet"
+                    android:src="@drawable/iconwallet"
+                    android:layout_marginLeft="10dp"
+                    app:layout_constraintBottom_toBottomOf="@id/button"
+                    android:layout_width="26dp"
+                    android:layout_height="22dp">
+             </ImageView>
+            <TextView
+                android:layout_width="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginLeft="8dp"
+                app:layout_constraintLeft_toRightOf="@id/imageWallet"
+                app:layout_constraintBottom_toBottomOf="@id/button"
+                android:layout_height="wrap_content"
+                android:id="@+id/title"
+                android:textSize="16dp"
+                android:fontFamily="@font/barlow_medium"
+                android:textColor="@color/blackSix"
+                android:text="TESST"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@id/button"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/title"
+                android:layout_marginLeft="8dp"
+                android:fontFamily="@font/barlow_medium"
+                android:textSize="16dp"
+                android:textColor="@color/brownishGrey"
+                android:id="@+id/note_method"
+                />
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_radius_with_boder_8dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginRight="8dp"
+                android:id="@+id/button"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/lineBottom"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/barlow_medium"
+                    android:text="@string/change"
+                    android:textSize="13dp"
+                    android:id="@+id/txtButton"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <View
+                android:layout_width="match_parent"
+                android:id="@+id/lineBottom"
+                android:background="@color/white"
+                android:layout_marginBottom="6dp"
+                app:layout_constraintBottom_toTopOf="@id/txtDescription"
+                android:layout_height="1dp"/>
+            <TextView
+                android:textColor="@color/red"
+                android:id="@+id/txtDescription"
+                android:textSize="12dp"
+                android:layout_marginLeft="10dp"
+                android:fontFamily="@font/barlow_regular"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="@string/description_active_now"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

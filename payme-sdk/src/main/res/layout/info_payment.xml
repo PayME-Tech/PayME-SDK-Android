@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.cardview.widget.CardView
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="15dp"
+    app:contentPaddingTop="10dp"
+    app:contentPaddingBottom="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardElevation="0dp"
+    >
+    <ListView
+        android:listSelector="@android:color/transparent"
+        android:id="@+id/recipe_list_view"
+        android:layout_width="match_parent"
+        android:fillViewport="true"
+        android:choiceMode="none"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:nestedScrollingEnabled="false"
+        />
+</androidx.cardview.widget.CardView>
+
+</merge>

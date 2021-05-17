@@ -7,41 +7,48 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import androidx.annotation.Nullable
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.enums.ERROR_CODE
+import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
+import vn.payme.sdk.enums.TypeCallBack
+import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.evenbus.ChangeTypePayment
 import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.hepper.Keyboard
+import vn.payme.sdk.store.Store
 
 internal class PaymePayment : DialogFragment() {
-    companion object{
-        fun onPaymentSuccess(jsonObject: JSONObject?,context: Context,fragmentManager:FragmentManager){
+    companion object {
+        fun onPaymentSuccess(
+            jsonObject: JSONObject?,
+            context: Context,
+            fragmentManager: FragmentManager
+        ) {
             PayME.onSuccess(jsonObject)
-            if(PayME.isShowResultUI){
+            if (Store.paymentInfo.isShowResultUI) {
                 val resultPaymentFragment = ResultPaymentFragment()
                 val fragment = fragmentManager?.beginTransaction()
                 fragment?.replace(R.id.frame_container, resultPaymentFragment)
                 fragment?.commit()
-            }else{
+            } else {
                 closePopup(context)
             }
-
         }
-        fun onPaymentError(message:String,context: Context,fragmentManager:FragmentManager){
-            PayME.onError(null, ERROR_CODE.PAYMENT_ERROR,message,)
-            if(PayME.isShowResultUI){
+
+        fun onPaymentError(message: String, context: Context, fragmentManager: FragmentManager) {
+            PayME.onError(null, ERROR_CODE.PAYMENT_ERROR, message)
+            if (Store.paymentInfo.isShowResultUI) {
                 val bundle: Bundle = Bundle()
                 bundle.putString("message", message)
                 val resultPaymentFragment = ResultPaymentFragment()
@@ -49,22 +56,19 @@ internal class PaymePayment : DialogFragment() {
                 val fragment = fragmentManager?.beginTransaction()
                 fragment?.replace(R.id.frame_container, resultPaymentFragment)
                 fragment?.commit()
-            }else{
+            } else {
                 closePopup(context)
             }
         }
-        fun backPopup(fragmentManager:FragmentManager){
-            val fragment = fragmentManager?.beginTransaction()
-            fragment?.replace(R.id.frame_container, SelectMethodFragment())
-            fragment?.commit()
-        }
-        fun  closePopup(context: Context){
+
+        fun closePopup(context: Context) {
             Keyboard.closeKeyboard(context)
             var even: EventBus = EventBus.getDefault()
             var myEven: MyEven = MyEven(TypeCallBack.onClose, "")
             even.post(myEven)
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle)
@@ -78,7 +82,7 @@ internal class PaymePayment : DialogFragment() {
         val message = arguments?.getString("message")
         if (showResult == true) {
             val bundle: Bundle = Bundle()
-            if (message!=null) {
+            if (message != null) {
                 bundle.putString("message", message)
             }
             val resultPaymentFragment: ResultPaymentFragment =
@@ -92,19 +96,19 @@ internal class PaymePayment : DialogFragment() {
             fragment.commit()
 
         } else {
-            if(PayME.methodSelected!==null){
-                if(PayME.methodSelected?.type!=TYPE_PAYMENT.BANK_CARD){
+            if (Store.paymentInfo.methodSelected !== null) {
+                if (Store.paymentInfo.methodSelected?.type != TYPE_PAYMENT.BANK_CARD) {
                     fragmentManager = childFragmentManager
                     val fragment = fragmentManager.beginTransaction()
                     fragment.add(R.id.frame_container, ConfirmPassFragment())
                     fragment.commit()
-                }else{
+                } else {
                     fragmentManager = childFragmentManager
                     val fragment = fragmentManager.beginTransaction()
                     fragment.add(R.id.frame_container, SelectMethodFragment())
                     fragment.commit()
                 }
-            }else{
+            } else {
                 fragmentManager = childFragmentManager
                 val fragment = fragmentManager.beginTransaction()
                 fragment.add(R.id.frame_container, SelectMethodFragment())
@@ -140,46 +144,32 @@ internal class PaymePayment : DialogFragment() {
     }
 
     @Subscribe
-    fun onChangeFragment(typePayment: ChangeTypePayment) {
-
-        if (typePayment.type == TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS) {
+    fun onChangeFragment(event: ChangeFragmentPayment) {
+        if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT) {
+            val confirmFragment =
+                ConfirmPaymentFragment()
+            val fragment = childFragmentManager?.beginTransaction()
+            fragment?.replace(
+                R.id.frame_container,
+                confirmFragment
+            )
+            fragment?.commit()
+        }
+        if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_NAPAS) {
             this.dialog?.dismiss()
             val bundle: Bundle = Bundle()
-            bundle.putString("html", typePayment.value)
-            bundle.putString("history", typePayment.data.toString())
+            bundle.putString("html", event.value)
             val intent = Intent(PayME.context, WebViewNapasActivity::class.java)
             intent.putExtras(bundle)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             PayME.context?.startActivity(intent)
-
-
-        } else if (typePayment.type == TYPE_PAYMENT.CONFIRM_OTP_BANK) {
-            val confirmOtpFragment: ConfirmOtpFragment =
-                ConfirmOtpFragment()
-            val bundle: Bundle = Bundle()
-            bundle.putString("transaction", typePayment.value)
-            val fragment = childFragmentManager?.beginTransaction()
-            confirmOtpFragment.arguments = bundle
-            fragment?.replace(
-                R.id.frame_container,
-                confirmOtpFragment
-            )
-            fragment?.commit()
-
-        } else if (typePayment.type == TYPE_PAYMENT.PAYMENT_RESULT) {
-            val message = typePayment.value
-            if (message?.length!! > 0) {
-                onPaymentError(message,requireContext(),childFragmentManager)
-            }else{
-                onPaymentSuccess(typePayment.data,requireContext(),childFragmentManager)
-            }
-        } else if (typePayment.type == TYPE_PAYMENT.WALLET) {
+        }
+        if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_PASS) {
             val confirmPassFragment: ConfirmPassFragment = ConfirmPassFragment()
             val fragment = childFragmentManager?.beginTransaction()
             fragment?.replace(R.id.frame_container, confirmPassFragment)
             fragment?.commit()
         }
-
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

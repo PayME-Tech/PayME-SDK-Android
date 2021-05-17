@@ -51,18 +51,13 @@ import vn.payme.sdk.R;
 public class PinView extends AppCompatEditText {
 
     private static final String TAG = "PinView";
-
     private static final boolean DBG = false;
-
     private static final int BLINK = 500;
-
     private static final int DEFAULT_COUNT = 4;
-
     private static final InputFilter[] NO_FILTERS = new InputFilter[0];
 
     private static final int[] HIGHLIGHT_STATES = new int[]{
             android.R.attr.state_selected};
-
     private static final int VIEW_TYPE_RECTANGLE = 0;
     private static final int VIEW_TYPE_LINE = 1;
     private static final int VIEW_TYPE_NONE = 2;

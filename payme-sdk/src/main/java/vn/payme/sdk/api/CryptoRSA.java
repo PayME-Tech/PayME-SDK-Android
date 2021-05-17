@@ -17,6 +17,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import vn.payme.sdk.PayME;
+import vn.payme.sdk.store.Store;
 
 class CryptoRSA {
     PublicKey publicKey;
@@ -36,8 +37,8 @@ class CryptoRSA {
 
     private void generateKeyPair()
             throws NoSuchAlgorithmException, InvalidKeySpecException {
-        privateKey = stringToPrivateKey(PayME.appPrivateKey);
-        publicKey =stringToPublicKey(PayME.publicKey);
+        privateKey = stringToPrivateKey(Store.config.getAppPrivateKey());
+        publicKey =stringToPublicKey(Store.config.getPublicKey());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)

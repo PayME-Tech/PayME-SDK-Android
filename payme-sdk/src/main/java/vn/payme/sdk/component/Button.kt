@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
+import vn.payme.sdk.store.Store
 
 class Button : RelativeLayout {
 
@@ -57,7 +58,7 @@ class Button : RelativeLayout {
 
 
     private fun init(context: Context, attrs: AttributeSet?) {
-        this.background = PayME.colorApp.backgroundColorRadius
+        this.background = Store.config.colorApp.backgroundColorRadius
         isLoadingShowing = false
         LayoutInflater.from(getContext()).inflate(R.layout.view_loading_button, this, true)
         progressBar = findViewById<View>(R.id.pb_progress) as ProgressBar

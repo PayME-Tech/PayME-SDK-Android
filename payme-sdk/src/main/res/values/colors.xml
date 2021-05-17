@@ -6,6 +6,10 @@
     <color name="white">#ffffff</color>
     <color name="steel">#728190</color>
     <color name="veryLightPinkTwo">#cbcbcb</color>
+    <color name="paleGrey">#eff2f7</color>
+    <color name="nb40">#a5aeb8</color>
+    <color name="nb60">#647081</color>
+    <color name="nb20">#eff2f7</color>
     <color name="darkBlueGrey">#181a41</color>
     <color name="brownGreyTwo">#949494</color>
     <color name="dark">#262e34</color>
@@ -18,5 +22,6 @@
     <color name="colorPrimary">#FFC107</color>
     <color name="colorPrimaryDark">#FFA000</color>
     <color name="colorAccent">#3D98FF</color>
+    <color name="red">#ff0000</color>
     <color name="button_black">#1c1c1c</color>
 </resources>

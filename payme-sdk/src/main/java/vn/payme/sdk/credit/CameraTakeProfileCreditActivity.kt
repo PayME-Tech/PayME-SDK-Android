@@ -25,6 +25,7 @@ import vn.payme.sdk.component.Button
 import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.kyc.PermisionCamera
+import vn.payme.sdk.store.Store
 import java.io.ByteArrayOutputStream
 
 
@@ -60,7 +61,7 @@ class CameraTakeProfileCreditActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera_take_profile_credit)
         getWindow().setStatusBarColor(Color.TRANSPARENT);
-        getWindow().setBackgroundDrawable(PayME.colorApp.backgroundColor);
+        getWindow().setBackgroundDrawable(Store.config.colorApp.backgroundColor);
         cameraKitView = findViewById(R.id.previewCamera)
         buttonTakePicture = findViewById(R.id.btn_takepicture)
         buttonChooseGallery = findViewById(R.id.buttonChooseGallery)

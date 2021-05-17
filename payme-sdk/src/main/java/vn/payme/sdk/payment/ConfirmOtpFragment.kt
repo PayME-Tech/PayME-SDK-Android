@@ -19,6 +19,7 @@ import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.enums.TypeCallBack
+import vn.payme.sdk.store.Store
 
 class ConfirmOtpFragment : Fragment() {
     private lateinit var buttonSubmit: Button
@@ -34,7 +35,7 @@ class ConfirmOtpFragment : Fragment() {
         buttonSubmit = view.findViewById(R.id.buttonSubmit)
         buttonClose = view.findViewById(R.id.buttonClose)
         pinView = view.findViewById(R.id.otp_view)
-        buttonSubmit.background = PayME.colorApp.backgroundColorRadius
+        buttonSubmit.background = Store.config.colorApp.backgroundColorRadius
         pinView.setItemBackgroundColor(ContextCompat.getColor(PayME.context, R.color.ice))
         pinView.setAnimationEnable(true)
         pinView.requestFocus()
@@ -53,7 +54,7 @@ class ConfirmOtpFragment : Fragment() {
         }
         buttonClose.setOnClickListener {
             if (!buttonSubmit.isLoadingShowing) {
-                PayME.onError(null, ERROR_CODE.USER_CANCELLED,"")
+                PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
                 PaymePayment.closePopup(requireContext())
             }
         }
@@ -65,59 +66,69 @@ class ConfirmOtpFragment : Fragment() {
         buttonSubmit.enableLoading()
         val paymentApi = PaymentApi()
         val transaction = arguments?.getString("transaction")
-        PayME.methodSelected?.let {
-            paymentApi.payment(
-                it,
-                null,
-                null,
-                null,
-                null,
-                pass,
-                transaction,
-                onSuccess = { jsonObject ->
-                    buttonSubmit.disableLoading()
-                    val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
-                    val Payment = OpenEWallet.optJSONObject("Payment")
-                    val Pay = Payment.optJSONObject("Pay")
-                    val succeeded = Pay.optBoolean("succeeded")
-                    val payment = Pay.optJSONObject("payment")
-                    val history = Pay.optJSONObject("history")
-                    val message = Pay.optString("message")
-                    if (succeeded) {
-                        Keyboard.closeKeyboard(requireContext())
-                        PaymePayment.onPaymentSuccess(history,requireContext(), requireFragmentManager())
+        paymentApi.payment(
+            Store.paymentInfo.methodSelected!!,
+            null,
+            null,
+            null,
+            null,
+            pass,
+            transaction,
+            onSuccess = { jsonObject ->
+                buttonSubmit.disableLoading()
+                val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
+                val Payment = OpenEWallet.optJSONObject("Payment")
+                val Pay = Payment.optJSONObject("Pay")
+                val succeeded = Pay.optBoolean("succeeded")
+                val payment = Pay.optJSONObject("payment")
+                val history = Pay.optJSONObject("history")
+                val message = Pay.optString("message")
+                if (succeeded) {
+                    Keyboard.closeKeyboard(requireContext())
+                    PaymePayment.onPaymentSuccess(
+                        history,
+                        requireContext(),
+                        requireFragmentManager()
+                    )
 
-                    } else {
-                        if (payment != null) {
-                            val statePaymentLinkedResponsed =
-                                payment.optString("statePaymentLinkedResponsed")
-                            if (statePaymentLinkedResponsed == "INVALID_OTP") {
-                                pinView.setText("")
-                                PayME.showError(message)
-                            } else {
-                                Keyboard.closeKeyboard(requireContext())
-                                PaymePayment.onPaymentError(message,requireContext(), requireFragmentManager())
-                            }
+                } else {
+                    if (payment != null) {
+                        val statePaymentLinkedResponsed =
+                            payment.optString("statePaymentLinkedResponsed")
+                        if (statePaymentLinkedResponsed == "INVALID_OTP") {
+                            pinView.setText("")
+                            PayME.showError(message)
                         } else {
                             Keyboard.closeKeyboard(requireContext())
-                            PaymePayment.onPaymentError(message,requireContext(), requireFragmentManager())
-
+                            PaymePayment.onPaymentError(
+                                message,
+                                requireContext(),
+                                requireFragmentManager()
+                            )
                         }
-                    }
-
-                },
-                onError = { jsonObject, code, message ->
-                    buttonSubmit.disableLoading()
-                    if (code == ERROR_CODE.EXPIRED) {
-                        PayME.onExpired()
-                        PayME.onError(jsonObject, code, message)
                     } else {
-                        PayME.showError(message)
+                        Keyboard.closeKeyboard(requireContext())
+                        PaymePayment.onPaymentError(
+                            message,
+                            requireContext(),
+                            requireFragmentManager()
+                        )
+
                     }
+                }
+
+            },
+            onError = { jsonObject, code, message ->
+                buttonSubmit.disableLoading()
+                if (code == ERROR_CODE.EXPIRED) {
+                    PayME.onExpired()
+                    PayME.onError(jsonObject, code, message)
+                } else {
+                    PayME.showError(message)
+                }
 
 
-                })
-        }
-
+            })
     }
+
 }

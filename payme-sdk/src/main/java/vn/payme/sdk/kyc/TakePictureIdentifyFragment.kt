@@ -23,6 +23,7 @@ import vn.payme.sdk.model.TypeIdentify
 import vn.payme.sdk.payment.PopupSelectTypeIdentify
 import vn.payme.sdk.payment.PopupTakeFace
 import vn.payme.sdk.payment.PopupTakeVideo
+import vn.payme.sdk.store.Store
 
 
 class TakePictureIdentifyFragment : Fragment() {
@@ -116,11 +117,11 @@ class TakePictureIdentifyFragment : Fragment() {
                 imageBackSide = saveImage
                 CameraKycActivity.imageBackSide = imageBackSide
                 CameraKycActivity.imageFront = imageFront
-                if (PayME.kycFace) {
+                if (Store.config.kycFace) {
                     val popupTakeFace = PopupTakeFace()
                     popupTakeFace.show(parentFragmentManager, "ModalBottomSheet")
 
-                } else if (PayME.kycVideo) {
+                } else if (Store.config.kycVideo) {
 
                     val popupTakeVideo = PopupTakeVideo()
                     popupTakeVideo.show(parentFragmentManager, "ModalBottomSheet")

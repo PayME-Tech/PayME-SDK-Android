@@ -33,6 +33,7 @@ import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.InfoPayment
 import vn.payme.sdk.model.JsObject
+import vn.payme.sdk.store.Store
 import java.net.URLEncoder
 
 
@@ -56,6 +57,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             finish()
         }
     }
+
     fun takeImage(): Unit {
         val intent = Intent(this, CameraTakeProfileCreditActivity::class.java)
         this?.startActivity(intent)
@@ -96,7 +98,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         }
 
         getWindow().setStatusBarColor(Color.TRANSPARENT);
-        getWindow().setBackgroundDrawable(PayME.colorApp.backgroundColor);
+        getWindow().setBackgroundDrawable(Store.config.colorApp.backgroundColor);
 
 
         myWebView = findViewById(R.id.webview)
@@ -113,7 +115,10 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         myWebView.clearSslPreferences();
         loadingProgressBar.getIndeterminateDrawable()
             .mutate()
-            .setColorFilter(Color.parseColor(PayME.colorApp.startColor), PorterDuff.Mode.SRC_ATOP)
+            .setColorFilter(
+                Color.parseColor(Store.config.colorApp.startColor),
+                PorterDuff.Mode.SRC_ATOP
+            )
 
         val cookieManager = CookieManager.getInstance()
         cookieManager.setAcceptCookie(true)
@@ -127,7 +132,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
         }
 
-        buttonBack?.background = PayME.colorApp.backgroundColorRadiusAlpha
+        buttonBack?.background = Store.config.colorApp.backgroundColorRadiusAlpha
 
         myWebView.setWebViewClient(object : WebViewClient() {
             override fun onReceivedError(
@@ -200,29 +205,33 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                 cameraManager
             )
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
-        var action: String = PayME.action.toString()
-        val showLog = if (PayME.showLog) 1 else 0
+        var action: String = Store.paymentInfo.action.toString()
+        val showLog = if (Store.config.showLog) 1 else 0
 
         var data: JSONObject = JSONObject(
             """{
-                      connectToken:  '${PayME.connectToken}',
-                      appToken: '${PayME.appToken}',
-                      publicKey: '${PayME.publicKey}',
-                      privateKey: '${PayME.appPrivateKey}',
-                      xApi: '${PayME.appID}',
-                      env: '${PayME.env.toString()}',
+                      connectToken:  '${Store.config.connectToken}',
+                      appToken: '${Store.config.appToken}',
+                      publicKey: '${Store.config.publicKey}',
+                      privateKey: '${Store.config.appPrivateKey}',
+                      xApi: '${Store.config.appID}',
+                      env: '${Store.config.env.toString()}',
                       showLog: '${showLog}',
-                      clientId: '${PayME.clientId}',
-                      amount:${PayME.amount},
-                      configColor: ['${PayME.configColor?.get(0)}', '${PayME.configColor?.get(1)}'],
-                      dataInit:${PayME.dataInit?.toString()},
+                      clientId: '${Store.config.clientId}',
+                      amount:${Store.paymentInfo.amount},
+                      configColor: ['${Store.config.configColor?.get(0)}', '${
+                Store.config.configColor?.get(
+                    1
+                )
+            }'],
+                      dataInit:${Store.userInfo.dataInit?.toString()},
                       partner : {
                         type:'ANDROID'
                       },
                       actions:{
                         type:${action},
-                        serviceCode:${PayME.service?.code},
-                        amount:${PayME.amount}
+                        serviceCode:${Store.paymentInfo.service?.code},
+                        amount:${Store.paymentInfo.amount}
                       }
                     }"""
         )
@@ -231,9 +240,9 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         val xAPIData = cryptoAES.encrytAESDataWebview("LkaWasflkjfqr2g3", data.toString())
         val encode: String = URLEncoder.encode(xAPIData, "utf-8")
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
-        if (PayME.env == Env.DEV) {
+        if (Store.config.env == Env.DEV) {
             myWebView.loadUrl("https://dev-sdk.payme.com.vn/active/${encode}")
-        } else if (PayME.env == Env.SANDBOX) {
+        } else if (Store.config.env == Env.SANDBOX) {
             myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
 
         } else {
@@ -270,10 +279,33 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                     popup.show(this.supportFragmentManager, "ModalBottomSheet")
                 } else {
                     val infoPayment =
-                        InfoPayment(action, amount, note, orderId, storeId, type, PayME.extraData)
-
-                    PayME.pay(
-                        this.supportFragmentManager, infoPayment, true, null, null, null
+                        InfoPayment(
+                            action,
+                            amount,
+                            note,
+                            orderId,
+                            storeId,
+                            type,
+                            Store.paymentInfo.extraData
+                        )
+                    val paymeSDK = PayME(
+                        PayME.context,
+                        Store.config.appToken,
+                        Store.config.publicKey,
+                        Store.config.connectToken,
+                        Store.config.appPrivateKey,
+                        Store.config.configColor!!,
+                        Store.config.language,
+                        Store.config.env!!,
+                        Store.config.showLog
+                    )
+                    paymeSDK.pay(
+                        this.supportFragmentManager,
+                        infoPayment,
+                        true,
+                        null,
+                        PayME.onSuccess,
+                        PayME.onError
                     )
                 }
             },
@@ -303,16 +335,16 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         }
         if (myEven.type === TypeCallBack.onTakeImageResult) {
 
-                if (myEven.value != null) {
-                    image = myEven.value.toString()
-                }
-                val injectedJS = "       const script = document.createElement('script');\n" +
-                        "          script.type = 'text/javascript';\n" +
-                        "          script.async = true;\n" +
-                        "          script.text = 'nativeAndroidSendBase64Image()';\n" +
-                        "          document.body.appendChild(script);\n" +
-                        "          true; // note: this is required, or you'll sometimes get silent failures\n"
-                myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
+            if (myEven.value != null) {
+                image = myEven.value.toString()
+            }
+            val injectedJS = "       const script = document.createElement('script');\n" +
+                    "          script.type = 'text/javascript';\n" +
+                    "          script.async = true;\n" +
+                    "          script.text = 'nativeAndroidSendBase64Image()';\n" +
+                    "          document.body.appendChild(script);\n" +
+                    "          true; // note: this is required, or you'll sometimes get silent failures\n"
+            myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
         }
         if (myEven.type === TypeCallBack.onScan) {
             myEven.value?.let { checkScanQr(it) }

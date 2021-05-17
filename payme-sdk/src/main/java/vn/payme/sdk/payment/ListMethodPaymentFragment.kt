@@ -12,6 +12,7 @@ import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 
 import org.greenrobot.eventbus.EventBus
+import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.adapter.MethodAdapter
@@ -20,7 +21,15 @@ import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.ChangeTypePayment
 import vn.payme.sdk.model.DataMethod
 import vn.payme.sdk.enums.ERROR_CODE
+import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
+import vn.payme.sdk.evenbus.ChangeFragmentPayment
+import vn.payme.sdk.evenbus.PaymentInfoEvent
+import vn.payme.sdk.hepper.Keyboard
+import vn.payme.sdk.model.CardInfo
+import vn.payme.sdk.model.Info
 import vn.payme.sdk.model.Method
+import vn.payme.sdk.store.Store
+import java.text.DecimalFormat
 
 class ListMethodPaymentFragment : Fragment() {
     private var loading: Boolean = false
@@ -43,7 +52,7 @@ class ListMethodPaymentFragment : Fragment() {
         paymentApi.getBalance(onSuccess = { jsonObject ->
             val walletBalance = jsonObject.optJSONObject("Wallet")
             val balance = walletBalance.optInt("balance")
-            PayME.balance = balance
+            Store.userInfo.balance = balance
             getListMethod()
 
         }, onError = { jsonObject, code, message ->
@@ -58,7 +67,6 @@ class ListMethodPaymentFragment : Fragment() {
             }
         })
     }
-
 
 
     private fun getListMethod() {
@@ -131,8 +139,6 @@ class ListMethodPaymentFragment : Fragment() {
     }
 
 
-
-
     fun setListViewHeightBasedOnChildren(listView: ListView) {
         val mAdapter: ListAdapter = listView.adapter
         var totalHeight = 0
@@ -157,63 +163,128 @@ class ListMethodPaymentFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater?.inflate(R.layout.list_method_payme_fragment, container, false)
-
+        context?.let { Keyboard.closeKeyboard(it) }
         listView = view.findViewById(R.id.recipe_list_view)
         loadingProcess = view.findViewById(R.id.loadingListMethodPayment)
         loadingProcess.getIndeterminateDrawable()
             .mutate()
-            .setColorFilter(Color.parseColor(PayME.colorApp.startColor), PorterDuff.Mode.SRC_ATOP)
+            .setColorFilter(
+                Color.parseColor(Store.config.colorApp.startColor),
+                PorterDuff.Mode.SRC_ATOP
+            )
         methodAdapter = MethodAdapter(PayME.context, this.listMethod!!)
         this.listView.adapter = methodAdapter
-        getBalance()
+        if (Store.userInfo.accountActive && Store.userInfo.accountKycSuccess) {
+            getBalance()
+        } else {
+            getListMethod()
+        }
 
-        PayME.numberAtmCard = ""
-        PayME.transaction = ""
-        if(PayME.methodSelected?.type == TYPE_PAYMENT.BANK_CARD){
-                val fragment = fragmentManager?.beginTransaction()
-                fragment?.replace(R.id.frame_container_select_method, EnterAtmCardFragment())
-                fragment?.commit()
+        if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.BANK_CARD) {
+            val fragment = fragmentManager?.beginTransaction()
+            fragment?.replace(R.id.frame_container_select_method, EnterAtmCardFragment())
+            fragment?.commit()
         }
 
 
         this.listView.setOnItemClickListener { adapterView, view, i, l ->
-            if (loadingProcess.visibility!=View.VISIBLE) {
-                val paymentApi = PaymentApi()
+            if (loadingProcess.visibility != View.VISIBLE) {
                 val method = this.listMethod[i]
-                PayME.methodSelected = method!!
-                if (method?.type == TYPE_PAYMENT.WALLET) {
-                    if (PayME.balance < PayME.infoPayment?.amount!!) {
-                        PayME.showError("Số dư trong ví không đủ")
-                    } else {
-                        var even: EventBus = EventBus.getDefault()
-                        var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.WALLET, "",null)
-                        even.post(myEven)
-                    }
-
-                } else if(PayME.openPayAndKyc){
-                    if (method.type == TYPE_PAYMENT.BANK_CARD) {
+                Store.paymentInfo.methodSelected = method!!
+                if(method?.type != TYPE_PAYMENT.WALLET){
+                    if(!Store.config.openPayAndKyc){
+                        PayME.showError("Chức năng chỉ có thể thao tác môi trường production")
+                    }else if(method.type == TYPE_PAYMENT.BANK_CARD){
                         val fragment = fragmentManager?.beginTransaction()
                         val enterAtmCardFragment = EnterAtmCardFragment()
-                        val bundle  = Bundle()
-                        bundle.putBoolean("showChangeMethod",true)
-                        enterAtmCardFragment.arguments  = bundle
-                        fragment?.replace(R.id.frame_container_select_method,enterAtmCardFragment)
+                        val bundle = Bundle()
+                        bundle.putBoolean("showChangeMethod", true)
+                        enterAtmCardFragment.arguments = bundle
+                        fragment?.replace(R.id.frame_container_select_method, enterAtmCardFragment)
                         fragment?.commit()
-                    } else if (method?.type == TYPE_PAYMENT.LINKED) {
-                        var even: EventBus = EventBus.getDefault()
-                        var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.WALLET, "",null)
-                        even.post(myEven)
-                    } else {
-
+                    }else{
+                        checkFree()
                     }
                 }else{
-                    PayME.showError("Chức năng chỉ có thể thao tác môi trường production")
+                    checkFree()
                 }
-
             }
-
-
         }
         return view
+    }
+
+    fun checkFree() {
+        var listInfoTop = arrayListOf<Info>()
+        var listInfoBottom = arrayListOf<Info>()
+        val decimal = DecimalFormat("#,###")
+        val method = Store.paymentInfo.methodSelected
+        listInfoTop.add(Info("Dịch vụ", "Tên Merchant", null, null, false))
+        listInfoTop.add(
+            Info(
+                "Số tiền thanh toán",
+                "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ",
+                null,
+                Color.parseColor(Store.config.colorApp.startColor),
+                false
+            )
+        )
+        listInfoTop.add(Info("Nội dung", Store.paymentInfo.infoPayment?.note, null, null, true))
+
+        if (method?.type == TYPE_PAYMENT.LINKED) {
+            listInfoBottom.add(Info("Phương thức", "Tài khoản liên kết", null, null, false))
+            listInfoBottom.add(
+                Info(
+                    "Số tài khoản",
+                    Store.paymentInfo.methodSelected?.title + Store.paymentInfo.methodSelected?.label,
+                    null,
+                    null,
+                    false
+                )
+            )
+        } else {
+            listInfoBottom.add(
+                Info(
+                    "Phương thức",
+                    Store.paymentInfo.methodSelected?.title,
+                    null,
+                    null,
+                    false
+                )
+            )
+        }
+        val paymentApi = PaymentApi()
+        loadingProcess.visibility = View.VISIBLE
+        paymentApi.getFee(Store.paymentInfo.amount, onSuccess = { jsonObject ->
+            val Utility = jsonObject.getJSONObject("Utility")
+            val GetFee = Utility.getJSONObject("GetFee")
+            val succeeded = GetFee.getBoolean("succeeded")
+            val message = GetFee.getString("message")
+            val decimal = DecimalFormat("#,###")
+            if (succeeded) {
+                val feeObject = GetFee.getJSONObject("fee")
+                val fee = feeObject.getInt("fee")
+                listInfoBottom.add(Info("Phí", "${decimal.format(fee)} đ", null, null, false))
+                listInfoBottom.add(
+                    Info(
+                        "Tổng thanh toán", "${
+                            decimal.format(
+                                Store.paymentInfo.infoPayment?.amount?.plus(
+                                    fee
+                                )
+                            )
+                        } đ", null, resources.getColor(R.color.red), true
+                    )
+                )
+                EventBus.getDefault()
+                    .postSticky(PaymentInfoEvent(listInfoTop, listInfoBottom, null))
+                EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,null))
+
+            } else {
+                PayME.showError(message)
+            }
+        }, onError = { jsonObject: JSONObject?, code: Int?, message: String ->
+            loadingProcess.visibility = View.GONE
+            PayME.showError(message)
+        })
     }
 }

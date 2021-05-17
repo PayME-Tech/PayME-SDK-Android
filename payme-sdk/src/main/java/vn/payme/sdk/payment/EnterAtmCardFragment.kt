@@ -1,5 +1,6 @@
 package vn.payme.sdk.payment
 
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
@@ -11,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -19,34 +21,40 @@ import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.Button
-import vn.payme.sdk.enums.TYPE_PAYMENT
-import vn.payme.sdk.evenbus.ChangeTypePayment
 import vn.payme.sdk.model.BankInfo
 import vn.payme.sdk.enums.ERROR_CODE
+import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
+import vn.payme.sdk.evenbus.ChangeFragmentPayment
+import vn.payme.sdk.evenbus.PaymentInfoEvent
+import vn.payme.sdk.hepper.Keyboard
+import vn.payme.sdk.model.CardInfo
+import vn.payme.sdk.model.Info
+import vn.payme.sdk.store.Store
+import java.text.DecimalFormat
 import java.util.*
 
 
 class EnterAtmCardFragment : Fragment() {
     private lateinit var buttonSubmit: Button
-    private lateinit var contentButtonChangeMethod: ConstraintLayout
     private lateinit var buttonChangeMethod: ConstraintLayout
     private var listBanks: ArrayList<BankInfo> = ArrayList<BankInfo>()
     private lateinit var textInputCardNumber: EditText
     private lateinit var textInputCardHolder: EditText
     private lateinit var textInputCardDate: EditText
     private lateinit var textErrorCard: TextView
-    private lateinit var textNoteCard: TextView
     private lateinit var textErrorDate: TextView
+    private lateinit var textChangeMethod: TextView
+    private lateinit var textNoteInputCardDate: TextView
+    private lateinit var textDetectCardHolder: TextView
     private lateinit var textTitle: TextView
-    private lateinit var containerInputCardHolder: ConstraintLayout
+    private lateinit var containerInputCardHolder: CardView
+    private lateinit var containerInputCardDate: CardView
+    private lateinit var containerInputCardNumber: CardView
     private var bankSelected: BankInfo? = null
     private var cardHolder: String = ""
     private var cardDate: String = ""
     private var cardNumberValue: String = ""
-    fun checkVerifyCardNumber(text: String) {
 
-
-    }
 
     fun detechCardHoder(cardNumber: String) {
         val paymentApi = PaymentApi()
@@ -64,12 +72,13 @@ class EnterAtmCardFragment : Fragment() {
                         textInputCardHolder.setText(accountName)
                         cardHolder = accountName
                     } else {
-                        textNoteCard.setText(bankSelected?.shortName + " " + accountName.toUpperCase())
+                        textDetectCardHolder.text = accountName.toUpperCase()
                         cardHolder = accountName
                     }
 
                 } else {
                     containerInputCardHolder.visibility = View.VISIBLE
+                    textNoteInputCardDate.visibility = View.VISIBLE
 //                    PayME.showError(message)
                 }
 
@@ -95,29 +104,47 @@ class EnterAtmCardFragment : Fragment() {
     ): View? {
         val view: View = inflater?.inflate(R.layout.enter_atm_card_fragment, container, false)
         buttonSubmit = view.findViewById(R.id.buttonSubmit)
-        contentButtonChangeMethod = view.findViewById(R.id.contentButtonChangeMethod)
-        buttonChangeMethod = view.findViewById(R.id.buttonChangeMethod)
+        buttonChangeMethod = view.findViewById(R.id.contentButtonChangeMethod)
 
-        textInputCardNumber = view.findViewById(R.id.textInputCardNumber)
-        textInputCardHolder = view.findViewById(R.id.textInputCardHolder)
-        textInputCardDate = view.findViewById(R.id.textInputCardDate)
+        textInputCardNumber = view.findViewById(R.id.inputCardNumber)
+        textInputCardHolder = view.findViewById(R.id.inputCardHolder)
+        textInputCardDate = view.findViewById(R.id.inputCardDate)
 
-        textErrorCard = view.findViewById(R.id.textErrorCard)
-        textNoteCard = view.findViewById(R.id.textNoteCard)
-        textErrorDate = view.findViewById(R.id.textErrorDate)
+        textErrorCard = view.findViewById(R.id.txtErrorCard)
+        textErrorDate = view.findViewById(R.id.txtErrorDate)
         textTitle = view.findViewById(R.id.title_select_method)
+        textChangeMethod = view.findViewById(R.id.txtChangeMethod)
 
         containerInputCardHolder = view.findViewById(R.id.containerInputCardHolder)
+        containerInputCardDate = view.findViewById(R.id.containerInputCardDate)
+        containerInputCardNumber = view.findViewById(R.id.containerInputCardNumber)
+
+        textNoteInputCardDate = view.findViewById(R.id.txtNoteInputCardDate)
+        textDetectCardHolder = view.findViewById(R.id.txtCardHolderDetect)
+
+        containerInputCardHolder.setOnClickListener {
+            textInputCardHolder.requestFocus()
+            context?.let { it1 -> Keyboard.showKeyboard(it1) }
+        }
+        containerInputCardNumber.setOnClickListener {
+            textInputCardNumber.requestFocus()
+            context?.let { it1 -> Keyboard.showKeyboard(it1) }
+        }
+        containerInputCardDate.setOnClickListener {
+            textInputCardDate.requestFocus()
+            context?.let { it1 -> Keyboard.showKeyboard(it1) }
+        }
 
         textInputCardNumber.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val cardNumber = s?.replace("[^0-9]".toRegex(), "")
                 cardHolder = ""
                 cardNumberValue = ""
-                textNoteCard.setText(R.string.enter_the_number_card_on_the_front_of_the_card)
+                textDetectCardHolder.text = ""
                 if (containerInputCardHolder.visibility != View.GONE) {
                     textInputCardHolder.setText("")
                     containerInputCardHolder.visibility = View.GONE
+                    textNoteInputCardDate.visibility = View.GONE
                 }
 
 
@@ -136,11 +163,9 @@ class EnterAtmCardFragment : Fragment() {
                             filters[0] = LengthFilter(maxLength)
                             textInputCardNumber.filters = filters
                             bankVerify = true
-                            textNoteCard.setText(bankSelected?.shortName)
                             if (cardNumber.length == bankSelected?.cardNumberLength) {
                                 detechCardHoder(cardNumber)
                                 cardNumberValue = cardNumber
-
                             }
 
                         }
@@ -148,11 +173,8 @@ class EnterAtmCardFragment : Fragment() {
 
                     if (!bankVerify) {
                         textErrorCard.visibility = View.VISIBLE
-                        textNoteCard.visibility = View.GONE
                     } else {
                         textErrorCard.visibility = View.GONE
-                        textNoteCard.visibility = View.VISIBLE
-
                     }
                     var cardNew = ""
 
@@ -170,7 +192,7 @@ class EnterAtmCardFragment : Fragment() {
                     } else {
                         for (i in 0 until cardNumber.length) {
                             if ((i == 3 || i == 7 || i == 11) && (i + 1 < cardNumber.length)) {
-                                cardNew += cardNumber[i] + " "
+                                cardNew += cardNumber[i] + "-"
                             } else {
                                 cardNew += cardNumber[i]
                             }
@@ -188,7 +210,6 @@ class EnterAtmCardFragment : Fragment() {
 
                 } else {
                     textErrorCard.visibility = View.GONE
-                    textNoteCard.visibility = View.VISIBLE
                 }
             }
 
@@ -202,7 +223,6 @@ class EnterAtmCardFragment : Fragment() {
                 s: CharSequence, start: Int,
                 before: Int, count: Int
             ) {
-//                textInputCardHolder.setText(s.toString().toUpperCase())
             }
         })
         textInputCardHolder.setFilters(arrayOf<InputFilter>(AllCaps()))
@@ -255,102 +275,143 @@ class EnterAtmCardFragment : Fragment() {
 
 
         buttonChangeMethod.setOnClickListener {
-            PayME.methodSelected = null
+            Store.paymentInfo.methodSelected = null
             val fragment = fragmentManager?.beginTransaction()
             fragment?.replace(R.id.frame_container_select_method, ListMethodPaymentFragment())
             fragment?.commit()
         }
-       val  showChangeMethod  = arguments?.getBoolean("showChangeMethod")
-        contentButtonChangeMethod.background = PayME.colorApp.backgroundColorRadiusAlpha
 
-        if(showChangeMethod== true){
-            buttonChangeMethod.visibility = View.VISIBLE
-            textTitle.visibility = View.VISIBLE
-        }else {
-            textTitle.visibility = View.GONE
+        buttonChangeMethod.background = Store.config.colorApp.backgroundColorRadiusBorder
+        textChangeMethod.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
+        if(!Store.paymentInfo.isChangeMethod){
             buttonChangeMethod.visibility = View.GONE
         }
         buttonSubmit.setOnClickListener {
             if (!buttonSubmit.isLoadingShowing && cardDate.length > 0 && cardHolder.length > 0 && cardNumberValue.length > 0) {
                 buttonSubmit.enableLoading()
                 val paymentApi = PaymentApi()
-                var even: EventBus = EventBus.getDefault()
+                context?.let { it1 -> Keyboard.closeKeyboard(it1) }
 
-                var myEven: ChangeTypePayment = ChangeTypePayment(TYPE_PAYMENT.PAYMENT_RESULT, "",null)
-                val method = PayME.methodSelected
-                method?.let { it1 ->
-                    paymentApi.payment(it1, null, cardNumberValue, cardHolder, cardDate, null, null,
-                        onSuccess = { jsonObject ->
+                paymentApi.getFee(Store.paymentInfo.amount,onSuccess = {jsonObject ->
+                    buttonSubmit.disableLoading()
+                    val Utility = jsonObject.getJSONObject("Utility")
+                    val GetFee = Utility.getJSONObject("GetFee")
+                    val succeeded = GetFee.getBoolean("succeeded")
+                    val message = GetFee.getString("message")
+                    val decimal = DecimalFormat("#,###")
+                    if(succeeded){
+                        val feeObject = GetFee.getJSONObject("fee")
+                        val fee = feeObject.getInt("fee")
+                        var listInfoTop = arrayListOf<Info>()
+                        var listInfoBottom = arrayListOf<Info>()
+
+                        listInfoTop.add(Info("Dịch vụ", "Tên Merchant", null, null, false))
+                        listInfoTop.add(Info("Số tiền thanh toán","${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ" , null,Color.parseColor(Store.config.colorApp.startColor), false))
+                        listInfoTop.add(Info("Nội dung", Store.paymentInfo.infoPayment?.note, null, null, true))
+
+                        listInfoBottom.add(Info("Phương thức", Store.paymentInfo.methodSelected?.title, null, null, false))
+                        listInfoBottom.add(Info("Ngân hàng", bankSelected?.shortName, null, null, false))
+                        listInfoBottom.add(Info("Số thẻ ATM", textInputCardNumber.text.toString(), null, null, false))
+                        listInfoBottom.add(Info("Họ tên chủ thẻ", cardHolder, null, null, false))
+                        listInfoBottom.add(Info("Ngày phát hành", textInputCardDate.text.toString(), null, null, false))
+                        listInfoBottom.add(Info("Phí", "${decimal.format(fee)} đ", null,null  ,false))
+                        listInfoBottom.add(Info("Tổng thanh toán", "${decimal.format(Store.paymentInfo.infoPayment?.amount?.plus(
+                            fee
+                        ))} đ", null, resources.getColor(R.color.red), true))
+                        val cardInfo = CardInfo(cardNumberValue,cardHolder,cardDate)
+                        EventBus.getDefault().postSticky(PaymentInfoEvent(listInfoTop,listInfoBottom,cardInfo))
+                        EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,null))
+
+                    }else{
+                        PayME.showError(message)
+                    }
+
+
+                },onError = {jsonObject, code, message ->
                             buttonSubmit.disableLoading()
-                            val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
-                            val Payment = OpenEWallet.optJSONObject("Payment")
-                            val Pay = Payment.optJSONObject("Pay")
-                            val succeeded = Pay.optBoolean("succeeded")
-                            val history = Pay.optJSONObject("history")
-                            if (history != null) {
-                                val payment = history.optJSONObject("payment")
-                                if (payment != null) {
-                                    val transaction = payment.optString("transaction")
-                                    PayME.transaction = transaction
-                                }
-
-                            }
-                            val payment = Pay.optJSONObject("payment")
-                            val message = Pay.optString("message")
-                            PayME.numberAtmCard =
-                                bankSelected?.shortName + "-" + cardNumberValue.substring(
-                                    cardNumberValue.length - 4
-                                )
-                            if (succeeded) {
-
-                                even.post(myEven)
-                            } else {
-                                if (payment != null) {
-                                    val statePaymentBankCardResponsed =
-                                        payment.optString("statePaymentBankCardResponsed")
-                                    if (statePaymentBankCardResponsed == "REQUIRED_VERIFY") {
-                                        val html = payment.optString("html")
-                                        var changeFragmentOtp: ChangeTypePayment =
-                                            ChangeTypePayment(
-                                                TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS,
-                                                html,history
-                                            )
-                                        even.post(changeFragmentOtp)
-                                    } else if (statePaymentBankCardResponsed == "REQUIRED_OTP") {
-                                        val transaction = payment.optString("transaction")
-                                        var changeFragmentOtp: ChangeTypePayment =
-                                            ChangeTypePayment(
-                                                TYPE_PAYMENT.CONFIRM_OTP_BANK,
-                                                transaction,history
-                                            )
-                                        even.post(changeFragmentOtp)
-                                    } else {
-                                        myEven.value = message
-                                        even.post(myEven)
-                                    }
-                                } else {
-                                    println("THAT BAI ")
-                                    myEven.value = message
-                                    even.post(myEven)
-                                }
-
-                            }
-                            buttonSubmit.disableLoading()
-
-                        },
-                        onError = { jsonObject, code, message ->
-                            buttonSubmit.disableLoading()
-
                             if (code == ERROR_CODE.EXPIRED) {
                                 PayME.onExpired()
                                 PayME.onError(jsonObject, code, message)
                             } else {
                                 PayME.showError(message)
                             }
-                        }
+                })
 
-                    )
-                }
+
+
+//                method?.let { it1 ->
+//                    paymentApi.payment(it1, null, cardNumberValue, cardHolder, cardDate, null, null,
+//                        onSuccess = { jsonObject ->
+//                            buttonSubmit.disableLoading()
+//                            val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
+//                            val Payment = OpenEWallet.optJSONObject("Payment")
+//                            val Pay = Payment.optJSONObject("Pay")
+//                            val succeeded = Pay.optBoolean("succeeded")
+//                            val history = Pay.optJSONObject("history")
+//                            if (history != null) {
+//                                val payment = history.optJSONObject("payment")
+//                                if (payment != null) {
+//                                    val transaction = payment.optString("transaction")
+//                                    Store.paymentInfo.transaction = transaction
+//                                }
+//
+//                            }
+//                            val payment = Pay.optJSONObject("payment")
+//                            val message = Pay.optString("message")
+//                            Store.paymentInfo.numberAtmCard =
+//                                bankSelected?.shortName + "-" + cardNumberValue.substring(
+//                                    cardNumberValue.length - 4
+//                                )
+//                            if (succeeded) {
+//
+//                                even.post(myEven)
+//                            } else {
+//                                if (payment != null) {
+//                                    val statePaymentBankCardResponsed =
+//                                        payment.optString("statePaymentBankCardResponsed")
+//                                    if (statePaymentBankCardResponsed == "REQUIRED_VERIFY") {
+//                                        val html = payment.optString("html")
+//                                        var changeFragmentOtp: ChangeTypePayment =
+//                                            ChangeTypePayment(
+//                                                TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS,
+//                                                html,history
+//                                            )
+//                                        even.post(changeFragmentOtp)
+//                                    } else if (statePaymentBankCardResponsed == "REQUIRED_OTP") {
+//                                        val transaction = payment.optString("transaction")
+//                                        var changeFragmentOtp: ChangeTypePayment =
+//                                            ChangeTypePayment(
+//                                                TYPE_PAYMENT.CONFIRM_OTP_BANK,
+//                                                transaction,history
+//                                            )
+//                                        even.post(changeFragmentOtp)
+//                                    } else {
+//                                        myEven.value = message
+//                                        even.post(myEven)
+//                                    }
+//                                } else {
+//                                    println("THAT BAI ")
+//                                    myEven.value = message
+//                                    even.post(myEven)
+//                                }
+//
+//                            }
+//                            buttonSubmit.disableLoading()
+//
+//                        },
+//                        onError = { jsonObject, code, message ->
+//                            buttonSubmit.disableLoading()
+//
+//                            if (code == ERROR_CODE.EXPIRED) {
+//                                PayME.onExpired()
+//                                PayME.onError(jsonObject, code, message)
+//                            } else {
+//                                PayME.showError(message)
+//                            }
+//                        }
+//
+//                    )
+//                }
             }
         }
         val paymentApi = PaymentApi()

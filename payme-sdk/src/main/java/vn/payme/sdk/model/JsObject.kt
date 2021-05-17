@@ -13,6 +13,7 @@ import vn.payme.sdk.PaymeWaletActivity
 import vn.payme.sdk.payment.PopupTakeFace
 import vn.payme.sdk.payment.PopupTakeIdentify
 import vn.payme.sdk.payment.PopupTakeVideo
+import vn.payme.sdk.store.Store
 
 
 public class JsObject(
@@ -56,27 +57,27 @@ public class JsObject(
             if (actions == "onRegisterSuccess") {
                 val dataInt = json.optJSONObject("data")
                 val Init = dataInt.getJSONObject("Init")
-                PayME.dataInit = Init
+                Store.userInfo.dataInit = Init
                 val accessToken = Init.optString("accessToken")
                 val handShake = Init.optString("handShake")
                 val kyc = Init.optJSONObject("kyc")
                 if (!accessToken.equals("null")) {
-                    PayME.accessToken = accessToken
+                    Store.userInfo.accessToken = accessToken
                 } else {
-                    PayME.accessToken = ""
+                    Store.userInfo.accessToken = ""
                 }
                 if (kyc != null) {
                     val state = kyc.optString("state")
                     if (state == "APPROVED") {
-                        PayME.accountKycSuccess = true
+                        Store.userInfo.accountKycSuccess = true
                     } else {
-                        PayME.accountKycSuccess = false
+                        Store.userInfo.accountKycSuccess = false
                     }
                 } else {
-                    PayME.accountKycSuccess = false
+                    Store.userInfo.accountKycSuccess = false
                 }
-                PayME.accountActive = true
-                PayME.handShake = handShake
+                Store.userInfo.accountActive = true
+                Store.config.handShake = handShake
             } else if (actions == "onNetworkError") {
 
             }
@@ -124,9 +125,9 @@ public class JsObject(
     @JavascriptInterface
     public fun onKyc(kycVideo: Boolean, kycIdentity: Boolean, kycFace: Boolean) {
 //        println("onKyc")
-        PayME.kycVideo = kycVideo
-        PayME.kycIdenity = kycIdentity
-        PayME.kycFace = kycFace
+        Store.config.kycVideo = kycVideo
+        Store.config.kycIdenity = kycIdentity
+        Store.config.kycFace = kycFace
         val bundle: Bundle = Bundle()
         bundle.putBoolean("openKycActivity", true)
         if (kycIdentity) {
