@@ -93,15 +93,12 @@ class ListMethodPaymentFragment : Fragment() {
                         dataMethod = DataMethod(linkedId, swiftCode)
 
                     }
-
                     var fee = jsonObject.optInt("fee")
                     var label = jsonObject.optString("label")
                     var methodId = jsonObject.optInt("methodId")
                     var minFee = jsonObject.optInt("minFee")
                     var title = jsonObject.optString("title")
                     var type = jsonObject.optString("type")
-
-
                     this.listMethod.add(
                         Method(
                             dataMethod,
@@ -214,77 +211,6 @@ class ListMethodPaymentFragment : Fragment() {
     }
 
     fun checkFree() {
-        var listInfoTop = arrayListOf<Info>()
-        var listInfoBottom = arrayListOf<Info>()
-        val decimal = DecimalFormat("#,###")
-        val method = Store.paymentInfo.methodSelected
-        listInfoTop.add(Info("Dịch vụ", "Tên Merchant", null, null, false))
-        listInfoTop.add(
-            Info(
-                "Số tiền thanh toán",
-                "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ",
-                null,
-                Color.parseColor(Store.config.colorApp.startColor),
-                false
-            )
-        )
-        listInfoTop.add(Info("Nội dung", Store.paymentInfo.infoPayment?.note, null, null, true))
 
-        if (method?.type == TYPE_PAYMENT.LINKED) {
-            listInfoBottom.add(Info("Phương thức", "Tài khoản liên kết", null, null, false))
-            listInfoBottom.add(
-                Info(
-                    "Số tài khoản",
-                    Store.paymentInfo.methodSelected?.title + Store.paymentInfo.methodSelected?.label,
-                    null,
-                    null,
-                    false
-                )
-            )
-        } else {
-            listInfoBottom.add(
-                Info(
-                    "Phương thức",
-                    Store.paymentInfo.methodSelected?.title,
-                    null,
-                    null,
-                    false
-                )
-            )
-        }
-        val paymentApi = PaymentApi()
-        loadingProcess.visibility = View.VISIBLE
-        paymentApi.getFee(Store.paymentInfo.amount, onSuccess = { jsonObject ->
-            val Utility = jsonObject.getJSONObject("Utility")
-            val GetFee = Utility.getJSONObject("GetFee")
-            val succeeded = GetFee.getBoolean("succeeded")
-            val message = GetFee.getString("message")
-            val decimal = DecimalFormat("#,###")
-            if (succeeded) {
-                val feeObject = GetFee.getJSONObject("fee")
-                val fee = feeObject.getInt("fee")
-                listInfoBottom.add(Info("Phí", "${decimal.format(fee)} đ", null, null, false))
-                listInfoBottom.add(
-                    Info(
-                        "Tổng thanh toán", "${
-                            decimal.format(
-                                Store.paymentInfo.infoPayment?.amount?.plus(
-                                    fee
-                                )
-                            )
-                        } đ", null, resources.getColor(R.color.red), true
-                    )
-                )
-                EventBus.getDefault()
-                    .postSticky(PaymentInfoEvent(listInfoTop, listInfoBottom, null))
-                EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,null))
-
-            } else {
-                PayME.showError(message)
-            }
-        }, onError = { jsonObject: JSONObject?, code: Int?, message: String ->
-            loadingProcess.visibility = View.GONE
-            PayME.showError(message)
-        })
     }
 }

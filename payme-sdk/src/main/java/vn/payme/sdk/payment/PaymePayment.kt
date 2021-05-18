@@ -29,45 +29,7 @@ import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.store.Store
 
 internal class PaymePayment : DialogFragment() {
-    companion object {
-        fun onPaymentSuccess(
-            jsonObject: JSONObject?,
-            context: Context,
-            fragmentManager: FragmentManager
-        ) {
-            PayME.onSuccess(jsonObject)
-            if (Store.paymentInfo.isShowResultUI) {
-                val resultPaymentFragment = ResultPaymentFragment()
-                val fragment = fragmentManager?.beginTransaction()
-                fragment?.replace(R.id.frame_container, resultPaymentFragment)
-                fragment?.commit()
-            } else {
-                closePopup(context)
-            }
-        }
 
-        fun onPaymentError(message: String, context: Context, fragmentManager: FragmentManager) {
-            PayME.onError(null, ERROR_CODE.PAYMENT_ERROR, message)
-            if (Store.paymentInfo.isShowResultUI) {
-                val bundle: Bundle = Bundle()
-                bundle.putString("message", message)
-                val resultPaymentFragment = ResultPaymentFragment()
-                resultPaymentFragment.arguments = bundle
-                val fragment = fragmentManager?.beginTransaction()
-                fragment?.replace(R.id.frame_container, resultPaymentFragment)
-                fragment?.commit()
-            } else {
-                closePopup(context)
-            }
-        }
-
-        fun closePopup(context: Context) {
-            Keyboard.closeKeyboard(context)
-            var even: EventBus = EventBus.getDefault()
-            var myEven: MyEven = MyEven(TypeCallBack.onClose, "")
-            even.post(myEven)
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +42,9 @@ internal class PaymePayment : DialogFragment() {
         val fragmentManager: FragmentManager
         val showResult = arguments?.getBoolean("showResult")
         val message = arguments?.getString("message")
+        Keyboard.closeKeyboard(requireContext())
         if (showResult == true) {
+
             val bundle: Bundle = Bundle()
             if (message != null) {
                 bundle.putString("message", message)
@@ -96,17 +60,18 @@ internal class PaymePayment : DialogFragment() {
             fragment.commit()
 
         } else {
-            if (Store.paymentInfo.methodSelected !== null) {
-                if (Store.paymentInfo.methodSelected?.type != TYPE_PAYMENT.BANK_CARD) {
-                    fragmentManager = childFragmentManager
-                    val fragment = fragmentManager.beginTransaction()
-                    fragment.add(R.id.frame_container, ConfirmPassFragment())
-                    fragment.commit()
-                } else {
+            if (Store.paymentInfo.methodSelected != null) {
+                if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.BANK_CARD) {
                     fragmentManager = childFragmentManager
                     val fragment = fragmentManager.beginTransaction()
                     fragment.add(R.id.frame_container, SelectMethodFragment())
                     fragment.commit()
+                } else {
+                    fragmentManager = childFragmentManager
+                    val fragment = fragmentManager.beginTransaction()
+                    fragment.add(R.id.frame_container, ConfirmPaymentFragment())
+                    fragment.commit()
+
                 }
             } else {
                 fragmentManager = childFragmentManager
@@ -122,6 +87,7 @@ internal class PaymePayment : DialogFragment() {
 
     }
 
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -135,27 +101,54 @@ internal class PaymePayment : DialogFragment() {
         return v
 
     }
-
-    @Subscribe
-    fun onClose(myEven: MyEven) {
-        if (myEven.type === TypeCallBack.onClose) {
-            this.dialog?.dismiss()
-        }
-    }
-
     @Subscribe
     fun onChangeFragment(event: ChangeFragmentPayment) {
-        if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT) {
-            val confirmFragment =
-                ConfirmPaymentFragment()
+        if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT) {
+
+            this.dialog?.dismiss()
+
+        } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT) {
+            if (Store.paymentInfo.isShowResultUI) {
+                val confirmFragment = ConfirmPaymentFragment()
+                val fragment = childFragmentManager?.beginTransaction()
+                fragment?.replace(
+                    R.id.frame_container,
+                    confirmFragment
+                )
+                fragment?.commit()
+            }
+
+        } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.RESULT) {
+            val message = event.value
+            if (message != null) {
+                PayME.onError(null, ERROR_CODE.PAYMENT_ERROR, message!!)
+            } else {
+                val data = JSONObject("""{transaction:${Store.paymentInfo.transaction}}""")
+                PayME.onSuccess(data)
+            }
+            if (Store.paymentInfo.isShowResultUI) {
+                val resultPaymentFragment = ResultPaymentFragment()
+                val bundle = Bundle()
+                bundle.putString("message", message)
+                resultPaymentFragment.arguments = bundle
+                val fragment = childFragmentManager?.beginTransaction()
+                fragment?.replace(
+                    R.id.frame_container,
+                    resultPaymentFragment
+                )
+                fragment?.commit()
+            }
+
+
+        } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_OTP) {
+            val confirmFragment = ConfirmOtpFragment()
             val fragment = childFragmentManager?.beginTransaction()
             fragment?.replace(
                 R.id.frame_container,
                 confirmFragment
             )
             fragment?.commit()
-        }
-        if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_NAPAS) {
+        } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_NAPAS) {
             this.dialog?.dismiss()
             val bundle: Bundle = Bundle()
             bundle.putString("html", event.value)
@@ -163,8 +156,7 @@ internal class PaymePayment : DialogFragment() {
             intent.putExtras(bundle)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             PayME.context?.startActivity(intent)
-        }
-        if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_PASS) {
+        } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_PASS) {
             val confirmPassFragment: ConfirmPassFragment = ConfirmPassFragment()
             val fragment = childFragmentManager?.beginTransaction()
             fragment?.replace(R.id.frame_container, confirmPassFragment)

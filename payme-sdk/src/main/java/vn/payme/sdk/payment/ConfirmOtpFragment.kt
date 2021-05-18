@@ -18,7 +18,9 @@ import vn.payme.sdk.component.PinView
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.enums.ERROR_CODE
+import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TypeCallBack
+import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.store.Store
 
 class ConfirmOtpFragment : Fragment() {
@@ -55,7 +57,9 @@ class ConfirmOtpFragment : Fragment() {
         buttonClose.setOnClickListener {
             if (!buttonSubmit.isLoadingShowing) {
                 PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
-                PaymePayment.closePopup(requireContext())
+                EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT,null))
+
+//                PaymePayment.closePopup(requireContext())
             }
         }
         return view
@@ -85,12 +89,10 @@ class ConfirmOtpFragment : Fragment() {
                 val message = Pay.optString("message")
                 if (succeeded) {
                     Keyboard.closeKeyboard(requireContext())
-                    PaymePayment.onPaymentSuccess(
-                        history,
-                        requireContext(),
-                        requireFragmentManager()
-                    )
-
+                    val payment = history.optJSONObject("payment")
+                    val transaction = payment.optString("transaction")
+                    Store.paymentInfo.transaction = transaction
+                    EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.RESULT,null))
                 } else {
                     if (payment != null) {
                         val statePaymentLinkedResponsed =
@@ -100,19 +102,11 @@ class ConfirmOtpFragment : Fragment() {
                             PayME.showError(message)
                         } else {
                             Keyboard.closeKeyboard(requireContext())
-                            PaymePayment.onPaymentError(
-                                message,
-                                requireContext(),
-                                requireFragmentManager()
-                            )
+                            EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.RESULT,message))
                         }
                     } else {
                         Keyboard.closeKeyboard(requireContext())
-                        PaymePayment.onPaymentError(
-                            message,
-                            requireContext(),
-                            requireFragmentManager()
-                        )
+                        EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.RESULT,message))
 
                     }
                 }

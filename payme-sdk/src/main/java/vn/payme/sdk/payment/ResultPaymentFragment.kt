@@ -15,9 +15,11 @@ import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.component.InfoPayment
+import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.enums.TypeCallBack
+import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.evenbus.PaymentInfoEvent
 import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.model.Info
@@ -69,17 +71,15 @@ class ResultPaymentFragment : Fragment() {
         textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
         buttonSubmit.background = Store.config.colorApp.backgroundColorRadius
         val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
-        val infoTotal= event.infoBottom[event.infoBottom.size-1]
-        event.infoBottom[event.infoBottom.size-2].isEnd = true
-        event.infoBottom.removeAt(event.infoBottom.size-1)
-        infoBottom.updateData(event.infoBottom)
-        infoTop.updateData(event.infoTop)
-        textAmount.text = infoTotal.value
+        val infoTotal= event.infoBottom?.get(event.infoBottom!!.size-1)
+        event.infoBottom?.get(event.infoBottom!!.size-2)?.isEnd = true
+        event.infoBottom?.removeAt(event.infoBottom!!.size-1)
+        event.infoBottom?.let { infoBottom.updateData(it) }
+        event.infoTop?.let { infoTop.updateData(it) }
+        textAmount.text = infoTotal?.value
         textAmount.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
         buttonSubmit.setOnClickListener {
-            var even: EventBus = EventBus.getDefault()
-            var myEven: MyEven = MyEven(TypeCallBack.onClose, "")
-            even.post(myEven)
+            EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT,null))
         }
 
         return view

@@ -41,6 +41,7 @@ class Config {
         env: Env? = null,
         configColor: Array<String>,
         language: LANGUAGES = LANGUAGES.VN,
+        clientId:String?
     ) {
 
         this.appPrivateKey = appPrivateKey
@@ -52,6 +53,9 @@ class Config {
         this.configColor = configColor
         this.colorApp = colorApp
         this.language = language
+        if (clientId != null) {
+            this.clientId = clientId
+        }
         colorApp = ColorApp(configColor.get(0), configColor[1])
         clientInfo = ClientInfo(PayME.context)
         appID = getAppID(appToken)

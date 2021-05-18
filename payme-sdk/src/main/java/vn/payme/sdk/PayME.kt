@@ -71,10 +71,14 @@ public class PayME(
             showLog,
             env,
             configColor,
-            language
+            language,
+            Store.config.clientId
         )
         Security.insertProviderAt(BouncyCastleProvider(), 1)
         ENV_API.updateEnv()
+    }
+    public fun  onForgotPassword(){
+        openWalletActivity(Action.FORGOT_PASSWORD, 0, null, null, null, onSuccess, onError)
     }
 
     public fun login(
@@ -290,10 +294,11 @@ public class PayME(
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit,
     ) {
-
+        println("method"+method?.title)
 
         Store.paymentInfo.transaction = ""
         Store.paymentInfo.isChangeMethod = method == null
+        Store.paymentInfo.methodSelected = method
 
         if (method != null && method?.type != TYPE_PAYMENT.WALLET && !Store.config.openPayAndKyc) {
             PayME.showError("Chức năng chỉ có thể thao tác môi trường production")
@@ -317,7 +322,6 @@ public class PayME(
                     "Số tiền giao dịch tối đa ${decimal.format(Store.config.limitPayment.max)} VND"
                 )
             } else {
-                Store.paymentInfo.methodSelected = method
                 val paymePayment: PaymePayment = PaymePayment()
                 paymePayment.show(
                     fragmentManager,

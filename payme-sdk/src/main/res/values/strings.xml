@@ -30,6 +30,7 @@
     <string name="confirm_take_video">Xác nhận video</string>
     <string name="confirm_take_face">Xác nhận ảnh</string>
     <string name="select_identity">Chọn loại giấy tờ</string>
+    <string name="forgot_password">Quên mật khẩu</string>
     <string name="identity_card">Chứng minh nhân dân</string>
     <string name="citizen_identity">Căn cước công dân</string>
     <string name="passport">Hộ chiếu</string>

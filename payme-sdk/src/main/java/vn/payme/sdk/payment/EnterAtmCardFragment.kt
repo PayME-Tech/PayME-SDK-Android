@@ -288,130 +288,16 @@ class EnterAtmCardFragment : Fragment() {
         }
         buttonSubmit.setOnClickListener {
             if (!buttonSubmit.isLoadingShowing && cardDate.length > 0 && cardHolder.length > 0 && cardNumberValue.length > 0) {
-                buttonSubmit.enableLoading()
-                val paymentApi = PaymentApi()
-                context?.let { it1 -> Keyboard.closeKeyboard(it1) }
-
-                paymentApi.getFee(Store.paymentInfo.amount,onSuccess = {jsonObject ->
-                    buttonSubmit.disableLoading()
-                    val Utility = jsonObject.getJSONObject("Utility")
-                    val GetFee = Utility.getJSONObject("GetFee")
-                    val succeeded = GetFee.getBoolean("succeeded")
-                    val message = GetFee.getString("message")
-                    val decimal = DecimalFormat("#,###")
-                    if(succeeded){
-                        val feeObject = GetFee.getJSONObject("fee")
-                        val fee = feeObject.getInt("fee")
-                        var listInfoTop = arrayListOf<Info>()
-                        var listInfoBottom = arrayListOf<Info>()
-
-                        listInfoTop.add(Info("Dịch vụ", "Tên Merchant", null, null, false))
-                        listInfoTop.add(Info("Số tiền thanh toán","${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ" , null,Color.parseColor(Store.config.colorApp.startColor), false))
-                        listInfoTop.add(Info("Nội dung", Store.paymentInfo.infoPayment?.note, null, null, true))
-
-                        listInfoBottom.add(Info("Phương thức", Store.paymentInfo.methodSelected?.title, null, null, false))
-                        listInfoBottom.add(Info("Ngân hàng", bankSelected?.shortName, null, null, false))
-                        listInfoBottom.add(Info("Số thẻ ATM", textInputCardNumber.text.toString(), null, null, false))
-                        listInfoBottom.add(Info("Họ tên chủ thẻ", cardHolder, null, null, false))
-                        listInfoBottom.add(Info("Ngày phát hành", textInputCardDate.text.toString(), null, null, false))
-                        listInfoBottom.add(Info("Phí", "${decimal.format(fee)} đ", null,null  ,false))
-                        listInfoBottom.add(Info("Tổng thanh toán", "${decimal.format(Store.paymentInfo.infoPayment?.amount?.plus(
-                            fee
-                        ))} đ", null, resources.getColor(R.color.red), true))
-                        val cardInfo = CardInfo(cardNumberValue,cardHolder,cardDate)
-                        EventBus.getDefault().postSticky(PaymentInfoEvent(listInfoTop,listInfoBottom,cardInfo))
-                        EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,null))
-
-                    }else{
-                        PayME.showError(message)
-                    }
-
-
-                },onError = {jsonObject, code, message ->
-                            buttonSubmit.disableLoading()
-                            if (code == ERROR_CODE.EXPIRED) {
-                                PayME.onExpired()
-                                PayME.onError(jsonObject, code, message)
-                            } else {
-                                PayME.showError(message)
-                            }
-                })
-
-
-
-//                method?.let { it1 ->
-//                    paymentApi.payment(it1, null, cardNumberValue, cardHolder, cardDate, null, null,
-//                        onSuccess = { jsonObject ->
-//                            buttonSubmit.disableLoading()
-//                            val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
-//                            val Payment = OpenEWallet.optJSONObject("Payment")
-//                            val Pay = Payment.optJSONObject("Pay")
-//                            val succeeded = Pay.optBoolean("succeeded")
-//                            val history = Pay.optJSONObject("history")
-//                            if (history != null) {
-//                                val payment = history.optJSONObject("payment")
-//                                if (payment != null) {
-//                                    val transaction = payment.optString("transaction")
-//                                    Store.paymentInfo.transaction = transaction
-//                                }
-//
-//                            }
-//                            val payment = Pay.optJSONObject("payment")
-//                            val message = Pay.optString("message")
-//                            Store.paymentInfo.numberAtmCard =
-//                                bankSelected?.shortName + "-" + cardNumberValue.substring(
-//                                    cardNumberValue.length - 4
-//                                )
-//                            if (succeeded) {
-//
-//                                even.post(myEven)
-//                            } else {
-//                                if (payment != null) {
-//                                    val statePaymentBankCardResponsed =
-//                                        payment.optString("statePaymentBankCardResponsed")
-//                                    if (statePaymentBankCardResponsed == "REQUIRED_VERIFY") {
-//                                        val html = payment.optString("html")
-//                                        var changeFragmentOtp: ChangeTypePayment =
-//                                            ChangeTypePayment(
-//                                                TYPE_PAYMENT.CONFIRM_OTP_BANK_NAPAS,
-//                                                html,history
-//                                            )
-//                                        even.post(changeFragmentOtp)
-//                                    } else if (statePaymentBankCardResponsed == "REQUIRED_OTP") {
-//                                        val transaction = payment.optString("transaction")
-//                                        var changeFragmentOtp: ChangeTypePayment =
-//                                            ChangeTypePayment(
-//                                                TYPE_PAYMENT.CONFIRM_OTP_BANK,
-//                                                transaction,history
-//                                            )
-//                                        even.post(changeFragmentOtp)
-//                                    } else {
-//                                        myEven.value = message
-//                                        even.post(myEven)
-//                                    }
-//                                } else {
-//                                    println("THAT BAI ")
-//                                    myEven.value = message
-//                                    even.post(myEven)
-//                                }
-//
-//                            }
-//                            buttonSubmit.disableLoading()
-//
-//                        },
-//                        onError = { jsonObject, code, message ->
-//                            buttonSubmit.disableLoading()
-//
-//                            if (code == ERROR_CODE.EXPIRED) {
-//                                PayME.onExpired()
-//                                PayME.onError(jsonObject, code, message)
-//                            } else {
-//                                PayME.showError(message)
-//                            }
-//                        }
-//
-//                    )
-//                }
+                val cardInfo = CardInfo(
+                    textInputCardDate.text.toString(),
+                    textInputCardNumber.text.toString(),
+                    bankSelected?.shortName!!,
+                    cardNumberValue,
+                    cardHolder,
+                    cardDate
+                )
+                EventBus.getDefault().postSticky(PaymentInfoEvent(null,null,cardInfo))
+                EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,null))
             }
         }
         val paymentApi = PaymentApi()

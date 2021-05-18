@@ -409,24 +409,31 @@ class MainActivity : AppCompatActivity() {
                     ""
                 )
 
-            payme?.pay(this.supportFragmentManager, infoPayment, true, null,
-                onSuccess = { json: JSONObject? ->
-                    println("jsononSuccess"+json.toString())
-                },
-                onError = { jsonObject, code, message ->
-                    println("co loi")
-                    if (message != null && message.length > 0) {
-                        PayME.showError(message)
+            payme?.getPaymentMethods(onSuccess = {it
+
+                payme?.pay(this.supportFragmentManager, infoPayment, true, it[0],
+                    onSuccess = { json: JSONObject? ->
+                        println("jsononSuccess"+json.toString())
+                    },
+                    onError = { jsonObject, code, message ->
+                        println("co loi")
+                        if (message != null && message.length > 0) {
+                            PayME.showError(message)
+                        }
+                        if (code == ERROR_CODE.EXPIRED) {
+                            walletView.setVisibility(View.GONE)
+                            payme?.logout()
+                        }
+                        if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
+                            openWallet()
+                        }
                     }
-                    if (code == ERROR_CODE.EXPIRED) {
-                        walletView.setVisibility(View.GONE)
-                        payme?.logout()
-                    }
-                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
-                        openWallet()
-                    }
-                }
-            )
+                )
+
+            },onError = {jsonObject, i, s ->
+
+            })
+
 //            payme?.getPaymentMethods(onSuccess = { list ->
 //                payme?.pay(this.supportFragmentManager, infoPayment, true, list[1],
 //                    onSuccess = { json: JSONObject? ->

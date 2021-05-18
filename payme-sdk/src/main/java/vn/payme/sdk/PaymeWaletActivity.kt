@@ -235,6 +235,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                       }
                     }"""
         )
+        println("dataINTTT"+data)
 
         val cryptoAES = CryptoAES()
         val xAPIData = cryptoAES.encrytAESDataWebview("LkaWasflkjfqr2g3", data.toString())

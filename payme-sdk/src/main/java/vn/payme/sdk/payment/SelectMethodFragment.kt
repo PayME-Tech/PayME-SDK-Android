@@ -8,9 +8,12 @@ import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.enums.ERROR_CODE
+import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
+import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.store.Store
 import java.text.DecimalFormat
 
@@ -45,7 +48,8 @@ class SelectMethodFragment : Fragment() {
         buttonClose.setOnClickListener {
             if (!loading) {
                 PayME.onError(null, ERROR_CODE.USER_CANCELLED,"")
-                PaymePayment.closePopup(requireContext())
+                EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT,null))
+//                PaymePayment.closePopup(requireContext())
             }
         }
 

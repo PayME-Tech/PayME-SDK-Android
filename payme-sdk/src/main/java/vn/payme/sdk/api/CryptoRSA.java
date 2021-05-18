@@ -37,8 +37,8 @@ class CryptoRSA {
 
     private void generateKeyPair()
             throws NoSuchAlgorithmException, InvalidKeySpecException {
-        privateKey = stringToPrivateKey(Store.config.getAppPrivateKey());
-        publicKey =stringToPublicKey(Store.config.getPublicKey());
+        privateKey = stringToPrivateKey(Store.Companion.getConfig().getAppPrivateKey());
+        publicKey =stringToPublicKey(Store.Companion.getConfig().getPublicKey());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
