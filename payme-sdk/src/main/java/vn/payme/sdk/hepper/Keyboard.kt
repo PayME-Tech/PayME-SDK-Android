@@ -13,7 +13,7 @@ class Keyboard {
 
     companion object {
         fun closeKeyboard(context: Context) {
-            if(KeyboardVisibilityEvent.isKeyboardVisible(PayME.context as Activity?)){
+            if(KeyboardVisibilityEvent.isKeyboardVisible(context as Activity?)){
                 val inputMethodManager: InputMethodManager =
                     context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
@@ -23,7 +23,7 @@ class Keyboard {
         }
 
         fun showKeyboard(context: Context) {
-            if(!KeyboardVisibilityEvent.isKeyboardVisible(PayME.context as Activity?)) {
+            if(!KeyboardVisibilityEvent.isKeyboardVisible(context as Activity?)) {
                 val inputMethodManager =
                     context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)

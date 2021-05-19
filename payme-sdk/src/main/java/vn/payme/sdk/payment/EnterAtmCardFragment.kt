@@ -124,15 +124,15 @@ class EnterAtmCardFragment : Fragment() {
 
         containerInputCardHolder.setOnClickListener {
             textInputCardHolder.requestFocus()
-            context?.let { it1 -> Keyboard.showKeyboard(it1) }
+           Keyboard.showKeyboard(requireContext())
         }
         containerInputCardNumber.setOnClickListener {
             textInputCardNumber.requestFocus()
-            context?.let { it1 -> Keyboard.showKeyboard(it1) }
+           Keyboard.showKeyboard(requireContext())
         }
         containerInputCardDate.setOnClickListener {
             textInputCardDate.requestFocus()
-            context?.let { it1 -> Keyboard.showKeyboard(it1) }
+            Keyboard.showKeyboard(requireContext())
         }
 
         textInputCardNumber.addTextChangedListener(object : TextWatcher {

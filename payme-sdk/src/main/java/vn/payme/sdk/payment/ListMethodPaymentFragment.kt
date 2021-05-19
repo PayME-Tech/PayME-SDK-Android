@@ -159,7 +159,7 @@ class ListMethodPaymentFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater?.inflate(R.layout.list_method_payme_fragment, container, false)
-        context?.let { Keyboard.closeKeyboard(it) }
+        Keyboard.closeKeyboard(requireContext())
         listView = view.findViewById(R.id.recipe_list_view)
         loadingProcess = view.findViewById(R.id.loadingListMethodPayment)
         loadingProcess.getIndeterminateDrawable()
