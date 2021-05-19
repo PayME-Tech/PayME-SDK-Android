@@ -294,13 +294,16 @@ public class PayME(
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit,
     ) {
-        println("method"+method?.title)
-
         Store.paymentInfo.transaction = ""
         Store.paymentInfo.isChangeMethod = method == null
         Store.paymentInfo.methodSelected = method
-
-        if (method != null && method?.type != TYPE_PAYMENT.WALLET && !Store.config.openPayAndKyc) {
+        if(method != null && method?.type != TYPE_PAYMENT.BANK_CARD && (!Store.userInfo.accountActive || !Store.userInfo.accountKycSuccess)){
+            if (!Store.userInfo.accountActive) {
+                onError(null, ERROR_CODE.ACCOUNT_NOT_ACTIVETES, "Tài khoản chưa kích hoạt")
+            } else if (!Store.userInfo.accountKycSuccess) {
+                onError(null, ERROR_CODE.ACCOUNT_NOT_KYC, "Tài khoản chưa định danh")
+            }
+        }else if (method != null && method?.type != TYPE_PAYMENT.WALLET && !Store.config.openPayAndKyc) {
             PayME.showError("Chức năng chỉ có thể thao tác môi trường production")
         } else {
             Store.paymentInfo.isShowResultUI = isShowResultUI

@@ -62,7 +62,9 @@ internal class PaymentApi {
         getFeeInput["serviceType"] = "OPEN_EWALLET_PAYMENT"
         getFeeInput["amount"] = amount
         variables["getFeeInput"] = getFeeInput
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+        val accessToken = if(Store.userInfo.accountKycSuccess)   Store.userInfo.accessToken!! else ""
+
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path,accessToken, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -250,7 +252,8 @@ internal class PaymentApi {
         }
         variables["payInput"] = payInput
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+        val accessToken = if(Store.userInfo.accountKycSuccess)   Store.userInfo.accessToken!! else ""
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, accessToken, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
