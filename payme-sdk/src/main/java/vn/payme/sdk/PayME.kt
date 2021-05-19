@@ -210,13 +210,12 @@ public class PayME(
 
     public fun deposit(
         amount: Int,
-        content: String?,
-        extraData: String,
+        closeDepositResult: Boolean,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        Store.paymentInfo.content = content
-        Store.paymentInfo.extraData = extraData
+        Store.config.closeWhenDone = closeDepositResult
+
         if (amount != null) {
             Store.paymentInfo.amount = amount
         } else {
@@ -230,8 +229,8 @@ public class PayME(
             this.openWalletActivity(
                 Action.DEPOSIT,
                 amount,
-                content,
-                extraData,
+                "",
+                "",
                 null,
                 onSuccess,
                 onError
@@ -265,10 +264,11 @@ public class PayME(
 
     public fun withdraw(
         amount: Int,
+        closeWithdrawResult: Boolean,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-
+        Store.config.closeWhenDone = closeWithdrawResult
         if (!Store.userInfo.accountActive) {
             onError(null, ERROR_CODE.ACCOUNT_NOT_ACTIVETES, "Tài khoản chưa kích hoạt")
         } else if (!Store.userInfo.accountKycSuccess) {

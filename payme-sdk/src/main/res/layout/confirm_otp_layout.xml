@@ -36,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:src="@drawable/confirm_otp"
+        android:src="@drawable/ic_confirm_pass"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textView" />
@@ -48,6 +48,7 @@
         android:layout_marginTop="16dp"
         android:text="@string/please_enter_otp_from_phone_number"
         android:textColor="@color/blackSeven"
+        android:fontFamily="@font/barlow_medium"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/image_otp"

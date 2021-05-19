@@ -10,6 +10,7 @@ import org.json.JSONObject
 import vn.payme.sdk.AnyOrientationCaptureActivity
 import vn.payme.sdk.PayME
 import vn.payme.sdk.PaymeWaletActivity
+import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.payment.PopupTakeFace
 import vn.payme.sdk.payment.PopupTakeIdentify
 import vn.payme.sdk.payment.PopupTakeVideo
@@ -45,6 +46,41 @@ public class JsObject(
     @JavascriptInterface
     public fun getImage(): String {
        return "data:image/png;base64," +PaymeWaletActivity.image
+    }
+    @JavascriptInterface
+    fun onDeposit(string: String){
+        try {
+            val json: JSONObject = JSONObject(string)
+            val data = json.getJSONObject("data")
+            val status = data.getString("status")
+            if(status=="SUCCEEDED"){
+                PayME.onSuccess(null)
+            }else{
+                PayME.onError(null,null,"")
+
+            }
+            back()
+
+        }catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    @JavascriptInterface
+    fun onWithdraw(string: String){
+        try {
+            val json: JSONObject = JSONObject(string)
+            val data = json.getJSONObject("data")
+            val status = data.getString("status")
+            if(status=="SUCCEEDED"){
+                PayME.onSuccess(null)
+            }else{
+                PayME.onError(null,null,"")
+
+            }
+            back()
+        }catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     @JavascriptInterface

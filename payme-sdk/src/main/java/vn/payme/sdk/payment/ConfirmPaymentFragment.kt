@@ -20,6 +20,7 @@ import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.evenbus.PaymentInfoEvent
+import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.model.Info
 import vn.payme.sdk.store.Store
 import java.text.DecimalFormat
@@ -40,6 +41,7 @@ class ConfirmPaymentFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater?.inflate(R.layout.confirm_payment_fragment, container, false)
+        Keyboard.closeKeyboard(requireContext())
         buttonClose = view.findViewById(R.id.buttonClose)
         buttonBack = view.findViewById(R.id.buttonBack)
         buttonSubmit = view.findViewById(R.id.buttonSubmit)
@@ -78,6 +80,7 @@ class ConfirmPaymentFragment : Fragment() {
         val decimal = DecimalFormat("#,###")
         val method = Store.paymentInfo.methodSelected
         val storeName = Store.userInfo.dataInit?.optString("storeName")
+        val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
         listInfoTop.add(Info("Dịch vụ", storeName, null, null, false))
         listInfoTop.add(
             Info(
@@ -112,7 +115,6 @@ class ConfirmPaymentFragment : Fragment() {
                 )
             )
             if (method?.type == TYPE_PAYMENT.BANK_CARD){
-                val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
                 listInfoBottom.add(Info("Ngân hàng", event.cardInfo?.bankShortName, null, null, false))
                 listInfoBottom.add(Info("Số thẻ ATM", event.cardInfo?.cardNumberView, null, null, false))
                 listInfoBottom.add(Info("Họ tên chủ thẻ", event.cardInfo?.cardHolder, null, null, false))
@@ -132,7 +134,9 @@ class ConfirmPaymentFragment : Fragment() {
             if (succeeded) {
                 val feeObject = GetFee.getJSONObject("fee")
                 val fee = feeObject.getInt("fee")
-                listInfoBottom.add(Info("Phí", "${decimal.format(fee)} đ", null, null, false))
+                if(fee>0){
+                    listInfoBottom.add(Info("Phí", "${decimal.format(fee)} đ", null, null, false))
+                }
                 listInfoBottom.add(
                     Info(
                         "Tổng thanh toán", "${
@@ -146,7 +150,7 @@ class ConfirmPaymentFragment : Fragment() {
                 )
                 infoTop.updateData(listInfoTop)
                 infoBottom.updateData(listInfoBottom)
-                EventBus.getDefault().postSticky(PaymentInfoEvent(listInfoTop,listInfoBottom,null))
+                EventBus.getDefault().postSticky(PaymentInfoEvent(listInfoTop,listInfoBottom,event?.cardInfo,fee))
                 getFeeSuccess = true
                 buttonSubmit.setText("Xác nhận")
             } else {

@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@drawable/background_radius_gray"
     android:clickable="true">
 
     <ScrollView
+        android:fillViewport="true"
+        android:layout_weight="1"
+        android:id="@+id/contentScroll"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -33,7 +38,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:lottie_autoPlay="true"
                     app:lottie_loop="true"
-                    app:lottie_rawRes="@raw/result_thanh_cong" />
+                    app:lottie_rawRes="@raw/thanhcong" />
 
                 <TextView
                     android:id="@+id/title_result"
@@ -155,19 +160,21 @@
                 android:layout_marginTop="15dp"
                 app:layout_constraintTop_toBottomOf="@id/infoTop" />
 
-            <Button
-                android:id="@+id/buttonSubmit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/background_gradient_radius"
-                android:fontFamily="@font/semi_bold"
-                android:text="@string/done"
-                android:textColor="@color/white"
-                android:textSize="16dp"
-                app:layout_constraintTop_toBottomOf="@id/infoBottom" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
+    <Button
+        android:id="@+id/buttonSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/background_gradient_radius"
+        android:fontFamily="@font/semi_bold"
+        android:text="@string/done"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        app:layout_constraintTop_toBottomOf="@id/contentScroll" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

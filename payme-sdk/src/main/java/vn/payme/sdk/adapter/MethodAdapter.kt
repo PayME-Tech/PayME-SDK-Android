@@ -118,7 +118,7 @@ class MethodAdapter(
                 } else if (!Store.userInfo.accountKycSuccess) {
                     paymeSDK.openWallet(PayME.onSuccess, PayME.onError)
                 } else if (Store.paymentInfo.amount > Store.userInfo.balance) {
-                    paymeSDK.deposit(0, "", "", PayME.onSuccess, PayME.onError)
+                    paymeSDK.deposit(0, false,PayME.onSuccess, PayME.onError)
                 }
                 var even: EventBus = EventBus.getDefault()
                 var myEven: MyEven = MyEven(TypeCallBack.onClose, "")

@@ -100,20 +100,6 @@ class SettingAcitivity : AppCompatActivity(), LifecycleObserver {
 
         checkboxShowLog.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { compoundButton, b -> //Code khi trạng thái check thay đổi
 
-//            if (b) {
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-//                    val settingIntent = Intent(
-//                            Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse(
-//                            "package:$packageName"
-//                    )
-//                    )
-//                    startActivityForResult(settingIntent, REQUEST_OVERLAY_PERMISSION)
-//                } else {
-//                    startService(Intent(this, WindowService::class.java))
-//                }
-//            } else {
-//                stopService(Intent(this, WindowService::class.java))
-//            }
             MainActivity.showLog =b
             paymePref.edit().putBoolean(ON_LOG, b).commit()
         })
@@ -137,12 +123,7 @@ class SettingAcitivity : AppCompatActivity(), LifecycleObserver {
         }
 
     }
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//        if (requestCode == REQUEST_OVERLAY_PERMISSION && Settings.canDrawOverlays(this)) {
-//
-//        }
-//    }
+
 
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()

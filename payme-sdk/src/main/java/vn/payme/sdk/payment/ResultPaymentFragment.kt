@@ -6,27 +6,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
 import org.greenrobot.eventbus.EventBus
-import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.component.InfoPayment
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
-import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.enums.TypeCallBack
+
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.evenbus.PaymentInfoEvent
-import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.model.Info
 import vn.payme.sdk.store.Store
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class ResultPaymentFragment : Fragment() {
     private lateinit var buttonSubmit: Button
@@ -40,7 +36,11 @@ class ResultPaymentFragment : Fragment() {
     private lateinit var infoBottom: InfoPayment
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view: View = inflater?.inflate(R.layout.result_payment_layout, container, false)
         buttonSubmit = view.findViewById(R.id.buttonSubmit)
         textAmount = view.findViewById(R.id.money)
@@ -59,27 +59,62 @@ class ResultPaymentFragment : Fragment() {
         lottie = view.findViewById(R.id.animation_view)
         val message = arguments?.getString("message")
 
-        if(message!=null){
+        if (message != null) {
             textError.text = message
             textError.visibility = View.VISIBLE
-            lottie.setAnimation(R.raw.result_that_bai)
+            lottie.setAnimation(R.raw.thatbai)
             textResult.text = getString(R.string.payment_fail)
-        }else{
+        } else {
         }
 
         val decimal = DecimalFormat("#,###")
         textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
         buttonSubmit.background = Store.config.colorApp.backgroundColorRadius
         val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
-        val infoTotal= event.infoBottom?.get(event.infoBottom!!.size-1)
-        event.infoBottom?.get(event.infoBottom!!.size-2)?.isEnd = true
-        event.infoBottom?.removeAt(event.infoBottom!!.size-1)
-        event.infoBottom?.let { infoBottom.updateData(it) }
+        val infoTotal = event.infoBottom?.get(event.infoBottom!!.size - 1)
+        event.infoBottom?.get(event.infoBottom!!.size - 2)?.isEnd = true
+        event.infoBottom?.removeAt(event.infoBottom!!.size - 1)
+        if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.BANK_CARD) {
+            val listInfoBottom: ArrayList<Info> = arrayListOf()
+            listInfoBottom.add(
+                Info(
+                    "Phương thức",
+                    Store.paymentInfo.methodSelected?.title,
+                    null,
+                    null,
+                    false
+                )
+            )
+            val lengthCard = event.cardInfo?.cardNumber?.length
+            val cardNumber = event.cardInfo?.cardNumber?.substring(
+                lengthCard!! - 4,
+                lengthCard!!
+            )
+
+
+            listInfoBottom.add(
+                Info(
+                    "Số thẻ ATM",
+                    event.cardInfo?.bankShortName + "-" + cardNumber,
+                    null,
+                    null,
+                    event.fee==0
+                )
+            )
+            if(event.fee>0){
+                listInfoBottom.add(Info("Phí", "${decimal.format(event.fee)} đ", null, null, false))
+            }
+            infoBottom.updateData(listInfoBottom)
+
+        } else {
+            event.infoBottom?.let { infoBottom.updateData(it) }
+        }
         event.infoTop?.let { infoTop.updateData(it) }
         textAmount.text = infoTotal?.value
         textAmount.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
         buttonSubmit.setOnClickListener {
-            EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT,null))
+            EventBus.getDefault()
+                .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, null))
         }
 
         return view

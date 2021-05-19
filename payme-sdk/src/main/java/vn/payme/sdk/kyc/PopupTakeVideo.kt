@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -19,6 +20,7 @@ import vn.payme.sdk.kyc.TakeVideoKycFragment
 internal class PopupTakeVideo : BottomSheetDialogFragment() {
 
     private lateinit var buttonNext: Button
+    private lateinit var buttonClose: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +37,10 @@ internal class PopupTakeVideo : BottomSheetDialogFragment() {
             container, false
         )
         buttonNext = view.findViewById(R.id.buttonNext)
+        buttonClose = view.findViewById(R.id.buttonClose)
+        buttonClose.setOnClickListener {
+            dialog?.dismiss()
+        }
         buttonNext.setOnClickListener {
             val openKycActivity = arguments?.getBoolean("openKycActivity")
             if (openKycActivity==true) {

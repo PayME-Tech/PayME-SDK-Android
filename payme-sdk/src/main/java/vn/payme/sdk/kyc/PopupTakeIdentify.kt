@@ -2,10 +2,13 @@ package vn.payme.sdk.payment
 
 import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -14,10 +17,13 @@ import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.kyc.CameraKycActivity
+import vn.payme.sdk.store.Store
 
 internal class PopupTakeIdentify : BottomSheetDialogFragment() {
 
     private lateinit var buttonNext: Button
+    private lateinit var buttonClose: ImageView
+    private lateinit var textNote: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,12 +40,20 @@ internal class PopupTakeIdentify : BottomSheetDialogFragment() {
             container, false
         )
         buttonNext = view.findViewById(R.id.buttonNext)
+        buttonClose = view.findViewById(R.id.buttonClose)
+        textNote = view.findViewById(R.id.txtNote)
+        textNote.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
+        textNote.background = Store.config.colorApp.backgroundColorRadiusAlpha
+        buttonClose.setOnClickListener {
+            dialog?.dismiss()
+        }
         buttonNext.setOnClickListener {
             val intent = Intent(PayME.context, CameraKycActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             PayME.context?.startActivity(intent)
             dialog?.dismiss()
         }
+
 
 
         return view

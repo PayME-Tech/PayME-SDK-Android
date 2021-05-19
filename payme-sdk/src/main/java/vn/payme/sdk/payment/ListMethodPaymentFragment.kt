@@ -36,7 +36,6 @@ class ListMethodPaymentFragment : Fragment() {
     private lateinit var listView: ListView
     private lateinit var loadingProcess: ProgressBar
     private lateinit var methodAdapter: MethodAdapter
-
     val listMethod: ArrayList<Method> = ArrayList<Method>()
     private fun showLoading() {
         loadingProcess.visibility = View.VISIBLE
@@ -200,17 +199,15 @@ class ListMethodPaymentFragment : Fragment() {
                         fragment?.replace(R.id.frame_container_select_method, enterAtmCardFragment)
                         fragment?.commit()
                     }else{
-                        checkFree()
+                        EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,null))
                     }
                 }else{
-                    checkFree()
+                    EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,null))
                 }
             }
         }
         return view
     }
 
-    fun checkFree() {
 
-    }
 }

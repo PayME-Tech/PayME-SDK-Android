@@ -296,7 +296,7 @@ class EnterAtmCardFragment : Fragment() {
                     cardHolder,
                     cardDate
                 )
-                EventBus.getDefault().postSticky(PaymentInfoEvent(null,null,cardInfo))
+                EventBus.getDefault().postSticky(PaymentInfoEvent(null,null,cardInfo,0))
                 EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,null))
             }
         }

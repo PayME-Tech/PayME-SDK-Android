@@ -230,6 +230,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                       },
                       actions:{
                         type:${action},
+                        closeWhenDone:${Store.config.closeWhenDone},
                         serviceCode:${Store.paymentInfo.service?.code},
                         amount:${Store.paymentInfo.amount}
                       }

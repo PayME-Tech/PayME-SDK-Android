@@ -7,145 +7,117 @@
     android:layout_gravity="center"
     android:orientation="vertical"
     android:clickable="true"
-    android:paddingHorizontal="16dp"
-    android:paddingBottom="16dp"
     >
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:background="@drawable/background_radius"
-        android:padding="16dp"
+        android:background="@drawable/background_radius_confirm_payment"
         android:layout_height="match_parent"
+        android:paddingBottom="16dp"
         >
+        <TextView
+            android:layout_width="wrap_content"
+            android:text="@string/take_identify"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:textColor="@color/blackSeven"
+            android:fontFamily="@font/semi_bold"
+            android:id="@+id/titlePopup"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textSize="17dp"
+            android:layout_height="wrap_content"/>
+        <ImageView
+            android:src="@drawable/close"
+            app:layout_constraintTop_toTopOf="@id/titlePopup"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_width="wrap_content"
+            android:id="@+id/buttonClose"
+            android:padding="16dp"
+            app:layout_constraintBottom_toBottomOf="@id/titlePopup"
+            android:layout_height="wrap_content"/>
+        <TextView
+            app:layout_constraintTop_toBottomOf="@id/titlePopup"
+            android:layout_width="match_parent"
+            android:textAlignment="center"
+            android:id="@+id/txtNote"
+            android:layout_marginHorizontal="16dp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="10dp"
+            android:fontFamily="@font/barlow_regular"
+            android:textSize="14dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/take_note_identify"
+            android:layout_height="wrap_content"/>
+
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/animation_view"
             android:layout_width="150dp"
+            android:layout_marginTop="16dp"
             android:layout_height="150dp"
             android:scaleType="centerCrop"
-            app:lottie_rawRes="@raw/guild_cmnd"
+            app:lottie_rawRes="@raw/chupgttt"
             app:lottie_loop="true"
             app:lottie_autoPlay="true"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtNote"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             />
-        <TextView
-            android:layout_width="wrap_content"
-            android:id="@+id/title"
-            android:text="@string/take_identify_photography"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/animation_view"
-            android:layout_marginTop="16dp"
-            android:textColor="@color/darkBlueGrey"
-            android:fontFamily="@font/semi_bold"
-            android:textSize="18dp"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:id="@+id/textNote"
-            android:layout_width="match_parent"
-            android:textAlignment="center"
-            android:layout_marginTop="16dp"
-            android:textSize="13dp"
-            android:textColor="@color/brownGreyTwo"
-            android:fontFamily="@font/barlow_regular"
-            android:text="@string/note_take_identify"
-            app:layout_constraintTop_toBottomOf="@id/title"
-            android:layout_height="wrap_content">
 
-        </TextView>
-        <ImageView
-            android:id="@+id/dotted"
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:layout_marginVertical="16dp"
-            android:layerType="software"
-            android:src="@drawable/dotted"
-            app:layout_constraintTop_toBottomOf="@id/textNote"
-            />
-        <LinearLayout
-            android:layout_marginTop="16dp"
-            android:id="@+id/note1"
-            app:layout_constraintTop_toBottomOf="@id/dotted"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:src="@drawable/fillcopy"
-                android:layout_width="15dp"
-                android:layout_height="12dp"
-                />
+
+
+
             <TextView
                 android:layout_weight="1"
                 android:fontFamily="@font/barlow_medium"
                 android:textSize="14dp"
+                android:id="@+id/note1"
                 android:textColor="@color/dark"
                 android:layout_marginLeft="16dp"
-                android:layout_width="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/animation_view"
+                android:layout_width="match_parent"
+                android:layout_marginHorizontal="32dp"
                 android:text="@string/use_your_own_valid_id"
                 android:layout_height="wrap_content">
             </TextView>
 
-        </LinearLayout>
-        <LinearLayout
-            android:layout_marginTop="6dp"
-            android:id="@+id/note2"
-            app:layout_constraintTop_toBottomOf="@id/note1"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:src="@drawable/fillcopy"
-                android:layout_width="15dp"
-                android:layout_height="12dp"
-                />
+
             <TextView
                 android:layout_weight="1"
+                android:layout_marginTop="6dp"
+                android:id="@+id/note2"
+                app:layout_constraintLeft_toLeftOf="@id/note1"
+                app:layout_constraintTop_toBottomOf="@id/note1"
                 android:fontFamily="@font/barlow_medium"
                 android:textSize="14dp"
                 android:textColor="@color/dark"
-                android:layout_marginLeft="16dp"
                 android:layout_width="wrap_content"
                 android:text="@string/the_card_must_be_placed_inside_the_camera_frame"
                 android:layout_height="wrap_content">
             </TextView>
 
-        </LinearLayout>
-        <LinearLayout
-            android:layout_marginTop="6dp"
-            android:id="@+id/note3"
-            app:layout_constraintTop_toBottomOf="@id/note2"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:src="@drawable/fillcopy"
-                android:layout_width="15dp"
-                android:layout_height="12dp"
-                />
+
             <TextView
+                app:layout_constraintTop_toBottomOf="@id/note2"
+                android:layout_marginTop="6dp"
+                android:id="@+id/note3"
+                app:layout_constraintLeft_toLeftOf="@id/note2"
                 android:layout_weight="1"
                 android:fontFamily="@font/barlow_medium"
                 android:textSize="14dp"
                 android:textColor="@color/dark"
-                android:layout_marginLeft="16dp"
                 android:layout_width="wrap_content"
                 android:text="@string/do_not_use_copies_of_identification_documents"
                 android:layout_height="wrap_content">
             </TextView>
 
-        </LinearLayout>
 
 
         <vn.payme.sdk.component.Button
             android:id="@+id/buttonNext"
+            android:layout_marginHorizontal="16dp"
             android:layout_width="match_parent"
             app:layout_constraintTop_toBottomOf="@id/note3"
             android:layout_height="wrap_content"

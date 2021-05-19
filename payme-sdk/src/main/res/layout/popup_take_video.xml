@@ -7,98 +7,86 @@
     android:layout_gravity="center"
     android:orientation="vertical"
     android:clickable="true"
-    android:paddingHorizontal="16dp"
-    android:paddingBottom="16dp"
     >
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:background="@drawable/background_radius"
-        android:padding="16dp"
+        android:background="@drawable/background_radius_confirm_payment"
         android:layout_height="match_parent"
+        android:paddingBottom="16dp"
         >
+        <TextView
+            android:layout_width="wrap_content"
+            android:text="@string/take_video"
+            android:layout_marginTop="16dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:textColor="@color/blackSeven"
+            android:fontFamily="@font/semi_bold"
+            android:id="@+id/titlePopup"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textSize="17dp"
+            android:layout_height="wrap_content"/>
+        <ImageView
+            android:src="@drawable/close"
+            android:padding="16dp"
+            android:id="@+id/buttonClose"
+            app:layout_constraintTop_toTopOf="@id/titlePopup"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_width="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/titlePopup"
+            android:layout_height="wrap_content"/>
+
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/animation_view"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:scaleType="centerCrop"
-            app:lottie_rawRes="@raw/guilde_take_video"
+            app:lottie_rawRes="@raw/quayvideo"
             app:lottie_loop="true"
+            android:layout_marginTop="16dp"
             app:lottie_autoPlay="true"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/titlePopup"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:id="@+id/title"
-            android:paddingHorizontal="30dp"
-            android:textAlignment="center"
-            android:text="@string/take_video_face_identify"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/animation_view"
-            android:layout_marginTop="16dp"
-            android:textColor="@color/darkBlueGrey"
-            android:fontFamily="@font/semi_bold"
-            android:textSize="18dp"
-            android:layout_height="wrap_content"/>
-        <LinearLayout
-            android:layout_marginTop="16dp"
-            android:id="@+id/note1"
-            app:layout_constraintTop_toBottomOf="@id/title"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:src="@drawable/fillcopy"
-                android:layout_width="15dp"
-                android:layout_height="12dp"
-                />
+
+
             <TextView
+                android:layout_marginTop="16dp"
+                android:id="@+id/note1"
+                app:layout_constraintLeft_toLeftOf="@id/note2"
+                app:layout_constraintTop_toBottomOf="@id/animation_view"
                 android:layout_weight="1"
                 android:fontFamily="@font/barlow_medium"
                 android:textSize="14dp"
                 android:textColor="@color/dark"
-                android:layout_marginLeft="16dp"
                 android:layout_width="wrap_content"
                 android:text="@string/time_video"
                 android:layout_height="wrap_content">
             </TextView>
 
-        </LinearLayout>
-        <LinearLayout
-            android:layout_marginTop="6dp"
-            android:id="@+id/note2"
-            app:layout_constraintTop_toBottomOf="@id/note1"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:src="@drawable/fillcopy"
-                android:layout_width="15dp"
-                android:layout_height="12dp"
-                />
+
             <TextView
+                android:layout_marginTop="6dp"
+                android:id="@+id/note2"
+                app:layout_constraintTop_toBottomOf="@id/note1"
                 android:layout_weight="1"
                 android:fontFamily="@font/barlow_medium"
                 android:textSize="14dp"
                 android:textColor="@color/dark"
-                android:layout_marginLeft="16dp"
-                android:layout_width="wrap_content"
+                android:layout_marginHorizontal="32dp"
+                android:layout_width="match_parent"
                 android:text="@string/keeps_face_identify"
                 android:layout_height="wrap_content">
             </TextView>
 
-        </LinearLayout>
 
 
         <vn.payme.sdk.component.Button
             android:id="@+id/buttonNext"
+            android:layout_marginHorizontal="16dp"
             android:layout_width="match_parent"
             app:layout_constraintTop_toBottomOf="@id/note2"
             android:layout_height="wrap_content"

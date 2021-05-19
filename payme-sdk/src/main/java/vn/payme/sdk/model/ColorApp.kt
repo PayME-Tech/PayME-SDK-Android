@@ -20,7 +20,7 @@ class ColorApp {
         this.backgroundColorRadius.cornerRadius = 60F
         this.backgroundColor = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
         this.backgroundColorRadiusAlpha = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
-        this.backgroundColorRadiusAlpha.alpha = 150
+        this.backgroundColorRadiusAlpha.alpha = 100
         this.backgroundColorRadiusAlpha.cornerRadius = 60F
 
 

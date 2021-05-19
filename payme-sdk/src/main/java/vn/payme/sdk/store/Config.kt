@@ -1,11 +1,8 @@
 package vn.payme.sdk.store
 
-import android.content.Context
 import android.util.Base64
-import androidx.fragment.app.FragmentManager
 import org.json.JSONObject
 import vn.payme.sdk.PayME
-import vn.payme.sdk.enums.Action
 import vn.payme.sdk.enums.Env
 import vn.payme.sdk.enums.LANGUAGES
 import vn.payme.sdk.model.*
@@ -31,6 +28,7 @@ class Config {
     var kycIdenity: Boolean = false
     var kycVideo: Boolean = false
     var kycFace: Boolean = false
+    var closeWhenDone: Boolean = false
 
     constructor(
         appPrivateKey: String,
