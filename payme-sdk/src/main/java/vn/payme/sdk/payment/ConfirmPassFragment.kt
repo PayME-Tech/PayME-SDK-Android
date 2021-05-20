@@ -99,7 +99,7 @@ class ConfirmPassFragment : Fragment() {
                             EventBus.getDefault().post(
                                 ChangeFragmentPayment(
                                     TYPE_FRAGMENT_PAYMENT.CONFIRM_OTP,
-                                    transaction
+                                    securityCode
                                 )
                             )
                         } else {

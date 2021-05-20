@@ -5,13 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.R
+import vn.payme.sdk.component.Button
 import vn.payme.sdk.component.InfoPayment
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
@@ -61,10 +61,7 @@ class ResultPaymentFragment : Fragment() {
         val message = arguments?.getString("message")
 
         if (message != null) {
-            textError.text = message
-            textError.visibility = View.VISIBLE
-            lottie.setAnimation(R.raw.thatbai)
-            textResult.text = getString(R.string.payment_fail)
+
         } else {
         }
 
@@ -117,9 +114,19 @@ class ResultPaymentFragment : Fragment() {
             listInfoBottom.add(Info("Phí", "${decimal.format(event.fee)} đ", null, null, false))
         }
         listInfoBottom[listInfoBottom.size-1].isEnd = true
-        infoBottom.updateData(listInfoBottom)
         textAmount.text = event.infoBottom!![event?.infoBottom!!.size -1].value
-        textAmount.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
+
+        if(message != null){
+            textError.text = message
+            textError.visibility = View.VISIBLE
+            lottie.setAnimation(R.raw.thatbai)
+            textResult.text = getString(R.string.payment_fail)
+            buttonSubmit.textView.text = getString(R.string.understood)
+            infoBottom.visibility = View.GONE
+        }else{
+            infoBottom.updateData(listInfoBottom)
+            textAmount.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
+        }
 
         buttonSubmit.setOnClickListener {
             EventBus.getDefault()

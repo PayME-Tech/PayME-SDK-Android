@@ -44,7 +44,6 @@ internal class PaymePayment : DialogFragment() {
         val message = arguments?.getString("message")
         Keyboard.closeKeyboard(requireContext())
         if (showResult == true) {
-
             val bundle: Bundle = Bundle()
             if (message != null) {
                 bundle.putString("message", message)
@@ -140,6 +139,9 @@ internal class PaymePayment : DialogFragment() {
 
         } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_OTP) {
             val confirmFragment = ConfirmOtpFragment()
+            val bundle = Bundle()
+            bundle.putString("securityCode", event.value)
+            confirmFragment.arguments
             val fragment = childFragmentManager?.beginTransaction()
             fragment?.replace(
                 R.id.frame_container,

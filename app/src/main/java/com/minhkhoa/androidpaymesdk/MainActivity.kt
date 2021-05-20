@@ -358,7 +358,7 @@ class MainActivity : AppCompatActivity() {
 
 
             val amount = convertInt(moneyDeposit.text.toString())
-            payme?.deposit(amount, false,
+            payme?.deposit(amount, true,
                 onSuccess = { json: JSONObject? ->
                 },
                 onError = { jsonObject, code, message ->

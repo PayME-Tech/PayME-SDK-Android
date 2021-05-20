@@ -10,6 +10,7 @@
     <string name="please_check_the_correct_name_printed_on_the_card">Vui lòng kiểm tra đúng tên in trên thẻ</string>
     <string name="enter_the_cardholder_full_name">Nhập họ tên chủ thẻ</string>
     <string name="done">Hoàn tất</string>
+    <string name="resend_otp">Gửi lại OTP</string>
     <string name="take_picture_again">Chụp lại</string>
     <string name="take_again">Làm lại</string>
     <string name="paper_photography">Chụp ảnh giấy tờ</string>
@@ -40,6 +41,7 @@
     <string name="passport">Hộ chiếu</string>
     <string name="front">Mặt trước</string>
     <string name="backside">Mặt sau</string>
+    <string name="understood">Đã hiểu</string>
     <string name="please_take_pictures_center">Vui lòng cân chỉnh giấy tờ tùy thân vào giữa khung</string>
     <string name="confirm_image_take_pictures_identify">Vui lòng xác nhận ảnh đã rõ nét, gương mặt của bạn đã có trong khung hình.</string>
     <string name="confirm_image_take_video_identify">Vui lòng xác nhận video đã rõ nét, gương mặt và giấy tờ tùy thân của bạn đã có trong khung hình.</string>

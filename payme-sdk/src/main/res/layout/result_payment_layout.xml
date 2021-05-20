@@ -163,7 +163,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-    <Button
+    <vn.payme.sdk.component.Button
         android:id="@+id/buttonSubmit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
