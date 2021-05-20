@@ -10,7 +10,7 @@ import java.lang.reflect.Method
 
 class ClientInfo {
     var appVersion: String = ""
-    var sdkVerSion: String = "0.4.6"
+    var sdkVerSion: String = "0.4.7"
     var appPackageName: String? = ""
     var deviceId: String? = ""
     fun getDeviceName(): String? {
