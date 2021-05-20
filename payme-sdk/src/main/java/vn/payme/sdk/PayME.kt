@@ -21,6 +21,7 @@ import vn.payme.sdk.api.ENV_API
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.api.QueryBuilder
 import vn.payme.sdk.enums.*
+import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.*
 import vn.payme.sdk.payment.PaymePayment
@@ -54,10 +55,9 @@ public class PayME(
 
         internal fun onExpired() {
             var even: EventBus = EventBus.getDefault()
-            var myEven: MyEven = MyEven(TypeCallBack.onClose, "")
             var myEven2: MyEven = MyEven(TypeCallBack.onExpired, "")
-            even.post(myEven)
             even.post(myEven2)
+            EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, null))
         }
     }
 
@@ -77,7 +77,8 @@ public class PayME(
         Security.insertProviderAt(BouncyCastleProvider(), 1)
         ENV_API.updateEnv()
     }
-    public fun  onForgotPassword(){
+
+    public fun onForgotPassword() {
         openWalletActivity(Action.FORGOT_PASSWORD, 0, null, null, null, onSuccess, onError)
     }
 
@@ -297,41 +298,45 @@ public class PayME(
         Store.paymentInfo.transaction = ""
         Store.paymentInfo.isChangeMethod = method == null
         Store.paymentInfo.methodSelected = method
-        if(method != null && method?.type != TYPE_PAYMENT.BANK_CARD && (!Store.userInfo.accountActive || !Store.userInfo.accountKycSuccess)){
-            if (!Store.userInfo.accountActive) {
-                onError(null, ERROR_CODE.ACCOUNT_NOT_ACTIVETES, "Tài khoản chưa kích hoạt")
-            } else if (!Store.userInfo.accountKycSuccess) {
-                onError(null, ERROR_CODE.ACCOUNT_NOT_KYC, "Tài khoản chưa định danh")
-            }
-        }else if (method != null && method?.type != TYPE_PAYMENT.WALLET && !Store.config.openPayAndKyc) {
-            PayME.showError("Chức năng chỉ có thể thao tác môi trường production")
-        } else {
-            Store.paymentInfo.isShowResultUI = isShowResultUI
-            Companion.onSuccess = onSuccess
-            Companion.onError = onError
-            PayME.fragmentManager = fragmentManager
-            Store.paymentInfo.infoPayment = infoPayment
-            val decimal = DecimalFormat("#,###")
-            if (infoPayment.amount!! < Store.config.limitPayment.min) {
-                onError(
-                    null,
-                    ERROR_CODE.LITMIT,
-                    "Số tiền giao dịch tối thiểu ${decimal.format(Store.config.limitPayment.min)} VND"
-                )
-            } else if (infoPayment.amount!! > Store.config.limitPayment.max) {
-                onError(
-                    null,
-                    ERROR_CODE.LITMIT,
-                    "Số tiền giao dịch tối đa ${decimal.format(Store.config.limitPayment.max)} VND"
-                )
-            } else {
-                val paymePayment: PaymePayment = PaymePayment()
-                paymePayment.show(
-                    fragmentManager,
-                    "ModalBottomSheet"
-                )
-            }
-        }
+        if (method != null && !((method.type == TYPE_PAYMENT.WALLET) || (method.type == TYPE_PAYMENT.BANK_CARD) || (method.type == TYPE_PAYMENT.LINKED))) {
+            onError(null, null, "Phương thức chưa được hỗ trợ")
+        } else
+            if (method != null && method?.type != TYPE_PAYMENT.BANK_CARD && (!Store.userInfo.accountActive || !Store.userInfo.accountKycSuccess)) {
+                if (!Store.userInfo.accountActive) {
+                    onError(null, ERROR_CODE.ACCOUNT_NOT_ACTIVETES, "Tài khoản chưa kích hoạt")
+                } else if (!Store.userInfo.accountKycSuccess) {
+                    onError(null, ERROR_CODE.ACCOUNT_NOT_KYC, "Tài khoản chưa định danh")
+                }
+            } else
+                if (method != null && method?.type != TYPE_PAYMENT.WALLET && !Store.config.openPayAndKyc) {
+                    PayME.showError("Chức năng chỉ có thể thao tác môi trường production")
+                } else {
+                    Store.paymentInfo.isShowResultUI = isShowResultUI
+                    Companion.onSuccess = onSuccess
+                    Companion.onError = onError
+                    PayME.fragmentManager = fragmentManager
+                    Store.paymentInfo.infoPayment = infoPayment
+                    val decimal = DecimalFormat("#,###")
+                    if (infoPayment.amount!! < Store.config.limitPayment.min) {
+                        onError(
+                            null,
+                            ERROR_CODE.LITMIT,
+                            "Số tiền giao dịch tối thiểu ${decimal.format(Store.config.limitPayment.min)} VND"
+                        )
+                    } else if (infoPayment.amount!! > Store.config.limitPayment.max) {
+                        onError(
+                            null,
+                            ERROR_CODE.LITMIT,
+                            "Số tiền giao dịch tối đa ${decimal.format(Store.config.limitPayment.max)} VND"
+                        )
+                    } else {
+                        val paymePayment: PaymePayment = PaymePayment()
+                        paymePayment.show(
+                            fragmentManager,
+                            "ModalBottomSheet"
+                        )
+                    }
+                }
     }
 
     fun closeOpenWallet() {

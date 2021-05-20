@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
 import org.greenrobot.eventbus.EventBus
@@ -71,11 +72,20 @@ class ResultPaymentFragment : Fragment() {
         textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
         buttonSubmit.background = Store.config.colorApp.backgroundColorRadius
         val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
-        val infoTotal = event.infoBottom?.get(event.infoBottom!!.size - 1)
-        event.infoBottom?.get(event.infoBottom!!.size - 2)?.isEnd = true
-        event.infoBottom?.removeAt(event.infoBottom!!.size - 1)
-        if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.BANK_CARD) {
-            val listInfoBottom: ArrayList<Info> = arrayListOf()
+        event.infoTop?.let { infoTop.updateData(it) }
+        val listInfoBottom: ArrayList<Info> = arrayListOf()
+        if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.LINKED) {
+            listInfoBottom.add(Info("Phương thức", "Tài khoản liên kết", null, null, false))
+            listInfoBottom.add(
+                Info(
+                    "Số tài khoản",
+                    Store.paymentInfo.methodSelected?.title + Store.paymentInfo.methodSelected?.label,
+                    null,
+                    null,
+                    false
+                )
+            )
+        } else {
             listInfoBottom.add(
                 Info(
                     "Phương thức",
@@ -85,33 +95,32 @@ class ResultPaymentFragment : Fragment() {
                     false
                 )
             )
+        }
+        if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.BANK_CARD) {
             val lengthCard = event.cardInfo?.cardNumber?.length
             val cardNumber = event.cardInfo?.cardNumber?.substring(
                 lengthCard!! - 4,
                 lengthCard!!
             )
-
-
             listInfoBottom.add(
                 Info(
                     "Số thẻ ATM",
                     event.cardInfo?.bankShortName + "-" + cardNumber,
                     null,
                     null,
-                    event.fee==0
+                    false
                 )
             )
-            if(event.fee>0){
-                listInfoBottom.add(Info("Phí", "${decimal.format(event.fee)} đ", null, null, false))
-            }
-            infoBottom.updateData(listInfoBottom)
-
-        } else {
-            event.infoBottom?.let { infoBottom.updateData(it) }
         }
-        event.infoTop?.let { infoTop.updateData(it) }
-        textAmount.text = infoTotal?.value
+
+        if (event.fee > 0) {
+            listInfoBottom.add(Info("Phí", "${decimal.format(event.fee)} đ", null, null, false))
+        }
+        listInfoBottom[listInfoBottom.size-1].isEnd = true
+        infoBottom.updateData(listInfoBottom)
+        textAmount.text = event.infoBottom!![event?.infoBottom!!.size -1].value
         textAmount.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
+
         buttonSubmit.setOnClickListener {
             EventBus.getDefault()
                 .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, null))

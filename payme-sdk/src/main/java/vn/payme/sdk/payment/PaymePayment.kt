@@ -103,12 +103,9 @@ internal class PaymePayment : DialogFragment() {
     }
     @Subscribe
     fun onChangeFragment(event: ChangeFragmentPayment) {
-        if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT) {
-
+        if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT || event.typeFragment == TYPE_FRAGMENT_PAYMENT.EXPIRED) {
             this.dialog?.dismiss()
-
         } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT) {
-            if (Store.paymentInfo.isShowResultUI) {
                 val confirmFragment = ConfirmPaymentFragment()
                 val fragment = childFragmentManager?.beginTransaction()
                 fragment?.replace(
@@ -116,7 +113,6 @@ internal class PaymePayment : DialogFragment() {
                     confirmFragment
                 )
                 fragment?.commit()
-            }
 
         } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.RESULT) {
             val message = event.value
@@ -137,6 +133,8 @@ internal class PaymePayment : DialogFragment() {
                     resultPaymentFragment
                 )
                 fragment?.commit()
+            }else{
+                this.dialog?.dismiss()
             }
 
 

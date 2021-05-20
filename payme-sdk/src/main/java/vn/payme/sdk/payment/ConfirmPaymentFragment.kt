@@ -134,9 +134,8 @@ class ConfirmPaymentFragment : Fragment() {
             if (succeeded) {
                 val feeObject = GetFee.getJSONObject("fee")
                 val fee = feeObject.getInt("fee")
-                if(fee>0){
-                    listInfoBottom.add(Info("Phí", "${decimal.format(fee)} đ", null, null, false))
-                }
+                val valueFree  = if(fee>0) "${decimal.format(fee)} đ" else "Miễn phí"
+                    listInfoBottom.add(Info("Phí", valueFree, null, null, false))
                 listInfoBottom.add(
                     Info(
                         "Tổng thanh toán", "${

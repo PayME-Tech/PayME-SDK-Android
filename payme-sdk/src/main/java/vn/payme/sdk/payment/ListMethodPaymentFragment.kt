@@ -185,25 +185,45 @@ class ListMethodPaymentFragment : Fragment() {
 
         this.listView.setOnItemClickListener { adapterView, view, i, l ->
             if (loadingProcess.visibility != View.VISIBLE) {
+
                 val method = this.listMethod[i]
-                Store.paymentInfo.methodSelected = method!!
-                if(method?.type != TYPE_PAYMENT.WALLET){
-                    if(!Store.config.openPayAndKyc){
-                        PayME.showError("Chức năng chỉ có thể thao tác môi trường production")
-                    }else if(method.type == TYPE_PAYMENT.BANK_CARD){
-                        val fragment = fragmentManager?.beginTransaction()
-                        val enterAtmCardFragment = EnterAtmCardFragment()
-                        val bundle = Bundle()
-                        bundle.putBoolean("showChangeMethod", true)
-                        enterAtmCardFragment.arguments = bundle
-                        fragment?.replace(R.id.frame_container_select_method, enterAtmCardFragment)
-                        fragment?.commit()
-                    }else{
-                        EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,null))
+                if ((method.type == TYPE_PAYMENT.WALLET) ||  (method.type == TYPE_PAYMENT.BANK_CARD) || (method.type == TYPE_PAYMENT.LINKED)) {
+                    Store.paymentInfo.methodSelected = method!!
+                    if ((method?.type == TYPE_PAYMENT.WALLET)) {
+                        println("VAO DAY NHE")
+                        EventBus.getDefault().post(
+                            ChangeFragmentPayment(
+                                TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,
+                                null
+                            )
+                        )
+                    } else {
+                        if (!Store.config.openPayAndKyc) {
+                            PayME.showError("Chức năng chỉ có thể thao tác môi trường production")
+                        } else if (method.type == TYPE_PAYMENT.BANK_CARD) {
+                            val fragment = fragmentManager?.beginTransaction()
+                            val enterAtmCardFragment = EnterAtmCardFragment()
+                            val bundle = Bundle()
+                            bundle.putBoolean("showChangeMethod", true)
+                            enterAtmCardFragment.arguments = bundle
+                            fragment?.replace(
+                                R.id.frame_container_select_method,
+                                enterAtmCardFragment
+                            )
+                            fragment?.commit()
+                        } else {
+                            EventBus.getDefault().post(
+                                ChangeFragmentPayment(
+                                    TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,
+                                    null
+                                )
+                            )
+                        }
                     }
-                }else{
-                    EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,null))
+                } else {
+                    PayME.showError("Phương thức chưa được hỗ trợ")
                 }
+
             }
         }
         return view

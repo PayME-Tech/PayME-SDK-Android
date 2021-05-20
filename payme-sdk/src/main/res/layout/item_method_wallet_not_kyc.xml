@@ -23,11 +23,11 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     android:id="@+id/imageWallet"
-                    android:src="@drawable/iconwallet"
+                    android:src="@drawable/ic_payme"
                     android:layout_marginLeft="10dp"
                     app:layout_constraintBottom_toBottomOf="@id/button"
-                    android:layout_width="26dp"
-                    android:layout_height="22dp">
+                    android:layout_width="32dp"
+                    android:layout_height="32dp">
              </ImageView>
             <TextView
                 android:layout_width="wrap_content"

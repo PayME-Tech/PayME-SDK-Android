@@ -65,10 +65,12 @@ class MethodAdapter(
     }
 
     private fun addImage(method: Method, imageView: ImageView) {
-        if (method.type == TYPE_PAYMENT.BANK_CARD) {
-            imageView.setImageResource(R.drawable.icon_atm)
+        if (method.type == TYPE_PAYMENT.BANK_QR_CODE) {
+            imageView.setImageResource(R.drawable.ic_qr_code)
+        }else if (method.type == TYPE_PAYMENT.BANK_CARD) {
+            imageView.setImageResource(R.drawable.ic_atm)
         } else if (method.type == TYPE_PAYMENT.WALLET) {
-            imageView.setImageResource(R.drawable.iconwallet)
+            imageView.setImageResource(R.drawable.ic_payme)
         } else if (method.type == TYPE_PAYMENT.NAPAS || method.type == TYPE_PAYMENT.LINKED) {
             val picasso = Picasso.get()
             picasso.setIndicatorsEnabled(false)
@@ -78,7 +80,7 @@ class MethodAdapter(
                 .into(imageView)
 
         } else {
-            imageView.setImageResource(R.drawable.iconwallet)
+            imageView.setImageResource(R.drawable.ic_payme)
 
         }
 
@@ -144,15 +146,7 @@ class MethodAdapter(
             val noteMethod = rowView.findViewById(R.id.note_method) as TextView
             val imageView = rowView.findViewById(R.id.image) as ImageView
 
-            val wrapImageMethod = rowView.findViewById(R.id.wrap_image_method) as CardView
-            val imageWallet = rowView.findViewById(R.id.imageWallet) as ImageView
-            if (method.type == TYPE_PAYMENT.WALLET) {
-                imageWallet.visibility = View.VISIBLE
-                wrapImageMethod.visibility = View.GONE
-            }
-
             setTitle(method, titleText, noteMethod)
-
             addImage(method, imageView)
 
 

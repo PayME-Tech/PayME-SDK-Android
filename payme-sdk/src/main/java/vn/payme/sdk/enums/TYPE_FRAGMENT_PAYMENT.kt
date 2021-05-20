@@ -7,6 +7,9 @@ enum  class TYPE_FRAGMENT_PAYMENT {
     CONFIRM_PASS,
     CONFIRM_OTP,
     RESULT,
-    CLOSE_PAYMENT
+    CLOSE_PAYMENT,
+    EXPIRED,
+
+
 
 }
