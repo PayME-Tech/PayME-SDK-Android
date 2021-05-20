@@ -179,6 +179,7 @@ public class PayME(
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
+        Store.config.closeWhenDone = false
         openWalletActivity(Action.OPEN, 0, null, null, null, onSuccess, onError)
 
     }
