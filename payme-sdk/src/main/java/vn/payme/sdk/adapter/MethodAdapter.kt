@@ -17,8 +17,10 @@ import com.squareup.picasso.Picasso
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
+import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.enums.TypeCallBack
+import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.Method
 import vn.payme.sdk.store.Store
@@ -89,11 +91,9 @@ class MethodAdapter(
     //4
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val method = dataSource[position]
-
-
         if (
             method.type == TYPE_PAYMENT.WALLET
-            && ( !Store.userInfo.accountActive || !Store.userInfo.accountKycSuccess ||Store.paymentInfo.amount > Store.userInfo.balance)
+            && ( !Store.userInfo.accountActive || !Store.userInfo.accountKycSuccess ||Store.paymentInfo.infoPayment!!.amount > Store.userInfo.balance)
         ) {
             val rowView = inflater.inflate(R.layout.item_method_wallet_not_kyc, null, true)
             val titleText = rowView.findViewById(R.id.title) as TextView
@@ -119,12 +119,10 @@ class MethodAdapter(
                     paymeSDK.openWallet(PayME.onSuccess, PayME.onError)
                 } else if (!Store.userInfo.accountKycSuccess) {
                     paymeSDK.openWallet(PayME.onSuccess, PayME.onError)
-                } else if (Store.paymentInfo.amount > Store.userInfo.balance) {
+                } else if (Store.paymentInfo.infoPayment!!.amount > Store.userInfo.balance) {
                     paymeSDK.deposit(0, false,PayME.onSuccess, PayME.onError)
                 }
-                var even: EventBus = EventBus.getDefault()
-                var myEven: MyEven = MyEven(TypeCallBack.onClose, "")
-                even.post(myEven)
+                EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT,null))
             }
             if (!Store.userInfo.accountActive) {
                 txtButton.setText(R.string.active_now)
@@ -132,7 +130,7 @@ class MethodAdapter(
             } else if (!Store.userInfo.accountKycSuccess) {
                 txtButton.setText(R.string.kyc_now)
                 txtDescription.setText(R.string.description_kyc_now)
-            } else if (Store.paymentInfo.amount > Store.userInfo.balance) {
+            } else if (Store.paymentInfo.infoPayment!!.amount > Store.userInfo.balance) {
                 txtButton.setText(R.string.deposit_now)
                 txtDescription.setText(R.string.description_deposit_now)
             }
