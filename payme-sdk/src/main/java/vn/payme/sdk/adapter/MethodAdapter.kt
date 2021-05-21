@@ -54,8 +54,11 @@ class MethodAdapter(
         } else if (method.type == TYPE_PAYMENT.WALLET) {
             titleText.text = method.title
             val decimal = DecimalFormat("#,###")
-            noteMethod.text = "(${decimal.format(Store.userInfo.balance?.toLong())}đ)"
-            noteMethod.textSize = 12F
+            if(Store.userInfo.accountKycSuccess){
+                noteMethod.text = "(${decimal.format(Store.userInfo.balance?.toLong())}đ)"
+                noteMethod.textSize = 12F
+            }
+
             return
         } else if (method.type == TYPE_PAYMENT.NAPAS || method.type == TYPE_PAYMENT.LINKED) {
             titleText.text = method.title!!
