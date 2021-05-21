@@ -301,13 +301,9 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                         Store.config.env!!,
                         Store.config.showLog
                     )
-                    paymeSDK.pay(
+                    paymeSDK.payInSDK(
                         this.supportFragmentManager,
                         infoPayment,
-                        true,
-                        null,
-                        PayME.onSuccess,
-                        PayME.onError
                     )
                 }
             },
@@ -329,14 +325,13 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
     @Subscribe
     fun onText(myEven: MyEven) {
-        if (myEven.type === TypeCallBack.onReload) {
+        if (myEven.type == TypeCallBack.onReload) {
             this.myWebView.reload()
         }
-        if (myEven.type === TypeCallBack.onExpired) {
+        if (myEven.type == TypeCallBack.onExpired) {
             finish()
         }
-        if (myEven.type === TypeCallBack.onTakeImageResult) {
-
+        if (myEven.type == TypeCallBack.onTakeImageResult) {
             if (myEven.value != null) {
                 image = myEven.value.toString()
             }
@@ -348,7 +343,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                     "          true; // note: this is required, or you'll sometimes get silent failures\n"
             myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
         }
-        if (myEven.type === TypeCallBack.onScan) {
+        if (myEven.type == TypeCallBack.onScan) {
             myEven.value?.let { checkScanQr(it) }
         }
     }

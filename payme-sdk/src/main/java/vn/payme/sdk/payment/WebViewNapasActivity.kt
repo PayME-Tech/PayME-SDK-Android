@@ -16,9 +16,9 @@ import vn.payme.sdk.store.Store
 
 class WebViewNapasActivity : AppCompatActivity() {
     private lateinit var buttonClose: ImageView
-    private  var message : String? = null
-    private  var trans_id : String? = null
-    private  var onResult : Boolean? = false
+    private var message: String? = null
+    private var trans_id: String? = null
+    private var onResult: Boolean? = false
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -27,7 +27,7 @@ class WebViewNapasActivity : AppCompatActivity() {
         myWebView.settings.javaScriptEnabled = true
         buttonClose = findViewById(R.id.buttonClose)
         buttonClose.setOnClickListener {
-            PayME.onError(null, ERROR_CODE.USER_CANCELLED,"")
+            PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
             finish()
         }
         getWindow().setStatusBarColor(Color.TRANSPARENT);
@@ -38,11 +38,11 @@ class WebViewNapasActivity : AppCompatActivity() {
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
                 val checkSuccess = url.contains("https://payme.vn/web/?success=true")
                 val checkError = url.contains("https://payme.vn/web/?success=false")
-                if(checkSuccess || checkError){
+                if (checkSuccess || checkError) {
                     val uri: Uri = Uri.parse(url)
                     val messageResult = uri.getQueryParameter("message")
                     val transIdResult = uri.getQueryParameter("trans_id")
-                    if(checkError){
+                    if (checkError) {
                         message = messageResult
                     }
                     trans_id = transIdResult
@@ -58,19 +58,24 @@ class WebViewNapasActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if(onResult == true){
+        if (onResult == true) {
             val bundle: Bundle = Bundle()
-            if(trans_id!=null){
+            if (trans_id != null) {
                 Store.paymentInfo.transaction = trans_id!!
             }
-            if(message!=null){
-                PayME.onError(null,ERROR_CODE.PAYMENT_ERROR, message!!)
+            if (message != null) {
+                if (!Store.config.disableCallBackResult) {
+                    PayME.onError(null, ERROR_CODE.PAYMENT_ERROR, message!!)
+                }
                 bundle.putString("message", message)
-            }else{
-                val data = JSONObject("""{transaction:${Store.paymentInfo.transaction}}""")
-                PayME.onSuccess(data)
+            } else {
+                val data =
+                    JSONObject("""{payment:{transaction:${Store.paymentInfo.transaction}}}""")
+                if (!Store.config.disableCallBackResult) {
+                    PayME.onSuccess(data)
+                }
             }
-            if(Store.paymentInfo.isShowResultUI){
+            if (Store.paymentInfo.isShowResultUI) {
                 bundle.putBoolean("showResult", true)
                 val paymePayment: PaymePayment = PaymePayment()
                 paymePayment.arguments = bundle

@@ -116,10 +116,14 @@ internal class PaymePayment : DialogFragment() {
         } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.RESULT) {
             val message = event.value
             if (message != null) {
-                PayME.onError(null, ERROR_CODE.PAYMENT_ERROR, message!!)
+                if(!Store.config.disableCallBackResult) {
+                    PayME.onError(null, ERROR_CODE.PAYMENT_ERROR, message!!)
+                }
             } else {
-                val data = JSONObject("""{transaction:${Store.paymentInfo.transaction}}""")
-                PayME.onSuccess(data)
+                val data = JSONObject("""{payment:{transaction:${Store.paymentInfo.transaction}}}""")
+                if(!Store.config.disableCallBackResult){
+                    PayME.onSuccess(data)
+                }
             }
             if (Store.paymentInfo.isShowResultUI) {
                 val resultPaymentFragment = ResultPaymentFragment()

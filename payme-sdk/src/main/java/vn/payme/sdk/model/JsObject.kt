@@ -51,14 +51,13 @@ public class JsObject(
     fun onDeposit(string: String){
         try {
             val json: JSONObject = JSONObject(string)
-            println("json"+json)
             val data = json.getJSONObject("data")
             val status = data.getString("status")
             val message = data.optString("message")
             if(status=="SUCCEEDED"){
                 PayME.onSuccess(null)
             }else{
-                PayME.onError(null,ERROR_CODE.OTHER,message)
+                PayME.onError(data,ERROR_CODE.OTHER,message)
 
             }
             back()
@@ -77,7 +76,7 @@ public class JsObject(
             if(status=="SUCCEEDED"){
                 PayME.onSuccess(null)
             }else{
-                PayME.onError(null,ERROR_CODE.OTHER,message)
+                PayME.onError(data,ERROR_CODE.OTHER,message)
 
             }
             back()

@@ -29,6 +29,7 @@ class Config {
     var kycVideo: Boolean = false
     var kycFace: Boolean = false
     var closeWhenDone: Boolean = false
+    var disableCallBackResult: Boolean = false
 
     constructor(
         appPrivateKey: String,

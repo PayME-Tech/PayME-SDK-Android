@@ -57,7 +57,8 @@ public class PayME(
             var even: EventBus = EventBus.getDefault()
             var myEven2: MyEven = MyEven(TypeCallBack.onExpired, "")
             even.post(myEven2)
-            EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, null))
+            EventBus.getDefault()
+                .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, null))
         }
     }
 
@@ -175,7 +176,7 @@ public class PayME(
     }
 
 
-    public fun openWallet(
+    fun openWallet(
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
@@ -288,7 +289,27 @@ public class PayME(
         }
     }
 
-    public fun pay(
+    fun payInSDK(
+        fragmentManager: FragmentManager,
+        infoPayment: InfoPayment,
+    ) {
+        pay(fragmentManager,infoPayment,true,null,onSuccess,onError)
+        Store.config.disableCallBackResult = true
+    }
+    fun pay(
+        fragmentManager: FragmentManager,
+        infoPayment: InfoPayment,
+        isShowResultUI: Boolean,
+        method: Method?,
+        onSuccess: (JSONObject?) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ){
+        payRoot(fragmentManager,infoPayment,isShowResultUI,method,onSuccess,onError)
+        Store.config.disableCallBackResult = false
+    }
+
+
+    fun payRoot(
         fragmentManager: FragmentManager,
         infoPayment: InfoPayment,
         isShowResultUI: Boolean,
@@ -299,6 +320,7 @@ public class PayME(
         Store.paymentInfo.transaction = ""
         Store.paymentInfo.isChangeMethod = method == null
         Store.paymentInfo.methodSelected = method
+
         if (method != null && !((method.type == TYPE_PAYMENT.WALLET) || (method.type == TYPE_PAYMENT.BANK_CARD) || (method.type == TYPE_PAYMENT.LINKED))) {
             onError(null, null, "Phương thức chưa được hỗ trợ")
         } else
@@ -469,7 +491,7 @@ public class PayME(
         )
     }
 
-    public fun getWalletInfo(
+    fun getWalletInfo(
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
