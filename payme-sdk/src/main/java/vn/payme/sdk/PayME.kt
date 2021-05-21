@@ -87,12 +87,9 @@ public class PayME(
         onSuccess: (AccountStatus) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        val accountApi = AccountApi()
         val paymentApi = PaymentApi()
-        val pref = PayME.context.getSharedPreferences("PayME_SDK", Context.MODE_PRIVATE)
-        val clientId = pref.getString("clientId", "")
 
-        val dataRegisterClientInfo = pref.getString("dataRegisterClientInfo", "")
+
         paymentApi.getSettings(onSuccess = { jsonObject ->
             val Setting = jsonObject.getJSONObject("Setting")
             val configs = Setting.getJSONArray("configs")
@@ -131,12 +128,23 @@ public class PayME(
                     }
                 }
             }
+            checkClientInfo(onSuccess,onError)
         },
             onError = { jsonObject, code, message ->
-
+                    onError( jsonObject, code, message)
             }
         )
 
+
+    }
+    private  fun checkClientInfo(
+        onSuccess: (AccountStatus) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ){
+        val accountApi = AccountApi()
+        val pref = PayME.context.getSharedPreferences("PayME_SDK", Context.MODE_PRIVATE)
+        val clientId = pref.getString("clientId", "")
+        val dataRegisterClientInfo = pref.getString("dataRegisterClientInfo", "")
         if (clientId?.length!! <= 0 || !dataRegisterClientInfo.equals(
                 Store.config.clientInfo?.getClientInfo().toString() + Store.config.env.toString()
             )
@@ -169,7 +177,6 @@ public class PayME(
                 onSuccess(accountInfo)
             }, onError = { jsonObject, code, message ->
                 onError(jsonObject, code, message)
-
             })
 
         }
