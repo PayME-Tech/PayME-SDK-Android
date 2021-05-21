@@ -67,7 +67,6 @@ class ConfirmPaymentFragment : Fragment() {
         buttonSubmit.setOnClickListener {
             if(getFeeSuccess){
                 onPay()
-
             }else{
                 getFee()
             }
@@ -157,9 +156,16 @@ class ConfirmPaymentFragment : Fragment() {
                 PayME.showError(message)
             }
         }, onError = { jsonObject: JSONObject?, code: Int?, message: String ->
-            buttonSubmit.disableLoading()
-            buttonSubmit.setText("Thử lại")
-            PayME.showError(message)
+
+            if (code == ERROR_CODE.EXPIRED) {
+                PayME.onExpired()
+                PayME.onError(jsonObject, code, message)
+            } else {
+                buttonSubmit.disableLoading()
+                buttonSubmit.setText("Thử lại")
+                PayME.showError(message)
+                buttonSubmit.disableLoading()
+            }
         })
 
     }
@@ -205,8 +211,13 @@ class ConfirmPaymentFragment : Fragment() {
                     }
                 },
                 onError = { jsonObject, code, message ->
-                    PayME.showError(message)
                     buttonSubmit.disableLoading()
+                    if (code == ERROR_CODE.EXPIRED) {
+                        PayME.onExpired()
+                        PayME.onError(jsonObject, code, message)
+                    } else {
+                        PayME.showError(message)
+                    }
                 })
 
         } else {
