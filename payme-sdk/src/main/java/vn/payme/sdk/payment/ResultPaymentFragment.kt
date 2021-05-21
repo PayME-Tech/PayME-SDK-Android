@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
 import org.greenrobot.eventbus.EventBus
@@ -67,7 +66,6 @@ class ResultPaymentFragment : Fragment() {
 
         val decimal = DecimalFormat("#,###")
         textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
-        buttonSubmit.background = Store.config.colorApp.backgroundColorRadius
         val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
         event.infoTop?.let { infoTop.updateData(it) }
         val listInfoBottom: ArrayList<Info> = arrayListOf()
