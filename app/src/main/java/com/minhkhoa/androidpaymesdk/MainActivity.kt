@@ -33,7 +33,7 @@ val APP_USER_ID = "APP_USER_ID"
 
 val APP_TOKEN_DEFAULT_SANDBOX =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTgsImlhdCI6MTYxNjc0NDc5OX0.G3YOOap-NwYstxiRRyFOuhcKFaOlRhzf2VDgIv1WG1M"
-val PUBLIC_KEY_DEFAULT_SANDBOX ="-----BEGIN PUBLIC KEY-----\n" +
+val PUBLIC_KEY_DEFAULT_SANDBOX = "-----BEGIN PUBLIC KEY-----\n" +
         "    MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIO5BEw44Izh74J6p5lBcIX/JcED7X1V\n" +
         "    MATeUN5+iIjo3u0kIMVpVhg/h5FaQ+3K6L8gVVDQvaRoXNwt6dJjcIcCAwEAAQ==\n" +
         "    -----END PUBLIC KEY-----"
@@ -50,7 +50,7 @@ val PRIVATE_KEY_DEFAULT_SANDBOX = "-----BEGIN RSA PRIVATE KEY-----\n" +
 
 val APP_TOKEN_DEFAULT_DEV =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTIsImlhdCI6MTYyMDg4MjQ2NH0.DJfi52Dc66IETflV2dQ8G_q4oUAVw_eG4TzrqkL0jLU"
-val PUBLIC_KEY_DEFAULT_DEV ="-----BEGIN PUBLIC KEY-----\n" +
+val PUBLIC_KEY_DEFAULT_DEV = "-----BEGIN PUBLIC KEY-----\n" +
         "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJi70XBS5+LtaCrNsrnWlVG6xec+J9M1\n" +
         "DzzvsmDfqRgTIw7RQ94SnEBBcTXhaIAZ8IW7OIWkVU0OXcybQEoLsdUCAwEAAQ==\n" +
         "-----END PUBLIC KEY-----"
@@ -270,17 +270,17 @@ class MainActivity : AppCompatActivity() {
 
                 val connectToken = CryptoAES.encrypt(
                     dataExample,
-                    if (env == Env.PRODUCTION) SecretKey else if(env==Env.DEV)  SECRET_KEY_DEFAULT_DEV else SECRET_KEY_DEFAULT_SANDBOX
+                    if (env == Env.PRODUCTION) SecretKey else if (env == Env.DEV) SECRET_KEY_DEFAULT_DEV else SECRET_KEY_DEFAULT_SANDBOX
                 )
                 ConnectToken = connectToken
                 loading.visibility = View.VISIBLE
                 payme =
                     PayME(
                         this,
-                        if (env == Env.PRODUCTION) AppToken else if(env== Env.DEV) APP_TOKEN_DEFAULT_DEV else APP_TOKEN_DEFAULT_SANDBOX,
-                        if (env == Env.PRODUCTION) PublicKey else if(env==Env.DEV) PUBLIC_KEY_DEFAULT_DEV else PUBLIC_KEY_DEFAULT_SANDBOX,
+                        if (env == Env.PRODUCTION) AppToken else if (env == Env.DEV) APP_TOKEN_DEFAULT_DEV else APP_TOKEN_DEFAULT_SANDBOX,
+                        if (env == Env.PRODUCTION) PublicKey else if (env == Env.DEV) PUBLIC_KEY_DEFAULT_DEV else PUBLIC_KEY_DEFAULT_SANDBOX,
                         ConnectToken,
-                        if (env == Env.PRODUCTION) PrivateKey else if(env==Env.DEV) PRIVATE_KEY_DEFAULT_DEV else PRIVATE_KEY_DEFAULT_SANDBOX,
+                        if (env == Env.PRODUCTION) PrivateKey else if (env == Env.DEV) PRIVATE_KEY_DEFAULT_DEV else PRIVATE_KEY_DEFAULT_SANDBOX,
                         configColor,
                         LANGUAGES.VN,
                         env,
@@ -296,10 +296,10 @@ class MainActivity : AppCompatActivity() {
                     if (accountStatus == AccountStatus.KYC_OK) {
                         //Tài khoản đã
                     }
-                    payme?.getAccountInfo(onSuccess = {data->
-                                                      println("getAccountInfo"+data)
+                    payme?.getAccountInfo(onSuccess = { data ->
+                        println("getAccountInfo" + data)
 
-                    },onError = { jsonObject, i, s ->
+                    }, onError = { jsonObject, i, s ->
 
                     })
                     loading.visibility = View.GONE
@@ -378,7 +378,7 @@ class MainActivity : AppCompatActivity() {
 
             val amount = convertInt(moneyWithdraw.text.toString())
 
-            payme?.withdraw(amount,false,
+            payme?.withdraw(amount, false,
                 onSuccess = { json: JSONObject? ->
                 },
                 onError = { jsonObject, code, message ->
@@ -397,7 +397,8 @@ class MainActivity : AppCompatActivity() {
 
             val amount = convertInt(moneyPay.text.toString())
 
-            val storeId: Long = if (env == Env.PRODUCTION) 57956431 else if(env == Env.SANDBOX) 46 else 9
+            val storeId: Long =
+                if (env == Env.PRODUCTION) 57956431 else if (env == Env.SANDBOX) 46 else 9
             val infoPayment =
                 InfoPayment(
                     "PAY",
@@ -409,10 +410,10 @@ class MainActivity : AppCompatActivity() {
                     ""
                 )
 
-
-                payme?.pay(this.supportFragmentManager, infoPayment, true, null,
+            payme?.getPaymentMethods({ list ->
+                payme?.pay(this.supportFragmentManager, infoPayment, false, list[1],
                     onSuccess = { json: JSONObject? ->
-                        println("jsononSuccess"+json.toString())
+                        println("jsononSuccess" + json.toString())
                     },
                     onError = { jsonObject, code, message ->
                         println("co loi")
@@ -428,9 +429,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 )
-
-
-
+            }, { jsonObject, i, s -> })
 
 
         }

@@ -71,7 +71,7 @@ class ConfirmOtpFragment : Fragment() {
 
             }
         }
-        timer.start()
+//        timer.start()
         textCountDownTimer.setOnClickListener {
             if(isResend){
                 isResend = false
@@ -105,7 +105,7 @@ class ConfirmOtpFragment : Fragment() {
                     if (statePaymentLinkedResponsed == "REQUIRED_OTP") {
                         val transaction = payment.optString("transaction")
                         Store.paymentInfo.transaction = transaction
-                        timer.start()
+//                        timer.start()
                     } else {
                         EventBus.getDefault()
                             .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.RESULT, message))
@@ -130,21 +130,21 @@ class ConfirmOtpFragment : Fragment() {
         )
     }
 
-      val timer =  object : CountDownTimer(120000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                val time =  (millisUntilFinished / 1000)
-                if(time > 60){
-                    textCountDownTimer.text = "${getString(R.string.resend_otp)} (01:${(time-60).toString()})"
-                }else{
-                    textCountDownTimer.text = "${getString(R.string.resend_otp)} (00:${time.toString()})"
-                }
-            }
-            override fun onFinish() {
-                isResend = true
-                textCountDownTimer.text = getString(R.string.resend_otp)
-                textCountDownTimer.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
-            }
-        }
+//      val timer =  object : CountDownTimer(120000, 1000) {
+//            override fun onTick(millisUntilFinished: Long) {
+//                val time =  (millisUntilFinished / 1000)
+//                if(time > 60){
+//                    textCountDownTimer.text = "${getString(R.string.resend_otp)} (01:${(time-60).toString()})"
+//                }else{
+//                    textCountDownTimer.text = "${getString(R.string.resend_otp)} (00:${time.toString()})"
+//                }
+//            }
+//            override fun onFinish() {
+//                isResend = true
+//                textCountDownTimer.text = getString(R.string.resend_otp)
+//                textCountDownTimer.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
+//            }
+//        }
 
 
     fun showLoading(state: Boolean) {
