@@ -59,7 +59,8 @@ internal class NetworkRequest(
             objectValidateRequest["accessToken"] = token
             objectValidateRequest["x-api-message"] = xAPIMessage
             if(BuildConfig.DEBUG){
-                println("REQUEST" + params)
+                println("REQUEST_params" + params)
+                println("REQUEST_token" + token)
             }
 
             var valueParams = ""

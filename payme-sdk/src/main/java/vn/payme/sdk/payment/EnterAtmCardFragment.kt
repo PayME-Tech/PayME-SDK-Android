@@ -146,6 +146,7 @@ class EnterAtmCardFragment : Fragment() {
                     containerInputCardHolder.visibility = View.GONE
                     textNoteInputCardDate.visibility = View.GONE
                 }
+                var maxLength = 16
 
 
                 if (cardNumber?.length!! >= 6) {
@@ -158,7 +159,7 @@ class EnterAtmCardFragment : Fragment() {
                         if (cardPrefix == cardPrefixBank) {
                             bankSelected = listBanks[i]
                             cardNumberLength = listBanks[i].cardNumberLength
-                            val maxLength = cardNumberLength + 3
+                            maxLength = cardNumberLength + 3
                             val filters = arrayOfNulls<InputFilter>(1)
                             filters[0] = LengthFilter(maxLength)
                             textInputCardNumber.filters = filters
@@ -205,7 +206,8 @@ class EnterAtmCardFragment : Fragment() {
                     val cursorPosition: Int = textInputCardNumber.getSelectionStart()
                     val newCursorPosition = cursorPosition + (cardNew.length - s.length)
                     textInputCardNumber.setText(cardNew)
-                    textInputCardNumber.setSelection(newCursorPosition)
+                    val check = if(newCursorPosition>maxLength) maxLength else newCursorPosition
+                    textInputCardNumber.setSelection(check)
                     textInputCardNumber.addTextChangedListener(this)
 
                 } else {
@@ -233,7 +235,8 @@ class EnterAtmCardFragment : Fragment() {
 
         textInputCardDate.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                val date = s?.replace("[^0-9]".toRegex(), "")
+                val number = s?.replace("[^0-9]".toRegex(), "")
+                val date = number?.substring(0,if(number.length<4)number.length else 4)
                 var newDate = ""
                 for (i in 0 until date?.length!!) {
                     if ((i == 1) && (i + 1 < date.length)) {
@@ -246,7 +249,7 @@ class EnterAtmCardFragment : Fragment() {
                 val cursorPosition: Int = textInputCardDate.getSelectionStart()
                 val newCursorPosition = cursorPosition + (newDate.length - s.length)
                 textInputCardDate.setText(newDate)
-                textInputCardDate.setSelection(newCursorPosition)
+                textInputCardDate.setSelection(if(newCursorPosition>5) 5 else newCursorPosition)
                 textInputCardDate.addTextChangedListener(this)
                 if (newDate.length == 5) {
                     val month = Integer.parseInt(newDate.substring(0, 2))

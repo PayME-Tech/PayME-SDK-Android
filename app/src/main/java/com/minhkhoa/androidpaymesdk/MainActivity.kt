@@ -410,8 +410,8 @@ class MainActivity : AppCompatActivity() {
                     ""
                 )
 
-            payme?.getPaymentMethods({ list ->
-                payme?.pay(this.supportFragmentManager, infoPayment, false, list[1],
+//            payme?.getPaymentMethods({ list ->
+                payme?.pay(this.supportFragmentManager, infoPayment, true,null,
                     onSuccess = { json: JSONObject? ->
                         println("jsononSuccess" + json.toString())
                     },
@@ -429,7 +429,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 )
-            }, { jsonObject, i, s -> })
+//            }, { jsonObject, i, s -> })
 
 
         }
