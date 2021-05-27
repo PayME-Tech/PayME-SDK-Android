@@ -7,6 +7,14 @@
         <attr name="pbTextColor" format="color|reference"/>
         <attr name="pbProgressColor" format="color|reference"/>
     </declare-styleable>
+    <declare-styleable name="Input">
+        <attr name="pbTitle" format="string"/>
+        <attr name="pbTitleRight" format="string"/>
+        <attr name="pbInputType" format="string"/>
+        <attr name="pbDigits" format="string"/>
+        <attr name="pbHint" format="string"/>
+        <attr name="pbMaxlength" format="integer"/>
+    </declare-styleable>
     <declare-styleable name="CameraKitView">
         <attr name="android_adjustViewBounds" format="boolean" />
         <attr name="camera_aspectRatio" format="float" />

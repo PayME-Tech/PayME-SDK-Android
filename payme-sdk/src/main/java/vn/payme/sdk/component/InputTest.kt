@@ -1,0 +1,137 @@
+package vn.payme.sdk.component
+
+import android.content.Context
+import android.graphics.drawable.GradientDrawable
+import android.text.InputFilter
+import android.text.InputType
+import android.text.method.DigitsKeyListener
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import vn.payme.sdk.PayME
+import vn.payme.sdk.R
+import vn.payme.sdk.hepper.Keyboard
+import vn.payme.sdk.model.Info
+import vn.payme.sdk.store.Store
+
+
+class InputTest : RelativeLayout {
+
+    lateinit  var txtTitle : TextView
+    lateinit  var txtTitleRight : TextView
+    lateinit  var input : EditText
+    lateinit  var containerInput : ConstraintLayout
+    var titleDefault  = ""
+    val backgroundError = GradientDrawable()
+    var isError = false
+    var isFocus = false
+
+    fun setError(message:String){
+        isError = true
+        containerInput.background = backgroundError
+        txtTitle.text = message
+        txtTitle.setTextColor(ContextCompat.getColor(context,R.color.red))
+    }
+    fun setDefault(){
+        isError = false
+        txtTitle.text = titleDefault
+        txtTitle.setTextColor(ContextCompat.getColor(context,R.color.nb40))
+        if (isFocus){
+            containerInput.background = Store.config.colorApp.backgroundColorRadiusBorder
+        }else{
+            containerInput.background = ContextCompat.getDrawable(PayME.context, R.drawable.background_gray_radius)
+
+        }
+    }
+    private fun setColorFocus(){
+        isFocus = true
+        if(isError){
+            containerInput.background = backgroundError
+        }else{
+            containerInput.background = Store.config.colorApp.backgroundColorRadiusBorder
+        }
+        input.background = ContextCompat.getDrawable(PayME.context, R.drawable.background_radius)
+    }
+    private fun setColorDefault(){
+        isFocus = false
+        containerInput.background = ContextCompat.getDrawable(PayME.context, R.drawable.background_gray_radius)
+        input.background = ContextCompat.getDrawable(PayME.context, R.drawable.background_gray_radius)
+    }
+
+    constructor(context: Context) : super(context) {
+        init(context, null)
+    }
+
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+        init(context, attrs)
+    }
+
+
+
+
+    private fun init(context: Context,attrs: AttributeSet?) {
+        LayoutInflater.from(getContext()).inflate(R.layout.input, this, true)
+
+        txtTitle = findViewById<View>(R.id.title) as TextView
+        txtTitleRight = findViewById<View>(R.id.titleRight) as TextView
+        input = findViewById<View>(R.id.input) as EditText
+        containerInput = findViewById<View>(R.id.containerInput) as ConstraintLayout
+        backgroundError.setStroke(2, ContextCompat.getColor(context,R.color.red))
+        backgroundError.cornerRadius = 30f
+
+        containerInput.setOnClickListener {
+            input.requestFocus()
+            Keyboard.showKeyboard(context)
+        }
+        input.setOnFocusChangeListener(OnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus) {
+               setColorDefault()
+            }else{
+                setColorFocus()
+            }
+        })
+
+
+        if (attrs != null) {
+            val a = context.theme.obtainStyledAttributes(
+                attrs,
+                R.styleable.Input,
+                0, 0
+            )
+            try {
+
+                val title = a.getString(R.styleable.Input_pbTitle)
+                titleDefault = title.toString()
+                val hint = a.getString(R.styleable.Input_pbHint)
+                val digits = a.getString(R.styleable.Input_pbDigits)
+                val inputType = a.getString(R.styleable.Input_pbInputType)
+                val maxlength = a.getInteger(R.styleable.Input_pbMaxlength,0)
+                txtTitle.text = title
+                input.hint = hint
+                input.filters = arrayOf(InputFilter.LengthFilter(maxlength),InputFilter.AllCaps())
+                if(digits!=null){
+                    input.keyListener =  DigitsKeyListener.getInstance(digits)
+                }
+                if (inputType=="number"){
+                    input.inputType  = InputType.TYPE_CLASS_NUMBER
+                }
+                if (inputType=="textFilter"){
+                    input.setRawInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME)
+                }
+
+            } finally {
+                a.recycle()
+            }
+        } else {
+
+        }
+    }
+
+
+
+
+}

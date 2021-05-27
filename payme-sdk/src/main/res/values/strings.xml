@@ -7,6 +7,8 @@
     <string name="enter_number_card">Nhập số thẻ</string>
     <string name="enter_the_number_card_on_the_front_of_the_card">Nhập thẻ số ở mặt trước thẻ</string>
     <string name="release_date_mm_yy">Ngày phát hành</string>
+    <string name="release_date_error">Ngày phát hành không đúng định dạng</string>
+    <string name="number_card_error">Số thẻ không đúng định dạng</string>
     <string name="please_check_the_correct_name_printed_on_the_card">Vui lòng kiểm tra đúng tên in trên thẻ</string>
     <string name="enter_the_cardholder_full_name">Nhập họ tên chủ thẻ</string>
     <string name="done">Hoàn tất</string>

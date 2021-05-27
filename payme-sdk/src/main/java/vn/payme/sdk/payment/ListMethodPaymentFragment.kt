@@ -73,7 +73,7 @@ class ListMethodPaymentFragment : Fragment() {
         this.showLoading()
 
 
-        paymentApi.getTransferMethods(onSuccess = { jsonObject ->
+        paymentApi.getTransferMethods(Store.paymentInfo.infoPayment!!.storeId,onSuccess = { jsonObject ->
             disableLoading()
 
             val Utility = jsonObject.optJSONObject("Utility")

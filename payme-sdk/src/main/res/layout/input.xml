@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:background="@drawable/background_gray_radius"
+    android:layout_height="wrap_content"
+    android:id="@+id/containerInput"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp"
+    >
+            <TextView
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="wrap_content"
+                android:textColor="@color/nb40"
+                android:textAllCaps="true"
+                android:id="@+id/title"
+                android:fontFamily="@font/barlow_regular"
+                android:textSize="12dp"
+                android:text="@string/enter_number_card"
+                android:layout_height="wrap_content"/>
+            <TextView
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="wrap_content"
+                android:textColor="@color/blackSeven"
+                android:textAllCaps="true"
+                android:id="@+id/titleRight"
+                android:fontFamily="@font/barlow_regular"
+                android:textSize="12dp"
+                android:text=""
+                android:layout_height="wrap_content"/>
+            <EditText
+                app:layout_constraintTop_toBottomOf="@id/title"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:id="@+id/input"
+                android:layout_width="match_parent"
+                android:textColor="@color/blackSeven"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/barlow_medium"
+                android:background="@color/paleGrey"
+                android:textSize="16dp"
+                />
+</androidx.constraintlayout.widget.ConstraintLayout>
+</merge>

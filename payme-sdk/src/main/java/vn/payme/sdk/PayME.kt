@@ -1,16 +1,9 @@
 package vn.payme.sdk
 
+import android.content.ClipDescription
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.Typeface
-import android.os.Build
-import android.os.Handler
-import android.util.Base64
 import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.core.provider.FontRequest
-import androidx.core.provider.FontsContractCompat
 import androidx.fragment.app.FragmentManager
 import es.dmoral.toasty.Toasty
 import org.greenrobot.eventbus.EventBus
@@ -19,17 +12,13 @@ import org.spongycastle.jce.provider.BouncyCastleProvider
 import vn.payme.sdk.api.AccountApi
 import vn.payme.sdk.api.ENV_API
 import vn.payme.sdk.api.PaymentApi
-import vn.payme.sdk.api.QueryBuilder
 import vn.payme.sdk.enums.*
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.*
 import vn.payme.sdk.payment.PaymePayment
 import vn.payme.sdk.store.Config
-import vn.payme.sdk.store.PaymentInfo
 import vn.payme.sdk.store.Store
-import vn.payme.sdk.store.UserInfo
-import java.nio.charset.StandardCharsets
 import java.security.Security
 import java.text.DecimalFormat
 
@@ -80,7 +69,7 @@ public class PayME(
     }
 
     public fun onForgotPassword() {
-        openWalletActivity(Action.FORGOT_PASSWORD, 0, null, null, null, onSuccess, onError)
+        openWalletActivity(Action.FORGOT_PASSWORD, 0, "", null, null, onSuccess, onError)
     }
 
     public fun login(
@@ -117,13 +106,15 @@ public class PayME(
                     Store.paymentInfo.listService = arrayListOf()
                     val listService = value.optJSONArray("listService")
                     for (i in 0 until listService.length()) {
-                        val json = listService.getJSONObject(i)
-                        val code = json.optString("code")
-                        val description = json.optString("description")
-                        val disable = json.optBoolean("disable")
-                        val enable = json.optBoolean("enable")
-                        if (enable == true && disable == false) {
-                            Store.paymentInfo.listService!!.add(Service(code, description))
+                        val json = listService.optJSONObject(i)
+                        if(json!==null){
+                            val code = json.optString("code")
+                            val description = json.optString("description")
+                            val disable = json.optBoolean("disable")
+                            val enable = json.optBoolean("enable")
+                            if (enable == true && disable == false) {
+                                Store.paymentInfo.listService!!.add(Service(code, description))
+                            }
                         }
                     }
                 }
@@ -188,14 +179,14 @@ public class PayME(
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
         Store.config.closeWhenDone = false
-        openWalletActivity(Action.OPEN, 0, null, null, null, onSuccess, onError)
+        openWalletActivity(Action.OPEN, 0, "", null, null, onSuccess, onError)
 
     }
 
     private fun openWalletActivity(
         action: Action,
         amount: Int?,
-        content: String?,
+        content: String,
         extraData: String?,
         service: Service?,
         onSuccess: (JSONObject?) -> Unit,
@@ -240,6 +231,37 @@ public class PayME(
                 Action.DEPOSIT,
                 amount,
                 "",
+                "",
+                null,
+                onSuccess,
+                onError
+            )
+        }
+    }
+    public fun transfer(
+        amount: Int,
+        description: String,
+        closeTransferResult: Boolean,
+        onSuccess: (JSONObject?) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+
+        Store.config.closeWhenDone = closeTransferResult
+
+        if (amount != null) {
+            Store.paymentInfo.amount = amount
+        } else {
+            Store.paymentInfo.amount = 0
+        }
+        if (!Store.userInfo.accountActive) {
+            onError(null, ERROR_CODE.ACCOUNT_NOT_ACTIVETES, "Tài khoản chưa kích hoạt")
+        } else if (!Store.userInfo.accountKycSuccess) {
+            onError(null, ERROR_CODE.ACCOUNT_NOT_KYC, "Tài khoản chưa định danh")
+        } else {
+            this.openWalletActivity(
+                Action.TRANSFER,
+                amount,
+                description,
                 "",
                 null,
                 onSuccess,
@@ -428,12 +450,12 @@ public class PayME(
             Store.config.handShake = handShake
             if (Store.userInfo.accountActive) {
                 if (Store.userInfo.accountKycSuccess) {
-                    onSuccess(AccountStatus.KYC_OK)
+                    onSuccess(AccountStatus.APPROVE)
                 } else {
                     onSuccess(AccountStatus.NOT_KYC)
                 }
             } else {
-                onSuccess(AccountStatus.NOT_ACTIVED)
+                onSuccess(AccountStatus.NOT_ACTIVATED)
             }
         }, onError = { jsonObject, code, message ->
             onError(jsonObject, code, message)
@@ -449,12 +471,14 @@ public class PayME(
     }
 
     public fun getPaymentMethods(
+        storeId:Long,
         onSuccess: (ArrayList<Method>) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
         val paymentApi = PaymentApi()
         val listMethod: ArrayList<Method> = ArrayList<Method>()
         paymentApi.getTransferMethods(
+            storeId,
             onSuccess = { jsonObject ->
                 val Utility = jsonObject.optJSONObject("Utility")
                 val GetPaymentMethod = Utility.optJSONObject("GetPaymentMethod")

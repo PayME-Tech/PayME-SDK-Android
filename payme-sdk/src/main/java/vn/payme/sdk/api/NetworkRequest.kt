@@ -116,11 +116,12 @@ internal class NetworkRequest(
                                 println("RESPONSE" + finalJSONObject)
                             }
                         } else {
-                            finalJSONObject = JSONObject(response.toString())
                             if (BuildConfig.DEBUG) {
                                 println("RESPONSE  " + response.toString() + "params" + params)
                             }
-
+                            var dataRaw = ConvertJSON().toString(response.toString())
+                            println("dataRaw"+dataRaw)
+                            finalJSONObject = JSONObject(response.toString())
                         }
                         val data = finalJSONObject?.optJSONObject("data")
                         val errors = finalJSONObject?.optJSONArray("errors")
@@ -163,7 +164,6 @@ internal class NetworkRequest(
                     headers["Accept"] = "application/json"
                     headers["Content-Type"] = "application/json"
                     if (isSecurity) {
-                        println("PayME.appID.toString()" + Store.config.appID.toString())
                         headers["x-api-client"] = Store.config.appID.toString()
                         headers["x-api-key"] = xAPIKey
                         headers["x-api-action"] = xAPIAction

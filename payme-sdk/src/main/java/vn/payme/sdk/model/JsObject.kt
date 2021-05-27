@@ -84,7 +84,24 @@ public class JsObject(
             e.printStackTrace()
         }
     }
+    @JavascriptInterface
+    fun onTransfer(string: String){
+        try {
+            val json: JSONObject = JSONObject(string)
+            val data = json.getJSONObject("data")
+            val status = data.getString("status")
+            val message = data.optString("message")
+            if(status=="SUCCEEDED"){
+                PayME.onSuccess(null)
+            }else{
+                PayME.onError(data,ERROR_CODE.OTHER,message)
 
+            }
+            back()
+        }catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
     @JavascriptInterface
     public fun onCommunicate(string: String) {
 //        println("onCommunicate"+string)

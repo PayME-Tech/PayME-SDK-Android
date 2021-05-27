@@ -78,7 +78,7 @@ internal class PaymentApi {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
         val variables: MutableMap<String, Any> = mutableMapOf()
-        val listKey = arrayListOf<String>("limit.param.amount.payment","limit.param.amount.all","service.main.visible")
+        val listKey = arrayListOf<String>("limit.param.amount.payment","limit.param.amount.all","service.main.visible","kyc.mode.enable")
         val query = "query Query(\$configsAppId: String, \$configsKeys: [String]) {\n" +
                 "  Setting {\n" +
                 "    configs(appId: \$configsAppId, keys: \$configsKeys) {\n" +
@@ -130,7 +130,7 @@ internal class PaymentApi {
         )
     }
 
-    fun getSecuriryCode(
+    fun getSecurityCode(
         password: String,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
@@ -262,12 +262,14 @@ internal class PaymentApi {
     }
 
     fun getTransferMethods(
+        storeId:Long,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
         val variables: MutableMap<String, Any> = mutableMapOf()
+        val extraData: MutableMap<String, Any> = mutableMapOf()
         val getPaymentMethodInput: MutableMap<String, Any> = mutableMapOf()
         val query =
             "mutation GetPaymentMethodMutation(\$getPaymentMethodInput: PaymentMethodInput) {\n" +
@@ -296,6 +298,8 @@ internal class PaymentApi {
                     "  }\n" +
                     "}"
         getPaymentMethodInput["serviceType"] = "OPEN_EWALLET_PAYMENT"
+        extraData["storeId"] = storeId
+        getPaymentMethodInput["extraData"] = extraData
         variables["getPaymentMethodInput"] = getPaymentMethodInput
         params["query"] = query
         params["variables"] = variables

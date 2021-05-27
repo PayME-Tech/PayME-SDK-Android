@@ -7,25 +7,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import org.greenrobot.eventbus.EventBus
-import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.PinView
-import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
-import vn.payme.sdk.evenbus.ChangeTypePayment
-import vn.payme.sdk.model.Method
 import vn.payme.sdk.store.Store
 import java.security.MessageDigest
 
@@ -178,7 +173,7 @@ class ConfirmPassFragment : Fragment() {
                     val paymentApi = PaymentApi()
                     val pass: String? = SHA256(text.toString())
                     showLoading()
-                    paymentApi.getSecuriryCode(pass!!,
+                    paymentApi.getSecurityCode(pass!!,
                         onSuccess = { jsonObject ->
                             Keyboard.closeKeyboard(requireContext())
                             val Account = jsonObject.optJSONObject("Account")

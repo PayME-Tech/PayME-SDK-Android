@@ -207,6 +207,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
         var action: String = Store.paymentInfo.action.toString()
         val showLog = if (Store.config.showLog) 1 else 0
+        val description = Store.paymentInfo.content
 
         var data: JSONObject = JSONObject(
             """{
@@ -232,11 +233,11 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                         type:${action},
                         closeWhenDone:${Store.config.closeWhenDone},
                         serviceCode:${Store.paymentInfo.service?.code},
-                        amount:${Store.paymentInfo.amount}
+                        amount:${Store.paymentInfo.amount},
+                        description:'${description}'
                       }
                     }"""
         )
-        println("dataINTTT"+data)
 
         val cryptoAES = CryptoAES()
         val xAPIData = cryptoAES.encrytAESDataWebview("LkaWasflkjfqr2g3", data.toString())

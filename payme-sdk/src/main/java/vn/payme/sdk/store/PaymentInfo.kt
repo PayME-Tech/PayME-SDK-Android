@@ -12,7 +12,7 @@ import vn.payme.sdk.model.*
 class PaymentInfo(
     var action: Action? = null,
     var amount: Int = 0,
-    var content: String? = null,
+    var content: String = "",
     var infoPayment: InfoPayment? = null,
     var methodSelected: Method? = null,
     var extraData : String? = "",

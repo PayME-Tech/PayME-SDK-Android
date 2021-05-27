@@ -21,7 +21,7 @@ class PayME {
         var connectToken: String = ""
         lateinit var action: Action
 
-        var deviceId: String? =  ""
+        var deviceId: String =  ""
 
         var amount: Int = 0
         var description: String? = null

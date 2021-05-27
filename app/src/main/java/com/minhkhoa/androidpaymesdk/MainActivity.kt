@@ -12,14 +12,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import org.json.JSONObject
 import vn.payme.sdk.PayME
-import vn.payme.sdk.api.ENV_API
 import vn.payme.sdk.enums.*
 import vn.payme.sdk.model.*
+import vn.payme.sdk.store.Store
 import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 
@@ -136,6 +135,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var buttonReload: ImageView
     lateinit var buttonDeposit: Button
     lateinit var buttonWithdraw: Button
+    lateinit var buttonTransfer: Button
     lateinit var buttonPay: Button
     lateinit var textView: TextView
     lateinit var inputUserId: EditText
@@ -143,6 +143,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var moneyDeposit: EditText
     lateinit var moneyPay: EditText
     lateinit var moneyWithdraw: EditText
+    lateinit var moneyTransfer: EditText
     lateinit var walletView: LinearLayout
     lateinit var buttonSetting: ImageView
     lateinit var spinnerEnvironment: Spinner
@@ -192,6 +193,7 @@ class MainActivity : AppCompatActivity() {
         buttonSetting = findViewById(R.id.buttonSetting)
         buttonReload = findViewById(R.id.buttonReload)
         buttonDeposit = findViewById(R.id.buttonDeposit)
+        buttonTransfer = findViewById(R.id.buttonTransfer)
         loading = findViewById(R.id.loading)
         buttonWithdraw = findViewById(R.id.buttonWithdraw)
         buttonPay = findViewById(R.id.buttonPay)
@@ -201,6 +203,7 @@ class MainActivity : AppCompatActivity() {
         moneyDeposit = findViewById(R.id.moneyDeposit)
         moneyPay = findViewById(R.id.moneyPay)
         moneyWithdraw = findViewById(R.id.moneyWithdraw)
+        moneyTransfer = findViewById(R.id.moneyTransfer)
         walletView = findViewById(R.id.walletView)
         spinnerEnvironment = findViewById(R.id.enviromentSpiner)
         inputUserId.setText(userId)
@@ -287,13 +290,13 @@ class MainActivity : AppCompatActivity() {
                         showLog
                     )
                 payme?.login(onSuccess = { accountStatus ->
-                    if (accountStatus == AccountStatus.NOT_ACTIVED) {
+                    if (accountStatus == AccountStatus.NOT_ACTIVATED) {
                         //Tài khoản chưa kich hoạt
                     }
                     if (accountStatus == AccountStatus.NOT_KYC) {
                         //Tài khoản chưa định danh
                     }
-                    if (accountStatus == AccountStatus.KYC_OK) {
+                    if (accountStatus == AccountStatus.APPROVE) {
                         //Tài khoản đã
                     }
                     payme?.getAccountInfo(onSuccess = { data ->
@@ -392,6 +395,26 @@ class MainActivity : AppCompatActivity() {
                     }
                 })
         }
+        buttonTransfer.setOnClickListener {
+
+            val amount = convertInt(moneyTransfer.text.toString())
+
+            payme?.transfer(amount, "chuyen tien cho ban nhe",true,
+                onSuccess = { json: JSONObject? ->
+                    println("onSuccesstransfer")
+                },
+                onError = { jsonObject, code, message ->
+                    PayME.showError(message)
+                    if (code == ERROR_CODE.EXPIRED) {
+                        walletView.setVisibility(View.GONE)
+                        payme?.logout()
+                    }
+                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
+                        openWallet()
+                    }
+                })
+        }
+
         buttonPay.setOnClickListener {
             val nextValues = List(10) { Random.nextInt(0, 100000) }
 
@@ -413,10 +436,8 @@ class MainActivity : AppCompatActivity() {
 //            payme?.getPaymentMethods({ list ->
                 payme?.pay(this.supportFragmentManager, infoPayment, true,null,
                     onSuccess = { json: JSONObject? ->
-                        println("jsononSuccess" + json.toString())
                     },
                     onError = { jsonObject, code, message ->
-                        println("co loi")
                         if (message != null && message.length > 0) {
                             PayME.showError(message)
                         }
