@@ -14,7 +14,6 @@ import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.enums.*
 import vn.payme.sdk.model.*
-import vn.payme.sdk.store.Store
 import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -296,7 +295,7 @@ class MainActivity : AppCompatActivity() {
                     if (accountStatus == AccountStatus.NOT_KYC) {
                         //Tài khoản chưa định danh
                     }
-                    if (accountStatus == AccountStatus.APPROVE) {
+                    if (accountStatus == AccountStatus.KYC_APPROVED) {
                         //Tài khoản đã
                     }
                     payme?.getAccountInfo(onSuccess = { data ->

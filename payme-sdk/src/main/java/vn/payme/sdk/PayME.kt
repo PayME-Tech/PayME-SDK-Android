@@ -1,6 +1,5 @@
 package vn.payme.sdk
 
-import android.content.ClipDescription
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
@@ -450,7 +449,7 @@ public class PayME(
             Store.config.handShake = handShake
             if (Store.userInfo.accountActive) {
                 if (Store.userInfo.accountKycSuccess) {
-                    onSuccess(AccountStatus.APPROVE)
+                    onSuccess(AccountStatus.KYC_APPROVED)
                 } else {
                     onSuccess(AccountStatus.NOT_KYC)
                 }
