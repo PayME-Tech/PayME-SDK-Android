@@ -1,5 +1,7 @@
 package vn.payme.sdk.kyc
 
+import android.app.Activity
+import android.app.ActivityManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,11 +13,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
+import vn.payme.sdk.PaymeWaletActivity
 import vn.payme.sdk.R
 import vn.payme.sdk.api.UploadKycApi
-import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.enums.TypeCallBack
+import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.store.Store
+
 
 class UploadKycFragment : Fragment() {
     private var layoutUpload: ConstraintLayout? = null
@@ -29,11 +33,18 @@ class UploadKycFragment : Fragment() {
                 val message = KYC.optString("message")
                 val succeeded = KYC.optBoolean("succeeded")
                 if(succeeded){
-                    loadingUploadKycApi = false
-                    activity?.finish()
-                    var even: EventBus = EventBus.getDefault()
-                    var myEven: MyEven = MyEven(TypeCallBack.onReload, "")
-                    even.post(myEven)
+                    if(PaymeWaletActivity.isVisible){
+                        loadingUploadKycApi = false
+                        var even: EventBus = EventBus.getDefault()
+                        var myEven: MyEven = MyEven(TypeCallBack.onReload, "")
+                        even.post(myEven)
+                        activity?.finish()
+                    }else{
+                        activity?.finish()
+                        val payme = PayME()
+                        payme.openWallet(PayME.onSuccess,PayME.onError)
+                    }
+
                 }else{
                     parentFragmentManager.popBackStack()
                     PayME.showError(message)

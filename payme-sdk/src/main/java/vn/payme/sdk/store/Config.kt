@@ -16,8 +16,8 @@ class Config {
     var appID: Int
     var handShake: String? = ""
     var showLog: Boolean = false
-    var limitPayment: MaxminPayment = MaxminPayment(2000, 100000)
-    var limitAll: MaxminPayment = MaxminPayment(2000, 100000)
+    var limitPayment: MaxminPayment = MaxminPayment(2000, 100000000)
+    var limitAll: MaxminPayment = MaxminPayment(2000, 100000000)
     var clientInfo: ClientInfo? = null
     var clientId : String = ""
     var env: Env? = null
@@ -25,11 +25,14 @@ class Config {
     var colorApp: ColorApp = ColorApp("#08941f", "#0eb92a")
     var openPayAndKyc: Boolean = true
     var language: LANGUAGES = LANGUAGES.VN
-    var kycIdenity: Boolean = false
+    var kycIdentify: Boolean = false
     var kycVideo: Boolean = false
     var kycFace: Boolean = false
     var closeWhenDone: Boolean = false
     var disableCallBackResult: Boolean = false
+    var enlableKycIdentify: Boolean = false
+    var enlableKycVideo: Boolean = false
+    var enlableKycFace: Boolean = false
 
     constructor(
         appPrivateKey: String,
@@ -40,7 +43,6 @@ class Config {
         env: Env? = null,
         configColor: Array<String>,
         language: LANGUAGES = LANGUAGES.VN,
-        clientId:String?
     ) {
 
         this.appPrivateKey = appPrivateKey

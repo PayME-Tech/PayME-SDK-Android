@@ -181,7 +181,7 @@ public class JsObject(
     public fun onKyc(kycVideo: Boolean, kycIdentity: Boolean, kycFace: Boolean) {
 //        println("onKyc")
         Store.config.kycVideo = kycVideo
-        Store.config.kycIdenity = kycIdentity
+        Store.config.kycIdentify = kycIdentity
         Store.config.kycFace = kycFace
         val bundle: Bundle = Bundle()
         bundle.putBoolean("openKycActivity", true)

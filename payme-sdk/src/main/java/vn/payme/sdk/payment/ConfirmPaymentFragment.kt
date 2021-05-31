@@ -33,7 +33,7 @@ class ConfirmPaymentFragment : Fragment() {
     private lateinit var buttonSubmit: Button
     private lateinit var infoTop: InfoPayment
     private lateinit var infoBottom: InfoPayment
-    private  var getFeeSuccess = false
+    private var getFeeSuccess = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,29 +51,28 @@ class ConfirmPaymentFragment : Fragment() {
         buttonClose.setOnClickListener {
             if (!buttonSubmit.isLoadingShowing) {
                 PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
-                EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT,null))
-//                PaymePayment.closePopup(requireContext())
+                EventBus.getDefault()
+                    .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, null))
             }
         }
         buttonBack.setOnClickListener {
             val fragment = parentFragmentManager.beginTransaction()
-            fragment.replace(R.id.frame_container,SelectMethodFragment())
+            fragment.replace(R.id.frame_container, SelectMethodFragment())
             fragment.commit()
         }
-        if (Store.paymentInfo.methodSelected?.type  != TYPE_PAYMENT.BANK_CARD && !Store.paymentInfo.isChangeMethod){
+        if (Store.paymentInfo.methodSelected?.type != TYPE_PAYMENT.BANK_CARD && !Store.paymentInfo.isChangeMethod) {
             buttonBack.visibility = View.GONE
         }
         getFee()
         buttonSubmit.setOnClickListener {
-            if(getFeeSuccess){
-                onPay()
-            }else{
-                getFee()
-            }
+
+            onPay()
         }
+
         return view
     }
-    fun getFee(){
+
+    fun getFee() {
         var listInfoTop = arrayListOf<Info>()
         var listInfoBottom = arrayListOf<Info>()
         val decimal = DecimalFormat("#,###")
@@ -113,62 +112,66 @@ class ConfirmPaymentFragment : Fragment() {
                     false
                 )
             )
-            if (method?.type == TYPE_PAYMENT.BANK_CARD){
-                listInfoBottom.add(Info("Ngân hàng", event.cardInfo?.bankShortName, null, null, false))
-                listInfoBottom.add(Info("Số thẻ ATM", event.cardInfo?.cardNumberView, null, null, false))
-                listInfoBottom.add(Info("Họ tên chủ thẻ", event.cardInfo?.cardHolder, null, null, false))
-                listInfoBottom.add(Info("Ngày phát hành", event.cardInfo?.cardDateView, null, null, false))
+            if (method?.type == TYPE_PAYMENT.BANK_CARD) {
+                listInfoBottom.add(
+                    Info(
+                        "Ngân hàng",
+                        event.cardInfo?.bankShortName,
+                        null,
+                        null,
+                        false
+                    )
+                )
+                listInfoBottom.add(
+                    Info(
+                        "Số thẻ ATM",
+                        event.cardInfo?.cardNumberView,
+                        null,
+                        null,
+                        false
+                    )
+                )
+                listInfoBottom.add(
+                    Info(
+                        "Họ tên chủ thẻ",
+                        event.cardInfo?.cardHolder,
+                        null,
+                        null,
+                        false
+                    )
+                )
+                listInfoBottom.add(
+                    Info(
+                        "Ngày phát hành",
+                        event.cardInfo?.cardDateView,
+                        null,
+                        null,
+                        false
+                    )
+                )
 
             }
         }
-        val paymentApi = PaymentApi()
-        buttonSubmit.enableLoading()
-        paymentApi.getFee(Store.paymentInfo.amount, onSuccess = { jsonObject ->
-            val Utility = jsonObject.getJSONObject("Utility")
-            val GetFee = Utility.getJSONObject("GetFee")
-            val succeeded = GetFee.getBoolean("succeeded")
-            val message = GetFee.getString("message")
-            val decimal = DecimalFormat("#,###")
-            buttonSubmit.disableLoading()
-            if (succeeded) {
-                val feeObject = GetFee.getJSONObject("fee")
-                val fee = feeObject.getInt("fee")
-                val valueFree  = if(fee>0) "${decimal.format(fee)} đ" else "Miễn phí"
-                    listInfoBottom.add(Info("Phí", valueFree, null, null, false))
-                listInfoBottom.add(
-                    Info(
-                        "Tổng thanh toán", "${
-                            decimal.format(
-                                Store.paymentInfo.infoPayment?.amount?.plus(
-                                    fee
-                                )
-                            )
-                        } đ", null, resources.getColor(R.color.red), true
+        val fee = event.fee
+        val valueFree = if (fee > 0) "${decimal.format(fee)} đ" else "Miễn phí"
+        listInfoBottom.add(Info("Phí", valueFree, null, null, false))
+        listInfoBottom.add(
+            Info(
+                "Tổng thanh toán", "${
+                    decimal.format(
+                        Store.paymentInfo.infoPayment?.amount?.plus(
+                            fee
+                        )
                     )
-                )
-                infoTop.updateData(listInfoTop)
-                infoBottom.updateData(listInfoBottom)
-                EventBus.getDefault().postSticky(PaymentInfoEvent(listInfoTop,listInfoBottom,event?.cardInfo,fee))
-                getFeeSuccess = true
-                buttonSubmit.setText("Xác nhận")
-            } else {
-                buttonSubmit.setText("Thử lại")
-                PayME.showError(message)
-            }
-        }, onError = { jsonObject: JSONObject?, code: Int?, message: String ->
-
-            if (code == ERROR_CODE.EXPIRED) {
-                PayME.onExpired()
-                PayME.onError(jsonObject, code, message)
-            } else {
-                buttonSubmit.disableLoading()
-                buttonSubmit.setText("Thử lại")
-                PayME.showError(message)
-                buttonSubmit.disableLoading()
-            }
-        })
-
+                } đ", null, resources.getColor(R.color.red), true
+            )
+        )
+        infoTop.updateData(listInfoTop)
+        infoBottom.updateData(listInfoBottom)
+        EventBus.getDefault().postSticky(PaymentInfoEvent(listInfoTop, listInfoBottom, event.cardInfo, fee))
     }
+
+
 
     private fun onPay() {
         val paymentApi = PaymentApi()

@@ -66,6 +66,51 @@ class ListMethodPaymentFragment : Fragment() {
             }
         })
     }
+    private fun checkFee() {
+        val paymentApi = PaymentApi()
+        val method = Store.paymentInfo.methodSelected
+        val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
+        showLoading()
+        paymentApi.getFee(
+            Store.paymentInfo.infoPayment!!.amount,
+            Store.paymentInfo.methodSelected!!,
+            if (method?.type == TYPE_PAYMENT.BANK_CARD) event.cardInfo else null,
+            onSuccess = { jsonObject ->
+                disableLoading()
+                val Utility = jsonObject.getJSONObject("Utility")
+                val GetFee = Utility.getJSONObject("GetFee")
+                val succeeded = GetFee.getBoolean("succeeded")
+                val message = GetFee.getString("message")
+                if (succeeded) {
+                    val feeObject = GetFee.getJSONObject("fee")
+                    val fee = feeObject.getInt("fee")
+                    val state = GetFee.getString("state")
+                    if (state == "null") {
+                        EventBus.getDefault().postSticky(PaymentInfoEvent(null,null,null,fee))
+                        EventBus.getDefault().post(
+                            ChangeFragmentPayment(
+                                TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,
+                                null
+                            )
+                        )
+                    } else {
+                        PayME.showError(message)
+                    }
+
+
+                } else {
+                    PayME.showError(message)
+                }
+            },
+            onError = { jsonObject: JSONObject?, code: Int?, message: String ->
+                disableLoading()
+                if (code == ERROR_CODE.EXPIRED) {
+                    PayME.onExpired()
+                } else {
+                    PayME.showError(message)
+                }
+            })
+    }
 
 
     private fun getListMethod() {
@@ -187,42 +232,57 @@ class ListMethodPaymentFragment : Fragment() {
             if (loadingProcess.visibility != View.VISIBLE) {
 
                 val method = this.listMethod[i]
-                if ((method.type == TYPE_PAYMENT.WALLET) ||  (method.type == TYPE_PAYMENT.BANK_CARD) || (method.type == TYPE_PAYMENT.LINKED)) {
-                    Store.paymentInfo.methodSelected = method!!
-                    if ((method?.type == TYPE_PAYMENT.WALLET)) {
-                        println("VAO DAY NHE")
-                        EventBus.getDefault().post(
-                            ChangeFragmentPayment(
-                                TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,
-                                null
-                            )
-                        )
-                    } else {
-                        if (!Store.config.openPayAndKyc) {
-                            PayME.showError("Chức năng chỉ có thể thao tác môi trường production")
-                        } else if (method.type == TYPE_PAYMENT.BANK_CARD) {
-                            val fragment = fragmentManager?.beginTransaction()
-                            val enterAtmCardFragment = EnterAtmCardFragment()
-                            val bundle = Bundle()
-                            bundle.putBoolean("showChangeMethod", true)
-                            enterAtmCardFragment.arguments = bundle
-                            fragment?.replace(
-                                R.id.frame_container_select_method,
-                                enterAtmCardFragment
-                            )
-                            fragment?.commit()
-                        } else {
-                            EventBus.getDefault().post(
-                                ChangeFragmentPayment(
-                                    TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,
-                                    null
-                                )
-                            )
-                        }
-                    }
-                } else {
-                    PayME.showError("Phương thức chưa được hỗ trợ")
+                Store.paymentInfo.methodSelected = method
+                if(method.type!=TYPE_PAYMENT.WALLET && !Store.config.openPayAndKyc){
+                    PayME.showError("Chức năng chỉ có thể thao tác môi trường production")
+                    return@setOnItemClickListener
                 }
+                if(method.type == TYPE_PAYMENT.BANK_CARD){
+                    val fragment = fragmentManager?.beginTransaction()
+                    val enterAtmCardFragment = EnterAtmCardFragment()
+                    val bundle = Bundle()
+                    bundle.putBoolean("showChangeMethod", true)
+                    enterAtmCardFragment.arguments = bundle
+                    fragment?.replace(
+                        R.id.frame_container_select_method,
+                        enterAtmCardFragment
+                    )
+                    fragment?.commit()
+                    return@setOnItemClickListener
+
+                }
+                if(method?.type == TYPE_PAYMENT.WALLET){
+                    if (
+                        ( !Store.userInfo.accountActive || !Store.userInfo.accountKycSuccess ||Store.paymentInfo.infoPayment!!.amount > Store.userInfo.balance)
+                    ){
+                        val paymeSDK = PayME()
+                        if (!Store.userInfo.accountActive) {
+                            paymeSDK.openWallet(PayME.onSuccess, PayME.onError)
+                        } else if (!Store.userInfo.accountKycSuccess) {
+                            paymeSDK.openKYC(PayME.fragmentManager,onSuccess = {},onError = { jsonObject: JSONObject?, i: Int?, message: String ->
+                                PayME.showError(message)
+                            })
+                        } else if (Store.paymentInfo.infoPayment!!.amount > Store.userInfo.balance) {
+                            paymeSDK.deposit(0, false,PayME.onSuccess, PayME.onError)
+                        }
+                        EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT,null))
+
+                    }else{
+                        checkFee()
+                    }
+                    return@setOnItemClickListener
+
+                }
+                if(method?.type == TYPE_PAYMENT.LINKED){
+                    checkFee()
+                    return@setOnItemClickListener
+
+                }
+                PayME.showError("Phương thức chưa được hỗ trợ")
+
+
+
+
 
             }
         }

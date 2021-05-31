@@ -106,27 +106,6 @@ class MethodAdapter(
             val button = rowView.findViewById(R.id.button) as ConstraintLayout
             button.background = Store.config.colorApp.backgroundColorRadiusBorder
             txtButton.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
-            button.setOnClickListener {
-                val paymeSDK = PayME(
-                    PayME.context,
-                    Store.config.appToken,
-                    Store.config.publicKey,
-                    Store.config.connectToken,
-                    Store.config.appPrivateKey,
-                    Store.config.configColor!!,
-                    Store.config.language,
-                    Store.config.env!!,
-                    Store.config.showLog
-                )
-                if (!Store.userInfo.accountActive) {
-                    paymeSDK.openWallet(PayME.onSuccess, PayME.onError)
-                } else if (!Store.userInfo.accountKycSuccess) {
-                    paymeSDK.openWallet(PayME.onSuccess, PayME.onError)
-                } else if (Store.paymentInfo.infoPayment!!.amount > Store.userInfo.balance) {
-                    paymeSDK.deposit(0, false,PayME.onSuccess, PayME.onError)
-                }
-                EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT,null))
-            }
             if (!Store.userInfo.accountActive) {
                 txtButton.setText(R.string.active_now)
                 txtDescription.setText(R.string.description_active_now)

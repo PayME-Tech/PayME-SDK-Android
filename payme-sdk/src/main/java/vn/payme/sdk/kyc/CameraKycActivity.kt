@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
-import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.store.Store
 
@@ -28,7 +27,7 @@ class CameraKycActivity : AppCompatActivity(R.layout.camera_kyc_activity) {
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         getWindow().setBackgroundDrawable(Store.config.colorApp.backgroundColor);
         if (savedInstanceState == null) {
-                if (Store.config.kycIdenity) {
+                if (Store.config.kycIdentify) {
                     supportFragmentManager.commit {
                         setReorderingAllowed(true)
                         add<TakePictureIdentifyFragment>(R.id.content_kyc)

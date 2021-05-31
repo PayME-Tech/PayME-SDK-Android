@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import org.greenrobot.eventbus.EventBus
+import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
@@ -21,8 +22,10 @@ import vn.payme.sdk.component.InputTest
 import vn.payme.sdk.model.BankInfo
 import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
+import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.evenbus.PaymentInfoEvent
+import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.model.CardInfo
 import vn.payme.sdk.store.Store
 import java.util.*
@@ -42,6 +45,61 @@ class EnterAtmCardFragment : Fragment() {
     private var cardHolder: String = ""
     private var cardDate: String = ""
     private var cardNumberValue: String = ""
+    private fun checkFee() {
+        Keyboard.closeKeyboard(requireContext())
+        val paymentApi = PaymentApi()
+        val method = Store.paymentInfo.methodSelected
+        val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
+        buttonSubmit.enableLoading()
+        val cardInfo = CardInfo(
+            inputCardDate.input.text.toString(),
+            inputCardNumber.input.text.toString(),
+            bankSelected?.shortName!!,
+            cardNumberValue,
+            cardHolder,
+            cardDate
+        )
+        paymentApi.getFee(
+            Store.paymentInfo.infoPayment!!.amount,
+            Store.paymentInfo.methodSelected!!,
+            cardInfo,
+            onSuccess = { jsonObject ->
+                buttonSubmit.disableLoading()
+                val Utility = jsonObject.getJSONObject("Utility")
+                val GetFee = Utility.getJSONObject("GetFee")
+                val succeeded = GetFee.getBoolean("succeeded")
+                val message = GetFee.getString("message")
+                if (succeeded) {
+                    val feeObject = GetFee.getJSONObject("fee")
+                    val fee = feeObject.getInt("fee")
+                    val state = GetFee.optString("state")
+                    if (state == "null") {
+                        EventBus.getDefault().postSticky(PaymentInfoEvent(null, null, cardInfo, fee))
+                        EventBus.getDefault().post(
+                            ChangeFragmentPayment(
+                                TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,
+                                null
+                            )
+                        )
+
+                    } else {
+                        PayME.showError(message)
+                    }
+
+
+                } else {
+                    PayME.showError(message)
+                }
+            },
+            onError = { jsonObject: JSONObject?, code: Int?, message: String ->
+                buttonSubmit.disableLoading()
+                if (code == ERROR_CODE.EXPIRED) {
+                    PayME.onExpired()
+                } else {
+                    PayME.showError(message)
+                }
+            })
+    }
 
 
     fun detechCardHoder(cardNumber: String) {
@@ -168,7 +226,7 @@ class EnterAtmCardFragment : Fragment() {
                     val cursorPosition: Int = inputCardNumber.input.getSelectionStart()
                     val newCursorPosition = cursorPosition + (cardNew.length - s.length)
                     inputCardNumber.input.setText(cardNew)
-                    val check = if(newCursorPosition>maxLength) maxLength else newCursorPosition
+                    val check = if (newCursorPosition > maxLength) maxLength else newCursorPosition
                     inputCardNumber.input.setSelection(check)
                     inputCardNumber.input.addTextChangedListener(this)
 
@@ -198,7 +256,7 @@ class EnterAtmCardFragment : Fragment() {
         inputCardDate.input.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val number = s?.replace("[^0-9]".toRegex(), "")
-                val date = number?.substring(0,if(number.length<4)number.length else 4)
+                val date = number?.substring(0, if (number.length < 4) number.length else 4)
                 var newDate = ""
                 for (i in 0 until date?.length!!) {
                     if ((i == 1) && (i + 1 < date.length)) {
@@ -211,7 +269,7 @@ class EnterAtmCardFragment : Fragment() {
                 val cursorPosition: Int = inputCardDate.input.getSelectionStart()
                 val newCursorPosition = cursorPosition + (newDate.length - s.length)
                 inputCardDate.input.setText(newDate)
-                inputCardDate.input.setSelection(if(newCursorPosition>5) 5 else newCursorPosition)
+                inputCardDate.input.setSelection(if (newCursorPosition > 5) 5 else newCursorPosition)
                 inputCardDate.input.addTextChangedListener(this)
                 if (newDate.length == 5) {
                     val month = Integer.parseInt(newDate.substring(0, 2))
@@ -248,21 +306,13 @@ class EnterAtmCardFragment : Fragment() {
 
         buttonChangeMethod.background = Store.config.colorApp.backgroundColorRadiusBorder
         textChangeMethod.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
-        if(!Store.paymentInfo.isChangeMethod){
+        if (!Store.paymentInfo.isChangeMethod) {
             buttonChangeMethod.visibility = View.GONE
         }
         buttonSubmit.setOnClickListener {
             if (!buttonSubmit.isLoadingShowing && cardDate.length > 0 && cardHolder.length > 0 && cardNumberValue.length > 0) {
-                val cardInfo = CardInfo(
-                    inputCardDate.input.text.toString(),
-                    inputCardNumber.input.text.toString(),
-                    bankSelected?.shortName!!,
-                    cardNumberValue,
-                    cardHolder,
-                    cardDate
-                )
-                EventBus.getDefault().postSticky(PaymentInfoEvent(null,null,cardInfo,0))
-                EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,null))
+
+                checkFee()
             }
         }
         val paymentApi = PaymentApi()

@@ -17,6 +17,7 @@ import vn.payme.sdk.model.*
 class UserInfo(
     var balance: Int,
     var accountKycSuccess: Boolean,
+    var accountLoginSuccess: Boolean,
     var accountActive: Boolean,
     var accessToken: String = "",
     var dataInit: JSONObject? = null,

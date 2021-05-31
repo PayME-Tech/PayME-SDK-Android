@@ -48,8 +48,10 @@ internal class PaymeWaletActivity : AppCompatActivity() {
     private var checkTimeoutLoadWebView = false
     private val REQUEST_CODE_TAKE_PICKTURE = 321
 
+
     companion object {
         var image: String = ""
+        var isVisible  = false
     }
 
     private fun backScreen(): Unit {
@@ -81,8 +83,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-
+        isVisible  = true
         super.onCreate(savedInstanceState)
         EventBus.getDefault().register(this)
         cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
@@ -291,17 +292,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                             type,
                             Store.paymentInfo.extraData
                         )
-                    val paymeSDK = PayME(
-                        PayME.context,
-                        Store.config.appToken,
-                        Store.config.publicKey,
-                        Store.config.connectToken,
-                        Store.config.appPrivateKey,
-                        Store.config.configColor!!,
-                        Store.config.language,
-                        Store.config.env!!,
-                        Store.config.showLog
-                    )
+                    val paymeSDK = PayME()
                     paymeSDK.payInSDK(
                         this.supportFragmentManager,
                         infoPayment,
@@ -317,8 +308,8 @@ internal class PaymeWaletActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        isVisible = false
         EventBus.getDefault().unregister(this);
-
         super.onDestroy()
 
 

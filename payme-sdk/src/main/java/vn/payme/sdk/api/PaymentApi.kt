@@ -3,6 +3,7 @@ package vn.payme.sdk.api
 import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.enums.TYPE_PAYMENT
+import vn.payme.sdk.model.CardInfo
 import vn.payme.sdk.model.Method
 import vn.payme.sdk.store.Store
 
@@ -36,11 +37,14 @@ internal class PaymentApi {
     }
     fun getFee(
         amount:Int,
+        method:Method,
+        cardInfo:CardInfo?,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
+        val payment: MutableMap<String, Any> = mutableMapOf()
         val variables: MutableMap<String, Any> = mutableMapOf()
         val getFeeInput: MutableMap<String, Any> = mutableMapOf()
         val query = "mutation GetFeeMutation(\$getFeeInput: GetFeeInput) {\n" +
@@ -52,6 +56,7 @@ internal class PaymentApi {
                 "        }\n" +
                 "      }\n" +
                 "      message\n" +
+                "      state\n" +
                 "      succeeded\n" +
                 "    }\n" +
                 "  }\n" +
@@ -62,6 +67,23 @@ internal class PaymentApi {
         getFeeInput["serviceType"] = "OPEN_EWALLET_PAYMENT"
         getFeeInput["amount"] = amount
         variables["getFeeInput"] = getFeeInput
+        if (method.type == TYPE_PAYMENT.WALLET) {
+            val wallet: MutableMap<String, Any> = mutableMapOf()
+            wallet["active"] = true
+            payment["wallet"] = wallet
+        } else if (method.type == TYPE_PAYMENT.BANK_CARD) {
+            val bankCard: MutableMap<String, Any> = mutableMapOf()
+            bankCard["cardNumber"] = cardInfo?.cardNumber!!
+            bankCard["cardHolder"] = cardInfo?.cardHolder!!
+            bankCard["issuedAt"] = cardInfo?.cardDate!!
+            payment["bankCard"] = bankCard
+        } else if (method.type == TYPE_PAYMENT.LINKED) {
+            val linked: MutableMap<String, Any> = mutableMapOf()
+            linked["linkedId"] = method.data?.linkedId!!.toBigInteger().toDouble()
+            linked["envName"] = "MobileApp"
+            payment["linked"] = linked
+        }
+        getFeeInput["payment"] = payment
         val accessToken = if(Store.userInfo.accountKycSuccess)   Store.userInfo.accessToken!! else ""
 
         val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path,accessToken, params,ENV_API.IS_SECURITY)
@@ -247,6 +269,7 @@ internal class PaymentApi {
             payment["linked"] = linked
         }
         payInput["payment"] = payment
+
         if(transaction!=null){
             payInput["transaction"] = transaction
         }

@@ -30,21 +30,21 @@ val APP_PHONE = "APP_PHONE"
 val APP_USER_ID = "APP_USER_ID"
 
 val APP_TOKEN_DEFAULT_SANDBOX =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTgsImlhdCI6MTYxNjc0NDc5OX0.G3YOOap-NwYstxiRRyFOuhcKFaOlRhzf2VDgIv1WG1M"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTQsImlhdCI6MTYxNDE2NDI3MH0.MmzNL81YTx8XyTu6SczAqZtnCA_ALsn9GHsJGBKJSIk"
 val PUBLIC_KEY_DEFAULT_SANDBOX = "-----BEGIN PUBLIC KEY-----\n" +
-        "    MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIO5BEw44Izh74J6p5lBcIX/JcED7X1V\n" +
-        "    MATeUN5+iIjo3u0kIMVpVhg/h5FaQ+3K6L8gVVDQvaRoXNwt6dJjcIcCAwEAAQ==\n" +
-        "    -----END PUBLIC KEY-----"
-val SECRET_KEY_DEFAULT_SANDBOX = "575fe35891e830b6ade1415e770fb4ae"
+        "      MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMyTFdiYBiaSIBgqFdxSgzk5LYXKocgT\n" +
+        "      MCx/g1gz9k2jadJ1PDohCs7N65+dh/0dTbT8CIvXrrlAgQT1zitpMPECAwEAAQ==\n" +
+        "      -----END PUBLIC KEY-----"
+val SECRET_KEY_DEFAULT_SANDBOX = "de7bbe6566b0f1c38898b7751b057a94"
 val PRIVATE_KEY_DEFAULT_SANDBOX = "-----BEGIN RSA PRIVATE KEY-----\n" +
-        "    MIIBOwIBAAJBAO1yM2bttpRQ72m1kENcCNzhWasw87K1X4iKZx2mUkNfEtkmkXnY\n" +
-        "    OcU356Pj0F7TFIObA57+qZVe/w+r1HVEaEkCAwEAAQJBANgkcagLUX0XY6g9T3IR\n" +
-        "    sDuoouBTsjKGKc139z+lLBMIElanw9xz9SyWjMmY2lF4OBhs6gmwkOMyyp5A/Pqg\n" +
-        "    R5ECIQD/JvADOJd1wms+2HBtFz5GKdk+sszM2ON5RaJ3y/tznQIhAO48M08vrDgH\n" +
-        "    m1WvvEUW83wQan9FBR2OSgUn830c6zWdAiADm+pjMUa7LK/VqLwWXvDLj0X6ZA8P\n" +
-        "    irXU/k4pAaKh5QIgBWuDM1L/VQr/QrTL0LqT8YeiFKEqW6DIGFPvWzJUO5UCIQDz\n" +
-        "    42wuBeDgq6e4H41U3ug3lkkgg/vQYPHqsCaxvxZbDA==\n" +
-        "    -----END RSA PRIVATE KEY-----"
+        "      MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL\n" +
+        "      yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF\n" +
+        "      5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB\n" +
+        "      AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA\n" +
+        "      ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK\n" +
+        "      xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd\n" +
+        "      A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=\n" +
+        "      -----END RSA PRIVATE KEY-----"
 
 val APP_TOKEN_DEFAULT_DEV =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTIsImlhdCI6MTYyMDg4MjQ2NH0.DJfi52Dc66IETflV2dQ8G_q4oUAVw_eG4TzrqkL0jLU"
@@ -135,6 +135,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var buttonDeposit: Button
     lateinit var buttonWithdraw: Button
     lateinit var buttonTransfer: Button
+    lateinit var buttonKYC: Button
     lateinit var buttonPay: Button
     lateinit var textView: TextView
     lateinit var inputUserId: EditText
@@ -190,6 +191,7 @@ class MainActivity : AppCompatActivity() {
         buttonLogin = findViewById(R.id.buttonLogin)
         buttonLogout = findViewById(R.id.buttonLogout)
         buttonSetting = findViewById(R.id.buttonSetting)
+        buttonKYC = findViewById(R.id.buttonKYC)
         buttonReload = findViewById(R.id.buttonReload)
         buttonDeposit = findViewById(R.id.buttonDeposit)
         buttonTransfer = findViewById(R.id.buttonTransfer)
@@ -225,6 +227,14 @@ class MainActivity : AppCompatActivity() {
                 updateWalletInfo()
             }
 
+        }
+        buttonKYC.setOnClickListener { 
+            payme?.openKYC(this.supportFragmentManager,onSuccess = {
+                                                                   println("mo kyc thanh cong")
+
+            },onError = {jsonObject, i, s ->
+                PayME.showError(s)
+            })
         }
         var list = arrayListOf<String>()
         list.add(Env.DEV.toString())
@@ -420,7 +430,7 @@ class MainActivity : AppCompatActivity() {
             val amount = convertInt(moneyPay.text.toString())
 
             val storeId: Long =
-                if (env == Env.PRODUCTION) 57956431 else if (env == Env.SANDBOX) 46 else 9
+                if (env == Env.PRODUCTION) 57956431 else if (env == Env.SANDBOX) 24088141 else 9
             val infoPayment =
                 InfoPayment(
                     "PAY",
@@ -431,9 +441,9 @@ class MainActivity : AppCompatActivity() {
                     "OpenEWallet",
                     ""
                 )
+            payme?.getPaymentMethods(if (env == Env.PRODUCTION) 57956431 else if (env == Env.SANDBOX) 24088141 else 9,onSuccess = {list->
 
-//            payme?.getPaymentMethods({ list ->
-                payme?.pay(this.supportFragmentManager, infoPayment, true,null,
+                payme?.pay(this.supportFragmentManager, infoPayment, true,list[0],
                     onSuccess = { json: JSONObject? ->
                     },
                     onError = { jsonObject, code, message ->
@@ -449,7 +459,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 )
-//            }, { jsonObject, i, s -> })
+            },onError = {jsonObject, i, s ->  })
 
 
         }
