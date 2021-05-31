@@ -162,7 +162,7 @@ class MainActivity : AppCompatActivity() {
             textView.text = "${decimal.format(balance)}đ"
         }, onError = { jsonObject, code, message ->
             PayME.showError(message)
-            if (code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
+            if (code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
                 openWallet()
             }
         })
@@ -379,7 +379,7 @@ class MainActivity : AppCompatActivity() {
                         walletView.setVisibility(View.GONE)
                         payme?.logout()
                     }
-                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
+                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
                         openWallet()
                     }
                 })
@@ -399,7 +399,7 @@ class MainActivity : AppCompatActivity() {
                         walletView.setVisibility(View.GONE)
                         payme?.logout()
                     }
-                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
+                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
                         openWallet()
                     }
                 })
@@ -418,7 +418,7 @@ class MainActivity : AppCompatActivity() {
                         walletView.setVisibility(View.GONE)
                         payme?.logout()
                     }
-                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
+                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
                         openWallet()
                     }
                 })
@@ -441,9 +441,9 @@ class MainActivity : AppCompatActivity() {
                     "OpenEWallet",
                     ""
                 )
-            payme?.getPaymentMethods(if (env == Env.PRODUCTION) 57956431 else if (env == Env.SANDBOX) 24088141 else 9,onSuccess = {list->
+//            payme?.getPaymentMethods(if (env == Env.PRODUCTION) 57956431 else if (env == Env.SANDBOX) 24088141 else 9,onSuccess = {list->
 
-                payme?.pay(this.supportFragmentManager, infoPayment, true,list[0],
+                payme?.pay(this.supportFragmentManager, infoPayment, true,null,
                     onSuccess = { json: JSONObject? ->
                     },
                     onError = { jsonObject, code, message ->
@@ -454,12 +454,12 @@ class MainActivity : AppCompatActivity() {
                             walletView.setVisibility(View.GONE)
                             payme?.logout()
                         }
-                        if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVETES) {
+                        if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
                             openWallet()
                         }
                     }
                 )
-            },onError = {jsonObject, i, s ->  })
+//            },onError = {jsonObject, i, s ->  })
 
 
         }

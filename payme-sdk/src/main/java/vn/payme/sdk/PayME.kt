@@ -96,10 +96,10 @@ public class PayME {
                 onError(null, ERROR_CODE.ACCOUNT_NOT_LOGIN, "Tài khoản chưa đăng nhập")
                 return false
             } else if (!Store.userInfo.accountActive) {
-                onError(null, ERROR_CODE.ACCOUNT_NOT_ACTIVETES, "Tài khoản chưa kích hoạt")
+                onError(null, ERROR_CODE.ACCOUNT_NOT_ACTIVATED, "Tài khoản chưa kích hoạt")
                 return false
             } else if (!Store.userInfo.accountKycSuccess) {
-                onError(null, ERROR_CODE.ACCOUNT_NOT_ACTIVETES, "Tài khoản chưa định danh")
+                onError(null, ERROR_CODE.ACCOUNT_NOT_KYC, "Tài khoản chưa định danh")
                 return false
             }
             return true
@@ -109,7 +109,7 @@ public class PayME {
                 onError(null, ERROR_CODE.ACCOUNT_NOT_LOGIN, "Tài khoản chưa đăng nhập")
                 return false
             } else if (!Store.userInfo.accountActive) {
-                onError(null, ERROR_CODE.ACCOUNT_NOT_ACTIVETES, "Tài khoản chưa kích hoạt")
+                onError(null, ERROR_CODE.ACCOUNT_NOT_ACTIVATED, "Tài khoản chưa kích hoạt")
                 return false
             }
             return true
@@ -453,7 +453,7 @@ public class PayME {
         fragmentManager: FragmentManager,
         infoPayment: InfoPayment,
     ) {
-        if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError= {jsonObject, code, m ->
+        if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE, onError= {jsonObject, code, m ->
                 PayME.showError(m)
             })) {
             payRoot(fragmentManager, infoPayment, true, null, onSuccess, onError)
@@ -470,7 +470,7 @@ public class PayME {
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
 
-        if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
+        if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE, onError)) {
             Store.config.disableCallBackResult = false
             if (method == null || method.type == TYPE_PAYMENT.BANK_CARD) {
                 payRoot(fragmentManager, infoPayment, isShowResultUI, method, onSuccess, onError)
