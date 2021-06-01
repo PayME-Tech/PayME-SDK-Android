@@ -265,12 +265,12 @@ public class PayME {
                     val state = kyc.getString("state")
                     if (state == "APPROVED") {
                         Store.userInfo.accountKycSuccess = true
-                        onError(kyc, ERROR_CODE.OTHER, "Tài khoản đã kyc")
+                        onError(kyc, ERROR_CODE.SYSTEM, "Tài khoản đã kyc")
                     } else if (state == "REJECTED" || state == "CANCELED" || state == "null") {
                         val details = kyc.optJSONObject("details")
-                        var stateFace = ""
-                        var stateImage = ""
-                        var stateVideo = ""
+                        var stateFace = "REJECTED"
+                        var stateImage = "REJECTED"
+                        var stateVideo = "REJECTED"
                         if (details != null) {
                             val face = details.optJSONObject("face")
                             val image = details.optJSONObject("image")
@@ -286,10 +286,12 @@ public class PayME {
                                 stateVideo = video.optString("state")
                             }
                         }
+
                         val kycVideo = Store.config.enlableKycFace && stateVideo == "REJECTED"
                         val kycIdentity =
                             Store.config.enlableKycIdentify && stateImage == "REJECTED"
                         val kycFace = Store.config.enlableKycFace && stateFace == "REJECTED"
+                        println("")
                         onSuccess(null)
                         onPopupKyc(fragmentManager, kycVideo, kycIdentity, kycFace)
                     } else if (state == "PENDING") {
@@ -705,7 +707,7 @@ public class PayME {
         onSuccess: (ArrayList<Method>) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        if(checkAccount(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE,onError)) {
+        if(checkAccount(RULE_CHECK_ACCOUNT.LOGGIN,onError)) {
             val paymentApi = PaymentApi()
             val listMethod: ArrayList<Method> = ArrayList<Method>()
             paymentApi.getTransferMethods(
