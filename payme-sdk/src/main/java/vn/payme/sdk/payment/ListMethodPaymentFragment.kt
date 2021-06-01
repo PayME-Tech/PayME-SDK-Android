@@ -3,6 +3,7 @@ package vn.payme.sdk.payment
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -155,6 +156,7 @@ class ListMethodPaymentFragment : Fragment() {
                         )
                     )
                 }
+                Log.d("LOGIN","getListMethod:"+Store.userInfo.accountKycSuccess)
                 methodAdapter.notifyDataSetChanged()
                 setListViewHeightBasedOnChildren(listView)
 

@@ -3,6 +3,7 @@ package vn.payme.sdk
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import es.dmoral.toasty.Toasty
@@ -502,7 +503,7 @@ public class PayME {
         paymentApi.getFee(
             infoPayment!!.amount,
             method!!,
-            if (method?.type == TYPE_PAYMENT.BANK_CARD) event.cardInfo else null,
+            null,
             onSuccess = { jsonObject ->
                 val Utility = jsonObject.getJSONObject("Utility")
                 val GetFee = Utility.getJSONObject("GetFee")
@@ -630,6 +631,8 @@ public class PayME {
             }
             if (kyc != null) {
                 val state = kyc.optString("state")
+                println("state"+state)
+
                 if (state == "APPROVED") {
                     Store.userInfo.accountKycSuccess = true
                 } else {
@@ -638,6 +641,7 @@ public class PayME {
             } else {
                 Store.userInfo.accountKycSuccess = false
             }
+
             val accessToken = Init.optString("accessToken")
             val handShake = Init.optString("handShake")
             if (!accessToken.equals("null")) {
@@ -647,6 +651,8 @@ public class PayME {
             }
             Store.config.handShake = handShake
             Store.userInfo.accountLoginSuccess = true
+            Log.d("LOGIN","login:"+Store.userInfo.accountKycSuccess)
+
             if (Store.userInfo.accountActive) {
                 if (Store.userInfo.accountKycSuccess) {
                     onSuccess(AccountStatus.KYC_APPROVED)

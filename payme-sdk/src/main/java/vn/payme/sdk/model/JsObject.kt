@@ -115,6 +115,7 @@ public class JsObject(
                 Store.userInfo.dataInit = Init
                 val accessToken = Init.optString("accessToken")
                 val handShake = Init.optString("handShake")
+                println("Init"+Init)
                 val kyc = Init.optJSONObject("kyc")
                 if (!accessToken.equals("null")) {
                     Store.userInfo.accessToken = accessToken

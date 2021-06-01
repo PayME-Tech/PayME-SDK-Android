@@ -195,7 +195,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         webSettings.setGeolocationEnabled(true)
         webSettings.loadWithOverviewMode = true
         webSettings.allowFileAccess = true
-        webSettings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+        webSettings.cacheMode = WebSettings.LOAD_NO_CACHE
 
         val jsObject: JsObject =
             JsObject(
@@ -209,7 +209,6 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         var action: String = Store.paymentInfo.action.toString()
         val showLog = if (Store.config.showLog) 1 else 0
         val description = Store.paymentInfo.content
-
         var data: JSONObject = JSONObject(
             """{
                       connectToken:  '${Store.config.connectToken}',
@@ -247,6 +246,8 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         if (Store.config.env == Env.DEV) {
             myWebView.loadUrl("https://dev-sdk.payme.com.vn/active/${encode}")
         } else if (Store.config.env == Env.SANDBOX) {
+            println("data"+data)
+            println("https://sbx-sdk.payme.com.vn/active/${encode}")
             myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
 
         } else {
@@ -308,7 +309,10 @@ internal class PaymeWaletActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+
         isVisible = false
+        myWebView.removeAllViews();
+        myWebView.destroy()
         EventBus.getDefault().unregister(this);
         super.onDestroy()
 

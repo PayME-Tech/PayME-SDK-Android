@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
 import android.media.Image
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -94,6 +95,8 @@ class MethodAdapter(
     //4
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val method = dataSource[position]
+        Log.d("LOGIN","getView:"+Store.userInfo.accountKycSuccess)
+
         if (
             method.type == TYPE_PAYMENT.WALLET
             && ( !Store.userInfo.accountActive || !Store.userInfo.accountKycSuccess ||Store.paymentInfo.infoPayment!!.amount > Store.userInfo.balance)
