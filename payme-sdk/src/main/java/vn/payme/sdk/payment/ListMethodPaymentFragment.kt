@@ -4,11 +4,13 @@ import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListAdapter
 import android.widget.ListView
+import android.widget.PopupWindow
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 
@@ -206,6 +208,9 @@ class ListMethodPaymentFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater?.inflate(R.layout.list_method_payme_fragment, container, false)
+//        val popupWindow = PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+
+//        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0)
         Keyboard.closeKeyboard(requireContext())
         listView = view.findViewById(R.id.recipe_list_view)
         loadingProcess = view.findViewById(R.id.loadingListMethodPayment)

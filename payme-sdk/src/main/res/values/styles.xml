@@ -5,6 +5,11 @@
 
     </style>
     <style name="PinWidget" />
+    <style name="DialogTheme" parent="AppTheme">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
 
     <style name="PinWidget.PinView" parent="Widget.AppCompat.EditText">
         <item name="android:background">@null</item>

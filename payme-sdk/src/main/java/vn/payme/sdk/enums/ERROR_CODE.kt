@@ -8,6 +8,7 @@ class ERROR_CODE {
        val  LITMIT = -3
        val  ACCOUNT_NOT_ACTIVATED = -4
         val ACCOUNT_NOT_LOGIN = -9
+        val BALANCE_ERROR = -10
         val ACCOUNT_NOT_KYC = -5
         val PAYMENT_ERROR = -6
         val ERROR_KEY_ENCODE = -7

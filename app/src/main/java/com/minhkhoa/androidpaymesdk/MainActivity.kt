@@ -441,9 +441,9 @@ class MainActivity : AppCompatActivity() {
                     "OpenEWallet",
                     ""
                 )
-//            payme?.getPaymentMethods(if (env == Env.PRODUCTION) 57956431 else if (env == Env.SANDBOX) 24088141 else 9,onSuccess = {list->
+            payme?.getPaymentMethods(if (env == Env.PRODUCTION) 57956431 else if (env == Env.SANDBOX) 24088141 else 9,onSuccess = {list->
 
-                payme?.pay(this.supportFragmentManager, infoPayment, true,null,
+                payme?.pay(this.supportFragmentManager, infoPayment, true,list[0],
                     onSuccess = { json: JSONObject? ->
                     },
                     onError = { jsonObject, code, message ->
@@ -459,7 +459,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 )
-//            },onError = {jsonObject, i, s ->  })
+            },onError = {jsonObject, i, s ->  })
 
 
         }

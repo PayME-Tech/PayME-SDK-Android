@@ -454,7 +454,7 @@ public class PayME {
         fragmentManager: FragmentManager,
         infoPayment: InfoPayment,
     ) {
-        if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE, onError= {jsonObject, code, m ->
+        if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN, onError= {jsonObject, code, m ->
                 PayME.showError(m)
             })) {
             payRoot(fragmentManager, infoPayment, true, null, onSuccess, onError)
@@ -470,21 +470,45 @@ public class PayME {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-
-        if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE, onError)) {
-            Store.config.disableCallBackResult = false
-            if (method == null || method.type == TYPE_PAYMENT.BANK_CARD) {
-                payRoot(fragmentManager, infoPayment, isShowResultUI, method, onSuccess, onError)
-            } else {
-                checkFee(
-                    fragmentManager,
-                    infoPayment,
-                    isShowResultUI,
-                    method,
-                    onSuccess,
-                    onError,
-                )
+        if(method!=null && method.type == TYPE_PAYMENT.WALLET ) {
+            if(checkAccount(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC,onError)){
+                getWalletInfo(onSuccess={jsonObject ->
+                    val walletBalance = jsonObject.getJSONObject("Wallet")
+                    val balance = walletBalance.getDouble("balance")
+                    if (balance < infoPayment.amount){
+                        onError(null,ERROR_CODE.BALANCE_ERROR,"Số dư trong ví không đủ")
+                    }else{
+                        payWithMethod(fragmentManager, infoPayment, isShowResultUI, method, onSuccess, onError)
+                    }
+                }, onError)
             }
+
+        }else if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
+            payWithMethod(fragmentManager, infoPayment, isShowResultUI, method, onSuccess, onError)
+
+        }
+
+    }
+    private fun payWithMethod(
+        fragmentManager: FragmentManager,
+        infoPayment: InfoPayment,
+        isShowResultUI: Boolean,
+        method: Method?,
+        onSuccess: (JSONObject?) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ){
+        Store.config.disableCallBackResult = false
+        if (method == null || method.type == TYPE_PAYMENT.BANK_CARD) {
+            payRoot(fragmentManager, infoPayment, isShowResultUI, method, onSuccess, onError)
+        } else {
+            checkFee(
+                fragmentManager,
+                infoPayment,
+                isShowResultUI,
+                method,
+                onSuccess,
+                onError,
+            )
         }
 
     }
