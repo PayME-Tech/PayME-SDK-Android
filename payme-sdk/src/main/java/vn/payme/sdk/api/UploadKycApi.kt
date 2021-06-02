@@ -229,7 +229,12 @@ class UploadKycApi {
         if (imageBackSide != null && imageFront != null) {
             image["back"] = imageBackSide!!
             image["front"] = imageFront!!
-            kycInput["image"] = image!!
+            if(CameraKycActivity.updateOnlyIdentify){
+                kycInput["identifyIC"] = image!!
+            }else{
+                kycInput["image"] = image!!
+
+            }
         }
         if (video != null) {
             kycInput["video"] = video!!

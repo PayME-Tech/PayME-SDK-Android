@@ -340,9 +340,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
         }
         if (myEven.type == TypeCallBack.onUpdateIdentify) {
-            if (myEven.value != null) {
-                image = myEven.value.toString()
-            }
+
             val injectedJS = "       const script = document.createElement('script');\n" +
                     "          script.type = 'text/javascript';\n" +
                     "          script.async = true;\n" +
