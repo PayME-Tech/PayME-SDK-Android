@@ -339,6 +339,18 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                     "          true; // note: this is required, or you'll sometimes get silent failures\n"
             myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
         }
+        if (myEven.type == TypeCallBack.onUpdateIdentify) {
+            if (myEven.value != null) {
+                image = myEven.value.toString()
+            }
+            val injectedJS = "       const script = document.createElement('script');\n" +
+                    "          script.type = 'text/javascript';\n" +
+                    "          script.async = true;\n" +
+                    "          script.text = 'onUpdateIdentify()';\n" +
+                    "          document.body.appendChild(script);\n" +
+                    "          true; // note: this is required, or you'll sometimes get silent failures\n"
+            myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
+        }
         if (myEven.type == TypeCallBack.onScan) {
             myEven.value?.let { checkScanQr(it) }
         }

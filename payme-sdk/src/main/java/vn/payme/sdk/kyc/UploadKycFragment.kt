@@ -1,7 +1,5 @@
 package vn.payme.sdk.kyc
 
-import android.app.Activity
-import android.app.ActivityManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,17 +26,25 @@ class UploadKycFragment : Fragment() {
         val uploadKycApi = UploadKycApi()
         uploadKycApi.upLoadKYC(CameraKycActivity.imageFront, CameraKycActivity.imageBackSide, CameraKycActivity.imageFace, CameraKycActivity.video,CameraKycActivity.typeIdentify,
             onSuccess = {jsonObject->
+                loadingUploadKycApi = false
                 val Account = jsonObject.optJSONObject("Account")
                 val KYC = Account.optJSONObject("KYC")
                 val message = KYC.optString("message")
                 val succeeded = KYC.optBoolean("succeeded")
                 if(succeeded){
                     if(PaymeWaletActivity.isVisible){
-                        loadingUploadKycApi = false
-                        var even: EventBus = EventBus.getDefault()
-                        var myEven: MyEven = MyEven(TypeCallBack.onReload, "")
-                        even.post(myEven)
-                        activity?.finish()
+                        if(CameraKycActivity.updateOnlyIdentify){
+                            var even: EventBus = EventBus.getDefault()
+                            var myEven: MyEven = MyEven(TypeCallBack.onUpdateIdentify, "")
+                            even.post(myEven)
+                            activity?.finish()
+                        }else{
+                            var even: EventBus = EventBus.getDefault()
+                            var myEven: MyEven = MyEven(TypeCallBack.onReload, "")
+                            even.post(myEven)
+                            activity?.finish()
+                        }
+
                     }else{
                         activity?.finish()
                         val payme = PayME()

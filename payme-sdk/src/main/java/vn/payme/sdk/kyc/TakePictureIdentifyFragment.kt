@@ -41,6 +41,7 @@ class TakePictureIdentifyFragment : Fragment() {
     private var textGuiTakePicture: TextView? = null
     private var textTypeIdentify: TextView? = null
     private var buttonSelectTypeIdentify: ConstraintLayout? = null
+    private lateinit var  buttonDropdown: ImageView
 
     private var buttonBackHeaderErrorCamera: ImageView? = null
     private var enableSetting = false
@@ -70,9 +71,7 @@ class TakePictureIdentifyFragment : Fragment() {
 
         val view: View = inflater?.inflate(R.layout.take_picture_image_identify, container, false)
 
-        CameraKycActivity.typeIdentify = "CMND"
         EventBus.getDefault().register(this)
-
         cameraKitView = view.findViewById(R.id.previewCamera)
         buttonTakePicture = view.findViewById(R.id.btn_takepicture)
         layoutConfirm = view.findViewById(R.id.confirm_screen)
@@ -85,11 +84,15 @@ class TakePictureIdentifyFragment : Fragment() {
         textGuiTakePicture = view.findViewById(R.id.textGuiTakePicture)
         textTypeIdentify = view.findViewById(R.id.title_type_identify)
         buttonSelectTypeIdentify = view.findViewById(R.id.buttonSelectTypeIdentify)
+        buttonDropdown = view.findViewById(R.id.buttonDropdown)
 
         containerErrorCamera = view.findViewById(R.id.containerErrorCamera)
         buttonOpenSetting = view.findViewById(R.id.buttonOpenSetting)
         buttonBackHeaderErrorCamera = view.findViewById(R.id.buttonBackHeaderErrorCamera)
         PermisionCamera().requestCamera(requireContext(),requireActivity())
+        if(CameraKycActivity.updateOnlyIdentify){
+            buttonDropdown.visibility  = View.GONE
+        }
         buttonOpenSetting!!.setOnClickListener {
             if (enableSetting) {
                 PermisionCamera().openSetting(requireActivity())
@@ -98,6 +101,13 @@ class TakePictureIdentifyFragment : Fragment() {
             }
         }
 
+        if(CameraKycActivity.updateOnlyIdentify){
+            CameraKycActivity.typeIdentify = "CCCD"
+            textTypeIdentify?.text = "Căn cước công dân"
+
+        }else{
+            CameraKycActivity.typeIdentify = "CMND"
+        }
 
 
 
@@ -142,7 +152,7 @@ class TakePictureIdentifyFragment : Fragment() {
             }
         }
         buttonSelectTypeIdentify?.setOnClickListener {
-            if(imageFront==null){
+            if(imageFront==null && !CameraKycActivity.updateOnlyIdentify){
                 val popupSelectTypeIdentify = PopupSelectTypeIdentify()
                 popupSelectTypeIdentify.show(childFragmentManager, "ModalBottomSheet")
             }

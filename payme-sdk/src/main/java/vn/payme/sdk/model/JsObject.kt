@@ -1,6 +1,7 @@
 package vn.payme.sdk.model
 
 import android.app.Activity
+import android.content.Intent
 import android.hardware.camera2.CameraManager
 import android.os.Bundle
 import android.webkit.JavascriptInterface
@@ -11,6 +12,7 @@ import vn.payme.sdk.AnyOrientationCaptureActivity
 import vn.payme.sdk.PayME
 import vn.payme.sdk.PaymeWaletActivity
 import vn.payme.sdk.enums.ERROR_CODE
+import vn.payme.sdk.kyc.CameraKycActivity
 import vn.payme.sdk.payment.PopupTakeFace
 import vn.payme.sdk.payment.PopupTakeIdentify
 import vn.payme.sdk.payment.PopupTakeVideo
@@ -55,7 +57,7 @@ public class JsObject(
             val status = data.getString("status")
             val message = data.optString("message")
             if(status=="SUCCEEDED"){
-                PayME.onSuccess(null)
+                PayME.onSuccess(data)
             }else{
                 PayME.onError(data,ERROR_CODE.OTHER,message)
 
@@ -74,7 +76,7 @@ public class JsObject(
             val status = data.getString("status")
             val message = data.optString("message")
             if(status=="SUCCEEDED"){
-                PayME.onSuccess(null)
+                PayME.onSuccess(data)
             }else{
                 PayME.onError(data,ERROR_CODE.OTHER,message)
 
@@ -92,7 +94,7 @@ public class JsObject(
             val status = data.getString("status")
             val message = data.optString("message")
             if(status=="SUCCEEDED"){
-                PayME.onSuccess(null)
+                PayME.onSuccess(data)
             }else{
                 PayME.onError(data,ERROR_CODE.OTHER,message)
 
@@ -176,29 +178,24 @@ public class JsObject(
 
 
     }
+    @JavascriptInterface
+    public fun onUpdateIdentify() {
+        Store.config.kycVideo = false
+        Store.config.kycIdentify = true
+        Store.config.kycFace = false
+        val bundle: Bundle = Bundle()
+        CameraKycActivity.updateOnlyIdentify  = true
+        val intent = Intent(PayME.context, CameraKycActivity::class.java)
+        intent.putExtras(bundle)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        PayME.context?.startActivity(intent)
+    }
 
     @JavascriptInterface
     public fun onKyc(kycVideo: Boolean, kycIdentity: Boolean, kycFace: Boolean) {
-//        println("onKyc")
-        Store.config.kycVideo = kycVideo
-        Store.config.kycIdentify = kycIdentity
-        Store.config.kycFace = kycFace
-        val bundle: Bundle = Bundle()
-        bundle.putBoolean("openKycActivity", true)
-        if (kycIdentity) {
-            val popupTakeIdentify = PopupTakeIdentify()
-            popupTakeIdentify.arguments = bundle
-            popupTakeIdentify.show(fragmentManager, "ModalBottomSheet")
-        } else if (kycFace) {
-            val popupTakeFace = PopupTakeFace()
-            popupTakeFace.arguments = bundle
-            popupTakeFace.show(fragmentManager, "ModalBottomSheet")
 
-        } else if (kycVideo) {
-            val popupTakeVideo = PopupTakeVideo()
-            popupTakeVideo.arguments = bundle
-            popupTakeVideo.show(fragmentManager, "ModalBottomSheet")
-        }
+        val payme = PayME()
+        payme.onPopupKyc(fragmentManager,kycVideo,kycIdentity,kycFace)
 
 
     }

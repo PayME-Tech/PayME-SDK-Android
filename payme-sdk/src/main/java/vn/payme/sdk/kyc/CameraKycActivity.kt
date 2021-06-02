@@ -16,6 +16,7 @@ class CameraKycActivity : AppCompatActivity(R.layout.camera_kyc_activity) {
         var imageFront :ByteArray? = null
         var imageBackSide :ByteArray? = null
         var typeIdentify :String? = null
+        var updateOnlyIdentify = false
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

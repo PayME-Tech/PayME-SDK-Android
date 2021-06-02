@@ -17,6 +17,7 @@ import vn.payme.sdk.enums.*
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.evenbus.PaymentInfoEvent
+import vn.payme.sdk.kyc.CameraKycActivity
 import vn.payme.sdk.model.*
 import vn.payme.sdk.payment.PaymePayment
 import vn.payme.sdk.payment.PopupTakeFace
@@ -78,7 +79,7 @@ public class PayME {
             configColor,
             language,
         )
-        Store.paymentInfo = PaymentInfo(null, 0, "", null, null, null, null, null, null, true, true)
+        Store.paymentInfo = PaymentInfo(null, 0, "", null, null, null, null,  arrayListOf(), null, true,true)
         Store.userInfo = UserInfo(0, false, false, false, "", null)
         Security.insertProviderAt(BouncyCastleProvider(), 1)
         ENV_API.updateEnv()
@@ -179,7 +180,7 @@ public class PayME {
                             val disable = json.optBoolean("disable")
                             val enable = json.optBoolean("enable")
                             if (enable && !disable) {
-                                Store.paymentInfo.listService!!.add(Service(code, description))
+                                Store.paymentInfo.listService.add(Service(code, description))
                             }
                         }
                     }
@@ -291,7 +292,6 @@ public class PayME {
                         val kycIdentity =
                             Store.config.enlableKycIdentify && stateImage == "REJECTED"
                         val kycFace = Store.config.enlableKycFace && stateFace == "REJECTED"
-                        println("")
                         onSuccess(null)
                         onPopupKyc(fragmentManager, kycVideo, kycIdentity, kycFace)
                     } else if (state == "PENDING") {
@@ -304,12 +304,13 @@ public class PayME {
 
     }
 
-    private fun onPopupKyc(
+    fun onPopupKyc(
         fragmentManager: FragmentManager,
         kycVideo: Boolean,
         kycIdentity: Boolean,
         kycFace: Boolean
     ) {
+        CameraKycActivity.updateOnlyIdentify  = false
         Store.config.kycVideo = kycVideo
         Store.config.kycIdentify = kycIdentity
         Store.config.kycFace = kycFace
@@ -699,7 +700,7 @@ public class PayME {
 
     public fun getSupportedServices(onSuccess: (ArrayList<Service>?) -> Unit,onError: (JSONObject?, Int?, String) -> Unit)  {
         if(checkAccount(RULE_CHECK_ACCOUNT.LOGGIN,onError)){
-            onSuccess(Store.paymentInfo.listService!!)
+            onSuccess(Store.paymentInfo.listService)
         }
     }
     public fun getPaymentMethods(

@@ -8,4 +8,5 @@ enum  class TypeCallBack {
     onReload,
     onScan,
     onTakeImageResult,
+    onUpdateIdentify,
 }
