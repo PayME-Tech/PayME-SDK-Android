@@ -22,6 +22,7 @@ import vn.payme.sdk.store.Store
 public class JsObject(
     val activity: Activity,
     val back: () -> Unit,
+    val showButtonClose: (boolean: Boolean) -> Unit,
     val takeImage: () -> Unit,
     val fragmentManager: FragmentManager,
     val cameraManager: CameraManager
@@ -36,6 +37,16 @@ public class JsObject(
             println(e)
         }
     }
+
+    @JavascriptInterface
+     fun showButtonCloseNapas(boolean: Boolean) {
+        try {
+            showButtonClose(boolean)
+        } catch (e: Exception) {
+            println(e)
+        }
+    }
+
 
     @JavascriptInterface
     public fun onTakeImageDocument() {
@@ -157,6 +168,9 @@ public class JsObject(
 //            println("onError" + jsonObject)
             back()
             PayME.onError(data, code, message)
+            if(code==ERROR_CODE.EXPIRED){
+                PayME.onExpired()
+            }
         } catch (e: Exception) {
             println(e)
 

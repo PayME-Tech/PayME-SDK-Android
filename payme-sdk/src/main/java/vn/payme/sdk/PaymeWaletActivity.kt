@@ -15,6 +15,7 @@ import android.util.DisplayMetrics
 import android.view.KeyEvent
 import android.view.View
 import android.webkit.*
+import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -44,9 +45,13 @@ internal class PaymeWaletActivity : AppCompatActivity() {
     private lateinit var myWebView: WebView
     private var buttonBack: Button? = null
     private var buttonNext: Button? = null
+    private lateinit var buttonClose: ImageView
     lateinit var containerErrorNetwork: ConstraintLayout
+    lateinit var header: ConstraintLayout
     private var checkTimeoutLoadWebView = false
     private val REQUEST_CODE_TAKE_PICKTURE = 321
+    var domain  = ""
+
 
 
     companion object {
@@ -108,7 +113,10 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
         buttonBack = findViewById(R.id.buttonBack)
         buttonNext = findViewById(R.id.buttonNext)
+        header = findViewById(R.id.header)
+        buttonClose = findViewById(R.id.buttonClose)
         containerErrorNetwork = findViewById(R.id.containerErrorNetwork)
+
 
         myWebView.clearCache(true);
         myWebView.clearFormData();
@@ -201,6 +209,9 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             JsObject(
                 this,
                 back = { backScreen() },
+                showButtonClose={b->
+                    showButtonClose(b)
+                },
                 takeImage = { takeImage() },
                 this.supportFragmentManager,
                 cameraManager
@@ -239,19 +250,39 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                     }"""
         )
 
+
         val cryptoAES = CryptoAES()
         val xAPIData = cryptoAES.encrytAESDataWebview("LkaWasflkjfqr2g3", data.toString())
         val encode: String = URLEncoder.encode(xAPIData, "utf-8")
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
+
         if (Store.config.env == Env.DEV) {
-            myWebView.loadUrl("https://dev-sdk.payme.com.vn/active/${encode}")
+            domain = "https://dev-sdk.payme.com.vn/"
         } else if (Store.config.env == Env.SANDBOX) {
-            println("data"+data)
-            println("https://sbx-sdk.payme.com.vn/active/${encode}")
-            myWebView.loadUrl("https://sbx-sdk.payme.com.vn/active/${encode}")
+            domain = "https://sbx-sdk.payme.com.vn/"
+        } else {
+            domain = "https://sdk.payme.com.vn/"
+        }
+        buttonClose.setOnClickListener {
+            header.visibility = View.GONE
+            if (Store.config.env == Env.DEV) {
+                myWebView.loadUrl("${domain}active/${encode}")
+            } else if (Store.config.env == Env.SANDBOX) {
+
+                myWebView.loadUrl("${domain}active/${encode}")
+
+            } else {
+                myWebView.loadUrl("${domain}active/${encode}")
+            }
+        }
+        if (Store.config.env == Env.DEV) {
+            myWebView.loadUrl("${domain}active/${encode}")
+        } else if (Store.config.env == Env.SANDBOX) {
+
+            myWebView.loadUrl("${domain}active/${encode}")
 
         } else {
-            myWebView.loadUrl("https://sdk.payme.com.vn/active/${encode}")
+            myWebView.loadUrl("${domain}active/${encode}")
         }
         if (!isNetworkConnected()) {
             containerErrorNetwork?.visibility = View.VISIBLE
@@ -353,10 +384,25 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             myEven.value?.let { checkScanQr(it) }
         }
     }
+    fun  showButtonClose(isShow: Boolean){
+        runOnUiThread {
+            if(isShow == true){
+                header.visibility = View.VISIBLE
+            }else{
+                header.visibility = View.GONE
+            }
+        }
+
+
+    }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        println("this.myWebView.url"+this.myWebView.url)
+        if(this.myWebView.url==domain){
+            finish()
 
-        if (this.myWebView.canGoBack()) {
+        }else if (this.myWebView.canGoBack()) {
+
             this.myWebView.goBack()
         } else {
             finish()
