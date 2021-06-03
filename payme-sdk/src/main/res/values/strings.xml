@@ -67,4 +67,8 @@
     <string name="description_active_now">(*) Vui lòng kích hoạt tài khoản ví trước khi sử dụng</string>
     <string name="description_kyc_now">(*) Vui lòng định danh tài khoản ví trước khi sử dụng</string>
     <string name="description_deposit_now">(*) Chọn phương thức khác hoặc nạp thêm để thanh toán</string>
+
+    <string name="amount_payment">Số tiền thanh toán</string>
+    <string name="person_receiving">Người nhận</string>
+    <string name="id_serice">Mã dịch vụ</string>
 </resources>
