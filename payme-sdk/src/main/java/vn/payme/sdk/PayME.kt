@@ -530,7 +530,6 @@ public class PayME {
         paymentApi.getFee(
             infoPayment!!.amount,
             method!!,
-            null,
             onSuccess = { jsonObject ->
                 val Utility = jsonObject.getJSONObject("Utility")
                 val GetFee = Utility.getJSONObject("GetFee")

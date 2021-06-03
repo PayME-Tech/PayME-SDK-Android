@@ -57,7 +57,6 @@ class MethodAdapter(
             val decimal = DecimalFormat("#,###")
             if(Store.userInfo.accountKycSuccess){
                 noteMethod.text = "(${decimal.format(Store.userInfo.balance?.toLong())}đ)"
-                noteMethod.textSize = 12F
             }
 
             return
@@ -87,7 +86,6 @@ class MethodAdapter(
 
         } else {
             imageView.setImageResource(R.drawable.ic_payme)
-
         }
 
     }

@@ -69,15 +69,13 @@ class ListMethodPaymentFragment : Fragment() {
             }
         })
     }
-    private fun checkFee() {
+    private fun checkFee(method: Method) {
         val paymentApi = PaymentApi()
-        val method = Store.paymentInfo.methodSelected
         val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
         showLoading()
         paymentApi.getFee(
             Store.paymentInfo.infoPayment!!.amount,
-            Store.paymentInfo.methodSelected!!,
-            if (method?.type == TYPE_PAYMENT.BANK_CARD) event.cardInfo else null,
+            method,
             onSuccess = { jsonObject ->
                 disableLoading()
                 val Utility = jsonObject.getJSONObject("Utility")
@@ -90,12 +88,7 @@ class ListMethodPaymentFragment : Fragment() {
                     val state = GetFee.getString("state")
                     if (state == "null") {
                         EventBus.getDefault().postSticky(PaymentInfoEvent(null,null,null,fee))
-                        EventBus.getDefault().post(
-                            ChangeFragmentPayment(
-                                TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT,
-                                null
-                            )
-                        )
+                        EventBus.getDefault().post(method)
                     } else {
                         PayME.showError(message)
                     }
@@ -138,7 +131,6 @@ class ListMethodPaymentFragment : Fragment() {
                         val linkedId = data.optString("linkedId")
                         val swiftCode = data.optString("swiftCode")
                         dataMethod = DataMethod(linkedId, swiftCode)
-
                     }
                     var fee = jsonObject.optInt("fee")
                     var label = jsonObject.optString("label")
@@ -208,9 +200,6 @@ class ListMethodPaymentFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater?.inflate(R.layout.list_method_payme_fragment, container, false)
-//        val popupWindow = PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-
-//        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0)
         Keyboard.closeKeyboard(requireContext())
         listView = view.findViewById(R.id.recipe_list_view)
         loadingProcess = view.findViewById(R.id.loadingListMethodPayment)
@@ -245,18 +234,8 @@ class ListMethodPaymentFragment : Fragment() {
                     return@setOnItemClickListener
                 }
                 if(method.type == TYPE_PAYMENT.BANK_CARD){
-                    val fragment = fragmentManager?.beginTransaction()
-                    val enterAtmCardFragment = EnterAtmCardFragment()
-                    val bundle = Bundle()
-                    bundle.putBoolean("showChangeMethod", true)
-                    enterAtmCardFragment.arguments = bundle
-                    fragment?.replace(
-                        R.id.frame_container_select_method,
-                        enterAtmCardFragment
-                    )
-                    fragment?.commit()
+                    checkFee(method)
                     return@setOnItemClickListener
-
                 }
                 if(method?.type == TYPE_PAYMENT.WALLET){
                     if (
@@ -275,13 +254,13 @@ class ListMethodPaymentFragment : Fragment() {
                         EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT,null))
 
                     }else{
-                        checkFee()
+                        checkFee(method)
                     }
                     return@setOnItemClickListener
 
                 }
                 if(method?.type == TYPE_PAYMENT.LINKED){
-                    checkFee()
+                    checkFee(method)
                     return@setOnItemClickListener
 
                 }

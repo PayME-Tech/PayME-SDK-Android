@@ -38,7 +38,6 @@ internal class PaymentApi {
     fun getFee(
         amount:Int,
         method:Method,
-        cardInfo:CardInfo?,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
@@ -73,9 +72,6 @@ internal class PaymentApi {
             payment["wallet"] = wallet
         } else if (method.type == TYPE_PAYMENT.BANK_CARD) {
             val bankCard: MutableMap<String, Any> = mutableMapOf()
-            bankCard["cardNumber"] = cardInfo?.cardNumber!!
-            bankCard["cardHolder"] = cardInfo?.cardHolder!!
-            bankCard["issuedAt"] = cardInfo?.cardDate!!
             payment["bankCard"] = bankCard
         } else if (method.type == TYPE_PAYMENT.LINKED) {
             val linked: MutableMap<String, Any> = mutableMapOf()

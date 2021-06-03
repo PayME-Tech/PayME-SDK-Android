@@ -425,7 +425,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonPay.setOnClickListener {
-            val nextValues = List(10) { Random.nextInt(0, 100000) }
+            val nextValues = Random.nextInt(0, 100000)
 
             val amount = convertInt(moneyPay.text.toString())
 

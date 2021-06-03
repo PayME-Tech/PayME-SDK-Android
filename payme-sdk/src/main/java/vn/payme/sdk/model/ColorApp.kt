@@ -1,7 +1,9 @@
 package vn.payme.sdk.model
 
+import android.R.attr.shape
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+
 
 class ColorApp {
     var startColor:String = "#08941f"
@@ -10,6 +12,7 @@ class ColorApp {
     var backgroundColorRadiusBorder : GradientDrawable = GradientDrawable()
     var backgroundColorRadiusAlpha : GradientDrawable = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
     var backgroundColor: GradientDrawable = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
+    var backgroundColorRadiusTop: GradientDrawable = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
 
     constructor(startColor: String,endColor:String){
         this.startColor = startColor
@@ -19,7 +22,9 @@ class ColorApp {
         this.backgroundColorRadius = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
         this.backgroundColorRadius.cornerRadius = 60F
         this.backgroundColor = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
-        this.backgroundColorRadiusAlpha = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
+        this.backgroundColorRadiusTop = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
+       backgroundColorRadiusTop.cornerRadii = (floatArrayOf(60f, 60f, 60f, 60f, 0f, 0f, 0f, 0f))
+
         this.backgroundColorRadiusAlpha.alpha = 100
         this.backgroundColorRadiusAlpha.cornerRadius = 60F
 

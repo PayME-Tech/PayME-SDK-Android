@@ -1,18 +1,11 @@
 package vn.payme.sdk.component
 
 import android.content.Context
-import android.graphics.PorterDuff
-import android.graphics.Typeface
-import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.model.Info
-import vn.payme.sdk.store.Store
 
 class ItemInfo : RelativeLayout {
 

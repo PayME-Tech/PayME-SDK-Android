@@ -59,15 +59,24 @@ class ResultPaymentFragment : Fragment() {
         lottie = view.findViewById(R.id.animation_view)
         val message = arguments?.getString("message")
 
-        if (message != null) {
-
-        } else {
-        }
-
         val decimal = DecimalFormat("#,###")
         textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
         val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
-        event.infoTop?.let { infoTop.updateData(it) }
+        var listInfoTop = arrayListOf<Info>()
+        val storeName = Store.userInfo.dataInit?.optString("storeName")
+        listInfoTop.add(Info("Dịch vụ", storeName, null, null, false))
+        listInfoTop.add(
+            Info(
+                "Số tiền thanh toán",
+                "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ",
+                null,
+                Color.parseColor(Store.config.colorApp.startColor),
+                false
+            )
+        )
+        listInfoTop.add(Info("Nội dung", Store.paymentInfo.infoPayment?.note, null, null, true))
+
+        infoTop.updateData(listInfoTop)
         val listInfoBottom: ArrayList<Info> = arrayListOf()
         if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.LINKED) {
             listInfoBottom.add(Info("Phương thức", "Tài khoản liên kết", null, null, false))
