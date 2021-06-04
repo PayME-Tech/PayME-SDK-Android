@@ -265,25 +265,9 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         }
         buttonClose.setOnClickListener {
             header.visibility = View.GONE
-            if (Store.config.env == Env.DEV) {
-                myWebView.loadUrl("${domain}active/${encode}")
-            } else if (Store.config.env == Env.SANDBOX) {
-
-                myWebView.loadUrl("${domain}active/${encode}")
-
-            } else {
-                myWebView.loadUrl("${domain}active/${encode}")
-            }
-        }
-        if (Store.config.env == Env.DEV) {
-            myWebView.loadUrl("${domain}active/${encode}")
-        } else if (Store.config.env == Env.SANDBOX) {
-
-            myWebView.loadUrl("${domain}active/${encode}")
-
-        } else {
             myWebView.loadUrl("${domain}active/${encode}")
         }
+        myWebView.loadUrl("${domain}active/${encode}")
         if (!isNetworkConnected()) {
             containerErrorNetwork?.visibility = View.VISIBLE
         }
