@@ -132,7 +132,7 @@ class ResultPaymentFragment : Fragment() {
 
         buttonSubmit.setOnClickListener {
             EventBus.getDefault()
-                .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, null))
+                .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, "DONE_PAYMENT"))
         }
 
         return view

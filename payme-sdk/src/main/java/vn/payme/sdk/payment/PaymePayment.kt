@@ -93,9 +93,12 @@ internal class PaymePayment : DialogFragment() {
 
     @Subscribe
     fun onChangeFragment(event: ChangeFragmentPayment) {
-        if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT || event.typeFragment == TYPE_FRAGMENT_PAYMENT.EXPIRED) {
+        if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT || event.typeFragment == TYPE_FRAGMENT_PAYMENT.EXPIRED ) {
             this.dialog?.dismiss()
-            PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
+            if(event.value=="DONE_PAYMENT" || event.typeFragment == TYPE_FRAGMENT_PAYMENT.EXPIRED){
+            }else{
+                PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
+            }
         } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.RESULT) {
             buttonClose.visibility = View.GONE
             val message = event.value
