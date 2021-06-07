@@ -3,7 +3,6 @@ package vn.payme.sdk.api
 import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.enums.TYPE_PAYMENT
-import vn.payme.sdk.model.CardInfo
 import vn.payme.sdk.model.Method
 import vn.payme.sdk.store.Store
 
@@ -72,6 +71,7 @@ internal class PaymentApi {
             payment["wallet"] = wallet
         } else if (method.type == TYPE_PAYMENT.BANK_CARD) {
             val bankCard: MutableMap<String, Any> = mutableMapOf()
+            bankCard["cardNumber"] = ""
             payment["bankCard"] = bankCard
         } else if (method.type == TYPE_PAYMENT.LINKED) {
             val linked: MutableMap<String, Any> = mutableMapOf()
@@ -250,6 +250,8 @@ internal class PaymentApi {
         } else if (method.type == TYPE_PAYMENT.BANK_CARD) {
 
             val bankCard: MutableMap<String, Any> = mutableMapOf()
+            println("cardInfo2"+cardNumber)
+
             bankCard["cardNumber"] = cardNumber!!
             bankCard["cardHolder"] = cardHolder!!
             bankCard["issuedAt"] = cardDate!!
@@ -309,6 +311,7 @@ internal class PaymentApi {
                     "        label\n" +
                     "        methodId\n" +
                     "        minFee\n" +
+                    "        feeDescription\n" +
                     "        title\n" +
                     "        type\n" +
                     "      }\n" +

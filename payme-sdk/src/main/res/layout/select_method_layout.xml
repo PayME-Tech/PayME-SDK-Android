@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true">
 
     <ScrollView
+        android:layout_weight="1"
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent">
@@ -27,18 +30,18 @@
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/wrapLogoMC"
+                    android:visibility="gone"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
-
                     android:background="@color/white"
                     app:cardCornerRadius="56dp"
-                    app:layout_constraintBottom_toTopOf="@id/dotted"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="@id/title_amount"
+                    app:layout_constraintBottom_toBottomOf="@id/money"
+                    >
 
                     <ImageView
                         android:id="@+id/imageLogoMC"
-
                         android:layout_width="49dp"
                         android:layout_height="49dp"
                         android:layout_gravity="center"
@@ -49,10 +52,11 @@
                     android:id="@+id/title_amount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/semi_bold"
+                    android:fontFamily="@font/main_semibold"
                     android:text="@string/amount_payment"
                     android:textColor="@color/white"
-                    android:textSize="15dp"
+                    android:textSize="14dp"
+                    android:alpha="0.7"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -60,7 +64,7 @@
                     android:id="@+id/money"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:fontFamily="@font/barlow_medium"
+                    android:fontFamily="@font/main_semibold"
                     android:text="500,000 đ "
                     android:textColor="@color/white"
                     android:textSize="28dp"
@@ -71,10 +75,10 @@
                     android:id="@+id/dotted"
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="10dp"
                     android:layerType="software"
                     android:src="@drawable/dotted"
-                    app:layout_constraintTop_toBottomOf="@id/wrapLogoMC"
+                    app:layout_constraintTop_toBottomOf="@id/money"
 
                     />
 
@@ -82,14 +86,13 @@
                     android:id="@+id/line1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="8dp"
                     app:layout_constraintTop_toBottomOf="@id/dotted">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/barlow_regular"
+                        android:fontFamily="@font/main_regular"
                         android:text="@string/person_receiving"
                         android:textColor="@color/white"
                         android:textSize="16dp" />
@@ -100,7 +103,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="16dp"
                         android:layout_weight="1"
-                        android:fontFamily="@font/barlow_medium"
+                        android:fontFamily="@font/main_semibold"
                         android:text=""
                         android:textAlignment="textEnd"
                         android:textColor="@color/white"
@@ -111,14 +114,13 @@
                     android:id="@+id/line2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="4dp"
                     app:layout_constraintTop_toBottomOf="@id/line1">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/barlow_regular"
+                        android:fontFamily="@font/main_regular"
                         android:text="@string/id_serice"
                         android:textColor="@color/white"
                         android:textSize="16dp" />
@@ -129,7 +131,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="16dp"
                         android:layout_weight="1"
-                        android:fontFamily="@font/barlow_medium"
+                        android:fontFamily="@font/main_semibold"
                         android:text=""
                         android:textAlignment="textEnd"
                         android:textColor="@color/white"
@@ -140,15 +142,14 @@
                     android:id="@+id/line3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="4dp"
                     app:layout_constraintTop_toBottomOf="@id/line2">
 
                     <TextView
                         android:id="@+id/title_note"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/barlow_regular"
+                        android:fontFamily="@font/main_regular"
                         android:text="@string/content"
                         android:textColor="@color/white"
                         android:textSize="16dp" />
@@ -159,7 +160,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="16dp"
                         android:layout_weight="1"
-                        android:fontFamily="@font/barlow_medium"
+                        android:fontFamily="@font/main_semibold"
                         android:text="Không có nội dung"
                         android:textAlignment="textEnd"
                         android:textColor="@color/white"
@@ -174,7 +175,7 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_weight="1"
-                android:fontFamily="@font/barlow_medium"
+                android:fontFamily="@font/main_semibold"
                 android:text="@string/select_method_payment"
                 android:textAlignment="textEnd"
                 android:textColor="@color/blackSeven"
@@ -219,7 +220,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
-                        android:fontFamily="@font/semi_bold"
+                        android:fontFamily="@font/main_bold"
                         android:text="@string/domestic_atm_card"
                         android:textColor="@color/blackSix"
                         android:textSize="15dp"
@@ -231,7 +232,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
-                        android:fontFamily="@font/semi_bold"
+                        android:fontFamily="@font/main_bold"
                         android:text=""
                         android:textColor="@color/nb60"
                         android:textSize="14dp"
@@ -243,8 +244,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
-                        android:fontFamily="@font/barlow_medium"
-                        android:text="Phí 2% + 2.500đ / giao dịch"
+                        android:fontFamily="@font/main_semibold"
+                        android:text=""
                         android:textColor="@color/nb60"
                         android:textSize="11dp"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -265,7 +266,7 @@
                             android:id="@+id/txtChangeMethod"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/barlow_medium"
+                            android:fontFamily="@font/main_semibold"
                             android:text="@string/change"
                             android:textSize="13dp"
                             app:layout_constraintRight_toRightOf="parent"
@@ -280,29 +281,32 @@
                 android:id="@+id/frame_container_select_method"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 app:layout_constraintTop_toBottomOf="@id/wrapButtonChangeMethod" />
             <vn.payme.sdk.component.InfoPayment
                 android:id="@+id/infoFee"
                 android:visibility="gone"
+                android:background="@drawable/dashed_border"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="15dp"
                 app:layout_constraintTop_toBottomOf="@id/frame_container_select_method" />
-            <vn.payme.sdk.component.Button
-                android:visibility="gone"
-                android:id="@+id/buttonSubmit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginHorizontal="16dp"
-                app:layout_constraintTop_toBottomOf="@id/infoFee"
-                app:pbText="@string/confirm" />
+
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+
     </ScrollView>
+    <vn.payme.sdk.component.Button
+        android:visibility="gone"
+        android:id="@+id/buttonSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="16dp"
+        app:pbText="@string/confirm" />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

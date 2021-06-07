@@ -6,10 +6,6 @@
     android:clickable="true"
     android:layout_height="match_parent">
 
-
-
-
-
     <ListView
         app:layout_constraintTop_toTopOf="parent"
         android:listSelector="@android:color/transparent"
@@ -26,7 +22,7 @@
     <ProgressBar
         android:layout_width="wrap_content"
         android:id="@+id/loadingListMethodPayment"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_marginTop="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

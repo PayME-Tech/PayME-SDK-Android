@@ -70,14 +70,21 @@ internal class PopupSelectTypeIdentify : BottomSheetDialogFragment() {
         )
         methodAdapter.notifyDataSetChanged()
         listView.setOnItemClickListener { adapterView, view, i, l ->
-                this.listMethod[i].selected = true
-                this.listMethod[methodSelected].selected = false
-                this.methodSelected = i
-                methodAdapter.notifyDataSetChanged()
+            this.listMethod[i].selected = true
+            this.listMethod[methodSelected].selected = false
+            this.methodSelected = i
+            methodAdapter.notifyDataSetChanged()
+            var typeIdentify = this.listMethod[i]
+            if (typeIdentify.type == "PASSPORT") {
+                fragmentManager?.let { PopupConfirmPassport().show(it, "ModalBottomSheet") }
+                this.dialog?.dismiss()
+
+            } else {
                 var even: EventBus = EventBus.getDefault()
-                var typeIdentify = this.listMethod[i]
                 even.post(typeIdentify)
                 this.dialog?.dismiss()
+            }
+
         }
 
         buttonClose.setOnClickListener {

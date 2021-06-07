@@ -15,7 +15,7 @@ import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.*
 
 class UserInfo(
-    var balance: Int,
+    var balance: Long,
     var accountKycSuccess: Boolean,
     var accountLoginSuccess: Boolean,
     var accountActive: Boolean,

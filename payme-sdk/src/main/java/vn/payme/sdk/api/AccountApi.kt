@@ -144,6 +144,7 @@ internal class AccountApi {
                 "        phone\n" +
                 "        appEnv\n" +
                 "        storeName\n" +
+                "        storeImage\n" +
                 "      }\n" +
                 "    }\n" +
                 "  }"

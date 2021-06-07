@@ -125,8 +125,9 @@ class MethodAdapter(
 
             val titleText = rowView.findViewById(R.id.title) as TextView
             val noteMethod = rowView.findViewById(R.id.note_method) as TextView
+            val fee = rowView.findViewById(R.id.txtFee) as TextView
             val imageView = rowView.findViewById(R.id.image) as ImageView
-
+            fee.text = method.feeDescription
             setTitle(method, titleText, noteMethod)
             addImage(method, imageView)
 

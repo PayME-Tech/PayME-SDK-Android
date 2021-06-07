@@ -43,35 +43,11 @@ class ListMethodPaymentFragment : Fragment() {
     private fun showLoading() {
         loadingProcess.visibility = View.VISIBLE
     }
-
     private fun disableLoading() {
         loadingProcess.visibility = View.GONE
-
-    }
-
-    private fun getBalance() {
-        val paymentApi = PaymentApi()
-        paymentApi.getBalance(onSuccess = { jsonObject ->
-            val walletBalance = jsonObject.optJSONObject("Wallet")
-            val balance = walletBalance.optInt("balance")
-            Store.userInfo.balance = balance
-            getListMethod()
-
-        }, onError = { jsonObject, code, message ->
-            if (code == ERROR_CODE.EXPIRED) {
-                PayME.onExpired()
-                PayME.onError(jsonObject, code, message)
-
-            } else {
-                disableLoading()
-                loading = false
-                PayME.showError(message)
-            }
-        })
     }
     private fun checkFee(method: Method) {
         val paymentApi = PaymentApi()
-        val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
         showLoading()
         paymentApi.getFee(
             Store.paymentInfo.infoPayment!!.amount,
@@ -87,7 +63,7 @@ class ListMethodPaymentFragment : Fragment() {
                     val fee = feeObject.getInt("fee")
                     val state = GetFee.getString("state")
                     if (state == "null") {
-                        EventBus.getDefault().postSticky(PaymentInfoEvent(null,null,null,fee))
+                        EventBus.getDefault().postSticky(PaymentInfoEvent(null,fee))
                         EventBus.getDefault().post(method)
                     } else {
                         PayME.showError(message)
@@ -101,7 +77,6 @@ class ListMethodPaymentFragment : Fragment() {
             onError = { jsonObject: JSONObject?, code: Int?, message: String ->
                 disableLoading()
                 if (code == ERROR_CODE.EXPIRED) {
-                    PayME.onExpired()
                 } else {
                     PayME.showError(message)
                 }
@@ -109,71 +84,7 @@ class ListMethodPaymentFragment : Fragment() {
     }
 
 
-    private fun getListMethod() {
-        val paymentApi = PaymentApi()
-        this.showLoading()
 
-
-        paymentApi.getTransferMethods(Store.paymentInfo.infoPayment!!.storeId,onSuccess = { jsonObject ->
-            disableLoading()
-
-            val Utility = jsonObject.optJSONObject("Utility")
-            val GetPaymentMethod = Utility.optJSONObject("GetPaymentMethod")
-            val message = GetPaymentMethod.optString("message")
-            val succeeded = GetPaymentMethod.optBoolean("succeeded")
-            val methods = GetPaymentMethod.optJSONArray("methods")
-            if (succeeded) {
-                for (i in 0 until methods.length()) {
-                    val jsonObject = methods.getJSONObject(i)
-                    var data = jsonObject.optJSONObject("data")
-                    var dataMethod = DataMethod(null, "")
-                    if (data != null) {
-                        val linkedId = data.optString("linkedId")
-                        val swiftCode = data.optString("swiftCode")
-                        dataMethod = DataMethod(linkedId, swiftCode)
-                    }
-                    var fee = jsonObject.optInt("fee")
-                    var label = jsonObject.optString("label")
-                    var methodId = jsonObject.optInt("methodId")
-                    var minFee = jsonObject.optInt("minFee")
-                    var title = jsonObject.optString("title")
-                    var type = jsonObject.optString("type")
-                    this.listMethod.add(
-                        Method(
-                            dataMethod,
-                            fee,
-                            label,
-                            methodId,
-                            minFee,
-                            title,
-                            type,
-                        )
-                    )
-                }
-                Log.d("LOGIN","getListMethod:"+Store.userInfo.accountKycSuccess)
-                methodAdapter.notifyDataSetChanged()
-                setListViewHeightBasedOnChildren(listView)
-
-            } else {
-                PayME.showError(message)
-            }
-
-        },
-            onError = { jsonObject, code, message ->
-                disableLoading()
-
-                if (code == ERROR_CODE.EXPIRED) {
-                    PayME.onExpired()
-                    PayME.onError(jsonObject, code, message)
-
-                } else {
-                    PayME.showError(message)
-                }
-
-
-            }
-        )
-    }
 
 
     fun setListViewHeightBasedOnChildren(listView: ListView) {
@@ -209,13 +120,9 @@ class ListMethodPaymentFragment : Fragment() {
                 Color.parseColor(Store.config.colorApp.startColor),
                 PorterDuff.Mode.SRC_ATOP
             )
-        methodAdapter = MethodAdapter(PayME.context, this.listMethod!!)
+        methodAdapter = MethodAdapter(PayME.context, Store.paymentInfo.listMethod)
         this.listView.adapter = methodAdapter
-        if (Store.userInfo.accountActive && Store.userInfo.accountKycSuccess) {
-            getBalance()
-        } else {
-            getListMethod()
-        }
+        setListViewHeightBasedOnChildren(listView)
 
         if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.BANK_CARD) {
             val fragment = fragmentManager?.beginTransaction()
@@ -223,17 +130,15 @@ class ListMethodPaymentFragment : Fragment() {
             fragment?.commit()
         }
 
-
         this.listView.setOnItemClickListener { adapterView, view, i, l ->
             if (loadingProcess.visibility != View.VISIBLE) {
-
-                val method = this.listMethod[i]
+                val method = Store.paymentInfo.listMethod[i]
                 Store.paymentInfo.methodSelected = method
                 if(method.type!=TYPE_PAYMENT.WALLET && !Store.config.openPayAndKyc){
                     PayME.showError("Chức năng chỉ có thể thao tác môi trường production")
                     return@setOnItemClickListener
                 }
-                if(method.type == TYPE_PAYMENT.BANK_CARD){
+                if(method.type == TYPE_PAYMENT.BANK_CARD || method?.type == TYPE_PAYMENT.LINKED){
                     checkFee(method)
                     return@setOnItemClickListener
                 }
@@ -259,11 +164,7 @@ class ListMethodPaymentFragment : Fragment() {
                     return@setOnItemClickListener
 
                 }
-                if(method?.type == TYPE_PAYMENT.LINKED){
-                    checkFee(method)
-                    return@setOnItemClickListener
 
-                }
                 PayME.showError("Phương thức chưa được hỗ trợ")
 
 

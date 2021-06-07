@@ -113,14 +113,13 @@ internal class NetworkRequest(
                             var dataRaw = ConvertJSON().toString(result)
                             finalJSONObject = JSONObject(dataRaw?.substring(1, dataRaw?.length - 1))
                             if (BuildConfig.DEBUG){
-                                println("RESPONSE" + finalJSONObject)
+                                println("RESPONSE" + finalJSONObject + params)
                             }
                         } else {
                             if (BuildConfig.DEBUG) {
-                                println("RESPONSE  " + response.toString() + "params" + params)
+                                println("RESPONSE  " + response.toString()  + params)
                             }
                             var dataRaw = ConvertJSON().toString(response.toString())
-                            println("dataRaw"+dataRaw)
                             finalJSONObject = JSONObject(response.toString())
                         }
                         val data = finalJSONObject?.optJSONObject("data")
@@ -135,6 +134,9 @@ internal class NetworkRequest(
                             }
                             val message = error.optString("message")
                             onError(data, code, message)
+                            if(code==ERROR_CODE.EXPIRED){
+                                PayME.onExpired()
+                            }
                         } else if (data != null) {
                             onSuccess(data)
                         }

@@ -2,12 +2,12 @@ package vn.payme.sdk.model
 
 class CardInfo
     (
-    val cardDateView: String,
-    val cardNumberView: String,
-    val bankShortName: String,
-    val cardNumber: String,
-    val cardHolder: String,
-    val cardDate: String,
+    var cardDateView: String,
+    var cardNumberView: String,
+    var bankShortName: String,
+    var cardNumber: String,
+    var cardHolder: String,
+    var cardDate: String,
 ) {
 
 }

@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/title"
             android:textSize="18dp"
-            android:fontFamily="@font/barlow_regular"
+            android:fontFamily="@font/main_regular"
             android:textColor="@color/blackSix"
             android:text="TESST"
             />

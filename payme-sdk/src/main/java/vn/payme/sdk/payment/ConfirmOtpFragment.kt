@@ -25,7 +25,6 @@ import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.store.Store
 
 class ConfirmOtpFragment : Fragment() {
-    private lateinit var buttonClose: ImageView
     private lateinit var pinView: PinView
     private lateinit var textNote: TextView
     private lateinit var textCountDownTimer: TextView
@@ -40,7 +39,6 @@ class ConfirmOtpFragment : Fragment() {
     ): View? {
         val view: View = inflater?.inflate(R.layout.confirm_otp_layout, container, false)
         loadingProgress = view.findViewById(R.id.loading)
-        buttonClose = view.findViewById(R.id.buttonClose)
         textNote = view.findViewById(R.id.text_note_otp)
         textCountDownTimer = view.findViewById(R.id.counterOtp)
         pinView = view.findViewById(R.id.otp_view)
@@ -63,14 +61,6 @@ class ConfirmOtpFragment : Fragment() {
                 PorterDuff.Mode.SRC_ATOP
             )
 
-        buttonClose.setOnClickListener {
-            if (!loading) {
-                PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
-                EventBus.getDefault()
-                    .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, null))
-
-            }
-        }
 //        timer.start()
         textCountDownTimer.setOnClickListener {
             if(isResend){
@@ -119,7 +109,6 @@ class ConfirmOtpFragment : Fragment() {
             onError = { jsonObject, code, s ->
                 showLoading(false)
                 if (code == ERROR_CODE.EXPIRED) {
-                    PayME.onExpired()
                     PayME.onError(jsonObject, code, s)
                 } else {
                     PayME.showError(s)
@@ -212,7 +201,6 @@ class ConfirmOtpFragment : Fragment() {
             onError = { jsonObject, code, message ->
                 showLoading(false)
                 if (code == ERROR_CODE.EXPIRED) {
-                    PayME.onExpired()
                     PayME.onError(jsonObject, code, message)
                 } else {
                     PayME.showError(message)

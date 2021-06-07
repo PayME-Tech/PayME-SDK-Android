@@ -1,11 +1,13 @@
 package vn.payme.sdk.payment
 
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
 import org.greenrobot.eventbus.EventBus
@@ -64,16 +66,8 @@ class ResultPaymentFragment : Fragment() {
         val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
         var listInfoTop = arrayListOf<Info>()
         val storeName = Store.userInfo.dataInit?.optString("storeName")
-        listInfoTop.add(Info("Dịch vụ", storeName, null, null, false))
-        listInfoTop.add(
-            Info(
-                "Số tiền thanh toán",
-                "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ",
-                null,
-                Color.parseColor(Store.config.colorApp.startColor),
-                false
-            )
-        )
+        listInfoTop.add(Info("Người nhận", storeName, null, null, false))
+        listInfoTop.add(Info("Mã dịch vụ", Store.paymentInfo.infoPayment?.orderId, null, null, false))
         listInfoTop.add(Info("Nội dung", Store.paymentInfo.infoPayment?.note, null, null, true))
 
         infoTop.updateData(listInfoTop)
@@ -116,13 +110,9 @@ class ResultPaymentFragment : Fragment() {
                 )
             )
         }
-
-        if (event.fee > 0) {
-            listInfoBottom.add(Info("Phí", "${decimal.format(event.fee)} đ", null, null, false))
-        }
-        listInfoBottom[listInfoBottom.size-1].isEnd = true
-        textAmount.text = event.infoBottom!![event?.infoBottom!!.size -1].value
-
+        textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
+        listInfoBottom.add(Info("Phí",  if(event.fee==0) "Miễn phí" else "${decimal.format(event.fee)} đ", null, null, false))
+        listInfoBottom.add(Info("Tổng thanh toán",  "${decimal.format(event.fee + Store.paymentInfo.infoPayment!!.amount)} đ", null, ContextCompat.getColor(requireContext(),R.color.red), true))
         if(message != null){
             textError.text = message
             textError.visibility = View.VISIBLE
@@ -130,6 +120,11 @@ class ResultPaymentFragment : Fragment() {
             textResult.text = getString(R.string.payment_fail)
             buttonSubmit.textView.text = getString(R.string.understood)
             infoBottom.visibility = View.GONE
+           var backgroundColorRadius = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(ContextCompat.getColor(requireContext(),R.color.red),ContextCompat.getColor(requireContext(),R.color.red)))
+            backgroundColorRadius.cornerRadius = 60F
+            buttonSubmit.background = backgroundColorRadius
+
+
         }else{
             infoBottom.updateData(listInfoBottom)
             textAmount.setTextColor(Color.parseColor(Store.config.colorApp.startColor))

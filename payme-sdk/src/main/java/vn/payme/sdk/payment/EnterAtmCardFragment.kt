@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
@@ -24,6 +25,7 @@ import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
+import vn.payme.sdk.evenbus.CheckInputAtm
 import vn.payme.sdk.evenbus.PaymentInfoEvent
 import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.model.CardInfo
@@ -75,7 +77,6 @@ class EnterAtmCardFragment : Fragment() {
             },
             onError = { jsonObject, code, message ->
                 if (code == ERROR_CODE.EXPIRED) {
-                    PayME.onExpired()
                     PayME.onError(jsonObject, code, message)
                 } else {
                     PayME.showError(message)
@@ -92,7 +93,7 @@ class EnterAtmCardFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater?.inflate(R.layout.enter_atm_card_fragment, container, false)
-
+        EventBus.getDefault().register(this)
         inputCardNumber = view.findViewById(R.id.inputCardNumber)
         inputCardHolder = view.findViewById(R.id.inputCardHolder)
         inputCardDate = view.findViewById(R.id.inputCardDate)
@@ -268,7 +269,6 @@ class EnterAtmCardFragment : Fragment() {
         },
             onError = { jsonObject, code, message ->
                 if (code == ERROR_CODE.EXPIRED) {
-                    PayME.onExpired()
                     PayME.onError(jsonObject, code, message)
                 } else {
                     PayME.showError(message)
@@ -276,6 +276,28 @@ class EnterAtmCardFragment : Fragment() {
             }
         )
         return view
+    }
+    @Subscribe
+    fun checkAtm (event :CheckInputAtm){
+
+        if (event.isCheck && cardDate.length > 0 && cardHolder.length > 0 && cardNumberValue.length > 0) {
+            val cardInfo = CardInfo(
+                inputCardDate.input.text.toString(),
+                inputCardNumber.input.text.toString(),
+                bankSelected?.shortName!!,
+                cardNumberValue,
+                cardHolder,
+                cardDate
+            )
+            EventBus.getDefault().post(CheckInputAtm(false,  cardInfo))
+        }
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        EventBus.getDefault().unregister(this)
+
     }
 
 }

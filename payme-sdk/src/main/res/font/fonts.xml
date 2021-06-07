@@ -3,13 +3,17 @@
     <font
         android:fontStyle="normal"
         android:fontWeight="400"
-        android:font="@font/semi_bold" />
+        android:font="@font/main_bold" />
     <font
         android:fontStyle="normal"
         android:fontWeight="400"
-        android:font="@font/barlow_regular" />
+        android:font="@font/main_regular" />
     <font
         android:fontStyle="normal"
         android:fontWeight="400"
-        android:font="@font/barlow_medium" />
+        android:font="@font/main_semibold" />
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="400"
+        android:font="@font/main_semibold" />
 </font-family>

@@ -2,10 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingHorizontal="12dp"
-    android:paddingBottom="12dp"
+    android:paddingHorizontal="16dp"
+    android:paddingBottom="4dp"
     android:background="@android:color/transparent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     >
     <LinearLayout
         android:orientation="horizontal"
@@ -16,17 +16,17 @@
         <TextView
             android:layout_width="wrap_content"
             android:text="Dịch vụ"
-            android:textSize="15dp"
+            android:textSize="14dp"
             android:id="@+id/txtLabel"
             android:textColor="@color/nb60"
-            android:fontFamily="@font/barlow_regular"
+            android:fontFamily="@font/main_regular"
             android:layout_height="wrap_content"
             />
         <TextView
-            android:textSize="15dp"
+            android:textSize="14dp"
             android:id="@+id/txtValue"
             android:textColor="@color/blackSeven"
-            android:fontFamily="@font/barlow_medium"
+            android:fontFamily="@font/main_semibold"
             android:layout_weight="1"
             android:textAlignment="textEnd"
             android:text="Tên Merchant"

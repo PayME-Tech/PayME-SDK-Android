@@ -32,6 +32,7 @@ class InfoPayment : RelativeLayout {
 
     }
     fun updateData(list : ArrayList<Info>){
+        listView.removeAllViews()
        for (info in list) {
            val button = ItemInfo(context,info)
            listView.addView(button)

@@ -1,18 +1,17 @@
 package vn.payme.sdk.payment
 
 import android.app.Dialog
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.Nullable
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.json.JSONObject
@@ -20,23 +19,21 @@ import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
-import vn.payme.sdk.enums.TYPE_PAYMENT
-import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
-import vn.payme.sdk.evenbus.ChangeTypePayment
-import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.store.Store
 
 internal class PaymePayment : DialogFragment() {
-
+   lateinit var buttonClose : ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        this.isCancelable = false
         setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle)
     }
 
     override fun onViewCreated(view: View, @Nullable savedInstanceState: Bundle?) {
+
         super.onViewCreated(view, savedInstanceState)
         val bottomSheetDialogFragment: BottomSheetDialog = dialog as BottomSheetDialog
         val fragmentManager: FragmentManager
@@ -48,6 +45,7 @@ internal class PaymePayment : DialogFragment() {
             if (message != null) {
                 bundle.putString("message", message)
             }
+            buttonClose.visibility = View.GONE
             val resultPaymentFragment: ResultPaymentFragment =
                 ResultPaymentFragment()
             resultPaymentFragment.arguments = bundle
@@ -59,25 +57,12 @@ internal class PaymePayment : DialogFragment() {
             fragment.commit()
 
         } else {
-            if (Store.paymentInfo.methodSelected != null) {
-                if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.BANK_CARD) {
-                    fragmentManager = childFragmentManager
-                    val fragment = fragmentManager.beginTransaction()
-                    fragment.add(R.id.frame_container, SelectMethodFragment())
-                    fragment.commit()
-                } else {
-                    fragmentManager = childFragmentManager
-                    val fragment = fragmentManager.beginTransaction()
-                    fragment.add(R.id.frame_container, ConfirmPaymentFragment())
-                    fragment.commit()
 
-                }
-            } else {
-                fragmentManager = childFragmentManager
-                val fragment = fragmentManager.beginTransaction()
-                fragment.add(R.id.frame_container, SelectMethodFragment())
-                fragment.commit()
-            }
+            fragmentManager = childFragmentManager
+            val fragment = fragmentManager.beginTransaction()
+            fragment.add(R.id.frame_container, SelectMethodFragment())
+            fragment.commit()
+
 
         }
         bottomSheetDialogFragment.behavior.isDraggable = false
@@ -96,32 +81,32 @@ internal class PaymePayment : DialogFragment() {
             R.layout.payment_layout,
             container, false
         )
+        buttonClose = v.findViewById(R.id.buttonClose)
+        buttonClose.setOnClickListener {
+            this.dialog?.dismiss()
+            PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
+        }
         EventBus.getDefault().register(this)
         return v
 
     }
+
     @Subscribe
     fun onChangeFragment(event: ChangeFragmentPayment) {
         if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT || event.typeFragment == TYPE_FRAGMENT_PAYMENT.EXPIRED) {
             this.dialog?.dismiss()
-        } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_PAYMENT) {
-                val confirmFragment = ConfirmPaymentFragment()
-                val fragment = childFragmentManager?.beginTransaction()
-                fragment?.replace(
-                    R.id.frame_container,
-                    confirmFragment
-                )
-                fragment?.commit()
-
+            PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
         } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.RESULT) {
+            buttonClose.visibility = View.GONE
             val message = event.value
             if (message != null) {
-                if(!Store.config.disableCallBackResult) {
+                if (!Store.config.disableCallBackResult) {
                     PayME.onError(null, ERROR_CODE.PAYMENT_ERROR, message!!)
                 }
             } else {
-                val data = JSONObject("""{payment:{transaction:${Store.paymentInfo.transaction}}}""")
-                if(!Store.config.disableCallBackResult){
+                val data =
+                    JSONObject("""{payment:{transaction:${Store.paymentInfo.transaction}}}""")
+                if (!Store.config.disableCallBackResult) {
                     PayME.onSuccess(data)
                 }
             }
@@ -136,7 +121,7 @@ internal class PaymePayment : DialogFragment() {
                     resultPaymentFragment
                 )
                 fragment?.commit()
-            }else{
+            } else {
                 this.dialog?.dismiss()
             }
 
@@ -185,4 +170,5 @@ internal class PaymePayment : DialogFragment() {
         EventBus.getDefault().unregister(this);
         super.onDestroy()
     }
+
 }

@@ -16,7 +16,7 @@
                 android:textColor="@color/nb40"
                 android:textAllCaps="true"
                 android:id="@+id/title"
-                android:fontFamily="@font/barlow_regular"
+                android:fontFamily="@font/main_regular"
                 android:textSize="12dp"
                 android:text="@string/enter_number_card"
                 android:layout_height="wrap_content"/>
@@ -27,7 +27,7 @@
                 android:textColor="@color/blackSeven"
                 android:textAllCaps="true"
                 android:id="@+id/titleRight"
-                android:fontFamily="@font/barlow_regular"
+                android:fontFamily="@font/main_regular"
                 android:textSize="12dp"
                 android:text=""
                 android:layout_height="wrap_content"/>
@@ -39,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:textColor="@color/blackSeven"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/barlow_medium"
+                android:fontFamily="@font/main_semibold"
                 android:background="@color/paleGrey"
                 android:textSize="16dp"
                 />

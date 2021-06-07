@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:clickable="true"
+    android:paddingHorizontal="16dp"
+    android:paddingBottom="16dp"
+    android:orientation="vertical"
+    >
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:paddingTop="16dp"
+            android:background="@drawable/background_radius"
+            android:layout_height="match_parent"
+            android:paddingBottom="16dp"
+            >
+            <ImageView
+                android:id="@+id/imagePassport"
+                android:layout_width="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:src="@drawable/ic_passpost"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/txtNotePassport"
+                android:fontFamily="@font/main_regular"
+                android:textSize="17dp"
+                android:textColor="@color/blackSeven"
+                android:paddingHorizontal="30dp"
+                android:layout_marginTop="16dp"
+                android:textAlignment="center"
+                app:layout_constraintTop_toBottomOf="@id/imagePassport"
+                android:layout_width="match_parent"
+                android:text="@string/confirm_passport"
+                android:layout_height="wrap_content">
+
+            </TextView>
+            <LinearLayout
+                app:layout_constraintTop_toBottomOf="@id/txtNotePassport"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+                <vn.payme.sdk.component.Button
+                    android:id="@+id/buttonNext"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_height="wrap_content"
+                    app:pbText="@string/ok"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    />
+                <vn.payme.sdk.component.Button
+                    android:id="@+id/buttonBack"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_height="wrap_content"
+                    app:pbText="@string/change"
+                    android:layout_marginTop="16dp"
+                    />
+            </LinearLayout>
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

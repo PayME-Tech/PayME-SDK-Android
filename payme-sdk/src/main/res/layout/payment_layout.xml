@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,9 +8,42 @@
     android:clickable="true"
     android:orientation="vertical"
     >
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:id="@+id/buttonClose"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:src="@drawable/close"
+            app:tint="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/txtClose"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+        <TextView
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="wrap_content"
+            android:text="@string/close"
+            android:textColor="@color/white"
+            android:id="@+id/txtClose"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginRight="16dp"
+            android:layout_height="wrap_content"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:layout_weight="1"
         android:layout_height="match_parent"
         android:background="@drawable/background_radius_payment"
         >
@@ -21,51 +54,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
              />
-        <androidx.constraintlayout.widget.ConstraintLayout
-            app:layout_constraintTop_toBottomOf="@id/frame_container"
-            android:layout_width="match_parent"
-            android:paddingBottom="15dp"
-            android:paddingTop="10dp"
-            android:paddingHorizontal="16dp"
-            android:background="@color/paleGrey"
-            android:layout_height="wrap_content">
-            <TextView
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:text="Powered by "
-                android:id="@+id/title_bottom_left"
-                android:layout_marginLeft="16dp"
-                android:textSize="10dp"
-                android:fontFamily="@font/semi_bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:textColor="@color/nb60"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <ImageView
-                android:layout_width="54dp"
-                android:id="@+id/imageLogoPayme"
-                app:layout_constraintLeft_toRightOf="@id/title_bottom_left"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:src="@drawable/ic_logo_payme_horizontal"
-                android:layout_height="15dp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="11dp"
-                android:fontFamily="@font/barlow_regular"
-                android:textColor="@color/nb60"
-                app:layout_constraintRight_toLeftOf="@id/imageLogoPci"
-                app:layout_constraintTop_toTopOf="parent"
-                android:text="Bảo mật với chứng chỉ "
-                />
-            <ImageView
-                android:layout_width="wrap_content"
-                android:id="@+id/imageLogoPci"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                android:src="@drawable/ic_logo_pci"
-                android:layout_height="wrap_content"/>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <include layout="@layout/power_by_payme" />
+
+</LinearLayout>

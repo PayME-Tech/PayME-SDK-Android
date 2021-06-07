@@ -2,7 +2,6 @@
 <resources>
     <string name="confirm">Xác nhận</string>
     <string name="domestic_atm_card">Thẻ ATM nội địa</string>
-    <string name="change">Thay đổi</string>
     <string name="next">Tiếp tục</string>
     <string name="enter_number_card">Nhập số thẻ</string>
     <string name="enter_the_number_card_on_the_front_of_the_card">Nhập thẻ số ở mặt trước thẻ</string>
@@ -71,4 +70,8 @@
     <string name="amount_payment">Số tiền thanh toán</string>
     <string name="person_receiving">Người nhận</string>
     <string name="id_serice">Mã dịch vụ</string>
+    <string name="close">Đóng</string>
+    <string name="confirm_passport">Hộ chiếu chỉ dùng để cung cấp định danh cho người nước ngoài</string>
+    <string name="ok">Đồng ý</string>
+    <string name="change">Thay đổi</string>
 </resources>

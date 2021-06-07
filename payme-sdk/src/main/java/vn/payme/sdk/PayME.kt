@@ -16,10 +16,11 @@ import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.enums.*
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.evenbus.PaymentInfoEvent
 import vn.payme.sdk.kyc.CameraKycActivity
 import vn.payme.sdk.model.*
-import vn.payme.sdk.payment.PaymePayment
+import vn.payme.sdk.payment.*
+import vn.payme.sdk.payment.PayFunction
+import vn.payme.sdk.payment.PopupConfirmPassport
 import vn.payme.sdk.payment.PopupTakeFace
 import vn.payme.sdk.payment.PopupTakeIdentify
 import vn.payme.sdk.payment.PopupTakeVideo
@@ -28,13 +29,7 @@ import vn.payme.sdk.store.PaymentInfo
 import vn.payme.sdk.store.Store
 import vn.payme.sdk.store.UserInfo
 import java.security.Security
-import java.text.DecimalFormat
 
-enum class RULE_CHECK_ACCOUNT {
-    LOGGIN_ACTIVE_KYC,
-    LOGGIN_ACTIVE,
-    LOGGIN,
-}
 
 public class PayME {
     companion object {
@@ -79,7 +74,8 @@ public class PayME {
             configColor,
             language,
         )
-        Store.paymentInfo = PaymentInfo(null, 0, "", null, null, null, null,  arrayListOf(), null, true,true)
+        Store.paymentInfo = PaymentInfo(null, 0, "", null, null, null, null,  arrayListOf(),
+            arrayListOf(), null, true,true)
         Store.userInfo = UserInfo(0, false, false, false, "", null)
         Security.insertProviderAt(BouncyCastleProvider(), 1)
         ENV_API.updateEnv()
@@ -89,43 +85,7 @@ public class PayME {
 
     }
 
-    private fun checkAccount(
-        rule: RULE_CHECK_ACCOUNT,
-        onError: (JSONObject?, Int?, String) -> Unit
-    ): Boolean {
-        if (rule == RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC) {
-            if (!Store.userInfo.accountLoginSuccess) {
-                onError(null, ERROR_CODE.ACCOUNT_NOT_LOGIN, "Tài khoản chưa đăng nhập")
-                return false
-            } else if (!Store.userInfo.accountActive) {
-                onError(null, ERROR_CODE.ACCOUNT_NOT_ACTIVATED, "Tài khoản chưa kích hoạt")
-                return false
-            } else if (!Store.userInfo.accountKycSuccess) {
-                onError(null, ERROR_CODE.ACCOUNT_NOT_KYC, "Tài khoản chưa định danh")
-                return false
-            }
-            return true
-        }
-        if (rule == RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE) {
-            if (!Store.userInfo.accountLoginSuccess) {
-                onError(null, ERROR_CODE.ACCOUNT_NOT_LOGIN, "Tài khoản chưa đăng nhập")
-                return false
-            } else if (!Store.userInfo.accountActive) {
-                onError(null, ERROR_CODE.ACCOUNT_NOT_ACTIVATED, "Tài khoản chưa kích hoạt")
-                return false
-            }
-            return true
-        }
-        if (rule == RULE_CHECK_ACCOUNT.LOGGIN) {
-            if (!Store.userInfo.accountLoginSuccess) {
-                onError(null, ERROR_CODE.ACCOUNT_NOT_LOGIN, "Tài khoản chưa đăng nhập")
-                return false
-            }
-            return true
-        }
-        return true
 
-    }
 
     public fun onForgotPassword() {
         openWalletActivity(Action.FORGOT_PASSWORD, 0, "", null, null, onSuccess, onError)
@@ -246,7 +206,7 @@ public class PayME {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
+        if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
             Store.config.closeWhenDone = false
             openWalletActivity(Action.OPEN, 0, "", null, null, onSuccess, onError)
         }
@@ -258,7 +218,7 @@ public class PayME {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE, onError)) {
+        if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE, onError)) {
             getAccountInfo(onSuccess = { jsonObject ->
                 val Account = jsonObject.getJSONObject("Account")
                 val kyc = Account.optJSONObject("kyc")
@@ -292,8 +252,8 @@ public class PayME {
                         val kycIdentity =
                             Store.config.enlableKycIdentify && stateImage == "REJECTED"
                         val kycFace = Store.config.enlableKycFace && stateFace == "REJECTED"
-                        onSuccess(null)
                         onPopupKyc(fragmentManager, kycVideo, kycIdentity, kycFace)
+                        onSuccess(null)
                     } else if (state == "PENDING") {
                         openWallet(onSuccess, onError)
                     }
@@ -361,12 +321,12 @@ public class PayME {
 
 
     public fun deposit(
-        amount: Int,
+        amount: Int?,
         closeDepositResult: Boolean,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
+        if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
             Store.config.closeWhenDone = closeDepositResult
             if (amount != null) {
                 Store.paymentInfo.amount = amount
@@ -387,13 +347,13 @@ public class PayME {
     }
 
     public fun transfer(
-        amount: Int,
+        amount: Int?,
         description: String,
         closeTransferResult: Boolean,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
+        if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
             Store.config.closeWhenDone = closeTransferResult
             if (amount != null) {
                 Store.paymentInfo.amount = amount
@@ -414,32 +374,18 @@ public class PayME {
 
     }
 
-    public fun openService(
-        service: Service,
-        onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
-    ) {
-        if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
-            this.openWalletActivity(
-                Action.UTILITY,
-                0,
-                "",
-                "",
-                service,
-                onSuccess,
-                onError
-            )
-        }
-    }
-
-
     public fun withdraw(
-        amount: Int,
+        amount: Int?,
         closeWithdrawResult: Boolean,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
+        if (amount != null) {
+            Store.paymentInfo.amount = amount
+        } else {
+            Store.paymentInfo.amount = 0
+        }
+        if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
             Store.config.closeWhenDone = closeWithdrawResult
             this.openWalletActivity(
                 Action.WITHDRAW,
@@ -453,16 +399,33 @@ public class PayME {
         }
     }
 
+    public fun openService(
+        service: Service,
+        onSuccess: (JSONObject?) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
+            this.openWalletActivity(
+                Action.UTILITY,
+                0,
+                "",
+                "",
+                service,
+                onSuccess,
+                onError
+            )
+        }
+    }
+
+
+
     fun payInSDK(
         fragmentManager: FragmentManager,
         infoPayment: InfoPayment,
     ) {
-        if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN, onError= {jsonObject, code, m ->
-                PayME.showError(m)
-            })) {
-            payRoot(fragmentManager, infoPayment, true, null, onSuccess, onError)
-            Store.config.disableCallBackResult = true
-        }
+        val payment  = PayFunction()
+        Store.config.disableCallBackResult = false
+        payment.pay(fragmentManager, infoPayment, true, null, onSuccess, onError)
     }
 
     fun pay(
@@ -473,138 +436,20 @@ public class PayME {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        if(method!=null && method.type == TYPE_PAYMENT.WALLET ) {
-            if(checkAccount(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC,onError)){
-                getWalletInfo(onSuccess={jsonObject ->
-                    val walletBalance = jsonObject.getJSONObject("Wallet")
-                    val balance = walletBalance.getDouble("balance")
-                    if (balance < infoPayment.amount){
-                        onError(null,ERROR_CODE.BALANCE_ERROR,"Số dư trong ví không đủ")
-                    }else{
-                        payWithMethod(fragmentManager, infoPayment, isShowResultUI, method, onSuccess, onError)
-                    }
-                }, onError)
-            }
-
-        }else if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
-            payWithMethod(fragmentManager, infoPayment, isShowResultUI, method, onSuccess, onError)
-
-        }
-
-    }
-    private fun payWithMethod(
-        fragmentManager: FragmentManager,
-        infoPayment: InfoPayment,
-        isShowResultUI: Boolean,
-        method: Method?,
-        onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
-    ){
+//        val popupTakeIdentify = PopupConfirmPassport()
+//        popupTakeIdentify.show(fragmentManager, "ModalBottomSheet")
+        println("BAT DAU PAY")
+        val payment  = PayFunction()
         Store.config.disableCallBackResult = false
-        if (method == null || method.type == TYPE_PAYMENT.BANK_CARD) {
-            payRoot(fragmentManager, infoPayment, isShowResultUI, method, onSuccess, onError)
-        } else {
-            checkFee(
-                fragmentManager,
-                infoPayment,
-                isShowResultUI,
-                method,
-                onSuccess,
-                onError,
-            )
-        }
+        payment.pay(fragmentManager, infoPayment, isShowResultUI, method, onSuccess, onError)
+
 
     }
 
-    private fun checkFee(
-        fragmentManager: FragmentManager,
-        infoPayment: InfoPayment,
-        isShowResultUI: Boolean,
-        method: Method?,
-        onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
-    ) {
-        val paymentApi = PaymentApi()
-        val method = method
-        val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
-        paymentApi.getFee(
-            infoPayment!!.amount,
-            method!!,
-            onSuccess = { jsonObject ->
-                val Utility = jsonObject.getJSONObject("Utility")
-                val GetFee = Utility.getJSONObject("GetFee")
-                val succeeded = GetFee.getBoolean("succeeded")
-                val message = GetFee.getString("message")
-                if (succeeded) {
-                    val feeObject = GetFee.getJSONObject("fee")
-                    val fee = feeObject.getInt("fee")
-                    val state = GetFee.optString("state")
-                    if (state == "null") {
-                        EventBus.getDefault().postSticky(PaymentInfoEvent(null, null, null, fee))
-                        payRoot(
-                            fragmentManager,
-                            infoPayment,
-                            isShowResultUI,
-                            method,
-                            onSuccess,
-                            onError
-                        )
-
-                    } else {
-                        onError(GetFee, ERROR_CODE.PAYMENT_ERROR, message)
-                    }
-                } else {
-                    onError(GetFee, ERROR_CODE.PAYMENT_ERROR, message)
-                }
-            },
-            onError
-        )
-    }
 
 
-    fun payRoot(
-        fragmentManager: FragmentManager,
-        infoPayment: InfoPayment,
-        isShowResultUI: Boolean,
-        method: Method?,
-        onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit,
-    ) {
-        if (method != null && !((method.type == TYPE_PAYMENT.WALLET) || (method.type == TYPE_PAYMENT.BANK_CARD) || (method.type == TYPE_PAYMENT.LINKED))) {
-            onError(null, null, "Phương thức chưa được hỗ trợ")
-        }else if(method != null && method?.type != TYPE_PAYMENT.WALLET && !Store.config.openPayAndKyc) {
-            onError(null, ERROR_CODE.OTHER, "Chức năng chỉ có thể thao tác môi trường production")
-        }else{
-            Store.paymentInfo.transaction = ""
-            Store.paymentInfo.isChangeMethod = method == null
-            Store.paymentInfo.methodSelected = method
-            Store.paymentInfo.isShowResultUI = isShowResultUI
-            Companion.onSuccess = onSuccess
-            Companion.onError = onError
-            PayME.fragmentManager = fragmentManager
-            Store.paymentInfo.infoPayment = infoPayment
-            val decimal = DecimalFormat("#,###")
-            if (infoPayment.amount!! < Store.config.limitPayment.min) {
-                onError(
-                    null,
-                    ERROR_CODE.LITMIT,
-                    "Số tiền giao dịch tối thiểu ${decimal.format(Store.config.limitPayment.min)} VND"
-                )
-            } else if (infoPayment.amount!! > Store.config.limitPayment.max) {
-                onError(
-                    null,
-                    ERROR_CODE.LITMIT,
-                    "Số tiền giao dịch tối đa ${decimal.format(Store.config.limitPayment.max)} VND"
-                )
-            } else {
-                val paymePayment: PaymePayment = PaymePayment()
-                paymePayment.show(
-                    fragmentManager,
-                    "ModalBottomSheet"
-                )
-            }
-        }
-    }
+
+
 
     fun closeOpenWallet() {
         var even: EventBus = EventBus.getDefault()
@@ -620,7 +465,7 @@ public class PayME {
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
 
-        if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE,onError)) {
+        if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE,onError)) {
 
             val accountApi = AccountApi()
             accountApi.getAccountInfo(onSuccess = { jsonObject ->
@@ -694,11 +539,12 @@ public class PayME {
     }
 
     public fun logout() {
+        Store.userInfo.accountLoginSuccess = false
         this.closeOpenWallet()
     }
 
     public fun getSupportedServices(onSuccess: (ArrayList<Service>?) -> Unit,onError: (JSONObject?, Int?, String) -> Unit)  {
-        if(checkAccount(RULE_CHECK_ACCOUNT.LOGGIN,onError)){
+        if(CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN,onError)){
             onSuccess(Store.paymentInfo.listService)
         }
     }
@@ -707,7 +553,7 @@ public class PayME {
         onSuccess: (ArrayList<Method>) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        if(checkAccount(RULE_CHECK_ACCOUNT.LOGGIN,onError)) {
+        if(CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN,onError)) {
             val paymentApi = PaymentApi()
             val listMethod: ArrayList<Method> = ArrayList<Method>()
             paymentApi.getTransferMethods(
@@ -730,6 +576,7 @@ public class PayME {
                             }
                             var fee = jsonObject.optInt("fee")
                             var label = jsonObject.optString("label")
+                            var feeDescription = jsonObject.optString("feeDescription")
                             var methodId = jsonObject.optInt("methodId")
                             var minFee = jsonObject.optInt("minFee")
                             var title = jsonObject.optString("title")
@@ -741,6 +588,7 @@ public class PayME {
                                     label,
                                     methodId,
                                     minFee,
+                                    feeDescription,
                                     title,
                                     type,
                                 )
@@ -760,7 +608,7 @@ public class PayME {
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        if (checkAccount(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC,onError)) {
+        if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC,onError)) {
             val paymentApi = PaymentApi()
             paymentApi.getBalance(onSuccess, onError)
         }

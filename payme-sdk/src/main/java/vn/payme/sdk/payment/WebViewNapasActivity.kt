@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.view.KeyEvent
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ImageView
@@ -84,10 +85,9 @@ class WebViewNapasActivity : AppCompatActivity() {
                     "ModalBottomSheet"
                 )
             }
-
-
         }
-
-
+    }
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        return true
     }
 }

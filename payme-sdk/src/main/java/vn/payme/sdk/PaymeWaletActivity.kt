@@ -265,7 +265,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         }
         buttonClose.setOnClickListener {
             header.visibility = View.GONE
-            myWebView.loadUrl("${domain}active/${encode}")
+            myWebView.loadUrl("${domain}")
         }
         myWebView.loadUrl("${domain}active/${encode}")
         if (!isNetworkConnected()) {
@@ -381,10 +381,8 @@ internal class PaymeWaletActivity : AppCompatActivity() {
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        println("this.myWebView.url"+this.myWebView.url)
         if(this.myWebView.url==domain){
             finish()
-
         }else if (this.myWebView.canGoBack()) {
 
             this.myWebView.goBack()

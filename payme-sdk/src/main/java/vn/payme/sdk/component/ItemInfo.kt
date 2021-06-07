@@ -19,6 +19,8 @@ class ItemInfo : RelativeLayout {
         val dotted = findViewById<View>(R.id.dotted) as ImageView
         txtLabel.text = info.label
         txtValue.text = info.value
+        txtValue.textSize = info.valueTextSize
+
         if(info.isEnd){
             dotted.visibility = View.GONE
         }

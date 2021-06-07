@@ -6,9 +6,11 @@ import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import vn.payme.sdk.PayME
@@ -18,6 +20,8 @@ import vn.payme.sdk.store.Store
 class Button : RelativeLayout {
 
     lateinit var progressBar: ProgressBar
+    lateinit var containerTitle: ConstraintLayout
+    lateinit var iconLeft: ImageView
     lateinit var textView: TextView
     var isLoadingShowing: Boolean = false
 
@@ -47,14 +51,16 @@ class Button : RelativeLayout {
 
 
     fun enableLoading() {
-            progressBar!!.visibility = View.VISIBLE
-            isLoadingShowing = true
-    }
-    fun disableLoading() {
-            progressBar!!.visibility = View.INVISIBLE
-            isLoadingShowing = false
+        progressBar!!.visibility = View.VISIBLE
+        containerTitle!!.visibility = View.GONE
+        isLoadingShowing = true
     }
 
+    fun disableLoading() {
+        progressBar!!.visibility = View.GONE
+        containerTitle!!.visibility = View.VISIBLE
+        isLoadingShowing = false
+    }
 
 
     private fun init(context: Context, attrs: AttributeSet?) {
@@ -63,9 +69,11 @@ class Button : RelativeLayout {
         LayoutInflater.from(getContext()).inflate(R.layout.view_loading_button, this, true)
         progressBar = findViewById<View>(R.id.pb_progress) as ProgressBar
         textView = findViewById<View>(R.id.pb_text) as TextView
+        containerTitle = findViewById<View>(R.id.container_title) as ConstraintLayout
+        iconLeft = findViewById<View>(R.id.iconLeft) as ImageView
         textView.setTextColor(ContextCompat.getColor(PayME.context, R.color.white))
         textView.textSize = 16F
-        val typeface: Typeface? = ResourcesCompat.getFont(PayME.context, R.font.semi_bold)
+        val typeface: Typeface? = ResourcesCompat.getFont(PayME.context, R.font.main_bold)
         textView.setTypeface(typeface)
 
         if (attrs != null) {

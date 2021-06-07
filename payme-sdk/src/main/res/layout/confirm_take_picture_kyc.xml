@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:fontFamily="@font/semi_bold"
+            android:fontFamily="@font/main_bold"
             android:text="@string/confirm_take_photography"
             android:textColor="@color/darkBlueGrey"
             android:textSize="18dp"

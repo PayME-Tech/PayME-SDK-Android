@@ -228,11 +228,11 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-        buttonKYC.setOnClickListener { 
-            payme?.openKYC(this.supportFragmentManager,onSuccess = {
-                                                                   println("mo kyc thanh cong")
+        buttonKYC.setOnClickListener {
+            payme?.openKYC(this.supportFragmentManager, onSuccess = {
+                println("mo kyc thanh cong")
 
-            },onError = {jsonObject, i, s ->
+            }, onError = { jsonObject, i, s ->
                 PayME.showError(s)
             })
         }
@@ -408,7 +408,7 @@ class MainActivity : AppCompatActivity() {
 
             val amount = convertInt(moneyTransfer.text.toString())
 
-            payme?.transfer(amount, "chuyen tien cho ban nhe",true,
+            payme?.transfer(amount, "chuyen tien cho ban nhe", true,
                 onSuccess = { json: JSONObject? ->
                     println("onSuccesstransfer")
                 },
@@ -441,27 +441,49 @@ class MainActivity : AppCompatActivity() {
                     "OpenEWallet",
                     ""
                 )
-//            payme?.getPaymentMethods(if (env == Env.PRODUCTION) 57956431 else if (env == Env.SANDBOX) 24088141 else 9,onSuccess = {list->
 
-                payme?.pay(this.supportFragmentManager, infoPayment, true,null,
-                    onSuccess = { json: JSONObject? ->
-                    },
-                    onError = { jsonObject, code, message ->
-                        if (message != null && message.length > 0) {
-                            PayME.showError(message)
+                    payme?.pay(this.supportFragmentManager, infoPayment, true, null,
+                        onSuccess = { json: JSONObject? ->
+                        },
+                        onError = { jsonObject, code, message ->
+                            if (message != null && message.length > 0) {
+                                PayME.showError(message)
+                            }
+                            if (code == ERROR_CODE.EXPIRED) {
+                                walletView.setVisibility(View.GONE)
+                                payme?.logout()
+                            }
+                            if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
+                                openWallet()
+                            }
                         }
-                        if (code == ERROR_CODE.EXPIRED) {
-                            walletView.setVisibility(View.GONE)
-                            payme?.logout()
-                        }
-                        if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
-                            openWallet()
-                        }
-                    }
-                )
-//            },onError = {jsonObject, i, s ->  })
+                    )
 
-
+//            payme?.getPaymentMethods(
+//                if (env == Env.PRODUCTION) 57956431 else if (env == Env.SANDBOX) 24088141 else 9,
+//                onSuccess = { list ->
+//                    payme?.pay(this.supportFragmentManager, infoPayment, true, list[1],
+//                        onSuccess = { json: JSONObject? ->
+//                        },
+//                        onError = { jsonObject, code, message ->
+//                            if (message != null && message.length > 0) {
+//                                PayME.showError(message)
+//                            }
+//                            if (code == ERROR_CODE.EXPIRED) {
+//                                walletView.setVisibility(View.GONE)
+//                                payme?.logout()
+//                            }
+//                            if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
+//                                openWallet()
+//                            }
+//                        }
+//                    )
+//                },
+//                onError = { jsonObject, i, message ->
+//                    if (message != null && message.length > 0) {
+//                            PayME.showError(message)
+//                        }
+//                })
         }
 
         buttonSetting.setOnClickListener {

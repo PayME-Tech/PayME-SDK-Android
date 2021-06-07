@@ -25,7 +25,6 @@ import vn.payme.sdk.store.Store
 import java.security.MessageDigest
 
 class ConfirmPassFragment : Fragment() {
-    private lateinit var buttonClose: ImageView
     private lateinit var pinView: PinView
     private lateinit var loading: ProgressBar
     private lateinit var textForgotPassword: TextView
@@ -111,7 +110,6 @@ class ConfirmPassFragment : Fragment() {
             },
             onError = { jsonObject, code, s ->
                 if (code == ERROR_CODE.EXPIRED) {
-                    PayME.onExpired()
                     PayME.onError(jsonObject, code, s)
                 } else {
                     disableLoading()
@@ -130,7 +128,6 @@ class ConfirmPassFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater?.inflate(R.layout.confirm_pass, container, false)
-        buttonClose = view.findViewById(R.id.buttonClose)
         pinView = view.findViewById(R.id.otp_view)
         loading = view.findViewById(R.id.loading)
         textForgotPassword = view.findViewById(R.id.txtForgotPassword)
@@ -196,7 +193,6 @@ class ConfirmPassFragment : Fragment() {
                             disableLoading()
 
                             if (code == ERROR_CODE.EXPIRED) {
-                                PayME.onExpired()
                                 PayME.onError(jsonObject, code, message)
                             } else {
                                 PayME.showError(message)
@@ -205,15 +201,6 @@ class ConfirmPassFragment : Fragment() {
 
                 }
 
-            }
-        }
-        buttonClose.setOnClickListener {
-            if (loading.visibility != View.VISIBLE) {
-                PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
-                EventBus.getDefault()
-                    .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, null))
-
-//                PaymePayment.closePopup(requireContext())
             }
         }
         return view
