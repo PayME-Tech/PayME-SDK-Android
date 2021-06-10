@@ -86,7 +86,7 @@ class SelectMethodFragment : Fragment() {
         EventBus.getDefault().register(this)
 
         val storeImage = Store.userInfo.dataInit?.optString("storeImage")
-        if(storeImage!=null && storeImage!="null"){
+        if(storeImage!=null && storeImage!="null" && storeImage!=""){
             containerLogoMC.visibility = View.VISIBLE
             val picasso = Picasso.get()
             picasso.setIndicatorsEnabled(false)

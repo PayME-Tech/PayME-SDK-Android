@@ -117,7 +117,7 @@ public class JsObject(
     }
     @JavascriptInterface
     public fun onCommunicate(string: String) {
-//        println("onCommunicate"+string)
+        println("onCommunicate"+string)
         try {
             val json: JSONObject = JSONObject(string)
             val type = json.optString("type")
