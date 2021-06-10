@@ -1,6 +1,10 @@
 package vn.payme.sdk.kyc
 
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -12,11 +16,15 @@ import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.model.KeyPath
+import com.airbnb.lottie.value.SimpleLottieValueCallback
 import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.CameraView
 import com.otaliastudios.cameraview.VideoResult
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
+import vn.payme.sdk.store.Store
 import java.io.File
 
 
@@ -68,6 +76,16 @@ class TakeVideoKycFragment : Fragment() {
         buttonBackHeader!!.setOnClickListener {
             activity?.finish()
         }
+        buttonTakePicture?.addValueCallback<ColorFilter>(
+            KeyPath("Camera", "**"),
+            LottieProperty.COLOR_FILTER,
+            SimpleLottieValueCallback<ColorFilter?> {
+                PorterDuffColorFilter(
+                    Color.parseColor(Store.config.colorApp.startColor),
+                    PorterDuff.Mode.SRC_ATOP
+                )
+            }
+        )
         cameraKitView!!.setLifecycleOwner(this)
         cameraKitView!!.addCameraListener(Listener())
         buttonTakePicture?.setOnClickListener {

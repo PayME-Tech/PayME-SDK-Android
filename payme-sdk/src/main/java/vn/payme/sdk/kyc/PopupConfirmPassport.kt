@@ -1,23 +1,30 @@
 package vn.payme.sdk.payment
 
 import android.app.Dialog
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
+import com.devs.vectorchildfinder.VectorChildFinder
+import com.devs.vectorchildfinder.VectorDrawableCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
+import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.model.TypeIdentify
+import vn.payme.sdk.store.Store
 
 internal class PopupConfirmPassport : BottomSheetDialogFragment() {
 
     private lateinit var buttonNext: Button
     private lateinit var buttonClose: Button
+    private lateinit var imagePassport: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +42,9 @@ internal class PopupConfirmPassport : BottomSheetDialogFragment() {
         )
         buttonNext = view.findViewById(R.id.buttonNext)
         buttonClose = view.findViewById(R.id.buttonBack)
+        imagePassport = view.findViewById(R.id.imagePassport)
+
+        ChangeColorImage().changeColor(requireContext(),imagePassport,R.drawable.ic_passpost,3)
         buttonClose.setOnClickListener {
             dialog?.dismiss()
             fragmentManager?.let { PopupSelectTypeIdentify().show(it, "ModalBottomSheet") }

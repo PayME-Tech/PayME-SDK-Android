@@ -13,6 +13,8 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import com.devs.vectorchildfinder.VectorChildFinder
+import com.devs.vectorchildfinder.VectorDrawableCompat
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
@@ -21,6 +23,7 @@ import vn.payme.sdk.component.PinView
 import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
+import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.store.Store
 
@@ -28,6 +31,7 @@ class ConfirmOtpFragment : Fragment() {
     private lateinit var pinView: PinView
     private lateinit var textNote: TextView
     private lateinit var textCountDownTimer: TextView
+    private lateinit var imageOtp: ImageView
     private lateinit var loadingProgress: ProgressBar
     var isResend = false
     var loading = false
@@ -42,6 +46,11 @@ class ConfirmOtpFragment : Fragment() {
         textNote = view.findViewById(R.id.text_note_otp)
         textCountDownTimer = view.findViewById(R.id.counterOtp)
         pinView = view.findViewById(R.id.otp_view)
+        imageOtp = view.findViewById(R.id.image_otp)
+
+        ChangeColorImage().changeColor(requireContext(),imageOtp,R.drawable.ic_confirm_pass,6)
+
+
         pinView.setItemBackgroundColor(ContextCompat.getColor(PayME.context, R.color.ice))
         pinView.setAnimationEnable(true)
         pinView.requestFocus()
@@ -209,5 +218,6 @@ class ConfirmOtpFragment : Fragment() {
 
             })
     }
+
 
 }

@@ -219,7 +219,7 @@ class MainActivity : AppCompatActivity() {
                 walletView.visibility = View.GONE
             }
         }
-        var configColor = arrayOf<String>("#0daa27", "#0daa27")
+        var configColor = arrayOf<String>("#6756d6", "#6756d6")
 
 
         buttonReload.setOnClickListener {

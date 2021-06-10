@@ -12,22 +12,27 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import com.devs.vectorchildfinder.VectorChildFinder
+import com.devs.vectorchildfinder.VectorDrawableCompat
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.PinView
-import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
+import vn.payme.sdk.hepper.ChangeColorImage
+import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.store.Store
 import java.security.MessageDigest
+
 
 class ConfirmPassFragment : Fragment() {
     private lateinit var pinView: PinView
     private lateinit var loading: ProgressBar
     private lateinit var textForgotPassword: TextView
+    private lateinit var imageConfirm: ImageView
     fun SHA256(text: String): String? {
         val charset = Charsets.UTF_8
         val byteArray = text.toByteArray(charset)
@@ -129,6 +134,8 @@ class ConfirmPassFragment : Fragment() {
     ): View? {
         val view: View = inflater?.inflate(R.layout.confirm_pass, container, false)
         pinView = view.findViewById(R.id.otp_view)
+        imageConfirm = view.findViewById(R.id.image_otp)
+
         loading = view.findViewById(R.id.loading)
         textForgotPassword = view.findViewById(R.id.txtForgotPassword)
 
@@ -138,11 +145,14 @@ class ConfirmPassFragment : Fragment() {
                 Color.parseColor(Store.config.colorApp.startColor),
                 PorterDuff.Mode.SRC_ATOP
             )
+        ChangeColorImage().changeColor(requireContext(),imageConfirm,R.drawable.ic_confirm_pass,6)
+
         textForgotPassword.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
         textForgotPassword.paintFlags = Paint.UNDERLINE_TEXT_FLAG
         pinView.setAnimationEnable(true)
         pinView.requestFocus()
         pinView.isPasswordHidden = true
+        pinView.background = Store.config.colorApp.backgroundColorRadiusBorder
         Keyboard.showKeyboard(requireContext())
         textForgotPassword.setOnClickListener {
             val paymeSDK = PayME(
@@ -205,4 +215,5 @@ class ConfirmPassFragment : Fragment() {
         }
         return view
     }
+
 }

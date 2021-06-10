@@ -19,6 +19,7 @@ import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
+import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.model.TypeIdentify
 import vn.payme.sdk.payment.PopupSelectTypeIdentify
 import vn.payme.sdk.payment.PopupTakeFace
@@ -90,6 +91,8 @@ class TakePictureIdentifyFragment : Fragment() {
         buttonOpenSetting = view.findViewById(R.id.buttonOpenSetting)
         buttonBackHeaderErrorCamera = view.findViewById(R.id.buttonBackHeaderErrorCamera)
         PermisionCamera().requestCamera(requireContext(),requireActivity())
+        ChangeColorImage().changeColor(requireContext(),buttonTakePicture!!,R.drawable.ic_buttontakepic,1)
+
         if(CameraKycActivity.updateOnlyIdentify){
             buttonDropdown.visibility  = View.GONE
         }

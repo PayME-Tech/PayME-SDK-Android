@@ -18,6 +18,7 @@ import com.otaliastudios.cameraview.PictureResult
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
+import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.payment.PopupTakeVideo
 import vn.payme.sdk.store.Store
 
@@ -87,6 +88,8 @@ class TakePictureAvataFragment : Fragment() {
         buttonBackHeaderErrorCamera = view.findViewById(R.id.buttonBackHeaderErrorCamera)
 
         PermisionCamera().requestCamera(requireContext(),requireActivity())
+        ChangeColorImage().changeColor(requireContext(),buttonTakePicture!!,R.drawable.ic_buttontakepic,1)
+
 
         buttonOpenSetting!!.setOnClickListener {
             if (enableSetting) {

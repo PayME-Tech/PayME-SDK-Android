@@ -60,7 +60,7 @@
             android:scaleType="centerCrop"
             app:lottie_rawRes="@raw/chupgttt"
             app:lottie_loop="true"
-            app:lottie_autoPlay="true"
+            app:lottie_autoPlay="false"
             app:layout_constraintTop_toBottomOf="@id/txtNote"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"

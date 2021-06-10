@@ -1,6 +1,9 @@
 package vn.payme.sdk.payment
 
 import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,13 +13,15 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.model.KeyPath
+import com.airbnb.lottie.value.SimpleLottieValueCallback
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.component.InfoPayment
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
-
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.evenbus.PaymentInfoEvent
 import vn.payme.sdk.model.Info
@@ -24,7 +29,7 @@ import vn.payme.sdk.store.Store
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
+
 
 class ResultPaymentFragment : Fragment() {
     private lateinit var buttonSubmit: Button
@@ -127,6 +132,7 @@ class ResultPaymentFragment : Fragment() {
 
         }else{
             infoBottom.updateData(listInfoBottom)
+            loadAnimation()
             textAmount.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
         }
 
@@ -137,4 +143,29 @@ class ResultPaymentFragment : Fragment() {
 
         return view
     }
+    fun loadAnimation (){
+        lottie.addValueCallback<ColorFilter>(
+            KeyPath("Laplanh", "**"),
+            LottieProperty.COLOR_FILTER,
+            SimpleLottieValueCallback<ColorFilter?> {
+                PorterDuffColorFilter(
+                    Color.parseColor(Store.config.colorApp.startColor),
+                    PorterDuff.Mode.SRC_ATOP
+                )
+            }
+        )
+        lottie.addValueCallback<ColorFilter>(
+            KeyPath("Do", "**"),
+            LottieProperty.COLOR_FILTER,
+            SimpleLottieValueCallback<ColorFilter?> {
+                PorterDuffColorFilter(
+                    Color.parseColor(Store.config.colorApp.startColor),
+                    PorterDuff.Mode.SRC_ATOP
+                )
+            }
+        )
+        lottie.playAnimation()
+
+    }
+
 }
