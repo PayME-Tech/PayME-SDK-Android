@@ -336,6 +336,8 @@ internal class PaymeWaletActivity : AppCompatActivity() {
 
     @Subscribe
     fun onText(myEven: MyEven) {
+        println("DONG")
+
         if (myEven.type == TypeCallBack.onReload) {
             this.myWebView.reload()
         }

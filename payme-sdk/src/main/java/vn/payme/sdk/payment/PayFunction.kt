@@ -45,6 +45,9 @@ internal class PayFunction {
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
 
+        PayME.onSuccess = onSuccess
+        PayME.onError = onError
+
         this.checkInfoPayment(
             fragmentManager,
             infoPayment,
@@ -264,8 +267,7 @@ internal class PayFunction {
                         Store.paymentInfo.isChangeMethod = method == null
                         Store.paymentInfo.methodSelected = method
                         Store.paymentInfo.isShowResultUI = isShowResultUI
-                        PayME.onSuccess = onSuccess
-                        PayME.onError = onError
+
                         PayME.fragmentManager = fragmentManager
                         Store.paymentInfo.infoPayment = infoPayment
                         val paymePayment: PaymePayment = PaymePayment()

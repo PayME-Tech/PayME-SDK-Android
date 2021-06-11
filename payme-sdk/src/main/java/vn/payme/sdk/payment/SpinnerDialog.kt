@@ -9,7 +9,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.fragment.app.DialogFragment
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.R
+import vn.payme.sdk.enums.TypeCallBack
+import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.store.Store
 
 
@@ -27,14 +31,28 @@ class SpinnerDialog : DialogFragment() {
                 Color.parseColor(Store.config.colorApp.startColor),
                 PorterDuff.Mode.SRC_ATOP
             )
+        EventBus.getDefault().register(this)
+
         return view
 
+    }
+       @Subscribe
+    fun onText(myEven: MyEven) {
+        if (myEven.type == TypeCallBack.onExpired) {
+            dismiss()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.isCancelable = false
         setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        EventBus.getDefault().unregister(this)
+
     }
     override fun setupDialog(dialog: Dialog, style: Int) {
         val contentView = View.inflate(context, R.layout.payment_layout, null)

@@ -68,20 +68,13 @@ class EnterAtmCardFragment : Fragment() {
                         inputCardNumber.txtTitleRight.text = accountName
                         cardHolder = accountName
                     }
-
                 } else {
                     inputCardHolder.visibility = View.VISIBLE
                 }
 
-
             },
             onError = { jsonObject, code, message ->
-                if (code == ERROR_CODE.EXPIRED) {
-                    PayME.onError(jsonObject, code, message)
-                } else {
                     PayME.showError(message)
-                }
-
             }
         )
 
@@ -268,11 +261,7 @@ class EnterAtmCardFragment : Fragment() {
 
         },
             onError = { jsonObject, code, message ->
-                if (code == ERROR_CODE.EXPIRED) {
-                    PayME.onError(jsonObject, code, message)
-                } else {
                     PayME.showError(message)
-                }
             }
         )
         return view

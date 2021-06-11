@@ -76,10 +76,7 @@ class ListMethodPaymentFragment : Fragment() {
             },
             onError = { jsonObject: JSONObject?, code: Int?, message: String ->
                 disableLoading()
-                if (code == ERROR_CODE.EXPIRED) {
-                } else {
-                    PayME.showError(message)
-                }
+                PayME.showError(message)
             })
     }
 

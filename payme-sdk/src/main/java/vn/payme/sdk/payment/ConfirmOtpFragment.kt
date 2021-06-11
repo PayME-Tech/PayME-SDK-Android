@@ -117,13 +117,7 @@ class ConfirmOtpFragment : Fragment() {
             },
             onError = { jsonObject, code, s ->
                 showLoading(false)
-                if (code == ERROR_CODE.EXPIRED) {
-                    PayME.onError(jsonObject, code, s)
-                } else {
-                    PayME.showError(s)
-                }
-
-
+                PayME.showError(s)
             }
         )
     }
@@ -209,13 +203,7 @@ class ConfirmOtpFragment : Fragment() {
             },
             onError = { jsonObject, code, message ->
                 showLoading(false)
-                if (code == ERROR_CODE.EXPIRED) {
-                    PayME.onError(jsonObject, code, message)
-                } else {
-                    PayME.showError(message)
-                }
-
-
+                PayME.showError(message)
             })
     }
 

@@ -114,14 +114,8 @@ class ConfirmPassFragment : Fragment() {
 
             },
             onError = { jsonObject, code, s ->
-                if (code == ERROR_CODE.EXPIRED) {
-                    PayME.onError(jsonObject, code, s)
-                } else {
                     disableLoading()
                     PayME.showError(s)
-                }
-
-
             }
         )
     }
@@ -201,12 +195,7 @@ class ConfirmPassFragment : Fragment() {
 
                         }, onError = { jsonObject, code, message ->
                             disableLoading()
-
-                            if (code == ERROR_CODE.EXPIRED) {
-                                PayME.onError(jsonObject, code, message)
-                            } else {
-                                PayME.showError(message)
-                            }
+                            PayME.showError(message)
                         })
 
                 }

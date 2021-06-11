@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.*
@@ -119,12 +120,14 @@ class MainActivity : AppCompatActivity() {
             },
             onError = { jsonObject, code, message ->
                 PayME.showError(message)
+                println("code"+code+"message"+message)
                 if (code == ERROR_CODE.EXPIRED) {
                     walletView.setVisibility(View.GONE)
                     payme?.logout()
                 }
 
             })
+
     }
 
 
@@ -161,6 +164,8 @@ class MainActivity : AppCompatActivity() {
             val decimal = DecimalFormat("#,###")
             textView.text = "${decimal.format(balance)}đ"
         }, onError = { jsonObject, code, message ->
+            println("code"+code+"message"+message)
+
             PayME.showError(message)
             if (code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
                 openWallet()
@@ -233,6 +238,8 @@ class MainActivity : AppCompatActivity() {
                 println("mo kyc thanh cong")
 
             }, onError = { jsonObject, i, s ->
+                println("code"+i+"message"+s)
+
                 PayME.showError(s)
             })
         }
@@ -311,6 +318,7 @@ class MainActivity : AppCompatActivity() {
                     payme?.getAccountInfo(onSuccess = { data ->
                         println("getAccountInfo" + data)
 
+
                     }, onError = { jsonObject, i, s ->
 
                     })
@@ -356,12 +364,16 @@ class MainActivity : AppCompatActivity() {
                     },
                     onError = { jsonObject, code, message ->
                         PayME.showError(message)
+                        println("code"+code+"message"+message)
+
                         if (code == ERROR_CODE.EXPIRED) {
                             walletView.setVisibility(View.GONE)
                             payme?.logout()
                         }
                     })
             }
+
+
 
 
         }
@@ -375,9 +387,10 @@ class MainActivity : AppCompatActivity() {
                 },
                 onError = { jsonObject, code, message ->
                     PayME.showError(message)
+                    println("code"+code+"message"+message)
+
                     if (code == ERROR_CODE.EXPIRED) {
                         walletView.setVisibility(View.GONE)
-                        payme?.logout()
                     }
                     if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
                         openWallet()
@@ -394,10 +407,11 @@ class MainActivity : AppCompatActivity() {
                 onSuccess = { json: JSONObject? ->
                 },
                 onError = { jsonObject, code, message ->
+                    println("code"+code+"message"+message)
+
                     PayME.showError(message)
                     if (code == ERROR_CODE.EXPIRED) {
                         walletView.setVisibility(View.GONE)
-                        payme?.logout()
                     }
                     if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
                         openWallet()
@@ -414,9 +428,10 @@ class MainActivity : AppCompatActivity() {
                 },
                 onError = { jsonObject, code, message ->
                     PayME.showError(message)
+                    println("code"+code+"message"+message)
+
                     if (code == ERROR_CODE.EXPIRED) {
                         walletView.setVisibility(View.GONE)
-                        payme?.logout()
                     }
                     if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
                         openWallet()
@@ -446,17 +461,19 @@ class MainActivity : AppCompatActivity() {
                         onSuccess = { json: JSONObject? ->
                         },
                         onError = { jsonObject, code, message ->
+                            println("code"+code+"message"+message)
+
                             if (message != null && message.length > 0) {
                                 PayME.showError(message)
                             }
                             if (code == ERROR_CODE.EXPIRED) {
                                 walletView.setVisibility(View.GONE)
-                                payme?.logout()
                             }
                             if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
                                 openWallet()
                             }
                         }
+
                     )
 
 //            payme?.getPaymentMethods(

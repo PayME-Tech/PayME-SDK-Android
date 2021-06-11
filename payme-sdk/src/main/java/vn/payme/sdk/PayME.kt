@@ -40,15 +40,6 @@ public class PayME {
         fun showError(message: String) {
             Toasty.error(PayME.context, message, Toast.LENGTH_SHORT, true).show();
         }
-
-        internal fun onExpired() {
-            Store.userInfo.accountLoginSuccess = false
-            var even: EventBus = EventBus.getDefault()
-            var myEven2: MyEven = MyEven(TypeCallBack.onExpired, "")
-            even.post(myEven2)
-            EventBus.getDefault()
-                .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, null))
-        }
     }
 
     constructor(
@@ -85,8 +76,12 @@ public class PayME {
 
     }
 
-
-
+    fun  close(){
+        EventBus.getDefault()
+            .post(MyEven(TypeCallBack.onExpired, ""))
+        EventBus.getDefault()
+            .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT_NOT_CALL_BACK, null))
+    }
     public fun onForgotPassword() {
         openWalletActivity(Action.FORGOT_PASSWORD, 0, "", null, null, onSuccess, onError)
     }
@@ -96,8 +91,6 @@ public class PayME {
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
         val paymentApi = PaymentApi()
-
-
         paymentApi.getSettings(onSuccess = { jsonObject ->
             val Setting = jsonObject.getJSONObject("Setting")
             val configs = Setting.getJSONArray("configs")
@@ -540,7 +533,7 @@ public class PayME {
 
     public fun logout() {
         Store.userInfo.accountLoginSuccess = false
-        this.closeOpenWallet()
+        this.close()
     }
 
     public fun getSupportedServices(onSuccess: (ArrayList<Service>?) -> Unit,onError: (JSONObject?, Int?, String) -> Unit)  {

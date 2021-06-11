@@ -165,12 +165,13 @@ public class JsObject(
             val data = jsonObject.optJSONObject("data")
             val message = jsonObject.optString("message")
             val type = jsonObject.optString("type")
-//            println("onError" + jsonObject)
             back()
             PayME.onError(data, code, message)
             if(code==ERROR_CODE.EXPIRED){
-                PayME.onExpired()
+                val payme = PayME()
+                payme.logout()
             }
+
         } catch (e: Exception) {
             println(e)
 

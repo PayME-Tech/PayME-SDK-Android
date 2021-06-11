@@ -24,8 +24,8 @@ import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.store.Store
 
 internal class PaymePayment : DialogFragment() {
-   lateinit var buttonClose : ConstraintLayout
 
+    lateinit var buttonClose: ConstraintLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.isCancelable = false
@@ -33,7 +33,6 @@ internal class PaymePayment : DialogFragment() {
     }
 
     override fun onViewCreated(view: View, @Nullable savedInstanceState: Bundle?) {
-
         super.onViewCreated(view, savedInstanceState)
         val bottomSheetDialogFragment: BottomSheetDialog = dialog as BottomSheetDialog
         val fragmentManager: FragmentManager
@@ -55,15 +54,11 @@ internal class PaymePayment : DialogFragment() {
                 resultPaymentFragment
             )
             fragment.commit()
-
         } else {
-
             fragmentManager = childFragmentManager
             val fragment = fragmentManager.beginTransaction()
             fragment.add(R.id.frame_container, SelectMethodFragment())
             fragment.commit()
-
-
         }
         bottomSheetDialogFragment.behavior.isDraggable = false
         dialog?.setCanceledOnTouchOutside(false)
@@ -93,12 +88,11 @@ internal class PaymePayment : DialogFragment() {
 
     @Subscribe
     fun onChangeFragment(event: ChangeFragmentPayment) {
-        if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT || event.typeFragment == TYPE_FRAGMENT_PAYMENT.EXPIRED ) {
+        if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT_NOT_CALL_BACK) {
             this.dialog?.dismiss()
-            if(event.value=="DONE_PAYMENT" || event.typeFragment == TYPE_FRAGMENT_PAYMENT.EXPIRED){
-            }else{
-                PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
-            }
+        } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT) {
+            this.dialog?.dismiss()
+            PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
         } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.RESULT) {
             buttonClose.visibility = View.GONE
             val message = event.value

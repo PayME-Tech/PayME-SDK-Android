@@ -304,11 +304,7 @@ class SelectMethodFragment : Fragment() {
                 },
                 onError = { jsonObject, code, message ->
                     buttonSubmit.disableLoading()
-                    if (code == ERROR_CODE.EXPIRED) {
-                        PayME.onError(jsonObject, code, message)
-                    } else {
                         PayME.showError(message)
-                    }
                 })
 
         } else {
