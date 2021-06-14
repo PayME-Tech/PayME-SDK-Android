@@ -23,5 +23,6 @@
     <color name="colorPrimaryDark">#FFA000</color>
     <color name="colorAccent">#3D98FF</color>
     <color name="red">#ff0000</color>
+    <color name="red60">#ff7a3b</color>
     <color name="button_black">#1c1c1c</color>
 </resources>

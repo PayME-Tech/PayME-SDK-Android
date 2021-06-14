@@ -47,10 +47,7 @@ class ConfirmOtpFragment : Fragment() {
         textCountDownTimer = view.findViewById(R.id.counterOtp)
         pinView = view.findViewById(R.id.otp_view)
         imageOtp = view.findViewById(R.id.image_otp)
-
         ChangeColorImage().changeColor(requireContext(),imageOtp,R.drawable.ic_confirm_pass,6)
-
-
         pinView.setItemBackgroundColor(ContextCompat.getColor(PayME.context, R.color.ice))
         pinView.setAnimationEnable(true)
         pinView.requestFocus()

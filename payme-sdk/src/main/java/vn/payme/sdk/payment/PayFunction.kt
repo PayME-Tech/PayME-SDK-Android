@@ -226,11 +226,12 @@ internal class PayFunction {
                     for (i in 0 until methods.length()) {
                         val jsonObject = methods.getJSONObject(i)
                         var data = jsonObject.optJSONObject("data")
-                        var dataMethod = DataMethod(null, "")
+                        var dataMethod = DataMethod(null, "","")
                         if (data != null) {
                             val linkedId = data.optString("linkedId")
                             val swiftCode = data.optString("swiftCode")
-                            dataMethod = DataMethod(linkedId, swiftCode)
+                            val issuer = data.optString("issuer")
+                            dataMethod = DataMethod(linkedId, swiftCode,issuer)
                         }
                         var fee = jsonObject.optInt("fee")
                         var label = jsonObject.optString("label")

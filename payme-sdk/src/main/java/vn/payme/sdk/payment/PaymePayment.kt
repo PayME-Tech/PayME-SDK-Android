@@ -38,11 +38,13 @@ internal class PaymePayment : DialogFragment() {
         val fragmentManager: FragmentManager
         val showResult = arguments?.getBoolean("showResult")
         val message = arguments?.getString("message")
+        val state = arguments?.getString("state")
         Keyboard.closeKeyboard(requireContext())
         if (showResult == true) {
             val bundle: Bundle = Bundle()
             if (message != null) {
                 bundle.putString("message", message)
+                bundle.putString("state", state)
             }
             buttonClose.visibility = View.GONE
             val resultPaymentFragment: ResultPaymentFragment =

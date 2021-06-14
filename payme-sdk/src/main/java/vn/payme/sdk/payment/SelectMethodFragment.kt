@@ -195,7 +195,8 @@ class SelectMethodFragment : Fragment() {
         } else if (method.type == TYPE_PAYMENT.NAPAS || method.type == TYPE_PAYMENT.LINKED) {
             val picasso = Picasso.get()
             picasso.setIndicatorsEnabled(false)
-            picasso.load("https://firebasestorage.googleapis.com/v0/b/vn-mecorp-payme-wallet.appspot.com/o/image_bank%2Fimage_method%2Fmethod${method.data?.swiftCode}.png?alt=media&token=28cdb30e-fa9b-430c-8c0e-5369f500612e")
+            val imageCode = if(method.data?.issuer!= "null") method.data?.issuer else method.data?.swiftCode
+            picasso.load("https://firebasestorage.googleapis.com/v0/b/vn-mecorp-payme-wallet.appspot.com/o/image_bank%2Fimage_method%2Fmethod${imageCode}.png?alt=media&token=28cdb30e-fa9b-430c-8c0e-5369f500612e")
                 .resize(50, 50)
                 .centerInside()
                 .into(imageView)

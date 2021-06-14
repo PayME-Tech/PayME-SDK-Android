@@ -42,7 +42,6 @@ class ResultPaymentFragment : Fragment() {
     private lateinit var infoTop: InfoPayment
     private lateinit var infoBottom: InfoPayment
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -65,6 +64,7 @@ class ResultPaymentFragment : Fragment() {
         textResult = view.findViewById(R.id.title_result)
         lottie = view.findViewById(R.id.animation_view)
         val message = arguments?.getString("message")
+        val state = arguments?.getString("state")
 
         val decimal = DecimalFormat("#,###")
         textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
@@ -118,9 +118,21 @@ class ResultPaymentFragment : Fragment() {
         textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
         listInfoBottom.add(Info("Phí",  if(event.fee==0) "Miễn phí" else "${decimal.format(event.fee)} đ", null, null, false))
         listInfoBottom.add(Info("Tổng thanh toán",  "${decimal.format(event.fee + Store.paymentInfo.infoPayment!!.amount)} đ", null, ContextCompat.getColor(requireContext(),R.color.red), true))
-        if(message != null){
-            textError.text = message
-            textError.visibility = View.VISIBLE
+        if(state =="PENDING"){
+            lottie.setAnimation(R.raw.cho_xu_ly)
+            textResult.text = getString(R.string.payment_pending)
+            buttonSubmit.textView.text = getString(R.string.understood)
+            infoBottom.visibility = View.GONE
+            var backgroundColorRadius = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(ContextCompat.getColor(requireContext(),R.color.red60),ContextCompat.getColor(requireContext(),R.color.red60)))
+            backgroundColorRadius.cornerRadius = 60F
+            buttonSubmit.background = backgroundColorRadius
+            lottie.playAnimation()
+
+        }else if(message != null || state=="FAILED"){
+            if(state!="FAILED"){
+                textError.text = message
+                textError.visibility = View.VISIBLE
+            }
             lottie.setAnimation(R.raw.thatbai)
             textResult.text = getString(R.string.payment_fail)
             buttonSubmit.textView.text = getString(R.string.understood)
@@ -128,8 +140,7 @@ class ResultPaymentFragment : Fragment() {
            var backgroundColorRadius = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(ContextCompat.getColor(requireContext(),R.color.red),ContextCompat.getColor(requireContext(),R.color.red)))
             backgroundColorRadius.cornerRadius = 60F
             buttonSubmit.background = backgroundColorRadius
-
-
+            lottie.playAnimation()
         }else{
             infoBottom.updateData(listInfoBottom)
             loadAnimation()

@@ -7,6 +7,41 @@ import vn.payme.sdk.model.Method
 import vn.payme.sdk.store.Store
 
 internal class PaymentApi {
+
+    fun checkVisa(
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+        ) {
+            val path = "/graphql"
+            val params: MutableMap<String, Any> = mutableMapOf()
+            val variables: MutableMap<String, Any> = mutableMapOf()
+        val query = "query CheckTransaction(\$historyListPaging: PagingInput, \$historyListFilter: HistoryFilterInput, \$historyListClientId: String) {\n" +
+                "  HistoryList(paging: \$historyListPaging, filter: \$historyListFilter, clientId: \$historyListClientId) {\n" +
+                "    items {\n" +
+                "      state\n" +
+                "    }\n" +
+                "  }\n" +
+                "}"
+        val historyListPaging: MutableMap<String, Any> = mutableMapOf()
+        val historyListFilter: MutableMap<String, Any> = mutableMapOf()
+        val service: MutableMap<String, Any> = mutableMapOf()
+        historyListPaging["start"] = 0
+        historyListPaging["limit"] = 1
+        service["transaction"] = Store.paymentInfo.transaction!!
+        service["type"] = "OPEN_EWALLET_PAYMENT"
+        historyListFilter["service"] = service
+        variables["historyListPaging"] = historyListPaging
+        variables["historyListFilter"] = historyListFilter
+        variables["historyListClientId"] = Store.config.clientId
+        params["query"] = query
+        params["variables"] = variables
+            val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+            request.setOnRequestCrypto(
+                onError = onError,
+                onSuccess = onSuccess,
+            )
+    }
+
     fun getListBanks(
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
@@ -302,6 +337,7 @@ internal class PaymentApi {
                     "          ... on LinkedMethodInfo {\n" +
                     "            linkedId\n" +
                     "            swiftCode\n" +
+                    "            issuer\n" +
                     "          }\n" +
                     "          ... on WalletMethodInfo {\n" +
                     "            accountId\n" +

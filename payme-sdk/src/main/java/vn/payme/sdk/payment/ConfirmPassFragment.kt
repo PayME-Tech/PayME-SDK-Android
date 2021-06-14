@@ -81,6 +81,13 @@ class ConfirmPassFragment : Fragment() {
                     EventBus.getDefault()
                         .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.RESULT, null))
                 } else {
+                    if (history != null) {
+                        val payment = history.optJSONObject("payment")
+                        if (payment != null) {
+                            val transaction = payment.optString("transaction")
+                            Store.paymentInfo.transaction = transaction
+                        }
+                    }
                     if (payment != null) {
                         val statePaymentLinkedResponsed =
                             payment.optString("statePaymentLinkedResponsed")
