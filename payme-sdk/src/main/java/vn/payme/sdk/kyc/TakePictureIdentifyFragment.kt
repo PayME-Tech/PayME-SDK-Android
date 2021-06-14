@@ -1,8 +1,7 @@
 package vn.payme.sdk.kyc
 
-import android.content.pm.PackageManager
+
 import android.graphics.BitmapFactory
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,9 +15,9 @@ import com.otaliastudios.cameraview.CameraView
 import com.otaliastudios.cameraview.PictureResult
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
-import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
+import vn.payme.sdk.evenbus.ChangeFragmentKYC
 import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.model.TypeIdentify
 import vn.payme.sdk.payment.PopupSelectTypeIdentify
@@ -44,10 +43,7 @@ class TakePictureIdentifyFragment : Fragment() {
     private var buttonSelectTypeIdentify: ConstraintLayout? = null
     private lateinit var  buttonDropdown: ImageView
 
-    private var buttonBackHeaderErrorCamera: ImageView? = null
-    private var enableSetting = false
-    private var containerErrorCamera: ConstraintLayout? = null
-    private var buttonOpenSetting: Button? = null
+
 
 
     private inner class Listener : CameraListener() {
@@ -86,23 +82,12 @@ class TakePictureIdentifyFragment : Fragment() {
         textTypeIdentify = view.findViewById(R.id.title_type_identify)
         buttonSelectTypeIdentify = view.findViewById(R.id.buttonSelectTypeIdentify)
         buttonDropdown = view.findViewById(R.id.buttonDropdown)
-
-        containerErrorCamera = view.findViewById(R.id.containerErrorCamera)
-        buttonOpenSetting = view.findViewById(R.id.buttonOpenSetting)
-        buttonBackHeaderErrorCamera = view.findViewById(R.id.buttonBackHeaderErrorCamera)
-        PermisionCamera().requestCamera(requireContext(),requireActivity())
+        cameraKitView!!.open()
         ChangeColorImage().changeColor(requireContext(),buttonTakePicture!!,R.drawable.ic_buttontakepic,1)
-
         if(CameraKycActivity.updateOnlyIdentify){
             buttonDropdown.visibility  = View.GONE
         }
-        buttonOpenSetting!!.setOnClickListener {
-            if (enableSetting) {
-                PermisionCamera().openSetting(requireActivity())
-            } else {
-                PermisionCamera().requestCamera(requireContext(), requireActivity())
-            }
-        }
+
 
         if(CameraKycActivity.updateOnlyIdentify){
             CameraKycActivity.typeIdentify = "CCCD"
@@ -118,7 +103,7 @@ class TakePictureIdentifyFragment : Fragment() {
             layoutConfirm!!.visibility = View.GONE
         }
         buttonBackHeader!!.setOnClickListener {
-            activity?.finish()
+            EventBus.getDefault().post(ChangeFragmentKYC.CLOSE)
         }
         buttonBack!!.setOnClickListener {
             layoutConfirm!!.visibility = View.GONE
@@ -139,9 +124,10 @@ class TakePictureIdentifyFragment : Fragment() {
                     val popupTakeVideo = PopupTakeVideo()
                     popupTakeVideo.show(parentFragmentManager, "ModalBottomSheet")
 
+
                 } else {
                     val newFragment = UploadKycFragment()
-                    val fragment = activity?.supportFragmentManager?.beginTransaction()
+                    val fragment = parentFragmentManager.beginTransaction()
                     fragment?.add(R.id.content_kyc, newFragment)
                     fragment?.addToBackStack(null)
                     fragment?.commit()
@@ -179,26 +165,9 @@ class TakePictureIdentifyFragment : Fragment() {
         CameraKycActivity.typeIdentify = myEven.type
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String?>,
-        grantResults: IntArray
-    ) {
-        val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
-        if (valid && !cameraKitView!!.isOpened) {
-            cameraKitView!!.open()
-            containerErrorCamera?.visibility = View.GONE
-        } else {
-            if (Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(
-                    permissions[0]!!
-                )
-            ) {
-                enableSetting = true
-                containerErrorCamera?.visibility = View.VISIBLE
-            } else {
-                containerErrorCamera?.visibility = View.VISIBLE
-            }
-        }
+    override fun onDestroy() {
+        super.onDestroy()
+        EventBus.getDefault().unregister(this)
     }
 
 

@@ -15,15 +15,16 @@ import androidx.fragment.app.Fragment
 import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.CameraView
 import com.otaliastudios.cameraview.PictureResult
-import vn.payme.sdk.PayME
+import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
+import vn.payme.sdk.evenbus.ChangeFragmentKYC
 import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.payment.PopupTakeVideo
 import vn.payme.sdk.store.Store
 
 
-class TakePictureAvataFragment : Fragment() {
+class TakePictureAvatarFragment : Fragment() {
     private var cameraKitView: CameraView? = null
     private var buttonTakePicture: ImageView? = null
     private var layoutConfirm: ConstraintLayout? = null
@@ -34,12 +35,6 @@ class TakePictureAvataFragment : Fragment() {
     private var buttonNext: Button? = null
     private var saveImage: ByteArray? = null
     private var cardViewCamera: CardView? = null
-
-    private var buttonBackHeaderErrorCamera: ImageView? = null
-    private var enableSetting = false
-    private var containerErrorCamera: ConstraintLayout? = null
-    private var buttonOpenSetting: Button? = null
-
 
 
 
@@ -61,15 +56,11 @@ class TakePictureAvataFragment : Fragment() {
 
         }
     }
-
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         val view: View = inflater?.inflate(R.layout.take_picture_image_avata, container, false)
         cameraKitView = view.findViewById(R.id.previewCamera)
         buttonTakePicture = view.findViewById(R.id.btn_takepicture)
@@ -81,53 +72,28 @@ class TakePictureAvataFragment : Fragment() {
 
         buttonBackHeader2 = view.findViewById(R.id.buttonBackHeader2)
         cardViewCamera = view.findViewById(R.id.cardViewCamera)
-
-        //ErrorCamera
-        containerErrorCamera = view.findViewById(R.id.containerErrorCamera)
-        buttonOpenSetting = view.findViewById(R.id.buttonOpenSetting)
-        buttonBackHeaderErrorCamera = view.findViewById(R.id.buttonBackHeaderErrorCamera)
-
-        PermisionCamera().requestCamera(requireContext(),requireActivity())
         ChangeColorImage().changeColor(requireContext(),buttonTakePicture!!,R.drawable.ic_buttontakepic,1)
-
-
-        buttonOpenSetting!!.setOnClickListener {
-            if (enableSetting) {
-                PermisionCamera().openSetting(requireActivity())
-            } else {
-                PermisionCamera().requestCamera(requireContext(),requireActivity())
-            }
-        }
-
         buttonBackHeader2!!.setOnClickListener {
             layoutConfirm!!.visibility = View.GONE
         }
         buttonBackHeader!!.setOnClickListener {
-            activity?.finish()
-        }
-        buttonBackHeaderErrorCamera!!.setOnClickListener {
-            activity?.finish()
+            EventBus.getDefault().post(ChangeFragmentKYC.CLOSE)
         }
         buttonBack!!.setOnClickListener {
             layoutConfirm!!.visibility = View.GONE
-
         }
         cameraKitView!!.setLifecycleOwner(this)
         cameraKitView!!.addCameraListener(Listener())
-
-
-//        cardCornerRadius
+        cameraKitView!!.open()
 
         buttonNext!!.setOnClickListener {
-
-
             CameraKycActivity.imageFace = saveImage
             if (Store.config.kycVideo) {
                 val popupTakeVideo = PopupTakeVideo()
                 popupTakeVideo.show(parentFragmentManager, "ModalBottomSheet")
             } else {
                 val newFragment = UploadKycFragment()
-                val fragment = activity?.supportFragmentManager?.beginTransaction()
+                val fragment = parentFragmentManager.beginTransaction()
                 fragment?.addToBackStack(null)
                 fragment?.add(R.id.content_kyc, newFragment)
                 fragment?.commit()
@@ -144,31 +110,8 @@ class TakePictureAvataFragment : Fragment() {
     }
 
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String?>,
-        grantResults: IntArray
-    ) {
-        val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
-        if (valid && !cameraKitView!!.isOpened) {
-            cameraKitView!!.open()
-            containerErrorCamera?.visibility = View.GONE
-        } else {
-            if (Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(
-                    permissions[0]!!
-                )
-            ) {
-                enableSetting = true
-                containerErrorCamera?.visibility = View.VISIBLE
-            } else {
-                containerErrorCamera?.visibility = View.VISIBLE
-            }
-        }
+    override fun onDestroy() {
+        super.onDestroy()
     }
-//    override fun onResume() {
-//        super.onResume()
-//        PermisionCamera().requestCamera(requireContext(),requireActivity())
-//    }
-
 
 }

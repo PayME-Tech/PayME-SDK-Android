@@ -187,7 +187,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <include layout="@layout/error_camera_layout"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,27 +1,21 @@
 package vn.payme.sdk
 
-import android.app.Activity
+import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.hardware.camera2.CameraManager
 import android.net.ConnectivityManager
-import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.view.KeyEvent
-import android.view.View
+import android.view.*
 import android.webkit.*
 import android.widget.ImageView
 import android.widget.ProgressBar
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.google.zxing.client.android.Intents
-import kotlinx.android.synthetic.main.webview_activity.*
+import androidx.fragment.app.DialogFragment
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.json.JSONObject
@@ -38,7 +32,7 @@ import vn.payme.sdk.store.Store
 import java.net.URLEncoder
 
 
-internal class PaymeWaletActivity : AppCompatActivity() {
+internal class PaymeWaletActivity : DialogFragment() {
     lateinit private var loading: ConstraintLayout
     lateinit private var loadingProgressBar: ProgressBar
     private lateinit var cameraManager: CameraManager
@@ -53,21 +47,26 @@ internal class PaymeWaletActivity : AppCompatActivity() {
     var domain  = ""
 
 
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        isCancelable = false
+        PaymeWaletActivity.isVisible = true
+        setStyle(STYLE_NO_FRAME,R.style.DialogStyle);
+    }
     companion object {
         var image: String = ""
         var isVisible  = false
     }
 
     private fun backScreen(): Unit {
-        runOnUiThread {
-            finish()
-        }
+            dismiss()
     }
 
     fun takeImage(): Unit {
-        val intent = Intent(this, CameraTakeProfileCreditActivity::class.java)
-        this?.startActivity(intent)
+//        val intent = Intent(this, CameraTakeProfileCreditActivity::class.java)
+//        this?.startActivity(intent)
+        val cameraTakeProfileCreditActivity = CameraTakeProfileCreditActivity()
+        cameraTakeProfileCreditActivity.show(parentFragmentManager,null)
     }
 
     fun convertPixelsToDp(px: Float): Float {
@@ -82,40 +81,46 @@ internal class PaymeWaletActivity : AppCompatActivity() {
     }
 
     private fun isNetworkConnected(): Boolean {
-        val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        val cm = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return cm.activeNetworkInfo != null && cm.activeNetworkInfo!!.isConnected
     }
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        isVisible  = true
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val v: View = inflater.inflate(
+            R.layout.webview_activity,
+            container, false
+        )
+
         EventBus.getDefault().register(this)
-        cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
-        WebView(applicationContext).clearCache(true)
+//        cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
+        WebView(requireContext()).clearCache(true)
         WebStorage.getInstance().deleteAllData();
         CookieManager.getInstance().removeAllCookies(null);
         CookieManager.getInstance().flush();
-        setContentView(R.layout.webview_activity)
         var statusBarHeight = 0
         val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
         if (resourceId > 0) {
             statusBarHeight = resources.getDimensionPixelSize(resourceId)
         }
 
-        getWindow().setStatusBarColor(Color.TRANSPARENT);
-        getWindow().setBackgroundDrawable(Store.config.colorApp.backgroundColor);
 
+        dialog?.window?.setStatusBarColor(Color.TRANSPARENT);
+        dialog?.window?.setBackgroundDrawable(Store.config.colorApp.backgroundColor);
 
-        myWebView = findViewById(R.id.webview)
-        loadingProgressBar = findViewById(R.id.loadingProgressBar)
-        loading = findViewById(R.id.loading)
+        myWebView = v.findViewById(R.id.webview)
+        loadingProgressBar =  v.findViewById(R.id.loadingProgressBar)
+        loading =  v.findViewById(R.id.loading)
 
-        buttonBack = findViewById(R.id.buttonBack)
-        buttonNext = findViewById(R.id.buttonNext)
-        header = findViewById(R.id.header)
-        buttonClose = findViewById(R.id.buttonClose)
-        containerErrorNetwork = findViewById(R.id.containerErrorNetwork)
+        buttonBack =  v.findViewById(R.id.buttonBack)
+        buttonNext =  v.findViewById(R.id.buttonNext)
+        header =  v.findViewById(R.id.header)
+        buttonClose =  v.findViewById(R.id.buttonClose)
+        containerErrorNetwork =  v.findViewById(R.id.containerErrorNetwork)
 
 
         myWebView.clearCache(true);
@@ -132,7 +137,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         val cookieManager = CookieManager.getInstance()
         cookieManager.setAcceptCookie(true)
         buttonBack?.setOnClickListener {
-            finish()
+            dismiss()
         }
         buttonNext?.setOnClickListener {
             containerErrorNetwork.visibility = View.GONE
@@ -176,10 +181,8 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                         e.printStackTrace()
                     }
                     if (!checkTimeoutLoadWebView) {
-                        runOnUiThread {
                             loading.visibility = View.GONE
                             containerErrorNetwork?.visibility = View.VISIBLE
-                        }
                     }
                 }.start()
             }
@@ -206,16 +209,30 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         webSettings.cacheMode = WebSettings.LOAD_NO_CACHE
 
         val jsObject: JsObject =
-            JsObject(
-                this,
-                back = { backScreen() },
-                showButtonClose={b->
-                    showButtonClose(b)
-                },
-                takeImage = { takeImage() },
-                this.supportFragmentManager,
-                cameraManager
-            )
+            fragmentManager?.let {
+                JsObject(
+                    back = { backScreen() },
+                    showButtonClose={b->
+                        showButtonClose(b)
+                    },
+                    onScanQR={
+//                        IntentIntegrator(requireActivity()).apply {
+//                            setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
+//                            captureActivity = AnyOrientationCaptureActivity::class.java
+//                            setPrompt("")
+//                            setCameraId(0)
+//                            setRequestCode(5)
+//                            setBeepEnabled(true)
+//                            setOrientationLocked(false)
+//                            initiateScan()
+//                        }
+                             val scanQR = ScanQR()
+                             scanQR.show(parentFragmentManager,null)
+                    },
+                    takeImage = { takeImage() },
+                    it,
+                )
+            }!!
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
         var action: String = Store.paymentInfo.action.toString()
         val showLog = if (Store.config.showLog) 1 else 0
@@ -271,8 +288,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         if (!isNetworkConnected()) {
             containerErrorNetwork?.visibility = View.VISIBLE
         }
-
-
+        return  v
     }
 
     fun checkScanQr(contents: String) {
@@ -296,7 +312,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                 if (!succeeded) {
                     loading?.visibility = View.GONE
                     var popup: PayMEQRCodePopup = PayMEQRCodePopup()
-                    popup.show(this.supportFragmentManager, "ModalBottomSheet")
+                    popup.show(requireFragmentManager(), "ModalBottomSheet")
                 } else {
                     val infoPayment =
                         InfoPayment(
@@ -310,7 +326,7 @@ internal class PaymeWaletActivity : AppCompatActivity() {
                         )
                     val paymeSDK = PayME()
                     paymeSDK.payInSDK(
-                        this.supportFragmentManager,
+                        requireFragmentManager(),
                         infoPayment,
                     )
                 }
@@ -318,31 +334,27 @@ internal class PaymeWaletActivity : AppCompatActivity() {
             onError = { jsonObject, code, message ->
                 loading?.visibility = View.GONE
                 var popup: PayMEQRCodePopup = PayMEQRCodePopup()
-                popup.show(this.supportFragmentManager, "ModalBottomSheet")
+                popup.show(requireFragmentManager(), "ModalBottomSheet")
             }
         )
     }
 
     override fun onDestroy() {
-
-        isVisible = false
         myWebView.removeAllViews();
         myWebView.destroy()
+        PaymeWaletActivity.isVisible = false
         EventBus.getDefault().unregister(this);
         super.onDestroy()
-
-
     }
 
     @Subscribe
     fun onText(myEven: MyEven) {
-        println("DONG")
 
         if (myEven.type == TypeCallBack.onReload) {
             this.myWebView.reload()
         }
         if (myEven.type == TypeCallBack.onExpired) {
-            finish()
+            dismiss()
         }
         if (myEven.type == TypeCallBack.onTakeImageResult) {
             if (myEven.value != null) {
@@ -371,27 +383,26 @@ internal class PaymeWaletActivity : AppCompatActivity() {
         }
     }
     fun  showButtonClose(isShow: Boolean){
-        runOnUiThread {
             if(isShow == true){
                 header.visibility = View.VISIBLE
             }else{
                 header.visibility = View.GONE
             }
-        }
 
 
     }
-
-    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        if(this.myWebView.url==domain){
-            finish()
-        }else if (this.myWebView.canGoBack()) {
-
-            this.myWebView.goBack()
-        } else {
-            finish()
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return object : Dialog(requireActivity(), theme) {
+            override fun onBackPressed() {
+                if(myWebView.url==domain){
+                    dismiss()
+                }else if (myWebView.canGoBack()) {
+                    myWebView.goBack()
+                } else {
+                    dismiss()
+                }
+            }
         }
-        return true
     }
 
 

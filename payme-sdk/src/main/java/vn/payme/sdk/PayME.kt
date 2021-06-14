@@ -18,9 +18,7 @@ import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.kyc.CameraKycActivity
 import vn.payme.sdk.model.*
-import vn.payme.sdk.payment.*
 import vn.payme.sdk.payment.PayFunction
-import vn.payme.sdk.payment.PopupConfirmPassport
 import vn.payme.sdk.payment.PopupTakeFace
 import vn.payme.sdk.payment.PopupTakeIdentify
 import vn.payme.sdk.payment.PopupTakeVideo
@@ -53,7 +51,6 @@ public class PayME {
         env: Env,
         showLog: Boolean
     ) {
-
         PayME.context = context
         Store.config = Config(
             appPrivateKey,
@@ -76,7 +73,7 @@ public class PayME {
 
     }
 
-    fun  close(){
+    fun close(){
         EventBus.getDefault()
             .post(MyEven(TypeCallBack.onExpired, ""))
         EventBus.getDefault()
@@ -196,14 +193,15 @@ public class PayME {
 
 
     fun openWallet(
+        fragmentManager:FragmentManager,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
+        PayME.fragmentManager = fragmentManager
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
             Store.config.closeWhenDone = false
             openWalletActivity(Action.OPEN, 0, "", null, null, onSuccess, onError)
         }
-
     }
 
     fun openKYC(
@@ -211,6 +209,9 @@ public class PayME {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
+        PayME.onSuccess = onSuccess
+        PayME.onError = onError
+        PayME.fragmentManager = fragmentManager
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE, onError)) {
             getAccountInfo(onSuccess = { jsonObject ->
                 val Account = jsonObject.getJSONObject("Account")
@@ -248,7 +249,7 @@ public class PayME {
                         onPopupKyc(fragmentManager, kycVideo, kycIdentity, kycFace)
                         onSuccess(null)
                     } else if (state == "PENDING") {
-                        openWallet(onSuccess, onError)
+                        openWallet(fragmentManager,onSuccess, onError)
                     }
 
                 }
@@ -305,20 +306,23 @@ public class PayME {
         } else {
             Store.paymentInfo.amount = 0
         }
-        val intent = Intent(context, PaymeWaletActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        context?.startActivity(intent)
+
         Companion.onSuccess = onSuccess
         Companion.onError = onError
+        val paymeWaletActivity = PaymeWaletActivity()
+        paymeWaletActivity.show(fragmentManager,null)
     }
 
 
     public fun deposit(
+        fragmentManager:FragmentManager,
         amount: Int?,
         closeDepositResult: Boolean,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
+        PayME.fragmentManager = fragmentManager
+
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
             Store.config.closeWhenDone = closeDepositResult
             if (amount != null) {
@@ -340,12 +344,14 @@ public class PayME {
     }
 
     public fun transfer(
+        fragmentManager: FragmentManager,
         amount: Int?,
         description: String,
         closeTransferResult: Boolean,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
+        PayME.fragmentManager = fragmentManager
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
             Store.config.closeWhenDone = closeTransferResult
             if (amount != null) {
@@ -368,11 +374,14 @@ public class PayME {
     }
 
     public fun withdraw(
+        fragmentManager: FragmentManager,
         amount: Int?,
         closeWithdrawResult: Boolean,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
+        PayME.fragmentManager =fragmentManager
+
         if (amount != null) {
             Store.paymentInfo.amount = amount
         } else {
@@ -429,28 +438,11 @@ public class PayME {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-//        val popupTakeIdentify = PopupConfirmPassport()
-//        popupTakeIdentify.show(fragmentManager, "ModalBottomSheet")
-        println("BAT DAU PAY")
         val payment  = PayFunction()
         Store.config.disableCallBackResult = false
         payment.pay(fragmentManager, infoPayment, isShowResultUI, method, onSuccess, onError)
 
 
-    }
-
-
-
-
-
-
-    fun closeOpenWallet() {
-        var even: EventBus = EventBus.getDefault()
-        var myEven: MyEven = MyEven(TypeCallBack.onClose, "")
-        even.post(myEven)
-        var closeWebview: MyEven = MyEven(TypeCallBack.onExpired, "")
-        even.post(myEven)
-        even.post(closeWebview)
     }
 
     public fun getAccountInfo(

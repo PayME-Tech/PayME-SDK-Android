@@ -1,7 +1,6 @@
 package vn.payme.sdk.payment
 
 import android.app.Dialog
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.PorterDuff
@@ -19,11 +18,12 @@ import com.airbnb.lottie.value.SimpleLottieValueCallback
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
+import vn.payme.sdk.evenbus.ChangeFragmentKYC
 import vn.payme.sdk.kyc.CameraKycActivity
-import vn.payme.sdk.kyc.TakePictureAvataFragment
 import vn.payme.sdk.store.Store
 
 internal class PopupTakeFace : BottomSheetDialogFragment() {
@@ -56,15 +56,10 @@ internal class PopupTakeFace : BottomSheetDialogFragment() {
         buttonNext.setOnClickListener {
             val openKycActivity = arguments?.getBoolean("openKycActivity")
             if(openKycActivity==true){
-                val intent = Intent(PayME.context, CameraKycActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                PayME.context?.startActivity(intent)
+                val cameraKycActivity = CameraKycActivity()
+                cameraKycActivity.show(PayME.fragmentManager,null)
             }else{
-                val newFragment = TakePictureAvataFragment()
-                newFragment.arguments = arguments
-                val fragment = activity?.supportFragmentManager?.beginTransaction()
-                fragment?.replace(R.id.content_kyc, newFragment)
-                fragment?.commit()
+               EventBus.getDefault().post(ChangeFragmentKYC.KYC_FACE)
             }
             dialog?.dismiss()
 

@@ -60,10 +60,9 @@ internal class PopupTakeIdentify : BottomSheetDialogFragment() {
             dialog?.dismiss()
         }
         buttonNext.setOnClickListener {
-            val intent = Intent(PayME.context, CameraKycActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            PayME.context?.startActivity(intent)
-            dialog?.dismiss()
+            val cameraKycActivity = CameraKycActivity()
+            cameraKycActivity.show(PayME.fragmentManager,null)
+            dismiss()
         }
 
 

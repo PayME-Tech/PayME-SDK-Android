@@ -1,31 +1,21 @@
 package vn.payme.sdk.model
 
-import android.app.Activity
-import android.content.Intent
-import android.hardware.camera2.CameraManager
-import android.os.Bundle
 import android.webkit.JavascriptInterface
 import androidx.fragment.app.FragmentManager
-import com.google.zxing.integration.android.IntentIntegrator
 import org.json.JSONObject
-import vn.payme.sdk.AnyOrientationCaptureActivity
 import vn.payme.sdk.PayME
 import vn.payme.sdk.PaymeWaletActivity
 import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.kyc.CameraKycActivity
-import vn.payme.sdk.payment.PopupTakeFace
-import vn.payme.sdk.payment.PopupTakeIdentify
-import vn.payme.sdk.payment.PopupTakeVideo
 import vn.payme.sdk.store.Store
 
 
 public class JsObject(
-    val activity: Activity,
     val back: () -> Unit,
     val showButtonClose: (boolean: Boolean) -> Unit,
+    val onScanQR: () -> Unit,
     val takeImage: () -> Unit,
     val fragmentManager: FragmentManager,
-    val cameraManager: CameraManager
 ) {
     @JavascriptInterface
     public fun onSuccess(string: String) {
@@ -117,7 +107,6 @@ public class JsObject(
     }
     @JavascriptInterface
     public fun onCommunicate(string: String) {
-        println("onCommunicate"+string)
         try {
             val json: JSONObject = JSONObject(string)
             val type = json.optString("type")
@@ -180,30 +169,17 @@ public class JsObject(
 
     @JavascriptInterface
     public fun onScanQr() {
-        IntentIntegrator(activity).apply {
-            setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
-            captureActivity = AnyOrientationCaptureActivity::class.java
-            setPrompt("")
-            setCameraId(0)
-            setRequestCode(5)
-            setBeepEnabled(true)
-            setOrientationLocked(false)
-            initiateScan()
-        }
-
-
+        onScanQR()
     }
     @JavascriptInterface
     public fun onUpdateIdentify() {
         Store.config.kycVideo = false
         Store.config.kycIdentify = true
         Store.config.kycFace = false
-        val bundle: Bundle = Bundle()
         CameraKycActivity.updateOnlyIdentify  = true
-        val intent = Intent(PayME.context, CameraKycActivity::class.java)
-        intent.putExtras(bundle)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        PayME.context?.startActivity(intent)
+        val cameraKycActivity = CameraKycActivity()
+        cameraKycActivity.show(PayME.fragmentManager,null)
+
     }
 
     @JavascriptInterface

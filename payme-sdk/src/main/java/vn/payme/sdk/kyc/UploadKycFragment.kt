@@ -15,6 +15,7 @@ import vn.payme.sdk.PaymeWaletActivity
 import vn.payme.sdk.R
 import vn.payme.sdk.api.UploadKycApi
 import vn.payme.sdk.enums.TypeCallBack
+import vn.payme.sdk.evenbus.ChangeFragmentKYC
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.store.Store
 
@@ -37,18 +38,24 @@ class UploadKycFragment : Fragment() {
                             var even: EventBus = EventBus.getDefault()
                             var myEven: MyEven = MyEven(TypeCallBack.onUpdateIdentify, "")
                             even.post(myEven)
-                            activity?.finish()
+                            EventBus.getDefault().post(ChangeFragmentKYC.CLOSE)
+
                         }else{
                             var even: EventBus = EventBus.getDefault()
                             var myEven: MyEven = MyEven(TypeCallBack.onReload, "")
                             even.post(myEven)
-                            activity?.finish()
+                            EventBus.getDefault().post(ChangeFragmentKYC.CLOSE)
                         }
 
                     }else{
-                        activity?.finish()
                         val payme = PayME()
-                        payme.openWallet(PayME.onSuccess,PayME.onError)
+                        payme.openWallet(PayME.fragmentManager,onSuccess = {
+                                                                           
+                        },onError = {jsonObject, i, s ->  
+                            
+                        })
+                        EventBus.getDefault().post(ChangeFragmentKYC.CLOSE)
+
                     }
 
                 }else{

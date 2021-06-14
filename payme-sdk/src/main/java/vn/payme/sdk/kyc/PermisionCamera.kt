@@ -9,6 +9,7 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 
 class PermisionCamera() {
@@ -31,8 +32,23 @@ class PermisionCamera() {
                 Manifest.permission.CAMERA
             ) != PackageManager.PERMISSION_GRANTED
         ) {
+
             requestPermissions(
                 activity,
+                arrayOf(Manifest.permission.CAMERA),
+                MY_CAMERA_REQUEST_CODE
+            );
+        } else {
+        }
+    }
+    fun requestCameraFragment(context: Context, fragment: Fragment) {
+        val MY_CAMERA_REQUEST_CODE = 100
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            fragment.requestPermissions(
                 arrayOf(Manifest.permission.CAMERA),
                 MY_CAMERA_REQUEST_CODE
             );

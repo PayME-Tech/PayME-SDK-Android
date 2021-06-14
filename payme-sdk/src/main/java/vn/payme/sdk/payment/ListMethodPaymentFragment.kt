@@ -145,13 +145,13 @@ class ListMethodPaymentFragment : Fragment() {
                     ){
                         val paymeSDK = PayME()
                         if (!Store.userInfo.accountActive) {
-                            paymeSDK.openWallet(PayME.onSuccess, PayME.onError)
+                            paymeSDK.openWallet(parentFragmentManager,PayME.onSuccess, PayME.onError)
                         } else if (!Store.userInfo.accountKycSuccess) {
                             paymeSDK.openKYC(PayME.fragmentManager,onSuccess = {},onError = { jsonObject: JSONObject?, i: Int?, message: String ->
                                 PayME.showError(message)
                             })
                         } else if (Store.paymentInfo.infoPayment!!.amount > Store.userInfo.balance) {
-                            paymeSDK.deposit(0, false,PayME.onSuccess, PayME.onError)
+                            paymeSDK.deposit(parentFragmentManager,0, false,PayME.onSuccess, PayME.onError)
                         }
                         EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT,null))
 

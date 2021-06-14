@@ -9,27 +9,35 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.add
+import androidx.fragment.app.commit
 import com.google.android.gms.common.util.Base64Utils
 import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.CameraView
 import com.otaliastudios.cameraview.PictureResult
 import com.otaliastudios.cameraview.controls.Flash
 import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.PayME
+import vn.payme.sdk.PaymeWaletActivity
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.kyc.PermisionCamera
+import vn.payme.sdk.kyc.*
 import vn.payme.sdk.store.Store
 import java.io.ByteArrayOutputStream
 
 
-class CameraTakeProfileCreditActivity : AppCompatActivity() {
+class CameraTakeProfileCreditActivity : DialogFragment() {
     companion object {
         public val EXTRA_DATA = "EXTRA_DATA"
     }
@@ -45,6 +53,7 @@ class CameraTakeProfileCreditActivity : AppCompatActivity() {
     private var enableSetting = false
     private var containerErrorCamera: ConstraintLayout? = null
     private var buttonOpenSetting: Button? = null
+
     private inner class Listener : CameraListener() {
         override fun onPictureTaken(result: PictureResult) {
             super.onPictureTaken(result)
@@ -53,29 +62,53 @@ class CameraTakeProfileCreditActivity : AppCompatActivity() {
             var even: EventBus = EventBus.getDefault()
             var myEven: MyEven = MyEven(TypeCallBack.onTakeImageResult, image)
             even.post(myEven)
-            finish()
+            dismiss()
+        }
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+
+        super.onCreate(savedInstanceState)
+        isCancelable = false
+        EventBus.getDefault().register(this)
+        setStyle(STYLE_NO_FRAME,R.style.DialogStyle);
+    }
+    @Subscribe
+    fun close(event : MyEven){
+        if(event.type == TypeCallBack.onExpired){
+            dismiss()
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_camera_take_profile_credit)
-        getWindow().setStatusBarColor(Color.TRANSPARENT);
-        getWindow().setBackgroundDrawable(Store.config.colorApp.backgroundColor);
-        cameraKitView = findViewById(R.id.previewCamera)
-        buttonTakePicture = findViewById(R.id.btn_takepicture)
-        buttonChooseGallery = findViewById(R.id.buttonChooseGallery)
-        buttonOnOffFlash = findViewById(R.id.buttonOnOffFlash)
+    override fun onDestroy() {
+        super.onDestroy()
+        EventBus.getDefault().unregister(this)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val v: View = inflater.inflate(
+            R.layout.activity_camera_take_profile_credit,
+            container, false
+        )
+
+        dialog?.window?.setStatusBarColor(Color.TRANSPARENT);
+        dialog?.window?.setBackgroundDrawable(Store.config.colorApp.backgroundColor);
+        cameraKitView = v.findViewById(R.id.previewCamera)
+        buttonTakePicture = v.findViewById(R.id.btn_takepicture)
+        buttonChooseGallery = v.findViewById(R.id.buttonChooseGallery)
+        buttonOnOffFlash = v.findViewById(R.id.buttonOnOffFlash)
 
 
-        buttonBackHeader = findViewById(R.id.buttonBackHeader)
+        buttonBackHeader = v.findViewById(R.id.buttonBackHeader)
 
 
-        containerErrorCamera = findViewById(R.id.containerErrorCamera)
-        buttonOpenSetting = findViewById(R.id.buttonOpenSetting)
-        buttonBackHeaderErrorCamera = findViewById(R.id.buttonBackHeaderErrorCamera)
+        containerErrorCamera = v.findViewById(R.id.containerErrorCamera)
+        buttonOpenSetting = v.findViewById(R.id.buttonOpenSetting)
+        buttonBackHeaderErrorCamera = v.findViewById(R.id.buttonBackHeaderErrorCamera)
 
-        PermisionCamera().requestCamera(this, this)
         buttonChooseGallery?.setOnClickListener {
             val i = Intent(
                 Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI
@@ -84,14 +117,18 @@ class CameraTakeProfileCreditActivity : AppCompatActivity() {
         }
         buttonOpenSetting!!.setOnClickListener {
             if (enableSetting) {
-                PermisionCamera().openSetting(this)
+                PermisionCamera().openSetting(requireActivity())
             } else {
-                PermisionCamera().requestCamera(this, this)
+                PermisionCamera().requestCameraFragment(requireContext(), this)
             }
         }
-        buttonBackHeader!!.setOnClickListener {
-            finish()
+        buttonBackHeaderErrorCamera!!.setOnClickListener {
+            dismiss()
         }
+        buttonBackHeader!!.setOnClickListener {
+            dismiss()
+        }
+
         cameraKitView!!.setLifecycleOwner(this)
         cameraKitView!!.addCameraListener(Listener())
 
@@ -110,7 +147,9 @@ class CameraTakeProfileCreditActivity : AppCompatActivity() {
 
 
         }
+        return  v
     }
+
 
     fun BitMapToString(bitmap: Bitmap): String? {
         val baos = ByteArrayOutputStream()
@@ -119,17 +158,26 @@ class CameraTakeProfileCreditActivity : AppCompatActivity() {
         return Base64Utils.encode(b)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_GRANTED){
+            cameraKitView!!.open()
+        }else{
+            PermisionCamera().requestCameraFragment(requireContext(),this)
+        }
+    }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
             val selectedImage: Uri? = data.data
-            val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, selectedImage)
+            val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, selectedImage)
             val image: String? = BitMapToString(bitmap)
             if (image !== null) {
                 var even: EventBus = EventBus.getDefault()
                 var myEven: MyEven = MyEven(TypeCallBack.onTakeImageResult, image)
                 even.post(myEven)
-                finish()
+                dismiss()
             }
 
         }

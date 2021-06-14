@@ -11,9 +11,11 @@ import android.widget.VideoView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.otaliastudios.cameraview.VideoResult
+import org.greenrobot.eventbus.EventBus
 
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
+import vn.payme.sdk.evenbus.ChangeFragmentKYC
 import java.io.File
 
 
@@ -72,31 +74,22 @@ class VideoPreviewFragment : Fragment() {
         }
 
         buttonBackHeader2!!.setOnClickListener {
-            val newFragment = TakeVideoKycFragment()
-            val fragment = activity?.supportFragmentManager?.beginTransaction()
-            fragment?.replace(R.id.content_kyc, newFragment)
-            fragment?.commit()
-
+            EventBus.getDefault().post(ChangeFragmentKYC.CLOSE)
         }
         buttonPlay?.setOnClickListener {
             buttonPlay?.visibility = View.GONE
-
-
             playVideo()
         }
 
         buttonBack!!.setOnClickListener {
-            val newFragment = TakeVideoKycFragment()
-            val fragment = activity?.supportFragmentManager?.beginTransaction()
-            fragment?.replace(R.id.content_kyc, newFragment)
-            fragment?.commit()
+            EventBus.getDefault().post(ChangeFragmentKYC.KYC_VIDEO)
         }
         imagePreView!!.setOnClickListener { playVideo() }
 
         buttonNext!!.setOnClickListener {
             CameraKycActivity.video = saveVideo
             val newFragment = UploadKycFragment()
-            val fragment = activity?.supportFragmentManager?.beginTransaction()
+            val fragment = parentFragmentManager.beginTransaction()
             fragment?.addToBackStack(null)
             fragment?.add(R.id.content_kyc, newFragment)
             fragment?.commit()

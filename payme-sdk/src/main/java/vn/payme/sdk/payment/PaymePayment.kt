@@ -138,10 +138,10 @@ internal class PaymePayment : DialogFragment() {
             this.dialog?.dismiss()
             val bundle: Bundle = Bundle()
             bundle.putString("html", event.value)
-            val intent = Intent(PayME.context, WebViewNapasActivity::class.java)
-            intent.putExtras(bundle)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            PayME.context?.startActivity(intent)
+            val web = WebViewNapasActivity()
+            web.arguments = bundle
+            fragmentManager?.let { web.show(it,null) }
+
         } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_PASS) {
             val confirmPassFragment: ConfirmPassFragment = ConfirmPassFragment()
             val fragment = childFragmentManager?.beginTransaction()

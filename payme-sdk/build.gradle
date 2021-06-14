@@ -66,14 +66,8 @@ dependencies {
     // Kotlin
     implementation "androidx.fragment:fragment-ktx:$fragment_version"
     implementation "androidx.cardview:cardview:1.0.0"
-
-
-
-
+    implementation 'com.budiyev.android:code-scanner:2.1.0'
     implementation 'com.google.zxing:core:3.3.3'
-    implementation ('com.journeyapps:zxing-android-embedded:3.6.0') { transitive = false }
-
-
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.appcompat:appcompat:1.2.0'
 
