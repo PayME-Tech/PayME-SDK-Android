@@ -30,58 +30,50 @@ import vn.payme.sdk.store.Store
 
 class WebViewNapasActivity : DialogFragment() {
     private lateinit var buttonClose: ImageView
-    private var message: String? = null
-    private var state: String = ""
-    private var trans_id: String? = null
-    private var onResult: Boolean? = false
     val loading = SpinnerDialog()
 
     var count = 0
-    fun checkVisa(){
-        loading.show(parentFragmentManager,null)
+    fun checkVisa() {
+        loading.show(parentFragmentManager, null)
         loopCallApi()
     }
 
-    fun loopCallApi(){
+    fun loopCallApi() {
         count++
-        val paymentApi  = PaymentApi()
-        paymentApi.checkVisa(onSuccess = {jsonObject ->
+        val paymentApi = PaymentApi()
+        paymentApi.checkVisa(onSuccess = { jsonObject ->
             val HistoryList = jsonObject.optJSONObject("HistoryList")
             val items = HistoryList.optJSONArray("items")
             val item = items.optJSONObject(0)
-            if(item!=null){
+            if (item != null) {
                 val state = item.optString("state")
-                if(state=="SUCCEEDED"){
-                    onResult = true
+                if (state == "SUCCEEDED") {
                     loading.dismiss()
-                    dismiss()
-                }else{
-                    if(count==5){
-                        this.state= state
-                        message  = state
-                        onResult = true
+                    onResult("",state)
+                } else {
+                    if (count == 6) {
                         loading.dismiss()
-                    }else if(count<5){
+                        onResult("",state)
+                    } else if (count < 6) {
                         GlobalScope.launch {
-                            delay(5000)
+                            delay(10000)
                             loopCallApi()
                         }
                     }
                 }
-            }else{
-                this.state= "FAILED"
-                onResult = true
+            } else {
                 loading.dismiss()
+                onResult("","FAILED")
             }
 
-        },onError = {jsonObject, i, s ->
-            message  = s
-            onResult = true
+        }, onError = { jsonObject, code, s ->
             loading.dismiss()
+            onResult(s,"FAILED")
 
         })
 
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -94,16 +86,19 @@ class WebViewNapasActivity : DialogFragment() {
         )
         val myWebView: WebView = v.findViewById(R.id.webview)
         myWebView.settings.javaScriptEnabled = true
-        buttonClose =  v.findViewById(R.id.buttonClose)
+        buttonClose = v.findViewById(R.id.buttonClose)
         buttonClose.setOnClickListener {
             PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
             dismiss()
         }
-        val form = if(Store.paymentInfo.methodSelected?.data?.issuer=="VISA"||Store.paymentInfo.methodSelected?.data?.issuer=="JCB"||Store.paymentInfo.methodSelected?.data?.issuer=="MASTERCARD") "<html><body onload=\"document.forms[0].submit();\">${arguments?.getString("html")}</html>," else arguments?.getString("html")
+        val form =
+            if (Store.paymentInfo.methodSelected?.data?.issuer == "VISA" || Store.paymentInfo.methodSelected?.data?.issuer == "JCB" || Store.paymentInfo.methodSelected?.data?.issuer == "MASTERCARD") "<html><body onload=\"document.forms[0].submit();\">${
+                arguments?.getString("html")
+            }</html>," else arguments?.getString("html")
         myWebView.loadDataWithBaseURL("x-data://base", form!!, "text/html", "UTF-8", null);
         myWebView.setWebViewClient(object : WebViewClient() {
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-                println("url"+url)
+                println("url" + url)
                 val checkSuccess = url.contains("https://payme.vn/web/?success=true")
                 val checkError = url.contains("https://payme.vn/web/?success=false")
                 val checkVisa = url.contains("https://payme.vn/web")
@@ -112,12 +107,11 @@ class WebViewNapasActivity : DialogFragment() {
                     val messageResult = uri.getQueryParameter("message")
                     val transIdResult = uri.getQueryParameter("trans_id")
                     if (checkError) {
-                        message = messageResult
+                        onResult(messageResult!!,"FAILED")
+                    }else{
+                        onResult("","SUCCEEDED")
                     }
-                    trans_id = transIdResult
-                    onResult = true
-                    dismiss()
-                }else{
+                } else {
                     if (checkVisa) {
                         checkVisa()
                     }
@@ -130,15 +124,17 @@ class WebViewNapasActivity : DialogFragment() {
         return v
 
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         isCancelable = false
         EventBus.getDefault().register(this)
-        setStyle(STYLE_NO_FRAME,R.style.DialogStyle);
+        setStyle(STYLE_NO_FRAME, R.style.DialogStyle);
     }
+
     @Subscribe
-    fun close(event : MyEven){
-        if(event.type == TypeCallBack.onExpired){
+    fun close(event: MyEven) {
+        if (event.type == TypeCallBack.onExpired) {
             dismiss()
         }
     }
@@ -146,33 +142,32 @@ class WebViewNapasActivity : DialogFragment() {
     override fun onDestroy() {
         super.onDestroy()
         EventBus.getDefault().unregister(this)
-        if (onResult == true) {
-            val bundle: Bundle = Bundle()
-            if (trans_id != null) {
-                Store.paymentInfo.transaction = trans_id!!
+    }
+
+    fun onResult(message: String, state: String) {
+        dismiss()
+        val bundle: Bundle = Bundle()
+        if (state == "SUCCEEDED") {
+            val data = JSONObject("""{payment:{transaction:${Store.paymentInfo.transaction}}}""")
+            if (!Store.config.disableCallBackResult) {
+                PayME.onSuccess(data)
             }
-            if (message != null) {
-                if (!Store.config.disableCallBackResult) {
-                    PayME.onError(null, ERROR_CODE.PAYMENT_ERROR, message!!)
-                }
-                bundle.putString("message", message)
-                bundle.putString("state", state)
-            } else {
-                val data =
-                    JSONObject("""{payment:{transaction:${Store.paymentInfo.transaction}}}""")
-                if (!Store.config.disableCallBackResult) {
-                    PayME.onSuccess(data)
-                }
+        } else {
+            bundle.putString("message", message)
+            bundle.putString("state", state)
+            if (!Store.config.disableCallBackResult) {
+                val data = JSONObject("""{state:${state}}""")
+                PayME.onError(data, ERROR_CODE.PAYMENT_ERROR, message!!)
             }
-            if (Store.paymentInfo.isShowResultUI) {
-                bundle.putBoolean("showResult", true)
-                val paymePayment: PaymePayment = PaymePayment()
-                paymePayment.arguments = bundle
-                paymePayment.show(
-                    PayME.fragmentManager,
-                    "ModalBottomSheet"
-                )
-            }
+        }
+        if (Store.paymentInfo.isShowResultUI) {
+            bundle.putBoolean("showResult", true)
+            val paymePayment: PaymePayment = PaymePayment()
+            paymePayment.arguments = bundle
+            paymePayment.show(
+                PayME.fragmentManager,
+                "ModalBottomSheet"
+            )
         }
     }
 

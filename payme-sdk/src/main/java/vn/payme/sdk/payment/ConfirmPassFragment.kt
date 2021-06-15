@@ -156,17 +156,7 @@ class ConfirmPassFragment : Fragment() {
         pinView.background = Store.config.colorApp.backgroundColorRadiusBorder
         Keyboard.showKeyboard(requireContext())
         textForgotPassword.setOnClickListener {
-            val paymeSDK = PayME(
-                PayME.context,
-                Store.config.appToken,
-                Store.config.publicKey,
-                Store.config.connectToken,
-                Store.config.appPrivateKey,
-                Store.config.configColor!!,
-                Store.config.language,
-                Store.config.env!!,
-                Store.config.showLog
-            )
+            val paymeSDK = PayME()
             Keyboard.closeKeyboard(requireContext())
             paymeSDK.onForgotPassword()
             EventBus.getDefault()
