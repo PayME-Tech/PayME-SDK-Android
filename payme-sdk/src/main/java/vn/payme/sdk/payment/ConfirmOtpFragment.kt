@@ -89,6 +89,7 @@ class ConfirmOtpFragment : Fragment() {
             null,
             null,
             onSuccess = { jsonObject ->
+                if(!isVisible) return@payment
                 showLoading(false)
                 val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
                 val Payment = OpenEWallet.optJSONObject("Payment")
@@ -113,6 +114,7 @@ class ConfirmOtpFragment : Fragment() {
 
             },
             onError = { jsonObject, code, s ->
+                if(!isVisible) return@payment
                 showLoading(false)
                 PayME.showError(s)
             }
@@ -162,6 +164,7 @@ class ConfirmOtpFragment : Fragment() {
             pass,
             transaction,
             onSuccess = { jsonObject ->
+                if (!isVisible) return@payment
                 showLoading(false)
                 val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
                 val Payment = OpenEWallet.optJSONObject("Payment")
@@ -199,6 +202,7 @@ class ConfirmOtpFragment : Fragment() {
 
             },
             onError = { jsonObject, code, message ->
+                if (!isVisible) return@payment
                 showLoading(false)
                 PayME.showError(message)
             })

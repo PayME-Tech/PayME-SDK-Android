@@ -94,7 +94,9 @@ internal class PaymePayment : DialogFragment() {
             this.dialog?.dismiss()
         } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT) {
             this.dialog?.dismiss()
-            PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
+            if (!Store.config.disableCallBackResult) {
+                PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
+            }
         } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.RESULT) {
             buttonClose.visibility = View.GONE
             val message = event.value

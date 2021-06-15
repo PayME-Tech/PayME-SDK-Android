@@ -38,6 +38,7 @@ class ResultPaymentFragment : Fragment() {
     private lateinit var textError: TextView
     private lateinit var textTransactionCode: TextView
     private lateinit var textTransactionTime: TextView
+    private lateinit var textHotline: TextView
     private lateinit var lottie: LottieAnimationView
     private lateinit var infoTop: InfoPayment
     private lateinit var infoBottom: InfoPayment
@@ -53,6 +54,7 @@ class ResultPaymentFragment : Fragment() {
         textError = view.findViewById(R.id.note_error)
         textTransactionCode = view.findViewById(R.id.transition_code_value)
         textTransactionTime = view.findViewById(R.id.transition_time_value)
+        textHotline = view.findViewById(R.id.txtHotline)
         infoTop = view.findViewById(R.id.infoTop)
         infoBottom = view.findViewById(R.id.infoBottom)
 
@@ -121,18 +123,18 @@ class ResultPaymentFragment : Fragment() {
         if(state =="PENDING"){
             lottie.setAnimation(R.raw.cho_xu_ly)
             textResult.text = getString(R.string.payment_pending)
+            textError.text = getString(R.string.payment_pending_description)
+            textError.visibility = View.VISIBLE
+            textHotline.visibility = View.VISIBLE
             buttonSubmit.textView.text = getString(R.string.understood)
             infoBottom.visibility = View.GONE
             var backgroundColorRadius = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(ContextCompat.getColor(requireContext(),R.color.red60),ContextCompat.getColor(requireContext(),R.color.red60)))
             backgroundColorRadius.cornerRadius = 60F
             buttonSubmit.background = backgroundColorRadius
             lottie.playAnimation()
-
         }else if(message != null || state=="FAILED"){
-            if(state!="FAILED"){
-                textError.text = message
-                textError.visibility = View.VISIBLE
-            }
+            textError.text = message
+            textError.visibility = View.VISIBLE
             lottie.setAnimation(R.raw.thatbai)
             textResult.text = getString(R.string.payment_fail)
             buttonSubmit.textView.text = getString(R.string.understood)

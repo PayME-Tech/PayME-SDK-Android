@@ -34,8 +34,10 @@ class WebViewNapasActivity : DialogFragment() {
 
     var count = 0
     fun checkVisa() {
-        loading.show(parentFragmentManager, null)
-        loopCallApi()
+        if(isVisible){
+            loading.show(parentFragmentManager, null)
+            loopCallApi()
+        }
     }
 
     fun loopCallApi() {
@@ -97,7 +99,9 @@ class WebViewNapasActivity : DialogFragment() {
         myWebView.settings.javaScriptEnabled = true
         buttonClose = v.findViewById(R.id.buttonClose)
         buttonClose.setOnClickListener {
-            PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
+            if (!Store.config.disableCallBackResult) {
+                PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
+            }
             dismiss()
         }
         val form =
@@ -107,7 +111,6 @@ class WebViewNapasActivity : DialogFragment() {
         myWebView.loadDataWithBaseURL("x-data://base", form!!, "text/html", "UTF-8", null);
         myWebView.setWebViewClient(object : WebViewClient() {
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-                println("url" + url)
                 val checkSuccess = url.contains("https://payme.vn/web/?success=true")
                 val checkError = url.contains("https://payme.vn/web/?success=false")
                 val checkVisa = url.contains("https://payme.vn/web")
@@ -115,10 +118,12 @@ class WebViewNapasActivity : DialogFragment() {
                     val uri: Uri = Uri.parse(url)
                     val messageResult = uri.getQueryParameter("message")
                     val transIdResult = uri.getQueryParameter("trans_id")
-                    if (checkError) {
-                        onResult(messageResult!!,"FAILED")
-                    }else{
-                        onResult("","SUCCEEDED")
+                    if(isVisible) {
+                        if (checkError) {
+                            onResult(messageResult!!, "FAILED")
+                        } else {
+                            onResult("", "SUCCEEDED")
+                        }
                     }
                 } else {
                     if (checkVisa) {

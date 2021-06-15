@@ -65,6 +65,7 @@ class ConfirmPassFragment : Fragment() {
             null,
             null,
             onSuccess = { jsonObject ->
+                if(!isVisible) return@payment
                 disableLoading()
                 val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
                 val Payment = OpenEWallet.optJSONObject("Payment")
@@ -121,7 +122,9 @@ class ConfirmPassFragment : Fragment() {
 
             },
             onError = { jsonObject, code, s ->
-                    disableLoading()
+                if(!isVisible) return@payment
+
+                disableLoading()
                     PayME.showError(s)
             }
         )
@@ -173,6 +176,7 @@ class ConfirmPassFragment : Fragment() {
                     showLoading()
                     paymentApi.getSecurityCode(pass!!,
                         onSuccess = { jsonObject ->
+                            if(!isVisible) return@getSecurityCode
                             Keyboard.closeKeyboard(requireContext())
                             val Account = jsonObject.optJSONObject("Account")
                             val SecurityCode = Account.optJSONObject("SecurityCode")
@@ -191,6 +195,7 @@ class ConfirmPassFragment : Fragment() {
                             }
 
                         }, onError = { jsonObject, code, message ->
+                            if(!isVisible) return@getSecurityCode
                             disableLoading()
                             PayME.showError(message)
                         })

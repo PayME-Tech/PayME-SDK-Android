@@ -78,10 +78,24 @@
                     android:fontFamily="@font/main_semibold"
                     android:textAlignment="center"
                     android:textColor="@color/scarlet"
-                    android:textSize="16dp"
+                    android:textSize="12dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/money" />
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="@font/main_bold"
+                    android:textSize="18dp"
+                    android:id="@+id/txtHotline"
+                    android:visibility="gone"
+                    android:textAlignment="center"
+                    android:textColor="@color/blackSeven"
+                    android:text="@string/payment_pending_hotline"
+                    app:layout_constraintTop_toBottomOf="@id/note_error"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </TextView>
 
 
 

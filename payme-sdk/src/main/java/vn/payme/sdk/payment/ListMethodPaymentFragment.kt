@@ -53,6 +53,7 @@ class ListMethodPaymentFragment : Fragment() {
             Store.paymentInfo.infoPayment!!.amount,
             method,
             onSuccess = { jsonObject ->
+                if (!isVisible) return@getFee
                 disableLoading()
                 val Utility = jsonObject.getJSONObject("Utility")
                 val GetFee = Utility.getJSONObject("GetFee")
@@ -75,6 +76,7 @@ class ListMethodPaymentFragment : Fragment() {
                 }
             },
             onError = { jsonObject: JSONObject?, code: Int?, message: String ->
+                if (!isVisible) return@getFee
                 disableLoading()
                 PayME.showError(message)
             })

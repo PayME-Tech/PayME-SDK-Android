@@ -426,7 +426,7 @@ public class PayME {
         infoPayment: InfoPayment,
     ) {
         val payment  = PayFunction()
-        Store.config.disableCallBackResult = false
+        Store.config.disableCallBackResult = true
         payment.pay(fragmentManager, infoPayment, true, null, onSuccess, onError)
     }
 

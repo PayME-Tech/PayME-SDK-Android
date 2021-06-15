@@ -70,7 +70,6 @@ internal class PayFunction {
     ) {
 
         loading.show(fragmentManager, null)
-        Store.config.disableCallBackResult = false
         val checkAccount = CheckAccount()
         val decimal = DecimalFormat("#,###")
         if (infoPayment.amount!! < Store.config.limitPayment.min) {

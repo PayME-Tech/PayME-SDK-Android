@@ -52,8 +52,6 @@ class SelectMethodFragment : Fragment() {
     private var loading: Boolean = false
     private lateinit var buttonSubmit: Button
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -271,6 +269,7 @@ class SelectMethodFragment : Fragment() {
                 "",
                 "",
                 onSuccess = { jsonObject ->
+                    if (!isVisible) return@payment
                     buttonSubmit.disableLoading()
                     val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
                     val Payment = OpenEWallet.optJSONObject("Payment")
@@ -304,6 +303,7 @@ class SelectMethodFragment : Fragment() {
 
                 },
                 onError = { jsonObject, code, message ->
+                    if (!isVisible) return@payment
                     buttonSubmit.disableLoading()
                         PayME.showError(message)
                 })
@@ -318,7 +318,6 @@ class SelectMethodFragment : Fragment() {
 
     override fun onDestroy() {
         EventBus.getDefault().unregister(this)
-
         super.onDestroy()
     }
 

@@ -57,6 +57,8 @@
     <string name="payment_success">Thanh toán thành công</string>
     <string name="payment_fail">Thanh toán thất bại</string>
     <string name="payment_pending">Thanh toán đang chờ xử </string>
+    <string name="payment_pending_description">Cần thời gian thêm để xử lý. Vui lòng không thực hiện lại tránh bị trùng. Liên hệ CSKH để hỗ trợ</string>
+    <string name="payment_pending_hotline">1900 88 66 65</string>
     <string name="select_method_payment">Nguồn thanh toán</string>
     <string name="please_enter_otp_from_phone_number">Vui lòng nhập mã OTP được gửi tới số điện thoại</string>
     <string name="please_enter_pass">Nhập mật khẩu ví PayME  để xác thực</string>
