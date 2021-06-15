@@ -15,25 +15,25 @@ internal class PaymentApi {
             val path = "/graphql"
             val params: MutableMap<String, Any> = mutableMapOf()
             val variables: MutableMap<String, Any> = mutableMapOf()
-        val query = "query CheckTransaction(\$historyListPaging: PagingInput, \$historyListFilter: HistoryFilterInput, \$historyListClientId: String) {\n" +
-                "  HistoryList(paging: \$historyListPaging, filter: \$historyListFilter, clientId: \$historyListClientId) {\n" +
-                "    items {\n" +
-                "      state\n" +
-                "    }\n" +
-                "  }\n" +
-                "}"
-        val historyListPaging: MutableMap<String, Any> = mutableMapOf()
-        val historyListFilter: MutableMap<String, Any> = mutableMapOf()
-        val service: MutableMap<String, Any> = mutableMapOf()
-        historyListPaging["start"] = 0
-        historyListPaging["limit"] = 1
-        service["transaction"] = Store.paymentInfo.transaction!!
-        service["type"] = "OPEN_EWALLET_PAYMENT"
-        historyListFilter["service"] = service
-        variables["historyListPaging"] = historyListPaging
-        variables["historyListFilter"] = historyListFilter
-        variables["historyListClientId"] = Store.config.clientId
+        val query = "mutation SucceededMutation(\$getTransactionInfoInput: GetTransactionInfoInput!) {\n" +
+                "   OpenEWallet {\n" +
+                "     Payment {\n" +
+                "       GetTransactionInfo(input: \$getTransactionInfoInput) {\n" +
+                "         succeeded\n" +
+                "         message\n" +
+                "         transaction\n" +
+                "         state\n" +
+                "         fee\n" +
+                "         description\n" +
+                "       }\n" +
+                "     }\n" +
+                "   }\n" +
+                " }"
+        val getTransactionInfoInput: MutableMap<String, Any> = mutableMapOf()
+
+        getTransactionInfoInput["transaction"] = Store.paymentInfo.transaction!!
         params["query"] = query
+        variables["getTransactionInfoInput"]= getTransactionInfoInput
         params["variables"] = variables
             val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
             request.setOnRequestCrypto(

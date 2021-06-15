@@ -42,29 +42,38 @@ class WebViewNapasActivity : DialogFragment() {
         count++
         val paymentApi = PaymentApi()
         paymentApi.checkVisa(onSuccess = { jsonObject ->
-            val HistoryList = jsonObject.optJSONObject("HistoryList")
-            val items = HistoryList.optJSONArray("items")
-            val item = items.optJSONObject(0)
-            if (item != null) {
-                val state = item.optString("state")
+            val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
+            val Payment = OpenEWallet.optJSONObject("Payment")
+            val GetTransactionInfo = Payment.optJSONObject("GetTransactionInfo")
+            val state = GetTransactionInfo.optString("state")
+            val succeeded = GetTransactionInfo.optBoolean("succeeded")
+            val transaction = GetTransactionInfo.optString("transaction")
+            val message = GetTransactionInfo.optString("message")
+            if(succeeded){
                 if (state == "SUCCEEDED") {
                     loading.dismiss()
                     onResult("",state)
-                } else {
-                    if (count == 6) {
-                        loading.dismiss()
-                        onResult("",state)
-                    } else if (count < 6) {
-                        GlobalScope.launch {
-                            delay(10000)
-                            loopCallApi()
+                }else{
+                    if(state=="PENDING"){
+                        if (count == 6) {
+                            loading.dismiss()
+                            onResult(message,state)
+                        } else if (count < 6) {
+                            GlobalScope.launch {
+                                delay(10000)
+                                loopCallApi()
+                            }
                         }
+                    }else{
+                        loading.dismiss()
+                        onResult(message,state)
                     }
                 }
-            } else {
+            }else{
                 loading.dismiss()
-                onResult("","FAILED")
+                onResult(message,"FAILED")
             }
+
 
         }, onError = { jsonObject, code, s ->
             loading.dismiss()
