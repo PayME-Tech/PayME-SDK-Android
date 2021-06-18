@@ -23,7 +23,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/pb_text"
                 android:layout_marginRight="10dp"
-                android:src="@drawable/ic_lock"
+                android:src="@drawable/ic_lock_button"
                 />
             <TextView
                 app:layout_constraintTop_toTopOf="parent"

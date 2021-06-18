@@ -1,17 +1,14 @@
 package vn.payme.sdk.payment
 
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -20,21 +17,21 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.json.JSONObject
 import vn.payme.sdk.PayME
-import vn.payme.sdk.PaymeWaletActivity
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.enums.ERROR_CODE
+import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.store.Store
 
-class WebViewNapasActivity : DialogFragment() {
+class PopupWebViewNapas : DialogFragment() {
     private lateinit var buttonClose: ImageView
     val loading = SpinnerDialog()
 
     var count = 0
     fun checkVisa() {
-        if(isVisible){
+        if (isVisible) {
             loading.show(parentFragmentManager, null)
             loopCallApi()
         }
@@ -51,35 +48,35 @@ class WebViewNapasActivity : DialogFragment() {
             val succeeded = GetTransactionInfo.optBoolean("succeeded")
             val transaction = GetTransactionInfo.optString("transaction")
             val message = GetTransactionInfo.optString("message")
-            if(succeeded){
+            if (succeeded) {
                 if (state == "SUCCEEDED") {
                     loading.dismiss()
-                    onResult("",state)
-                }else{
-                    if(state=="PENDING"){
+                    onResult("", state)
+                } else {
+                    if (state == "PENDING") {
                         if (count == 6) {
                             loading.dismiss()
-                            onResult(message,state)
+                            onResult(message, state)
                         } else if (count < 6) {
                             GlobalScope.launch {
                                 delay(10000)
                                 loopCallApi()
                             }
                         }
-                    }else{
+                    } else {
                         loading.dismiss()
-                        onResult(message,state)
+                        onResult(message, state)
                     }
                 }
-            }else{
+            } else {
                 loading.dismiss()
-                onResult(message,"FAILED")
+                onResult(message, "FAILED")
             }
 
 
         }, onError = { jsonObject, code, s ->
             loading.dismiss()
-            onResult(s,"FAILED")
+            onResult(s, "FAILED")
 
         })
 
@@ -92,7 +89,7 @@ class WebViewNapasActivity : DialogFragment() {
     ): View? {
         this.isCancelable = false
         val v: View = inflater.inflate(
-            R.layout.confirm_otp_webview_napas,
+            R.layout.payment_confirm_otp_webview_napas,
             container, false
         )
         val myWebView: WebView = v.findViewById(R.id.webview)
@@ -104,10 +101,18 @@ class WebViewNapasActivity : DialogFragment() {
             }
             dismiss()
         }
-        val form =
-            if (Store.paymentInfo.methodSelected?.data?.issuer == "VISA" || Store.paymentInfo.methodSelected?.data?.issuer == "JCB" || Store.paymentInfo.methodSelected?.data?.issuer == "MASTERCARD") "<html><body onload=\"document.forms[0].submit();\">${
+        var form = ""
+        if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.CREDIT_CARD ||
+            Store.paymentInfo.methodSelected?.data?.issuer == "VISA" ||
+            Store.paymentInfo.methodSelected?.data?.issuer == "JCB" ||
+            Store.paymentInfo.methodSelected?.data?.issuer == "MASTERCARD"
+        ) {
+            form = "<html><body onload=\"document.forms[0].submit();\">${
                 arguments?.getString("html")
-            }</html>," else arguments?.getString("html")
+            }</html>,"
+        } else {
+            form = arguments?.getString("html")!!
+        }
         myWebView.loadDataWithBaseURL("x-data://base", form!!, "text/html", "UTF-8", null);
         myWebView.setWebViewClient(object : WebViewClient() {
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
@@ -118,7 +123,7 @@ class WebViewNapasActivity : DialogFragment() {
                     val uri: Uri = Uri.parse(url)
                     val messageResult = uri.getQueryParameter("message")
                     val transIdResult = uri.getQueryParameter("trans_id")
-                    if(isVisible) {
+                    if (isVisible) {
                         if (checkError) {
                             onResult(messageResult!!, "FAILED")
                         } else {
@@ -162,7 +167,8 @@ class WebViewNapasActivity : DialogFragment() {
         dismiss()
         val bundle: Bundle = Bundle()
         if (state == "SUCCEEDED") {
-            val data = JSONObject("""{payment:{transaction:${Store.paymentInfo.transaction}}}""")
+            val data = if (Store.paymentInfo.transaction == "" || Store.paymentInfo.transaction == "null")   JSONObject("""{payment:{}}}""")
+            else  JSONObject("""{payment:{transaction:${Store.paymentInfo.transaction}}}""")
             if (!Store.config.disableCallBackResult) {
                 PayME.onSuccess(data)
             }
@@ -176,7 +182,7 @@ class WebViewNapasActivity : DialogFragment() {
         }
         if (Store.paymentInfo.isShowResultUI) {
             bundle.putBoolean("showResult", true)
-            val paymePayment: PaymePayment = PaymePayment()
+            val paymePayment: PopupPayment = PopupPayment()
             paymePayment.arguments = bundle
             paymePayment.show(
                 PayME.fragmentManager,

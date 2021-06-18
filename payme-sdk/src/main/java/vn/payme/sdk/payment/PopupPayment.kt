@@ -1,7 +1,6 @@
 package vn.payme.sdk.payment
 
 import android.app.Dialog
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -23,7 +22,7 @@ import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.store.Store
 
-internal class PaymePayment : DialogFragment() {
+internal class PopupPayment : DialogFragment() {
 
     lateinit var buttonClose: ConstraintLayout
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,8 +104,9 @@ internal class PaymePayment : DialogFragment() {
                     PayME.onError(null, ERROR_CODE.PAYMENT_ERROR, message!!)
                 }
             } else {
-                val data =
-                    JSONObject("""{payment:{transaction:${Store.paymentInfo.transaction}}}""")
+                val data = if (Store.paymentInfo.transaction == "" || Store.paymentInfo.transaction == "null")   JSONObject("""{payment:{}}}""")
+                else  JSONObject("""{payment:{transaction:${Store.paymentInfo.transaction}}}""")
+
                 if (!Store.config.disableCallBackResult) {
                     PayME.onSuccess(data)
                 }
@@ -142,7 +142,7 @@ internal class PaymePayment : DialogFragment() {
             this.dialog?.dismiss()
             val bundle: Bundle = Bundle()
             bundle.putString("html", event.value)
-            val web = WebViewNapasActivity()
+            val web = PopupWebViewNapas()
             web.arguments = bundle
             fragmentManager?.let { web.show(it,null) }
 

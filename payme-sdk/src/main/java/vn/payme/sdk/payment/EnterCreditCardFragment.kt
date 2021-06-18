@@ -2,128 +2,68 @@ package vn.payme.sdk.payment
 
 import android.os.Bundle
 import android.text.Editable
-import android.text.InputFilter
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
-import vn.payme.sdk.PayME
 import vn.payme.sdk.R
-import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.InputInfo
-import vn.payme.sdk.model.BankInfo
 import vn.payme.sdk.evenbus.CheckInputAtm
-import vn.payme.sdk.model.BankTransferInfo
+import vn.payme.sdk.hepper.CardType
 import vn.payme.sdk.model.CardInfo
-import java.util.*
 
 
-class EnterAtmCardFragment : Fragment() {
+class EnterCreditCardFragment : Fragment() {
 
     private lateinit var inputCardNumber: InputInfo
-    private lateinit var inputCardHolder: InputInfo
     private lateinit var inputCardDate: InputInfo
-
-    private var bankSelected: BankInfo? = null
-    private var cardHolder: String = ""
+    private lateinit var inputCvv: InputInfo
     private var cardDate: String = ""
     private var cardNumberValue: String = ""
+    private var bankShortName: String = ""
 
-
-
-    fun detechCardHoder(cardNumber: String) {
-        val paymentApi = PaymentApi()
-        paymentApi.detectCardHolder(bankSelected?.swiftCode!!,
-            cardNumber,
-            onSuccess = { jsonObject ->
-                val Utility = jsonObject.optJSONObject("Utility")
-                val GetBankName = Utility.optJSONObject("GetBankName")
-                val accountName = GetBankName.optString("accountName")
-                val message = GetBankName.optString("message")
-                val succeeded = GetBankName.optBoolean("succeeded")
-                if (succeeded) {
-                    if (accountName.length >= 19) {
-                        inputCardHolder.visibility = View.VISIBLE
-                        inputCardHolder.txtTitleRight.text = accountName
-                        cardHolder = accountName
-                    } else {
-                        inputCardNumber.txtTitleRight.text = accountName
-                        cardHolder = accountName
-                    }
-                } else {
-                    inputCardHolder.visibility = View.VISIBLE
-                }
-
-            },
-            onError = { jsonObject, code, message ->
-                    PayME.showError(message)
-            }
-        )
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater?.inflate(R.layout.payment_enter_atm_card_fragment, container, false)
+        val view: View =
+            inflater?.inflate(R.layout.payment_enter_credit_card_fragment, container, false)
         EventBus.getDefault().register(this)
         inputCardNumber = view.findViewById(R.id.inputCardNumber)
-        inputCardHolder = view.findViewById(R.id.inputCardHolder)
         inputCardDate = view.findViewById(R.id.inputCardDate)
-//
-//
+        inputCvv = view.findViewById(R.id.inputCvv)
+        inputCardDate.imageRight.visibility = View.VISIBLE
+        inputCvv.imageRight.visibility = View.VISIBLE
+        inputCardDate.imageRight.setImageResource(R.drawable.ic_calendar)
+        inputCvv.imageRight.setImageResource(R.drawable.ic_lock)
+
         inputCardNumber.input.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                val cardNumber = s?.replace("[^0-9]".toRegex(), "")
-                cardHolder = ""
-                cardNumberValue = ""
-                inputCardHolder.visibility = View.GONE
-                inputCardHolder.setDefault()
-                inputCardNumber.txtTitleRight.text = ""
-                inputCardHolder.input.setText("")
+                val stringReplace = s?.replace("[^0-9]".toRegex(), "")
+                val cardNumber =stringReplace?.subSequence(0,if(stringReplace.length<19) stringReplace.length else 19 )
+                val cardType = CardType.detect(cardNumber.toString())
+                if (cardType==CardType.JCB){
+                    inputCardNumber.imageRight.visibility = View.VISIBLE
+                    inputCardNumber.imageRight.setImageResource(R.drawable.ic_logo_jcb)
+                }else if (cardType==CardType.VISA){
+                    inputCardNumber.imageRight.visibility = View.VISIBLE
+                    inputCardNumber.imageRight.setImageResource(R.drawable.ic_logo_visa)
+                }else if (cardType==CardType.MASTERCARD){
+                    inputCardNumber.imageRight.visibility = View.VISIBLE
+                    inputCardNumber.imageRight.setImageResource(R.drawable.ic_logo_mastercard)
+                }else{
+                    inputCardNumber.imageRight.visibility = View.GONE
 
-
-                var maxLength = 16
-                val listBanks = EventBus.getDefault().getStickyEvent(arrayListOf<BankInfo>()::class.java)
+                }
+                bankShortName = cardType.toString()
                 if (cardNumber?.length!! >= 6) {
-                    val cardPrefix = cardNumber.substring(0, 6)
-                    var bankVerify = false
-                    var cardNumberLength = 16
-                    var cardPrefixBank = ""
-                    for (i in 0 until listBanks.size) {
-                        cardPrefixBank = listBanks[i].cardPrefix
-                        if (cardPrefix == cardPrefixBank) {
-                            bankSelected = listBanks[i]
-                            cardNumberLength = listBanks[i].cardNumberLength
-                            maxLength = cardNumberLength + 3
-                            val filters = arrayOfNulls<InputFilter>(1)
-                            filters[0] = InputFilter.LengthFilter(maxLength)
-                            inputCardNumber.input.filters = filters
-                            bankVerify = true
-                            if (cardNumber.length == bankSelected?.cardNumberLength) {
-                                detechCardHoder(cardNumber)
-                                cardNumberValue = cardNumber
-                            }
-
-                        }
-                    }
-
-                    if (!bankVerify) {
-                        inputCardNumber.setError(getString(R.string.number_card_error))
-                    } else {
-                        inputCardNumber.setDefault()
-                    }
                     var cardNew = ""
-
-
-                    if (cardNumberLength == 19) {
-                        var cardNew = ""
+                    if (cardNumber.length == 19) {
                         for (i in 0 until cardNumber.length) {
                             if ((i == 7 || i == 15) && (i + 1 < cardNumber.length)) {
                                 cardNew += cardNumber[i] + " "
@@ -131,25 +71,22 @@ class EnterAtmCardFragment : Fragment() {
                                 cardNew += cardNumber[i]
                             }
                         }
-
-                    } else {
+                    }else {
                         for (i in 0 until cardNumber.length) {
                             if ((i == 3 || i == 7 || i == 11) && (i + 1 < cardNumber.length)) {
-                                cardNew += cardNumber[i] + "-"
+                                cardNew += cardNumber[i] + " "
                             } else {
                                 cardNew += cardNumber[i]
                             }
                         }
-
-
                     }
-                    inputCardNumber.input
+                    cardNumberValue  = cardNew.replace("[^0-9]".toRegex(), "")
                     inputCardNumber.input.removeTextChangedListener(this)
                     val cursorPosition: Int = inputCardNumber.input.getSelectionStart()
                     val newCursorPosition = cursorPosition + (cardNew.length - s.length)
                     inputCardNumber.input.setText(cardNew)
-                    val check = if (newCursorPosition > maxLength) maxLength else newCursorPosition
-                    inputCardNumber.input.setSelection(check)
+                    val check =  newCursorPosition
+                    inputCardNumber.input.setSelection(check!!)
                     inputCardNumber.input.addTextChangedListener(this)
 
                 } else {
@@ -169,9 +106,6 @@ class EnterAtmCardFragment : Fragment() {
             ) {
             }
         })
-        inputCardHolder.input.addTextChangedListener { text ->
-            cardHolder = text.toString()
-        }
 
 
 
@@ -218,27 +152,23 @@ class EnterAtmCardFragment : Fragment() {
             }
         })
 
-
-
-
         return view
     }
-    @Subscribe
-    fun checkAtm (event :CheckInputAtm){
 
-        if (event.isCheck && cardDate.length > 0 && cardHolder.length > 0 && cardNumberValue.length > 0) {
+    @Subscribe
+    fun checkAtm(event: CheckInputAtm) {
+        if (event.isCheck && cardDate.length > 0 && cardNumberValue.length > 0 && inputCvv.input.text.length==3) {
             val cardInfo = CardInfo(
                 inputCardDate.input.text.toString(),
                 inputCardNumber.input.text.toString(),
-                bankSelected?.shortName!!,
+                bankShortName,
                 cardNumberValue,
-                cardHolder,
+                "",
                 cardDate,
-                ""
+                inputCvv.input.text.toString()
             )
             EventBus.getDefault().post(CheckInputAtm(false,  cardInfo))
         }
-
     }
 
     override fun onDestroy() {

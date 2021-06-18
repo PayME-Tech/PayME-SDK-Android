@@ -8,6 +8,7 @@ class CardInfo
     var cardNumber: String,
     var cardHolder: String,
     var cardDate: String,
+    var cvv: String,
 ) {
 
 }

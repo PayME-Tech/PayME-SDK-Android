@@ -16,7 +16,7 @@ class PaymentInfo(
     var infoPayment: InfoPayment? = null,
     var methodSelected: Method? = null,
     var extraData : String? = "",
-    var transaction : String? = "",
+    var transaction : String = "",
     var listService: ArrayList<Service> = arrayListOf(),
     var listMethod: ArrayList<Method> = arrayListOf(),
     var service: Service? = null,

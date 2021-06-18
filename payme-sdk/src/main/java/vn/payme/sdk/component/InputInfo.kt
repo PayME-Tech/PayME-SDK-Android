@@ -5,6 +5,7 @@ import android.graphics.drawable.GradientDrawable
 import android.text.InputFilter
 import android.text.InputType
 import android.text.method.DigitsKeyListener
+import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -19,10 +20,11 @@ import vn.payme.sdk.model.Info
 import vn.payme.sdk.store.Store
 
 
-class InputTest : RelativeLayout {
+class InputInfo : RelativeLayout {
 
     lateinit  var txtTitle : TextView
     lateinit  var txtTitleRight : TextView
+    lateinit  var imageRight : ImageView
     lateinit  var input : EditText
     lateinit  var containerInput : ConstraintLayout
     var titleDefault  = ""
@@ -79,6 +81,7 @@ class InputTest : RelativeLayout {
         txtTitle = findViewById<View>(R.id.title) as TextView
         txtTitleRight = findViewById<View>(R.id.titleRight) as TextView
         input = findViewById<View>(R.id.input) as EditText
+        imageRight = findViewById<View>(R.id.imageRight) as ImageView
         containerInput = findViewById<View>(R.id.containerInput) as ConstraintLayout
         backgroundError.setStroke(2, ContextCompat.getColor(context,R.color.red))
         backgroundError.cornerRadius = 30f
@@ -118,6 +121,11 @@ class InputTest : RelativeLayout {
                 }
                 if (inputType=="number"){
                     input.inputType  = InputType.TYPE_CLASS_NUMBER
+                }
+                if (inputType=="textPassword|number"){
+                    input.inputType  = InputType.TYPE_CLASS_NUMBER
+                    input.setTransformationMethod(PasswordTransformationMethod.getInstance());
+
                 }
                 if (inputType=="textFilter"){
                     input.setRawInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME)

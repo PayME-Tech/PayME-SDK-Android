@@ -3,6 +3,7 @@ package vn.payme.sdk.api
 import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.enums.TYPE_PAYMENT
+import vn.payme.sdk.model.CardInfo
 import vn.payme.sdk.model.Method
 import vn.payme.sdk.store.Store
 
@@ -113,7 +114,18 @@ internal class PaymentApi {
             linked["linkedId"] = method.data?.linkedId!!.toBigInteger().toDouble()
             linked["envName"] = "MobileApp"
             payment["linked"] = linked
+        }else if(method.type==TYPE_PAYMENT.CREDIT_CARD){
+            val creditCard: MutableMap<String, Any> = mutableMapOf()
+            creditCard["cardNumber"] = ""
+            creditCard["expiredAt"] = ""
+            creditCard["cvv"] = ""
+            payment["creditCard"] = creditCard
+        }else if(method.type==TYPE_PAYMENT.BANK_TRANSFER){
+            val bankTransfer: MutableMap<String, Any> = mutableMapOf()
+            bankTransfer["active"] = true
+            payment["bankTransfer"] = bankTransfer
         }
+
         getFeeInput["payment"] = payment
         val accessToken = if(Store.userInfo.accountKycSuccess)   Store.userInfo.accessToken!! else ""
 
@@ -151,7 +163,7 @@ internal class PaymentApi {
         )
 
     }
-    fun  detechCardHolder(
+    fun  detectCardHolder(
         swiftCode:String,
         cardNumber:String,
         onSuccess: (JSONObject) -> Unit,
@@ -221,11 +233,10 @@ internal class PaymentApi {
     fun payment(
         method: Method,
         securityCode: String?,
-        cardNumber: String?,
-        cardHolder: String?,
-        cardDate: String?,
+        cardInfo: CardInfo?,
         otp: String?,
         transaction: String?,
+        recheck: Boolean?,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
@@ -234,6 +245,7 @@ internal class PaymentApi {
         val variables: MutableMap<String, Any> = mutableMapOf()
         val payInput: MutableMap<String, Any> = mutableMapOf()
         val payment: MutableMap<String, Any> = mutableMapOf()
+
         val query = "mutation PayMutation(\$payInput: OpenEWalletPaymentPayInput!) {\n" +
                 "  OpenEWallet {\n" +
                 "    Payment {\n" +
@@ -254,6 +266,37 @@ internal class PaymentApi {
                 "            message\n" +
                 "            statePaymentBankCardResponsed : state\n" +
                 "          }\n" +
+                "          ... on PaymentCreditCardResponsed {\n" +
+//                "            html\n" +
+                "            message\n" +
+                "            statePaymentCreditCardResponsed : state\n" +
+                "          }\n" +
+                "          ... on PaymentBankTransferResponsed {\n" +
+                "            bankList {\n" +
+                "              bankAccountName\n" +
+                "              bankBranch\n" +
+                "              bankCity\n" +
+                "              bankName\n" +
+                "              content\n" +
+                "              swiftCode\n" +
+                "              bankAccountNumber\n" +
+                "              fastSupport\n" +
+                "            }\n" +
+                "            message\n" +
+                "            statePaymentBankTransferResponsed : state\n" +
+                "            paymentInfo {\n" +
+                "              fee\n" +
+                "              amount\n" +
+                "              bankTransaction\n" +
+                "              createdAt\n" +
+                "              description\n" +
+                "              id\n" +
+                "              reason\n" +
+                "              state\n" +
+                "              total\n" +
+                "              transaction\n" +
+                "            }\n" +
+                "        }\n" +
                 "          ... on PaymentLinkedResponsed {\n" +
                 "            html\n" +
                 "            linkedId\n" +
@@ -283,17 +326,24 @@ internal class PaymentApi {
             wallet["securityCode"] = securityCode!!
             payment["wallet"] = wallet
         } else if (method.type == TYPE_PAYMENT.BANK_CARD) {
-
             val bankCard: MutableMap<String, Any> = mutableMapOf()
-            println("cardInfo2"+cardNumber)
-
-            bankCard["cardNumber"] = cardNumber!!
-            bankCard["cardHolder"] = cardHolder!!
-            bankCard["issuedAt"] = cardDate!!
+            bankCard["cardNumber"] = cardInfo?.cardNumber!!
+            bankCard["cardHolder"] = cardInfo?.cardHolder!!
+            bankCard["issuedAt"] = cardInfo?.cardDate!!
             payment["bankCard"] = bankCard
+        } else if(method.type==TYPE_PAYMENT.CREDIT_CARD){
+            val creditCard: MutableMap<String, Any> = mutableMapOf()
+            creditCard["cardNumber"] = cardInfo?.cardNumber!!
+            creditCard["expiredAt"] = cardInfo?.cardDateView
+            creditCard["cvv"] = cardInfo?.cvv!!
+            payment["creditCard"] = creditCard
+        } else if(method.type==TYPE_PAYMENT.BANK_TRANSFER){
+            val bankTransfer: MutableMap<String, Any> = mutableMapOf()
+            bankTransfer["active"] = true
+            bankTransfer["recheck"] = recheck!!
+            payment["bankTransfer"] = bankTransfer
         } else if (method.type == TYPE_PAYMENT.LINKED) {
             val linked: MutableMap<String, Any> = mutableMapOf()
-            println("method.data:"+method.data)
             linked["linkedId"] = method.data?.linkedId!!.toBigInteger().toDouble()
             if(otp!=null){
                 linked["otp"] = otp

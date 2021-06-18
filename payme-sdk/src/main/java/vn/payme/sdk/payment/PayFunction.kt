@@ -10,9 +10,8 @@ import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.PaymentInfoEvent
-import vn.payme.sdk.model.DataMethod
-import vn.payme.sdk.model.InfoPayment
-import vn.payme.sdk.model.Method
+import vn.payme.sdk.hepper.Keyboard
+import vn.payme.sdk.model.*
 import vn.payme.sdk.store.Store
 import java.text.DecimalFormat
 
@@ -34,6 +33,106 @@ internal class PayFunction {
         )
 
 
+    }
+
+    fun getListBank(
+        fragmentManager: FragmentManager,
+        method: Method, onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        val paymentApi = PaymentApi()
+        paymentApi.getListBanks(
+            onSuccess = { jsonObject ->
+                val Setting = jsonObject.optJSONObject("Setting")
+                val banks = Setting.optJSONArray("banks")
+                val listBanks = arrayListOf<BankInfo>()
+                for (i in 0 until banks.length()) {
+                    val bank = banks.optJSONObject(i)
+                    val cardPrefix = bank.optString("cardPrefix")
+                    val depositable = bank.optBoolean("depositable")
+                    val cardNumberLength = bank.optInt("cardNumberLength")
+                    val shortName = bank.optString("shortName")
+                    val swiftCode = bank.optString("swiftCode")
+                    if (depositable) {
+                        val bankInfo = BankInfo(
+                            depositable,
+                            cardPrefix,
+                            cardNumberLength,
+                            shortName,
+                            swiftCode
+                        )
+                        listBanks.add(bankInfo)
+                    }
+
+                }
+                EventBus.getDefault().postSticky(listBanks)
+                val popupPayment: PopupPayment = PopupPayment()
+                loading.dismiss()
+                popupPayment.show(
+                    fragmentManager,
+                    "ModalBottomSheet"
+                )
+            },
+            onError
+        )
+
+    }
+
+    private fun getListBankTransfer(
+        fragmentManager: FragmentManager,
+        method: Method, onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        val paymentApi = PaymentApi()
+        paymentApi.payment(
+            method,
+            "",
+            null,
+            "",
+            "",
+            false,
+            onSuccess = { jsonObject ->
+                val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
+                val Payment = OpenEWallet.optJSONObject("Payment")
+                val Pay = Payment.optJSONObject("Pay")
+                val succeeded = Pay.optBoolean("succeeded")
+                val payment = Pay.optJSONObject("payment")
+                val message = Pay.optString("message")
+                if (succeeded) {
+                    val listBank = arrayListOf<BankTransferInfo>()
+                    val bankList = payment.optJSONArray("bankList")
+                    for (i in 0 until bankList.length()) {
+                        val bank = bankList.optJSONObject(i)
+                        val bankAccountName = bank.optString("bankAccountName")
+                        val bankAccountNumber = bank.optString("bankAccountNumber")
+                        val bankBranch = bank.optString("bankBranch")
+                        val bankCity = bank.optString("bankCity")
+                        val bankName = bank.optString("bankName")
+                        val content = bank.optString("content")
+                        val swiftCode = bank.optString("swiftCode")
+                        val bankTransferInfo = BankTransferInfo(
+                            bankAccountName,
+                            bankAccountNumber,
+                            bankBranch,
+                            bankCity,
+                            bankName,
+                            content,
+                            swiftCode
+                        )
+                        listBank.add(bankTransferInfo)
+                    }
+                    EventBus.getDefault().postSticky(listBank[0])
+                    EventBus.getDefault().postSticky(listBank)
+                    val popupPayment: PopupPayment = PopupPayment()
+                    loading.dismiss()
+                    popupPayment.show(
+                        fragmentManager,
+                        "ModalBottomSheet"
+                    )
+                } else {
+                    onError(null, ERROR_CODE.PAYMENT_ERROR, message)
+                }
+            },
+            onError
+        )
     }
 
     fun pay(
@@ -225,12 +324,12 @@ internal class PayFunction {
                     for (i in 0 until methods.length()) {
                         val jsonObject = methods.getJSONObject(i)
                         var data = jsonObject.optJSONObject("data")
-                        var dataMethod = DataMethod(null, "","")
+                        var dataMethod = DataMethod(null, "", "")
                         if (data != null) {
                             val linkedId = data.optString("linkedId")
                             val swiftCode = data.optString("swiftCode")
                             val issuer = data.optString("issuer")
-                            dataMethod = DataMethod(linkedId, swiftCode,issuer)
+                            dataMethod = DataMethod(linkedId, swiftCode, issuer)
                         }
                         var fee = jsonObject.optInt("fee")
                         var label = jsonObject.optString("label")
@@ -239,20 +338,22 @@ internal class PayFunction {
                         var minFee = jsonObject.optInt("minFee")
                         var title = jsonObject.optString("title")
                         var type = jsonObject.optString("type")
-                        Store.paymentInfo.listMethod.add(
-                            Method(
-                                dataMethod,
-                                fee,
-                                label,
-                                methodId,
-                                minFee,
-                                feeDescription,
-                                title,
-                                type,
-                            )
+                        val methodRes = Method(
+                            dataMethod,
+                            fee,
+                            label,
+                            methodId,
+                            minFee,
+                            feeDescription,
+                            title,
+                            type,
                         )
-                        if (method?.methodId == methodId) {
+                        Store.paymentInfo.listMethod.add(
+                            methodRes
+                        )
+                        if (method != null && method?.methodId == methodId) {
                             checkMethodNotFound = true
+                            Store.paymentInfo.methodSelected = methodRes
                         }
 
                     }
@@ -263,23 +364,31 @@ internal class PayFunction {
                             "Không tìm thấy phương thức thanh toán"
                         )
                     } else {
+                        if (method == null) {
+                            Store.paymentInfo.methodSelected = null
+                        }
                         Store.paymentInfo.transaction = ""
                         Store.paymentInfo.isChangeMethod = method == null
-                        Store.paymentInfo.methodSelected = method
                         Store.paymentInfo.isShowResultUI = isShowResultUI
-
                         PayME.fragmentManager = fragmentManager
                         Store.paymentInfo.infoPayment = infoPayment
-                        val paymePayment: PaymePayment = PaymePayment()
-                        loading.dismiss()
-                        paymePayment.show(
-                            fragmentManager,
-                            "ModalBottomSheet"
-                        )
+                        if (method?.type == TYPE_PAYMENT.BANK_CARD) {
+                            getListBank(fragmentManager, method, onError)
+                        }else if (method?.type == TYPE_PAYMENT.BANK_TRANSFER) {
+                            getListBankTransfer(fragmentManager, method, onError)
+                        } else {
+                            val popupPayment: PopupPayment = PopupPayment()
+                            loading.dismiss()
+                            popupPayment.show(
+                                fragmentManager,
+                                "ModalBottomSheet"
+                            )
+                        }
+
                     }
 
                 } else {
-                    onError(null,ERROR_CODE.PAYMENT_ERROR,message)
+                    onError(null, ERROR_CODE.PAYMENT_ERROR, message)
                 }
             },
             onError

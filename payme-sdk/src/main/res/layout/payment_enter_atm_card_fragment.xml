@@ -14,7 +14,7 @@
 
 
 
-    <vn.payme.sdk.component.InputTest
+    <vn.payme.sdk.component.InputInfo
         android:id="@+id/inputCardNumber"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
         app:pbMaxlength="21"
         app:pbTitle="@string/enter_number_card" />
 
-    <vn.payme.sdk.component.InputTest
+    <vn.payme.sdk.component.InputInfo
         android:id="@+id/inputCardHolder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
         app:pbMaxlength="50"
         app:pbTitle="@string/enter_the_cardholder_full_name" />
 
-    <vn.payme.sdk.component.InputTest
+    <vn.payme.sdk.component.InputInfo
         android:id="@+id/inputCardDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

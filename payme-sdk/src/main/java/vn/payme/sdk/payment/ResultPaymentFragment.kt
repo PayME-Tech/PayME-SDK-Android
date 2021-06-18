@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
@@ -42,18 +43,20 @@ class ResultPaymentFragment : Fragment() {
     private lateinit var lottie: LottieAnimationView
     private lateinit var infoTop: InfoPayment
     private lateinit var infoBottom: InfoPayment
+    private lateinit var transitionCodeContainer: ConstraintLayout
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater?.inflate(R.layout.result_payment_layout, container, false)
+        val view: View = inflater?.inflate(R.layout.payment_result_fragment, container, false)
         buttonSubmit = view.findViewById(R.id.buttonSubmit)
         textAmount = view.findViewById(R.id.money)
         textError = view.findViewById(R.id.note_error)
         textTransactionCode = view.findViewById(R.id.transition_code_value)
         textTransactionTime = view.findViewById(R.id.transition_time_value)
+        transitionCodeContainer = view.findViewById(R.id.transition_code_container)
         textHotline = view.findViewById(R.id.txtHotline)
         infoTop = view.findViewById(R.id.infoTop)
         infoBottom = view.findViewById(R.id.infoBottom)
@@ -77,7 +80,6 @@ class ResultPaymentFragment : Fragment() {
         listInfoTop.add(Info("Mã dịch vụ", Store.paymentInfo.infoPayment?.orderId, null, null, false))
         listInfoTop.add(Info("Nội dung", Store.paymentInfo.infoPayment?.note, null, null, true))
 
-        infoTop.updateData(listInfoTop)
         val listInfoBottom: ArrayList<Info> = arrayListOf()
         if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.LINKED) {
             listInfoBottom.add(Info("Phương thức", "Tài khoản liên kết", null, null, false))
@@ -117,10 +119,29 @@ class ResultPaymentFragment : Fragment() {
                 )
             )
         }
+        if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.CREDIT_CARD) {
+            val lengthCard = event.cardInfo?.cardNumber?.length
+            val cardNumber = event.cardInfo?.cardNumber?.substring(
+                lengthCard!! - 4,
+                lengthCard!!
+            )
+            listInfoBottom.add(
+                Info(
+                    "Số thẻ",
+                    event.cardInfo?.bankShortName + "-" + cardNumber,
+                    null,
+                    null,
+                    false
+                )
+            )
+        }
         textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
-        listInfoBottom.add(Info("Phí",  if(event.fee==0) "Miễn phí" else "${decimal.format(event.fee)} đ", null, null, false))
-        listInfoBottom.add(Info("Tổng thanh toán",  "${decimal.format(event.fee + Store.paymentInfo.infoPayment!!.amount)} đ", null, ContextCompat.getColor(requireContext(),R.color.red), true))
+        val feeString = if(event.fee==0) "Miễn phí" else "${decimal.format(event.fee)} đ"
+        val totalString ="${decimal.format(event.fee + Store.paymentInfo.infoPayment!!.amount)} đ"
+        listInfoBottom.add(Info("Phí",  feeString, null, null, false))
+        listInfoBottom.add(Info("Tổng thanh toán",  totalString, null, ContextCompat.getColor(requireContext(),R.color.red), true))
         if(state =="PENDING"){
+            infoTop.updateData(listInfoTop)
             lottie.setAnimation(R.raw.cho_xu_ly)
             textResult.text = getString(R.string.payment_pending)
             textError.text = getString(R.string.payment_pending_description)
@@ -133,6 +154,7 @@ class ResultPaymentFragment : Fragment() {
             buttonSubmit.background = backgroundColorRadius
             lottie.playAnimation()
         }else if(message != null || state=="FAILED"){
+            infoTop.updateData(listInfoTop)
             textError.text = message
             textError.visibility = View.VISIBLE
             lottie.setAnimation(R.raw.thatbai)
@@ -144,7 +166,22 @@ class ResultPaymentFragment : Fragment() {
             buttonSubmit.background = backgroundColorRadius
             lottie.playAnimation()
         }else{
-            infoBottom.updateData(listInfoBottom)
+            //Thành công
+                if(Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.BANK_TRANSFER){
+                    transitionCodeContainer.visibility = View.GONE
+                    infoBottom.updateData(listInfoTop)
+                    var listInfoTopBankTransfer = arrayListOf<Info>()
+                    listInfoTopBankTransfer.add(Info("Mã giao dịch", Store.paymentInfo.transaction, null, null, false))
+                    listInfoTopBankTransfer.add(Info("Thời gian giao dịch", DateStr, null, null, false))
+                    listInfoTopBankTransfer.add(Info("Phương thức", Store.paymentInfo.methodSelected?.title, null, null, false))
+                    listInfoTopBankTransfer.add(Info("Phí giao dịch",feeString, null, null, false))
+                    listInfoTopBankTransfer.add(Info("Tổng thanh toán",totalString, null, ContextCompat.getColor(requireContext(),R.color.red), true))
+                    infoTop.updateData(listInfoTopBankTransfer)
+                }else{
+                    infoTop.updateData(listInfoTop)
+                    infoBottom.updateData(listInfoBottom)
+                }
+
             loadAnimation()
             textAmount.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
         }

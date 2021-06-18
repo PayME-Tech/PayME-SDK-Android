@@ -62,7 +62,7 @@ public class PayME {
             configColor,
             language,
         )
-        Store.paymentInfo = PaymentInfo(null, 0, "", null, null, null, null,  arrayListOf(),
+        Store.paymentInfo = PaymentInfo(null, 0, "", null, null, null, "",  arrayListOf(),
             arrayListOf(), null, true,true)
         Store.userInfo = UserInfo(0, false, false, false, "", null)
         Security.insertProviderAt(BouncyCastleProvider(), 1)

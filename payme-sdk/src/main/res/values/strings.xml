@@ -5,7 +5,9 @@
     <string name="next">Tiếp tục</string>
     <string name="enter_number_card">Nhập số thẻ</string>
     <string name="enter_the_number_card_on_the_front_of_the_card">Nhập thẻ số ở mặt trước thẻ</string>
-    <string name="release_date_mm_yy">Ngày phát hành</string>
+    <string name="release_date_mm_yy">Ngày hiệu lực</string>
+    <string name="release_date_expired">Ngày hết hạn</string>
+    <string name="cvv">Mã bảo mật</string>
     <string name="release_date_error">Ngày phát hành không đúng định dạng</string>
     <string name="number_card_error">Số thẻ không đúng định dạng</string>
     <string name="please_check_the_correct_name_printed_on_the_card">Vui lòng kiểm tra đúng tên in trên thẻ</string>
@@ -77,4 +79,13 @@
     <string name="confirm_passport">Hộ chiếu chỉ dùng để cung cấp định danh cho người nước ngoài</string>
     <string name="ok">Đồng ý</string>
     <string name="change">Thay đổi</string>
+    <string name="account_number">Số tài khoản</string>
+    <string name="account_holder">Chủ tài khoản</string>
+    <string name="select_bank">Chọn ngân hàng</string>
+    <string name="search">Tìm kiếm</string>
+    <string name="copied">Đã sao chép nội dung</string>
+    <string name="note_bank_transfer">(*) Giao dịch sẽ được thực hiện ngay sau khi xác nhận chuyển khoản </string>
+    <string name="check_bank_transfer">Hệ thống đang kiểm tra trạng thái lệnh chuyển tiền của bạn. Vui lòng chờ trong giây lát...</string>
+    <string name="result_bank_transfer">Hệ thống vẫn chưa ghi nhận lệnh chuyển tiền của bạn. Tài khoản của bạn sẽ được ghi có ngay khi hệ thống ghi nhận thành công.</string>
+
 </resources>

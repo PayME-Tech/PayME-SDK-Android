@@ -36,6 +36,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 android:id="@+id/input"
+
                 android:layout_width="match_parent"
                 android:textColor="@color/blackSeven"
                 android:layout_height="wrap_content"
@@ -43,5 +44,14 @@
                 android:background="@color/paleGrey"
                 android:textSize="16dp"
                 />
+            <ImageView
+                android:id="@+id/imageRight"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="@id/input"
+                app:layout_constraintBottom_toBottomOf="@id/input"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_width="20dp"
+                android:layout_height="20dp"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 </merge>

@@ -23,7 +23,7 @@ class PayMEQRCodePopup : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater.inflate(
-            R.layout.modal_qr_layout,
+            R.layout.payment_modal_qr_layout,
             container, false
         )
         btnSubmit = view.findViewById(R.id.buttonSubmit)
@@ -41,7 +41,7 @@ class PayMEQRCodePopup : BottomSheetDialogFragment() {
     }
 
     override fun setupDialog(dialog: Dialog, style: Int) {
-        val contentView = View.inflate(context, R.layout.modal_qr_layout, null)
+        val contentView = View.inflate(context, R.layout.payment_modal_qr_layout, null)
         dialog.setContentView(contentView)
         (contentView.parent as View).setBackgroundColor(resources.getColor(android.R.color.transparent))
 

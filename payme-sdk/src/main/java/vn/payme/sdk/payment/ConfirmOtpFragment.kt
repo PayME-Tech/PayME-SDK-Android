@@ -3,7 +3,6 @@ package vn.payme.sdk.payment
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,14 +12,11 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import com.devs.vectorchildfinder.VectorChildFinder
-import com.devs.vectorchildfinder.VectorDrawableCompat
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.PinView
-import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.hepper.ChangeColorImage
@@ -41,13 +37,13 @@ class ConfirmOtpFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater?.inflate(R.layout.confirm_otp_layout, container, false)
+        val view: View = inflater?.inflate(R.layout.payment_confirm_otp_layout, container, false)
         loadingProgress = view.findViewById(R.id.loading)
         textNote = view.findViewById(R.id.text_note_otp)
         textCountDownTimer = view.findViewById(R.id.counterOtp)
         pinView = view.findViewById(R.id.otp_view)
         imageOtp = view.findViewById(R.id.image_otp)
-        ChangeColorImage().changeColor(requireContext(),imageOtp,R.drawable.ic_confirm_pass,6)
+        ChangeColorImage().changeColor(requireContext(), imageOtp, R.drawable.ic_confirm_pass, 6)
         pinView.setItemBackgroundColor(ContextCompat.getColor(PayME.context, R.color.ice))
         pinView.setAnimationEnable(true)
         pinView.requestFocus()
@@ -69,7 +65,7 @@ class ConfirmOtpFragment : Fragment() {
 
 //        timer.start()
         textCountDownTimer.setOnClickListener {
-            if(isResend){
+            if (isResend) {
                 isResend = false
                 resendOtp()
             }
@@ -77,6 +73,7 @@ class ConfirmOtpFragment : Fragment() {
         return view
 
     }
+
     private fun resendOtp() {
         showLoading(true)
         val securityCode = arguments?.getString("securityCode")
@@ -87,16 +84,15 @@ class ConfirmOtpFragment : Fragment() {
             null,
             null,
             null,
-            null,
             onSuccess = { jsonObject ->
-                if(!isVisible) return@payment
+                if (!isVisible) return@payment
                 showLoading(false)
                 val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
                 val Payment = OpenEWallet.optJSONObject("Payment")
                 val Pay = Payment.optJSONObject("Pay")
                 val payment = Pay.optJSONObject("payment")
                 val message = Pay.optString("message")
-                if(payment!=null){
+                if (payment != null) {
                     val statePaymentLinkedResponsed =
                         payment.optString("statePaymentLinkedResponsed")
                     if (statePaymentLinkedResponsed == "REQUIRED_OTP") {
@@ -107,14 +103,14 @@ class ConfirmOtpFragment : Fragment() {
                         EventBus.getDefault()
                             .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.RESULT, message))
                     }
-                }else{
+                } else {
                     EventBus.getDefault()
                         .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.RESULT, message))
                 }
 
             },
             onError = { jsonObject, code, s ->
-                if(!isVisible) return@payment
+                if (!isVisible) return@payment
                 showLoading(false)
                 PayME.showError(s)
             }
@@ -140,10 +136,10 @@ class ConfirmOtpFragment : Fragment() {
 
     fun showLoading(state: Boolean) {
         loading = state
-        if(state){
+        if (state) {
             loadingProgress.visibility = View.VISIBLE
             textCountDownTimer.visibility = View.GONE
-        }else{
+        } else {
             loadingProgress.visibility = View.GONE
             textCountDownTimer.visibility = View.GONE
         }
@@ -159,10 +155,9 @@ class ConfirmOtpFragment : Fragment() {
             Store.paymentInfo.methodSelected!!,
             null,
             null,
-            null,
-            null,
             pass,
             transaction,
+            null,
             onSuccess = { jsonObject ->
                 if (!isVisible) return@payment
                 showLoading(false)

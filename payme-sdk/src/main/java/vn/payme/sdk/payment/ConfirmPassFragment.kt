@@ -12,14 +12,11 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import com.devs.vectorchildfinder.VectorChildFinder
-import com.devs.vectorchildfinder.VectorDrawableCompat
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.PinView
-import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.hepper.ChangeColorImage
@@ -59,7 +56,6 @@ class ConfirmPassFragment : Fragment() {
         showLoading()
         paymentApi.payment(Store.paymentInfo.methodSelected!!,
             securityCode,
-            null,
             null,
             null,
             null,
@@ -136,7 +132,7 @@ class ConfirmPassFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater?.inflate(R.layout.confirm_pass, container, false)
+        val view: View = inflater?.inflate(R.layout.payment_confirm_pass, container, false)
         pinView = view.findViewById(R.id.otp_view)
         imageConfirm = view.findViewById(R.id.image_otp)
 

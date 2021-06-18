@@ -456,7 +456,7 @@ class MainActivity : AppCompatActivity() {
                     "PAY",
                     amount,
                     "Nội dung đơn hàng",
-                    nextValues.toString(),
+                    "11223344",
                     storeId,
                     "OpenEWallet",
                     ""
