@@ -307,6 +307,7 @@ class MainActivity : AppCompatActivity() {
                         showLog
                     )
                 payme?.login(onSuccess = { accountStatus ->
+                    println("accountStatus" + accountStatus)
                     if (accountStatus == AccountStatus.NOT_ACTIVATED) {
                         //Tài khoản chưa kich hoạt
                     }
@@ -456,12 +457,13 @@ class MainActivity : AppCompatActivity() {
                     "PAY",
                     amount,
                     "Nội dung đơn hàng",
-                    "11223344",
+                    nextValues.toString(),
                     storeId,
                     "OpenEWallet",
                     ""
                 )
-
+//            payme?.getPaymentMethods(storeId,
+//                onSuccess = {list->
                     payme?.pay(this.supportFragmentManager, infoPayment, true, null,
                         onSuccess = { json: JSONObject? ->
                         },
@@ -480,6 +482,12 @@ class MainActivity : AppCompatActivity() {
                         }
 
                     )
+//
+//            },onError = {jsonObject, code, message ->
+//
+//            })
+
+
 
         }
 

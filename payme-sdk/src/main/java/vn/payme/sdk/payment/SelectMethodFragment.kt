@@ -107,9 +107,12 @@ class SelectMethodFragment : Fragment() {
                 buttonSubmit.visibility = View.GONE
                 infoFee.visibility = View.GONE
                 frameLayout.visibility = View.VISIBLE
-                val fragment = childFragmentManager?.beginTransaction()
-                fragment?.replace(R.id.frame_container_select_method, ListMethodPaymentFragment())
-                fragment?.commit()
+                if(Store.paymentInfo.isChangeMethod){
+                    val fragment = childFragmentManager?.beginTransaction()
+                    fragment?.replace(R.id.frame_container_select_method, ListMethodPaymentFragment())
+                    fragment?.commit()
+                }
+
             }
         }
         buttonSubmit.setOnClickListener {
@@ -131,15 +134,12 @@ class SelectMethodFragment : Fragment() {
         if(Store.paymentInfo.methodSelected !=null){
             textChangeMethod.visibility = View.GONE
             changeMethod(Store.paymentInfo.methodSelected!!)
+        }else{
+            val fragment = childFragmentManager?.beginTransaction()
+            fragment?.replace(R.id.frame_container_select_method, ListMethodPaymentFragment())
+            fragment?.commit()
         }
-
         textChangeMethod.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
-        val fragmentManager: FragmentManager
-        fragmentManager = childFragmentManager
-        val fragment = fragmentManager.beginTransaction()
-        fragment.add(R.id.frame_container_select_method, ListMethodPaymentFragment())
-        fragment.commit()
-
         return view
     }
 
@@ -177,6 +177,13 @@ class SelectMethodFragment : Fragment() {
         buttonChangeMethod.visibility = View.VISIBLE
         AddInfoMethod().addImage(method,imageMethod)
         AddInfoMethod().setTitle(method,textTitleMethodSelected,textNoteMethodSelected,textFeeMethodSelected)
+        if(method.type == TYPE_PAYMENT.BANK_TRANSFER){
+            buttonSubmit.iconLeft.visibility = View.GONE
+            buttonSubmit.setText(getString(R.string.confirm_transfer))
+        }else{
+            buttonSubmit.iconLeft.visibility = View.VISIBLE
+            buttonSubmit.setText(getString(R.string.confirm))
+        }
         if(method.type == TYPE_PAYMENT.CREDIT_CARD){
             val fragment = childFragmentManager?.beginTransaction()
             fragment?.replace(R.id.frame_container_select_method, EnterCreditCardFragment())

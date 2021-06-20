@@ -1,6 +1,8 @@
 package vn.payme.sdk.component
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.graphics.drawable.GradientDrawable
 import android.text.InputFilter
 import android.text.InputType
@@ -27,6 +29,7 @@ class InputInfo : RelativeLayout {
     lateinit  var imageRight : ImageView
     lateinit  var input : EditText
     lateinit  var containerInput : ConstraintLayout
+    lateinit  var progressBar : ProgressBar
     var titleDefault  = ""
     val backgroundError = GradientDrawable()
     var isError = false
@@ -83,6 +86,14 @@ class InputInfo : RelativeLayout {
         input = findViewById<View>(R.id.input) as EditText
         imageRight = findViewById<View>(R.id.imageRight) as ImageView
         containerInput = findViewById<View>(R.id.containerInput) as ConstraintLayout
+        progressBar = findViewById(R.id.loading)
+        progressBar.getIndeterminateDrawable()
+            .mutate()
+            .setColorFilter(
+                Color.parseColor(Store.config.colorApp.startColor),
+                PorterDuff.Mode.SRC_ATOP
+            )
+
         backgroundError.setStroke(2, ContextCompat.getColor(context,R.color.red))
         backgroundError.cornerRadius = 30f
 

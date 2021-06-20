@@ -102,7 +102,7 @@ class PopupCheckBankTransfer : DialogFragment() {
                     if (payment != null) {
                         val statePaymentBankTransferResponsed =
                             payment.optString("statePaymentBankTransferResponsed")
-                        if (statePaymentBankTransferResponsed == "FAILED") {
+                        if (statePaymentBankTransferResponsed == "REQUIRED_TRANSFER") {
                             containerCheck.visibility = View.GONE
                             containerResult.visibility = View.VISIBLE
                         } else if (statePaymentBankTransferResponsed == "SUCCEEDED") {

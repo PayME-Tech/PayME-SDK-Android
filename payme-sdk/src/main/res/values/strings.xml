@@ -84,6 +84,7 @@
     <string name="select_bank">Chọn ngân hàng</string>
     <string name="search">Tìm kiếm</string>
     <string name="copied">Đã sao chép nội dung</string>
+    <string name="confirm_transfer">Xác nhận đã chuyển</string>
     <string name="note_bank_transfer">(*) Giao dịch sẽ được thực hiện ngay sau khi xác nhận chuyển khoản </string>
     <string name="check_bank_transfer">Hệ thống đang kiểm tra trạng thái lệnh chuyển tiền của bạn. Vui lòng chờ trong giây lát...</string>
     <string name="result_bank_transfer">Hệ thống vẫn chưa ghi nhận lệnh chuyển tiền của bạn. Tài khoản của bạn sẽ được ghi có ngay khi hệ thống ghi nhận thành công.</string>

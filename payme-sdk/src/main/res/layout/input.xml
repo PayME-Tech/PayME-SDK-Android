@@ -52,6 +52,14 @@
                 app:layout_constraintRight_toRightOf="parent"
                 android:layout_width="20dp"
                 android:layout_height="20dp"/>
+            <ProgressBar
+                android:id="@+id/loading"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="@id/input"
+                app:layout_constraintBottom_toBottomOf="@id/input"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_width="20dp"
+                android:layout_height="20dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </merge>

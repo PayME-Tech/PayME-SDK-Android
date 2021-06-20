@@ -32,14 +32,20 @@ class EnterAtmCardFragment : Fragment() {
     private var cardHolder: String = ""
     private var cardDate: String = ""
     private var cardNumberValue: String = ""
+    var count = 0
 
 
 
-    fun detechCardHoder(cardNumber: String) {
+    fun detechCardHoder(cardNumber: String,count:Int) {
+
         val paymentApi = PaymentApi()
+        inputCardNumber.progressBar.visibility = View.VISIBLE
         paymentApi.detectCardHolder(bankSelected?.swiftCode!!,
             cardNumber,
             onSuccess = { jsonObject ->
+                if(count!=this.count) return@detectCardHolder
+                if(!isVisible) return@detectCardHolder
+                inputCardNumber.progressBar.visibility = View.GONE
                 val Utility = jsonObject.optJSONObject("Utility")
                 val GetBankName = Utility.optJSONObject("GetBankName")
                 val accountName = GetBankName.optString("accountName")
@@ -60,7 +66,10 @@ class EnterAtmCardFragment : Fragment() {
 
             },
             onError = { jsonObject, code, message ->
-                    PayME.showError(message)
+                if(count!=this.count) return@detectCardHolder
+                if(!isVisible) return@detectCardHolder
+                inputCardNumber.progressBar.visibility = View.GONE
+                PayME.showError(message)
             }
         )
 
@@ -80,6 +89,9 @@ class EnterAtmCardFragment : Fragment() {
 //
         inputCardNumber.input.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
+                count = count+1
+                inputCardNumber.progressBar.visibility = View.GONE
+
                 val cardNumber = s?.replace("[^0-9]".toRegex(), "")
                 cardHolder = ""
                 cardNumberValue = ""
@@ -87,7 +99,6 @@ class EnterAtmCardFragment : Fragment() {
                 inputCardHolder.setDefault()
                 inputCardNumber.txtTitleRight.text = ""
                 inputCardHolder.input.setText("")
-
 
                 var maxLength = 16
                 val listBanks = EventBus.getDefault().getStickyEvent(arrayListOf<BankInfo>()::class.java)
@@ -107,7 +118,7 @@ class EnterAtmCardFragment : Fragment() {
                             inputCardNumber.input.filters = filters
                             bankVerify = true
                             if (cardNumber.length == bankSelected?.cardNumberLength) {
-                                detechCardHoder(cardNumber)
+                                detechCardHoder(cardNumber,count)
                                 cardNumberValue = cardNumber
                             }
 

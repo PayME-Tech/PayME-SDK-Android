@@ -143,6 +143,8 @@ internal class PayFunction {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
+        val arrayBank  = arrayListOf<BankTransferInfo>()
+        EventBus.getDefault().postSticky(arrayBank)
 
         PayME.onSuccess = onSuccess
         PayME.onError = onError
@@ -233,7 +235,11 @@ internal class PayFunction {
             }
             return
         }
-        if (!((method?.type == TYPE_PAYMENT.WALLET) || (method?.type == TYPE_PAYMENT.BANK_CARD) || (method?.type == TYPE_PAYMENT.LINKED))) {
+        if (!((method?.type == TYPE_PAYMENT.WALLET) ||
+                    (method?.type == TYPE_PAYMENT.BANK_CARD) ||
+                    (method?.type == TYPE_PAYMENT.BANK_TRANSFER) ||
+                    (method?.type == TYPE_PAYMENT.CREDIT_CARD) ||
+                    (method?.type == TYPE_PAYMENT.LINKED))) {
             onError(null, ERROR_CODE.PAYMENT_ERROR, "Phương thức chưa được hỗ trợ")
             return
         }

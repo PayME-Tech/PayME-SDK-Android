@@ -94,11 +94,18 @@ class ListMethodPaymentFragment : Fragment() {
                     val state = GetFee.getString("state")
                     if (state == "null") {
                         if(method.type == TYPE_PAYMENT.BANK_CARD){
+
                             EventBus.getDefault().postSticky(PaymentInfoEvent(null,fee))
                             getListBank(method)
                         }else if(method.type == TYPE_PAYMENT.BANK_TRANSFER){
                             EventBus.getDefault().postSticky(PaymentInfoEvent(null,fee))
-                            getListBankTransfer(method)
+                            val listBank = EventBus.getDefault().getStickyEvent(arrayListOf<BankTransferInfo>()::class.java)
+                            if( listBank !=null && listBank.size>0){
+                                disableLoading()
+                                EventBus.getDefault().post(method)
+                            }else{
+                                getListBankTransfer(method)
+                            }
                         }else{
                             disableLoading()
                             EventBus.getDefault().postSticky(PaymentInfoEvent(null,fee))
