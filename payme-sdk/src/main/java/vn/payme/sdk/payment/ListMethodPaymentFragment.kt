@@ -94,7 +94,6 @@ class ListMethodPaymentFragment : Fragment() {
                     val state = GetFee.getString("state")
                     if (state == "null") {
                         if(method.type == TYPE_PAYMENT.BANK_CARD){
-
                             EventBus.getDefault().postSticky(PaymentInfoEvent(null,fee))
                             getListBank(method)
                         }else if(method.type == TYPE_PAYMENT.BANK_TRANSFER){
@@ -224,7 +223,7 @@ class ListMethodPaymentFragment : Fragment() {
         }
 
         this.listView.setOnItemClickListener { adapterView, view, i, l ->
-            if (loadingProcess.visibility != View.VISIBLE) {
+            if (!loadingPopup.isVisible) {
                 val method = Store.paymentInfo.listMethod[i]
                 Store.paymentInfo.methodSelected = method
                 if(method.type!=TYPE_PAYMENT.WALLET && !Store.config.openPayAndKyc){

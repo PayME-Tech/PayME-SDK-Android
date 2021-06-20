@@ -11,7 +11,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
-import vn.payme.sdk.PaymeWaletActivity
+import vn.payme.sdk.PayMEOpenSDKPopup
 import vn.payme.sdk.R
 import vn.payme.sdk.api.UploadKycApi
 import vn.payme.sdk.enums.TypeCallBack
@@ -33,7 +33,7 @@ class UploadKycFragment : Fragment() {
                 val message = KYC.optString("message")
                 val succeeded = KYC.optBoolean("succeeded")
                 if(succeeded){
-                    if(PaymeWaletActivity.isVisible){
+                    if(PayMEOpenSDKPopup.isVisible){
                         if(CameraKycActivity.updateOnlyIdentify){
                             var even: EventBus = EventBus.getDefault()
                             var myEven: MyEven = MyEven(TypeCallBack.onUpdateIdentify, "")

@@ -4,7 +4,7 @@ import android.webkit.JavascriptInterface
 import androidx.fragment.app.FragmentManager
 import org.json.JSONObject
 import vn.payme.sdk.PayME
-import vn.payme.sdk.PaymeWaletActivity
+import vn.payme.sdk.PayMEOpenSDKPopup
 import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.kyc.CameraKycActivity
 import vn.payme.sdk.store.Store
@@ -48,7 +48,7 @@ public class JsObject(
     }
     @JavascriptInterface
     public fun getImage(): String {
-       return "data:image/png;base64," +PaymeWaletActivity.image
+       return "data:image/png;base64," +PayMEOpenSDKPopup.image
     }
     @JavascriptInterface
     fun onDeposit(string: String){

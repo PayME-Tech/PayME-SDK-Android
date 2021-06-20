@@ -33,8 +33,9 @@
                     android:visibility="gone"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
+                    app:layout_constraintDimensionRatio="1:1"
                     android:background="@color/white"
-                    app:cardCornerRadius="56dp"
+                    app:cardCornerRadius="30dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toTopOf="@id/title_amount"
                     app:layout_constraintBottom_toBottomOf="@id/money"
@@ -42,8 +43,8 @@
 
                     <ImageView
                         android:id="@+id/imageLogoMC"
-                        android:layout_width="49dp"
-                        android:layout_height="49dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_payme" />
                 </androidx.cardview.widget.CardView>

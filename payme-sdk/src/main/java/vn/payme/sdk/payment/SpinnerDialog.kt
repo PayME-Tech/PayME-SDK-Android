@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.R
@@ -34,6 +35,12 @@ class SpinnerDialog : DialogFragment() {
         EventBus.getDefault().register(this)
 
         return view
+
+    }
+
+    override fun show(manager: FragmentManager, tag: String?) {
+        if(isVisible) return
+        super.show(manager, tag)
 
     }
        @Subscribe

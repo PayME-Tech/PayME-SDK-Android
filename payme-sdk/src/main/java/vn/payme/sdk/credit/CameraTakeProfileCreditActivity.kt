@@ -13,12 +13,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.add
-import androidx.fragment.app.commit
 import com.google.android.gms.common.util.Base64Utils
 import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.CameraView
@@ -26,8 +23,6 @@ import com.otaliastudios.cameraview.PictureResult
 import com.otaliastudios.cameraview.controls.Flash
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
-import vn.payme.sdk.PayME
-import vn.payme.sdk.PaymeWaletActivity
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.enums.TypeCallBack

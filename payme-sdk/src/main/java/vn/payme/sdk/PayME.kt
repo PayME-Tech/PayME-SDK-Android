@@ -1,7 +1,6 @@
 package vn.payme.sdk
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -30,6 +29,8 @@ import java.security.Security
 
 
 public class PayME {
+    private val payMEOpenSDKPopup = PayMEOpenSDKPopup()
+
     companion object {
         lateinit var context: Context
         lateinit var onSuccess: ((JSONObject?) -> Unit)
@@ -309,8 +310,7 @@ public class PayME {
 
         Companion.onSuccess = onSuccess
         Companion.onError = onError
-        val paymeWaletActivity = PaymeWaletActivity()
-        paymeWaletActivity.show(fragmentManager,null)
+        payMEOpenSDKPopup.show(fragmentManager,null)
     }
 
 

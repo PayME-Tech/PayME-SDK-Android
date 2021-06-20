@@ -25,12 +25,16 @@ class ColorApp {
         GradientDrawable.Orientation.LEFT_RIGHT,
         intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor))
     )
+   var backgroundColorRadiusTopWhite: GradientDrawable = GradientDrawable(
+        GradientDrawable.Orientation.LEFT_RIGHT,
+        intArrayOf(Color.parseColor("#ffffff"), Color.parseColor("#ffffff"))
+    )
 
     constructor(startColor: String, endColor: String) {
         this.startColor = startColor
         this.endColor = endColor
         this.backgroundColorRadiusBorder.cornerRadius = 30f
-        this.backgroundColorRadiusBorder.setStroke(2, Color.parseColor(startColor))
+        this.backgroundColorRadiusBorder.setStroke(1, Color.parseColor(startColor))
         this.backgroundColorRadius = GradientDrawable(
             GradientDrawable.Orientation.LEFT_RIGHT,
             intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor))
@@ -45,6 +49,7 @@ class ColorApp {
             intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor))
         )
         backgroundColorRadiusTop.cornerRadii = (floatArrayOf(60f, 60f, 60f, 60f, 0f, 0f, 0f, 0f))
+        backgroundColorRadiusTopWhite.cornerRadii = (floatArrayOf(65f, 65f, 65f, 65f, 0f, 0f, 0f, 0f))
         backgroundColorRadiusAlpha  = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
 
         this.backgroundColorRadiusAlpha.alpha = 100

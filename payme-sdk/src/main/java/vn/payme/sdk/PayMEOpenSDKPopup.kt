@@ -16,6 +16,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.json.JSONObject
@@ -32,7 +33,7 @@ import vn.payme.sdk.store.Store
 import java.net.URLEncoder
 
 
-internal class PaymeWaletActivity : DialogFragment() {
+class PayMEOpenSDKPopup : DialogFragment() {
     lateinit private var loading: ConstraintLayout
     lateinit private var loadingProgressBar: ProgressBar
     private lateinit var cameraManager: CameraManager
@@ -50,8 +51,13 @@ internal class PaymeWaletActivity : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         isCancelable = false
-        PaymeWaletActivity.isVisible = true
+        PayMEOpenSDKPopup.isVisible = true
         setStyle(STYLE_NO_FRAME,R.style.DialogStyle);
+    }
+
+    override fun show(manager: FragmentManager, tag: String?) {
+        if(isVisible) return
+        super.show(manager, tag)
     }
     companion object {
         var image: String = ""
@@ -181,8 +187,10 @@ internal class PaymeWaletActivity : DialogFragment() {
                         e.printStackTrace()
                     }
                     if (!checkTimeoutLoadWebView) {
+                        if (isVisible){
                             loading.visibility = View.GONE
                             containerErrorNetwork?.visibility = View.VISIBLE
+                        }
                     }
                 }.start()
             }
@@ -342,7 +350,7 @@ internal class PaymeWaletActivity : DialogFragment() {
     override fun onDestroy() {
         myWebView.removeAllViews();
         myWebView.destroy()
-        PaymeWaletActivity.isVisible = false
+        PayMEOpenSDKPopup.isVisible = false
         EventBus.getDefault().unregister(this);
         super.onDestroy()
     }

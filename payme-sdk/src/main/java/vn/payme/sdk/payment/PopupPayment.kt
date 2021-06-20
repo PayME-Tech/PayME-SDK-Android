@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.annotation.Nullable
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
@@ -23,6 +24,8 @@ import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.store.Store
 
 internal class PopupPayment : DialogFragment() {
+    lateinit var frameContainer : ConstraintLayout
+
 
     lateinit var buttonClose: ConstraintLayout
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,6 +80,10 @@ internal class PopupPayment : DialogFragment() {
             R.layout.payment_layout,
             container, false
         )
+        frameContainer = v.findViewById(R.id.containerPayment)
+        frameContainer.background = Store.config.colorApp.backgroundColorRadiusTopWhite
+
+
         buttonClose = v.findViewById(R.id.buttonClose)
         buttonClose.setOnClickListener {
             this.dialog?.dismiss()
