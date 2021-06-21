@@ -134,7 +134,7 @@
                     android:layout_height="18dp"
                     android:id="@+id/imageCopiAccountNumber"
                     android:layout_marginLeft="10dp"
-                    android:src="@drawable/ic_copi" />
+                    android:src="@drawable/ic_copi2" />
             </LinearLayout>
         </LinearLayout>
 
@@ -219,7 +219,7 @@
                     android:layout_width="16dp"
                     android:layout_height="18dp"
                     android:layout_marginLeft="10dp"
-                    android:src="@drawable/ic_copi" />
+                    android:src="@drawable/ic_copi2" />
             </LinearLayout>
         </LinearLayout>
 

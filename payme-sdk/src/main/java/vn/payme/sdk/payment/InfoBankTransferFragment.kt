@@ -80,8 +80,8 @@ class InfoBankTransferFragment : Fragment() {
 
     }
     fun setupUi(){
-        ChangeColorImage().changeColor(requireContext(),imageCopiAccountNumber!!,R.drawable.ic_copi,1)
-        ChangeColorImage().changeColor(requireContext(),imageCopiNote!!,R.drawable.ic_copi,1)
+        ChangeColorImage().changeColor(requireContext(),imageCopiAccountNumber!!,R.drawable.ic_copi2,1)
+        ChangeColorImage().changeColor(requireContext(),imageCopiNote!!,R.drawable.ic_copi2,1)
         textChangeBank.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
     }
     fun setAmount (){
