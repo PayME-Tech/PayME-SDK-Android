@@ -178,6 +178,8 @@ class SelectMethodFragment : Fragment() {
         AddInfoMethod().addImage(method,imageMethod)
         AddInfoMethod().setTitle(method,textTitleMethodSelected,textNoteMethodSelected,textFeeMethodSelected)
         if(method.type == TYPE_PAYMENT.BANK_TRANSFER){
+            Store.paymentInfo.isChangeMethod = false
+            textChangeMethod.visibility = View.GONE
             buttonSubmit.iconLeft.visibility = View.GONE
             buttonSubmit.setText(getString(R.string.confirm_transfer))
         }else{
