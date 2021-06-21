@@ -1,6 +1,5 @@
 package vn.payme.sdk
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -85,9 +84,8 @@ class ScanQR : DialogFragment() {
             codeScanner.decodeCallback = DecodeCallback {
                 activity.runOnUiThread {
                     dismiss()
-                    var even: EventBus = EventBus.getDefault()
-                    var myEven: MyEven = MyEven(TypeCallBack.onScan, it.text.toString())
-                    even.post(myEven)
+                    val payme = PayME()
+                    payme.payQRCode(PayME.fragmentManager,it.text.toString())
                 }
             }
             cameraAccept = true
@@ -117,15 +115,12 @@ class ScanQR : DialogFragment() {
                 try {
                     val result = reader.decode(bBitmap)
                     dismiss()
-                    var even: EventBus = EventBus.getDefault()
-                    var myEven: MyEven = MyEven(TypeCallBack.onScan, result.toString())
-                    even.post(myEven)
+                    val payme = PayME()
+                    payme.payQRCode(PayME.fragmentManager,result.toString())
                 } catch (e: NotFoundException) {
                     dismiss()
-
-                    var popup: PayMEQRCodePopup = PayMEQRCodePopup()
+                    var popup: SearchQrResultPopup = SearchQrResultPopup()
                     popup.show(parentFragmentManager, "ModalBottomSheet")
-                    Log.d("TAG", "Not found")
                 }
             }
         }

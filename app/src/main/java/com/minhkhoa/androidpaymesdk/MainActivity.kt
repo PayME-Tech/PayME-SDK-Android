@@ -165,13 +165,12 @@ class MainActivity : AppCompatActivity() {
             val decimal = DecimalFormat("#,###")
             textView.text = "${decimal.format(balance)}đ"
         }, onError = { jsonObject, code, message ->
-            println("code"+code+"message"+message)
-
             PayME.showError(message)
             if (code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
                 openWallet()
             }
         })
+
 
     }
 

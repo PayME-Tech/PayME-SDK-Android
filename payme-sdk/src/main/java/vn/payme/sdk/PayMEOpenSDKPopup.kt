@@ -21,13 +21,11 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.json.JSONObject
 import vn.payme.sdk.api.CryptoAES
-import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.credit.CameraTakeProfileCreditActivity
 import vn.payme.sdk.enums.Env
 import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.model.InfoPayment
 import vn.payme.sdk.model.JsObject
 import vn.payme.sdk.store.Store
 import java.net.URLEncoder
@@ -224,18 +222,9 @@ class PayMEOpenSDKPopup : DialogFragment() {
                         showButtonClose(b)
                     },
                     onScanQR={
-//                        IntentIntegrator(requireActivity()).apply {
-//                            setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
-//                            captureActivity = AnyOrientationCaptureActivity::class.java
-//                            setPrompt("")
-//                            setCameraId(0)
-//                            setRequestCode(5)
-//                            setBeepEnabled(true)
-//                            setOrientationLocked(false)
-//                            initiateScan()
-//                        }
-                             val scanQR = ScanQR()
-                             scanQR.show(parentFragmentManager,null)
+                        val payme = PayME()
+                        payme.scanQR(parentFragmentManager)
+
                     },
                     takeImage = { takeImage() },
                     it,
@@ -299,53 +288,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
         return  v
     }
 
-    fun checkScanQr(contents: String) {
-        val paymentApi = PaymentApi()
-        loading?.visibility = View.VISIBLE
-        paymentApi.postCheckDataQr(contents,
-            onSuccess = { jsonObject ->
-                loading?.visibility = View.GONE
-                val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
-                val Payment = OpenEWallet.optJSONObject("Payment")
-                val Detect = Payment.optJSONObject("Detect")
-                val action = Detect.optString("action")
-                val message = Detect.optString("message")
-                val note = Detect.optString("note")
-                val amount = Detect.optInt("amount")
-                val orderId = Detect.optString("orderId")
-                val storeId = Detect.optLong("storeId")
-                val succeeded = Detect.optBoolean("succeeded")
-                val type = Detect.optString("type")
 
-                if (!succeeded) {
-                    loading?.visibility = View.GONE
-                    var popup: PayMEQRCodePopup = PayMEQRCodePopup()
-                    popup.show(requireFragmentManager(), "ModalBottomSheet")
-                } else {
-                    val infoPayment =
-                        InfoPayment(
-                            action,
-                            amount,
-                            note,
-                            orderId,
-                            storeId,
-                            type,
-                            Store.paymentInfo.extraData
-                        )
-                    val paymeSDK = PayME()
-                    paymeSDK.payInSDK(
-                        requireFragmentManager(),
-                        infoPayment,
-                    )
-                }
-            },
-            onError = { jsonObject, code, message ->
-                loading?.visibility = View.GONE
-                var popup: PayMEQRCodePopup = PayMEQRCodePopup()
-                popup.show(requireFragmentManager(), "ModalBottomSheet")
-            }
-        )
-    }
 
     override fun onDestroy() {
         myWebView.removeAllViews();
@@ -386,9 +329,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
                     "          true; // note: this is required, or you'll sometimes get silent failures\n"
             myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
         }
-        if (myEven.type == TypeCallBack.onScan) {
-            myEven.value?.let { checkScanQr(it) }
-        }
+
     }
     fun  showButtonClose(isShow: Boolean){
             if(isShow == true){

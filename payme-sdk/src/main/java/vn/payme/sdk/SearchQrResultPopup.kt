@@ -9,7 +9,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import vn.payme.sdk.component.Button
 
-class PayMEQRCodePopup : BottomSheetDialogFragment() {
+class SearchQrResultPopup : BottomSheetDialogFragment() {
     private var btnSubmit: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
