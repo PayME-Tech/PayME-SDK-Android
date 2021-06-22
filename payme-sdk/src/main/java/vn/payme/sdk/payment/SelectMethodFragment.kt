@@ -82,7 +82,8 @@ class SelectMethodFragment : Fragment() {
         buttonSubmit = view.findViewById(R.id.buttonSubmit)
         EventBus.getDefault().register(this)
 
-        val storeImage = Store.userInfo.dataInit?.optString("storeImage")
+        val storeImage = Store.paymentInfo.storeImage
+        println("storeImage"+storeImage)
         if(storeImage!=null && storeImage!="null" && storeImage!=""){
             containerLogoMC.visibility = View.VISIBLE
             val picasso = Picasso.get()
@@ -178,8 +179,6 @@ class SelectMethodFragment : Fragment() {
         AddInfoMethod().addImage(method,imageMethod)
         AddInfoMethod().setTitle(method,textTitleMethodSelected,textNoteMethodSelected,textFeeMethodSelected)
         if(method.type == TYPE_PAYMENT.BANK_TRANSFER){
-            Store.paymentInfo.isChangeMethod = false
-            textChangeMethod.visibility = View.GONE
             buttonSubmit.iconLeft.visibility = View.GONE
             buttonSubmit.setText(getString(R.string.confirm_transfer))
         }else{

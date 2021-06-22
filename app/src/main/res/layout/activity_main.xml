@@ -108,6 +108,14 @@
                 android:background="@drawable/background_button"
                 android:text="Logout"/>
         </LinearLayout>
+        <Button
+            android:id="@+id/buttonPayNotAccount"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/background_button"
+            android:text="PAY_NOT_ACCOUNT"/>
         <LinearLayout
             android:id="@+id/walletView"
             android:layout_width="match_parent"

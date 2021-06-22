@@ -60,9 +60,11 @@ class InfoBankTransferFragment : Fragment() {
         setupUi()
         EventBus.getDefault().register(this)
         val bank  = EventBus.getDefault().getStickyEvent(BankTransferInfo::class.java)
+        if(bank!=null){
+            setInfoBank(bank)
+            setAmount()
+        }
 
-        setInfoBank(bank)
-        setAmount()
         onClick()
         return view
     }
@@ -113,7 +115,9 @@ class InfoBankTransferFragment : Fragment() {
 
     @Subscribe
     fun changeBank(event : BankTransferInfo){
+        if(event!=null){
             setInfoBank(event)
+        }
     }
     fun setInfoBank(bank:BankTransferInfo){
         textBankName.text = bank.bankName

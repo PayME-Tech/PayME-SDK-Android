@@ -8,6 +8,35 @@ import vn.payme.sdk.model.Method
 import vn.payme.sdk.store.Store
 
 internal class PaymentApi {
+    fun getInfoMerchant(
+        storeId:Long,
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ){
+        val path = "/graphql"
+        val params: MutableMap<String, Any> = mutableMapOf()
+        val variables: MutableMap<String, Any> = mutableMapOf()
+        val query = "mutation StoreImageMutation(\$getInfoMerchantInput: OpenEWalletGetInfoMerchantInput!) {\n" +
+                "  OpenEWallet {\n" +
+                "    GetInfoMerchant(input: \$getInfoMerchantInput) {\n" +
+                "      storeImage\n" +
+                "      storeName\n" +
+                "      succeeded\n" +
+                "      message\n" +
+                "    }\n" +
+                "  }\n" +
+                "}"
+        val getInfoMerchantInput: MutableMap<String, Any> = mutableMapOf()
+        getInfoMerchantInput["appId"] = Store.config.appID.toString()
+        params["query"] = query
+        variables["getInfoMerchantInput"]= getInfoMerchantInput
+        params["variables"] = variables
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+        request.setOnRequestCrypto(
+            onError = onError,
+            onSuccess = onSuccess,
+        )
+    }
 
     fun checkVisa(
         onSuccess: (JSONObject) -> Unit,

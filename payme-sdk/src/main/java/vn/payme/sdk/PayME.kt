@@ -42,7 +42,7 @@ public class PayME {
         }
     }
 
-    fun scanQR(fragmentManager: FragmentManager) : Unit {
+    fun scanQR(fragmentManager: FragmentManager): Unit {
         PayME.fragmentManager = fragmentManager
         val scanQR = ScanQR()
         scanQR.show(fragmentManager, null)
@@ -122,7 +122,7 @@ public class PayME {
         )
         Store.paymentInfo = PaymentInfo(
             null, 0, "", null, null, null, "", arrayListOf(),
-            arrayListOf(), null, true, true
+            arrayListOf(), null, true, true,"",""
         )
         Store.userInfo = UserInfo(0, false, false, false, "", null)
         Security.insertProviderAt(BouncyCastleProvider(), 1)
@@ -144,71 +144,8 @@ public class PayME {
         openWalletActivity(Action.FORGOT_PASSWORD, 0, "", null, null, onSuccess, onError)
     }
 
-    public fun login(
-        onSuccess: (AccountStatus) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
-    ) {
-        val paymentApi = PaymentApi()
-        paymentApi.getSettings(onSuccess = { jsonObject ->
-            val Setting = jsonObject.getJSONObject("Setting")
-            val configs = Setting.getJSONArray("configs")
-            for (i in 0 until configs.length()) {
-                val config = configs.optJSONObject(i)
-                val key = config.optString("key")
-                val valueString = config.optString("value")
-                if (key == "kyc.mode.enable") {
-                    val value = JSONObject(valueString)
-                    val identifyImg = value.optBoolean("identifyImg")
-                    val kycVideo = value.optBoolean("kycVideo")
-                    val faceImg = value.optBoolean("faceImg")
-                    Store.config.enlableKycFace = faceImg
-                    Store.config.enlableKycIdentify = identifyImg
-                    Store.config.enlableKycVideo = kycVideo
-                }
-
-                if (key == "limit.param.amount.payment" && valueString != null) {
-                    val value = JSONObject(valueString)
-                    val max = Integer.parseInt(value.optString("max"))
-                    val min = Integer.parseInt(value.optString("min"))
-                    Store.config.limitPayment = MaxminPayment(min, max)
-                }
-                if (key == "limit.param.amount.all" && valueString != null) {
-                    val value = JSONObject(valueString)
-                    val max = Integer.parseInt(value.optString("max"))
-                    val min = Integer.parseInt(value.optString("min"))
-                    Store.config.limitPayment = MaxminPayment(min, max)
-
-                }
-                if (key == "service.main.visible" && valueString != null) {
-                    val value = JSONObject(valueString)
-                    Store.paymentInfo.listService = arrayListOf()
-                    val listService = value.optJSONArray("listService")
-                    for (i in 0 until listService.length()) {
-                        val json = listService.optJSONObject(i)
-                        if (json !== null) {
-                            val code = json.optString("code")
-                            val description = json.optString("description")
-                            val disable = json.optBoolean("disable")
-                            val enable = json.optBoolean("enable")
-                            if (enable && !disable) {
-                                Store.paymentInfo.listService.add(Service(code, description))
-                            }
-                        }
-                    }
-                }
-            }
-            checkClientInfo(onSuccess, onError)
-        },
-            onError = { jsonObject, code, message ->
-                onError(jsonObject, code, message)
-            }
-        )
-
-
-    }
-
-    private fun checkClientInfo(
-        onSuccess: (AccountStatus) -> Unit,
+    internal fun checkRegisterClient(
+        onSuccess: () -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
         val accountApi = AccountApi()
@@ -231,25 +168,87 @@ public class PayME {
                         Store.config.clientInfo?.getClientInfo()
                             .toString() + Store.config.env.toString()
                     ).commit()
-                    loginAccount(onSuccess = { jsonObject ->
-                        onSuccess(jsonObject)
-                    }, onError = { jsonObject, code, message ->
-                        onError(jsonObject, code, message)
-                    })
+                    onSuccess()
                 },
-                onError = { jsonObject, code, message ->
-                    onError(jsonObject, code, message)
-                }
+                onError
             )
         } else {
             Store.config.clientId = clientId.toString()
-            loginAccount(onSuccess = { accountInfo ->
-                onSuccess(accountInfo)
-            }, onError = { jsonObject, code, message ->
-                onError(jsonObject, code, message)
-            })
-
+            onSuccess()
         }
+    }
+
+    internal fun getSetting(
+        onSuccess: () -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        val paymentApi = PaymentApi()
+        paymentApi.getSettings(
+            onSuccess = { jsonObject ->
+                val Setting = jsonObject.getJSONObject("Setting")
+                val configs = Setting.getJSONArray("configs")
+                for (i in 0 until configs.length()) {
+                    val config = configs.optJSONObject(i)
+                    val key = config.optString("key")
+                    val valueString = config.optString("value")
+                    if (key == "kyc.mode.enable") {
+                        val value = JSONObject(valueString)
+                        val identifyImg = value.optBoolean("identifyImg")
+                        val kycVideo = value.optBoolean("kycVideo")
+                        val faceImg = value.optBoolean("faceImg")
+                        Store.config.enlableKycFace = faceImg
+                        Store.config.enlableKycIdentify = identifyImg
+                        Store.config.enlableKycVideo = kycVideo
+                    }
+
+                    if (key == "limit.param.amount.payment" && valueString != null) {
+                        val value = JSONObject(valueString)
+                        val max = Integer.parseInt(value.optString("max"))
+                        val min = Integer.parseInt(value.optString("min"))
+                        Store.config.limitPayment = MaxminPayment(min, max)
+                    }
+                    if (key == "limit.param.amount.all" && valueString != null) {
+                        val value = JSONObject(valueString)
+                        val max = Integer.parseInt(value.optString("max"))
+                        val min = Integer.parseInt(value.optString("min"))
+                        Store.config.limitPayment = MaxminPayment(min, max)
+
+                    }
+                    if (key == "service.main.visible" && valueString != null) {
+                        val value = JSONObject(valueString)
+                        Store.paymentInfo.listService = arrayListOf()
+                        val listService = value.optJSONArray("listService")
+                        for (i in 0 until listService.length()) {
+                            val json = listService.optJSONObject(i)
+                            if (json !== null) {
+                                val code = json.optString("code")
+                                val description = json.optString("description")
+                                val disable = json.optBoolean("disable")
+                                val enable = json.optBoolean("enable")
+                                if (enable && !disable) {
+                                    Store.paymentInfo.listService.add(Service(code, description))
+                                }
+                            }
+                        }
+                    }
+                }
+                onSuccess()
+            },
+            onError
+        )
+
+    }
+
+    public fun login(
+        onSuccess: (AccountStatus) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ) {
+        getSetting(onSuccess = {
+            checkRegisterClient(onSuccess = {
+                loginAccount(onSuccess, onError)
+            }, onError)
+
+        }, onError)
     }
 
 
@@ -374,7 +373,7 @@ public class PayME {
     }
 
 
-    public fun deposit(
+    fun deposit(
         fragmentManager: FragmentManager,
         amount: Int?,
         closeDepositResult: Boolean,
@@ -403,7 +402,7 @@ public class PayME {
 
     }
 
-    public fun transfer(
+    fun transfer(
         fragmentManager: FragmentManager,
         amount: Int?,
         description: String,
@@ -461,7 +460,7 @@ public class PayME {
         }
     }
 
-    public fun openService(
+    fun openService(
         service: Service,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
@@ -493,16 +492,16 @@ public class PayME {
         fragmentManager: FragmentManager,
         infoPayment: InfoPayment,
         isShowResultUI: Boolean,
-        method: Method?,
+        methodId: Number?,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
         val payment = PayFunction()
         Store.config.disableCallBackResult = false
-        payment.pay(fragmentManager, infoPayment, isShowResultUI, method, onSuccess, onError)
-
-
+        payment.pay(fragmentManager, infoPayment, isShowResultUI, methodId, onSuccess, onError)
     }
+
+
 
     fun getAccountInfo(
         onSuccess: (JSONObject) -> Unit,
@@ -538,6 +537,10 @@ public class PayME {
             val kyc = Init.optJSONObject("kyc")
             val appEnv = Init.optString("appEnv")
             val succeeded = Init.optBoolean("succeeded")
+            val storeName = Init.optString("storeName")
+            val storeImage = Init.optString("storeImage")
+            Store.paymentInfo.storeImage = storeName
+            Store.paymentInfo.storeImage = storeImage
             Store.userInfo.accountActive = succeeded
             if (appEnv == Env.SANDBOX.toString()) {
                 Store.config.openPayAndKyc = false
@@ -546,7 +549,6 @@ public class PayME {
             }
             if (kyc != null) {
                 val state = kyc.optString("state")
-                println("state" + state)
 
                 if (state == "APPROVED") {
                     Store.userInfo.accountKycSuccess = true
@@ -601,7 +603,6 @@ public class PayME {
         onSuccess: (ArrayList<Method>) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
-        if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
             val paymentApi = PaymentApi()
             val listMethod: ArrayList<Method> = ArrayList<Method>()
             paymentApi.getTransferMethods(
@@ -650,7 +651,6 @@ public class PayME {
                 },
                 onError
             )
-        }
     }
 
     fun getWalletInfo(

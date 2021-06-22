@@ -22,6 +22,8 @@ class PaymentInfo(
     var service: Service? = null,
     var isShowResultUI : Boolean = true,
     var isChangeMethod : Boolean = true,
+    var storeName : String = "",
+    var storeImage : String = "",
 ) {
 
 }

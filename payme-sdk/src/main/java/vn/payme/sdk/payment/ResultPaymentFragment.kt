@@ -75,8 +75,7 @@ class ResultPaymentFragment : Fragment() {
         textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
         val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
         var listInfoTop = arrayListOf<Info>()
-        val storeName = Store.userInfo.dataInit?.optString("storeName")
-        listInfoTop.add(Info("Người nhận", storeName, null, null, false))
+        listInfoTop.add(Info("Người nhận", Store.paymentInfo.storeImage, null, null, false))
         listInfoTop.add(Info("Mã dịch vụ", Store.paymentInfo.infoPayment?.orderId, null, null, false))
         listInfoTop.add(Info("Nội dung", Store.paymentInfo.infoPayment?.note, null, null, true))
 
