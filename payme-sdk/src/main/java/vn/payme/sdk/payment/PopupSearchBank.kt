@@ -74,8 +74,8 @@ class PopupSearchBank : DialogFragment() {
         onClick()
         inputSearch.addTextChangedListener { text ->
             val listBankNew = arrayListOf<BankTransferInfo>()
-            val listBankInfo = EventBus.getDefault().getStickyEvent(arrayListOf<BankTransferInfo>()::class.java)
-            listBankInfo.forEach { bank->
+            val listBankInfo = EventBus.getDefault().getStickyEvent(ListBankTransfer::class.java)
+            listBankInfo.listBankTransferInfo.forEach { bank->
                 if (bank.bankName.contains(text.toString(),ignoreCase = true)){
                     listBankNew.add(bank)
                 }
