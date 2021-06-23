@@ -109,6 +109,7 @@
                 android:text="Logout"/>
         </LinearLayout>
         <Button
+            android:visibility="gone"
             android:id="@+id/buttonPayNotAccount"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"

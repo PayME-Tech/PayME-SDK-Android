@@ -461,10 +461,12 @@ public class PayME {
     }
 
     fun openService(
+        fragmentManager: FragmentManager,
         service: Service,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
+        PayME.fragmentManager = fragmentManager
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
             this.openWalletActivity(
                 Action.UTILITY,
@@ -539,7 +541,7 @@ public class PayME {
             val succeeded = Init.optBoolean("succeeded")
             val storeName = Init.optString("storeName")
             val storeImage = Init.optString("storeImage")
-            Store.paymentInfo.storeImage = storeName
+            Store.paymentInfo.storeName = storeName
             Store.paymentInfo.storeImage = storeImage
             Store.userInfo.accountActive = succeeded
             if (appEnv == Env.SANDBOX.toString()) {
@@ -603,6 +605,7 @@ public class PayME {
         onSuccess: (ArrayList<Method>) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
+        if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
             val paymentApi = PaymentApi()
             val listMethod: ArrayList<Method> = ArrayList<Method>()
             paymentApi.getTransferMethods(
@@ -651,6 +654,7 @@ public class PayME {
                 },
                 onError
             )
+        }
     }
 
     fun getWalletInfo(

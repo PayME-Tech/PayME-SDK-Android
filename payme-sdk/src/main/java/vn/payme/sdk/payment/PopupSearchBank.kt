@@ -18,7 +18,7 @@ import vn.payme.sdk.R
 import vn.payme.sdk.adapter.BankAdapter
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
-import vn.payme.sdk.evenbus.ChangeTypePayment
+import vn.payme.sdk.evenbus.ListBankTransfer
 import vn.payme.sdk.model.BankTransferInfo
 
 
@@ -83,10 +83,10 @@ class PopupSearchBank : DialogFragment() {
             flowersAdapter.submitList(listBankNew as MutableList<BankTransferInfo>)
 
         }
-        val listBankInfo = EventBus.getDefault().getStickyEvent(arrayListOf<BankTransferInfo>()::class.java)
+        val listBankInfo = EventBus.getDefault().getStickyEvent(ListBankTransfer::class.java)
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
 
-        flowersAdapter.submitList(listBankInfo as MutableList<BankTransferInfo>)
+        flowersAdapter.submitList(listBankInfo.listBankTransferInfo as MutableList<BankTransferInfo>)
         recyclerView.adapter = flowersAdapter
 
         return  v

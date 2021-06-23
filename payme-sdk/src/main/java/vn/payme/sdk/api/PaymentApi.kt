@@ -37,6 +37,45 @@ internal class PaymentApi {
             onSuccess = onSuccess,
         )
     }
+    fun authCreditCard(
+        expiredAt:String?,
+        cardNumber:String?,
+        linkedId:String?,
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ){
+        val path = "/graphql"
+        val params: MutableMap<String, Any> = mutableMapOf()
+        val variables: MutableMap<String, Any> = mutableMapOf()
+        val query = "mutation AuthCreditCardMutation(\$authCreditCardInput: CreditCardAuthInput) {\n" +
+                "  CreditCardLink {\n" +
+                "    AuthCreditCard(input: \$authCreditCardInput) {\n" +
+                "      html\n" +
+                "      message\n" +
+                "      referenceId\n" +
+                "      succeeded\n" +
+                "    }\n" +
+                "  }\n" +
+                "}"
+        val authCreditCardInput: MutableMap<String, Any> = mutableMapOf()
+        if(expiredAt!=null){
+            authCreditCardInput["expiredAt"] =expiredAt
+        }
+        if(cardNumber!=null){
+            authCreditCardInput["cardNumber"] = cardNumber
+        }
+        if(linkedId!=null){
+            authCreditCardInput["linkedId"] = linkedId
+        }
+        params["query"] = query
+        variables["authCreditCardInput"]= authCreditCardInput
+        params["variables"] = variables
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+        request.setOnRequestCrypto(
+            onError = onError,
+            onSuccess = onSuccess,
+        )
+    }
 
     fun checkVisa(
         onSuccess: (JSONObject) -> Unit,

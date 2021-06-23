@@ -9,6 +9,8 @@ import vn.payme.sdk.RULE_CHECK_ACCOUNT
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.enums.TYPE_PAYMENT
+import vn.payme.sdk.evenbus.ListBankAtm
+import vn.payme.sdk.evenbus.ListBankTransfer
 import vn.payme.sdk.evenbus.PaymentInfoEvent
 import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.model.*
@@ -64,7 +66,7 @@ internal class PayFunction {
                     }
 
                 }
-                EventBus.getDefault().postSticky(listBanks)
+                EventBus.getDefault().postSticky(ListBankAtm(listBanks))
                 val popupPayment: PopupPayment = PopupPayment()
                 loading.dismiss()
                 popupPayment.show(
@@ -120,7 +122,7 @@ internal class PayFunction {
                         listBank.add(bankTransferInfo)
                     }
                     EventBus.getDefault().postSticky(listBank[0])
-                    EventBus.getDefault().postSticky(listBank)
+                    EventBus.getDefault().postSticky(ListBankTransfer(listBank))
                     val popupPayment: PopupPayment = PopupPayment()
                     loading.dismiss()
                     popupPayment.show(
@@ -184,21 +186,23 @@ internal class PayFunction {
     ) {
         loading.show(fragmentManager, null)
         val arrayBank = arrayListOf<BankTransferInfo>()
-        EventBus.getDefault().postSticky(arrayBank)
+        EventBus.getDefault().postSticky(ListBankTransfer(arrayBank))
         PayME.onSuccess = onSuccess
         PayME.onError = onError
         val checkAccount = CheckAccount()
         if (checkAccount.check(RULE_CHECK_ACCOUNT.LOGGIN, onError = { jsonObject, i, s ->
-                payNotAccount(
-                    fragmentManager,
-                    infoPayment,
-                    isShowResultUI,
-                    methodId,
-                    onSuccess,
-                    onError = { jsonObject, i, s ->
-                        onError(jsonObject, i, s)
-                        loading.dismiss()
-                    })
+                onError(jsonObject, i, s)
+                loading.dismiss()
+//                payNotAccount(
+//                    fragmentManager,
+//                    infoPayment,
+//                    isShowResultUI,
+//                    methodId,
+//                    onSuccess,
+//                    onError = { jsonObject, i, s ->
+//                        onError(jsonObject, i, s)
+//                        loading.dismiss()
+//                    })
             })) {
             this.checkInfoPayment(
                 fragmentManager,
@@ -262,7 +266,6 @@ internal class PayFunction {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit,
     ) {
-        println("showPopupPayment")
         Store.paymentInfo.methodSelected = method
         Store.paymentInfo.transaction = ""
         Store.paymentInfo.isChangeMethod = method == null
@@ -270,7 +273,17 @@ internal class PayFunction {
         PayME.fragmentManager = fragmentManager
         Store.paymentInfo.infoPayment = infoPayment
         if (method?.type == TYPE_PAYMENT.BANK_CARD) {
-            getListBank(fragmentManager, method, onError)
+            val listBankAtm = EventBus.getDefault().getStickyEvent(ListBankAtm::class.java)
+            if(listBankAtm !=null && listBankAtm.listBankATM.size>0){
+                val popupPayment: PopupPayment = PopupPayment()
+                loading.dismiss()
+                popupPayment.show(
+                    fragmentManager,
+                    "ModalBottomSheet"
+                )
+            }else{
+                getListBank(fragmentManager, method, onError)
+            }
         } else if (method?.type == TYPE_PAYMENT.BANK_TRANSFER) {
             getListBankTransfer(fragmentManager, method, onError)
         } else {

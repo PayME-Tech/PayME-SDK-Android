@@ -415,6 +415,7 @@ class MainActivity : AppCompatActivity() {
                         )
 
                     },onError = {jsonObject, code, message ->
+                        PayME.showError(message)
 
                     })
 
@@ -542,7 +543,7 @@ class MainActivity : AppCompatActivity() {
                 )
             payme?.getPaymentMethods(storeId,
                 onSuccess = {list->
-                    payme?.pay(this.supportFragmentManager, infoPayment, true,list[2].methodId,
+                    payme?.pay(this.supportFragmentManager, infoPayment, true,null,
                         onSuccess = { json: JSONObject? ->
                         },
                         onError = { jsonObject, code, message ->

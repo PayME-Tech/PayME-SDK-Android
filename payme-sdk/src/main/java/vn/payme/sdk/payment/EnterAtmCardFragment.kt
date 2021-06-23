@@ -17,6 +17,7 @@ import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.InputInfo
 import vn.payme.sdk.model.BankInfo
 import vn.payme.sdk.evenbus.CheckInputAtm
+import vn.payme.sdk.evenbus.ListBankAtm
 import vn.payme.sdk.model.BankTransferInfo
 import vn.payme.sdk.model.CardInfo
 import java.util.*
@@ -99,9 +100,8 @@ class EnterAtmCardFragment : Fragment() {
                 inputCardHolder.setDefault()
                 inputCardNumber.txtTitleRight.text = ""
                 inputCardHolder.input.setText("")
-
                 var maxLength = 16
-                val listBanks = EventBus.getDefault().getStickyEvent(arrayListOf<BankInfo>()::class.java)
+                val listBanks = EventBus.getDefault().getStickyEvent(ListBankAtm::class.java).listBankATM
                 if (cardNumber?.length!! >= 6) {
                     val cardPrefix = cardNumber.substring(0, 6)
                     var bankVerify = false

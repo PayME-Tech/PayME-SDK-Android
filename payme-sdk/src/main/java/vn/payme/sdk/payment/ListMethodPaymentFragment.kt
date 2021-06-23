@@ -20,11 +20,12 @@ import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
+import vn.payme.sdk.evenbus.ListBankAtm
+import vn.payme.sdk.evenbus.ListBankTransfer
 import vn.payme.sdk.evenbus.PaymentInfoEvent
 import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.model.BankInfo
 import vn.payme.sdk.model.BankTransferInfo
-import vn.payme.sdk.model.CardInfo
 import vn.payme.sdk.model.Method
 import vn.payme.sdk.store.Store
 
@@ -66,7 +67,7 @@ class ListMethodPaymentFragment : Fragment() {
                 }
 
             }
-            EventBus.getDefault().postSticky(listBanks)
+            EventBus.getDefault().postSticky(ListBankAtm(listBanks))
             EventBus.getDefault().post(method)
         },
             onError = { jsonObject, code, message ->
@@ -95,11 +96,17 @@ class ListMethodPaymentFragment : Fragment() {
                     if (state == "null") {
                         if(method.type == TYPE_PAYMENT.BANK_CARD){
                             EventBus.getDefault().postSticky(PaymentInfoEvent(null,fee))
-                            getListBank(method)
+                            val listBank = EventBus.getDefault().getStickyEvent(ListBankAtm::class.java)
+                            if( listBank !=null && listBank.listBankATM.size >0 ){
+                                disableLoading()
+                                EventBus.getDefault().post(method)
+                            }else{
+                                getListBank(method)
+                            }
                         }else if(method.type == TYPE_PAYMENT.BANK_TRANSFER){
                             EventBus.getDefault().postSticky(PaymentInfoEvent(null,fee))
-                            val listBank = EventBus.getDefault().getStickyEvent(arrayListOf<BankTransferInfo>()::class.java)
-                            if( listBank !=null && listBank.size>0){
+                            val listBank = EventBus.getDefault().getStickyEvent(ListBankTransfer::class.java)
+                            if( listBank !=null && listBank.listBankTransferInfo.size >0 ){
                                 disableLoading()
                                 EventBus.getDefault().post(method)
                             }else{
@@ -162,7 +169,7 @@ class ListMethodPaymentFragment : Fragment() {
                         listBank.add(bankTransferInfo)
                     }
                     EventBus.getDefault().postSticky(listBank[0])
-                    EventBus.getDefault().postSticky(listBank)
+                    EventBus.getDefault().postSticky(ListBankTransfer(listBank))
                     EventBus.getDefault().post(method)
                 }else{
                     PayME.showError(message)
