@@ -84,6 +84,7 @@ class ConfirmOtpFragment : Fragment() {
             null,
             null,
             null,
+            null,
             onSuccess = { jsonObject ->
                 if (!isVisible) return@payment
                 showLoading(false)
@@ -157,6 +158,7 @@ class ConfirmOtpFragment : Fragment() {
             null,
             pass,
             transaction,
+            null,
             null,
             onSuccess = { jsonObject ->
                 if (!isVisible) return@payment

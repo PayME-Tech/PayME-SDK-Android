@@ -1,8 +1,16 @@
 package vn.payme.sdk.api
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.os.Handler
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 import vn.payme.sdk.PayME
+import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
+import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.model.CardInfo
 import vn.payme.sdk.model.Method
 import vn.payme.sdk.store.Store
@@ -37,10 +45,74 @@ internal class PaymentApi {
             onSuccess = onSuccess,
         )
     }
+    fun checkAuthCard  (
+        context: Context,
+        expiredAt:String?,
+        cardNumber:String?,
+        linkedId: Double?,
+        onSuccess: (String?) -> Unit,
+        onError: (JSONObject?, Int?, String) -> Unit
+    ){
+        var timeCheck =  false
+
+            authCreditCard(
+                expiredAt,
+                cardNumber,
+                linkedId,
+                onSuccess = { jsonObject ->
+                    val CreditCardLink = jsonObject.optJSONObject("CreditCardLink")
+                    val AuthCreditCard = CreditCardLink.optJSONObject("AuthCreditCard")
+                    val succeeded = AuthCreditCard.optBoolean("succeeded")
+                    val html = AuthCreditCard.optString("html")
+                    val message = AuthCreditCard.optString("message")
+                    val referenceId = AuthCreditCard.optString("referenceId")
+                    val isAuth = AuthCreditCard.optBoolean("isAuth")
+                    if (succeeded) {
+                        if(isAuth){
+                            Handler().postDelayed(Runnable {
+                                if (!timeCheck){
+                                    timeCheck = true
+                                    onSuccess(referenceId)
+                                }
+
+                            }, 7 * 1000)
+                            val myWebView = WebView(context)
+                            myWebView.settings.javaScriptEnabled = true
+                            var form = "<html><body onload=\"document.forms[0].submit();\">${
+                                html
+                            }</html>,"
+
+                            myWebView.loadDataWithBaseURL(
+                                "x-data://base",
+                                form!!,
+                                "text/html",
+                                "UTF-8",
+                                null
+                            );
+                            myWebView.setWebViewClient(object : WebViewClient() {
+                                override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+                                    if(url.contains("CollectRedirect") && !timeCheck ){
+                                        onSuccess(referenceId)
+                                        timeCheck = true
+                                    }
+                                    super.onPageStarted(view, url, favicon)
+                                }
+
+                            })
+                        }else{
+                            onSuccess(null)
+                        }
+                    } else {
+                        EventBus.getDefault()
+                            .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.RESULT, message))
+                    }
+                },
+                onError)
+    }
     fun authCreditCard(
         expiredAt:String?,
         cardNumber:String?,
-        linkedId:String?,
+        linkedId:Double?,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ){
@@ -53,6 +125,7 @@ internal class PaymentApi {
                 "      html\n" +
                 "      message\n" +
                 "      referenceId\n" +
+                "      isAuth\n" +
                 "      succeeded\n" +
                 "    }\n" +
                 "  }\n" +
@@ -65,7 +138,7 @@ internal class PaymentApi {
             authCreditCardInput["cardNumber"] = cardNumber
         }
         if(linkedId!=null){
-            authCreditCardInput["linkedId"] = linkedId
+            authCreditCardInput["linkedId"] = linkedId!!
         }
         params["query"] = query
         variables["authCreditCardInput"]= authCreditCardInput
@@ -179,13 +252,14 @@ internal class PaymentApi {
             payment["bankCard"] = bankCard
         } else if (method.type == TYPE_PAYMENT.LINKED) {
             val linked: MutableMap<String, Any> = mutableMapOf()
-            linked["linkedId"] = method.data?.linkedId!!.toBigInteger().toDouble()
+            linked["linkedId"] = method.data?.linkedId!!
             linked["envName"] = "MobileApp"
             payment["linked"] = linked
         }else if(method.type==TYPE_PAYMENT.CREDIT_CARD){
             val creditCard: MutableMap<String, Any> = mutableMapOf()
             creditCard["cardNumber"] = ""
             creditCard["expiredAt"] = ""
+            creditCard["cvv"] = ""
             creditCard["cvv"] = ""
             payment["creditCard"] = creditCard
         }else if(method.type==TYPE_PAYMENT.BANK_TRANSFER){
@@ -298,6 +372,7 @@ internal class PaymentApi {
 
     }
 
+
     fun payment(
         method: Method,
         securityCode: String?,
@@ -305,6 +380,7 @@ internal class PaymentApi {
         otp: String?,
         transaction: String?,
         recheck: Boolean?,
+        referenceId: String?,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int?, String) -> Unit
     ) {
@@ -404,6 +480,9 @@ internal class PaymentApi {
             creditCard["cardNumber"] = cardInfo?.cardNumber!!
             creditCard["expiredAt"] = cardInfo?.cardDateView
             creditCard["cvv"] = cardInfo?.cvv!!
+            if(referenceId!=null){
+                creditCard["referenceId"] = referenceId
+            }
             payment["creditCard"] = creditCard
         } else if(method.type==TYPE_PAYMENT.BANK_TRANSFER){
             val bankTransfer: MutableMap<String, Any> = mutableMapOf()
@@ -412,9 +491,12 @@ internal class PaymentApi {
             payment["bankTransfer"] = bankTransfer
         } else if (method.type == TYPE_PAYMENT.LINKED) {
             val linked: MutableMap<String, Any> = mutableMapOf()
-            linked["linkedId"] = method.data?.linkedId!!.toBigInteger().toDouble()
+            linked["linkedId"] = method.data?.linkedId!!
             if(otp!=null){
                 linked["otp"] = otp
+            }
+            if(referenceId!=null){
+                linked["referenceId"] = referenceId
             }
             linked["envName"] = "MobileApp"
             payment["linked"] = linked

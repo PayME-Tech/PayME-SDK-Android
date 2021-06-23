@@ -144,6 +144,7 @@ class ListMethodPaymentFragment : Fragment() {
             "",
             "",
             false,
+            null,
             onSuccess = { jsonObject ->
                 if (!isVisible) return@payment
                 disableLoading()

@@ -78,6 +78,7 @@ class PopupCheckBankTransfer : DialogFragment() {
             "",
             "",
             true,
+            null,
             onSuccess = { jsonObject ->
                 if (!isVisible) return@payment
                 val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")

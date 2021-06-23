@@ -2,11 +2,12 @@ package vn.payme.sdk.payment
 
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.*
@@ -14,16 +15,15 @@ import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import com.squareup.picasso.Picasso
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import org.w3c.dom.EntityReference
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.component.InfoPayment
-import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
@@ -36,6 +36,7 @@ import vn.payme.sdk.model.Info
 import vn.payme.sdk.model.Method
 import vn.payme.sdk.store.Store
 import java.text.DecimalFormat
+
 
 class SelectMethodFragment : Fragment() {
     private lateinit var textAmount: TextView
@@ -237,78 +238,17 @@ class SelectMethodFragment : Fragment() {
 
     fun authCreditCard(cardInfo: CardInfo?) {
         val paymentApi = PaymentApi()
-        buttonSubmit.enableLoading()
-
-        paymentApi.authCreditCard(
-            cardInfo?.cardDateView,
-            cardInfo?.cardNumber,
-            null,
-            onSuccess = { jsonObject ->
-                buttonSubmit.disableLoading()
-                val CreditCardLink = jsonObject.optJSONObject("CreditCardLink")
-                val AuthCreditCard = CreditCardLink.optJSONObject("AuthCreditCard")
-                val succeeded = AuthCreditCard.optBoolean("succeeded")
-                val html = AuthCreditCard.optString("html")
-                val message = AuthCreditCard.optString("message")
-                val referenceId = AuthCreditCard.optString("referenceId")
-                if (succeeded) {
-                    val myWebView = WebView(requireContext())
-                    myWebView.settings.javaScriptEnabled = true
-                    var form = "<html><body onload=\"document.forms[0].submit();\">${
-                        html
-                    }</html>,"
-
-                    myWebView.loadDataWithBaseURL(
-                        "x-data://base",
-                        form!!,
-                        "text/html",
-                        "UTF-8",
-                        null
-                    );
-                    myWebView.setWebViewClient(object : WebViewClient() {
-                        override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-                            println("url"+url)
-//                            val checkSuccess = url.contains("https://payme.vn/web/?success=true")
-//                            val checkError = url.contains("https://payme.vn/web/?success=false")
-//                            val checkVisa = url.contains("https://payme.vn/web")
-//                            if (checkSuccess || checkError) {
-//                                val uri: Uri = Uri.parse(url)
-//                                val messageResult = uri.getQueryParameter("message")
-//                                val transIdResult = uri.getQueryParameter("trans_id")
-//                                if (isVisible) {
-//                                    if (checkError) {
-//                                        onResult(messageResult!!, "FAILED")
-//                                    } else {
-//                                        onResult("", "SUCCEEDED")
-//                                    }
-//                                }
-//                            } else {
-//                                if (checkVisa) {
-//                                    checkVisa()
-//                                }
-//
-//                            }
-
-                            super.onPageStarted(view, url, favicon)
-                        }
-                    })
-
-                } else {
-
-                    EventBus.getDefault()
-                        .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.RESULT, message))
-                }
-
-
-            },
-            onError = { jsonObject, i, s ->
-                buttonSubmit.disableLoading()
-
-                PayME.showError(s)
-
-            })
+        paymentApi.checkAuthCard(requireContext(), cardInfo?.cardDateView,cardInfo?.cardNumber,null,
+            onSuccess = {ref->
+                if(!isVisible) return@checkAuthCard
+                onPay(ref,cardInfo)
+        }) { jsonObject, i, s ->
+            if(!isVisible) return@checkAuthCard
+            buttonSubmit.disableLoading()
+            PayME.showError(s)
+        }
     }
-    fun onPay(cardInfo:CardInfo?){
+    fun onPay(referenceId :String?,cardInfo:CardInfo?){
         val paymentApi = PaymentApi()
         paymentApi.payment(
             Store.paymentInfo.methodSelected!!,
@@ -317,6 +257,7 @@ class SelectMethodFragment : Fragment() {
             "",
             "",
             true,
+            referenceId,
             onSuccess = { jsonObject ->
                 if (!isVisible) return@payment
                 buttonSubmit.disableLoading()
@@ -410,21 +351,17 @@ class SelectMethodFragment : Fragment() {
     }
 
     private fun onSubmit(cardInfo: CardInfo?) {
-//        if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.CREDIT_CARD ||
-//            (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.LINKED &&
-//                    Store.paymentInfo.methodSelected?.data?.issuer !="null"
-//                    )) {
-//            authCreditCard(cardInfo)
-//            return
-//        }
-        val paymentApi = PaymentApi()
         buttonSubmit.enableLoading()
         Keyboard.closeKeyboard(requireContext())
+        if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.CREDIT_CARD) {
+            authCreditCard(cardInfo)
+            return
+        }
         if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.BANK_CARD ||
             Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.CREDIT_CARD ||
             Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.BANK_TRANSFER
         ) {
-            onPay(cardInfo)
+            onPay(null,cardInfo)
         } else {
             EventBus.getDefault()
                 .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CONFIRM_PASS, null))

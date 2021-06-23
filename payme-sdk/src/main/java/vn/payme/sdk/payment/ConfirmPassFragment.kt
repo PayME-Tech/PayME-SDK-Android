@@ -1,5 +1,6 @@
 package vn.payme.sdk.payment
 
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
@@ -7,6 +8,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -18,6 +21,7 @@ import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.PinView
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
+import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.hepper.Keyboard
@@ -50,8 +54,56 @@ class ConfirmPassFragment : Fragment() {
         pinView.requestFocus()
         loading.visibility = View.GONE
     }
+    fun authCreditCard(securityCode:String) {
+        val paymentApi = PaymentApi()
+        paymentApi.authCreditCard(
+            null,
+            null,
+            Store.paymentInfo.methodSelected?.data?.linkedId,
+            onSuccess = { jsonObject ->
+                disableLoading()
+                val CreditCardLink = jsonObject.optJSONObject("CreditCardLink")
+                val AuthCreditCard = CreditCardLink.optJSONObject("AuthCreditCard")
+                val succeeded = AuthCreditCard.optBoolean("succeeded")
+                val html = AuthCreditCard.optString("html")
+                val message = AuthCreditCard.optString("message")
+                val referenceId = AuthCreditCard.optString("referenceId")
+                if (succeeded) {
+                    val myWebView = WebView(requireContext())
+                    myWebView.settings.javaScriptEnabled = true
+                    var form = "<html><body onload=\"document.forms[0].submit();\">${
+                        html
+                    }</html>,"
 
-    private fun paymentSubmit(securityCode: String) {
+                    myWebView.loadDataWithBaseURL(
+                        "x-data://base",
+                        form!!,
+                        "text/html",
+                        "UTF-8",
+                        null
+                    );
+                    myWebView.setWebViewClient(object : WebViewClient() {
+                        override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+                            if(url.contains("CollectRedirect")){
+                                paymentSubmit(securityCode,referenceId)
+                            }
+                            super.onPageStarted(view, url, favicon)
+                        }
+
+                    })
+
+                } else {
+                    EventBus.getDefault()
+                        .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.RESULT, message))
+                }
+            },
+            onError = { jsonObject, i, s ->
+                disableLoading()
+                PayME.showError(s)
+            })
+    }
+
+    private fun paymentSubmit(securityCode: String,referenceId:String?) {
         val paymentApi = PaymentApi()
         showLoading()
         paymentApi.payment(Store.paymentInfo.methodSelected!!,
@@ -60,6 +112,7 @@ class ConfirmPassFragment : Fragment() {
             null,
             null,
             null,
+            referenceId,
             onSuccess = { jsonObject ->
                 if(!isVisible) return@payment
                 disableLoading()
@@ -182,7 +235,21 @@ class ConfirmPassFragment : Fragment() {
                             val securityCode = CreateCodeByPassword.optString("securityCode")
                             val succeeded = CreateCodeByPassword.optBoolean("succeeded")
                             if (succeeded) {
-                                paymentSubmit(securityCode)
+                                if(Store.paymentInfo.methodSelected?.type==TYPE_PAYMENT.LINKED && Store.paymentInfo.methodSelected?.data?.issuer !="null" ){
+                                    val paymentApi = PaymentApi()
+                                    paymentApi.checkAuthCard(requireContext(),null,null,Store.paymentInfo.methodSelected?.data?.linkedId!!,
+                                        onSuccess = { referenceId->
+                                            if(!isVisible) return@checkAuthCard
+                                            paymentSubmit(securityCode,referenceId)
+                                    }) { jsonObject, i, s ->
+                                        if(!isVisible) return@checkAuthCard
+                                        disableLoading()
+                                        PayME.showError(s)
+                                    }
+                                }else{
+                                    paymentSubmit(securityCode,null)
+
+                                }
                             } else {
 
                                 disableLoading()

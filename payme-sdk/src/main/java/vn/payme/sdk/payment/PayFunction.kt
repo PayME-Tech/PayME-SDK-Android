@@ -91,6 +91,7 @@ internal class PayFunction {
             "",
             "",
             false,
+            null,
             onSuccess = { jsonObject ->
                 val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
                 val Payment = OpenEWallet.optJSONObject("Payment")
@@ -441,7 +442,7 @@ internal class PayFunction {
                         var data = jsonObject.optJSONObject("data")
                         var dataMethod = DataMethod(null, "", "")
                         if (data != null) {
-                            val linkedId = data.optString("linkedId")
+                            val linkedId = data.optDouble("linkedId")
                             val swiftCode = data.optString("swiftCode")
                             val issuer = data.optString("issuer")
                             dataMethod = DataMethod(linkedId, swiftCode, issuer)
