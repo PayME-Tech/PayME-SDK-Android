@@ -394,8 +394,8 @@ class MainActivity : AppCompatActivity() {
                         "OpenEWallet",
                         ""
                     )
-                payme?.getPaymentMethods(storeId,
-                    onSuccess = {list->
+//                payme?.getPaymentMethods(storeId,
+//                    onSuccess = {list->
                         payme?.pay(this.supportFragmentManager, infoPayment, true,null,
                             onSuccess = { json: JSONObject? ->
                             },
@@ -413,11 +413,11 @@ class MainActivity : AppCompatActivity() {
                             }
 
                         )
-
-                    },onError = {jsonObject, code, message ->
-                        PayME.showError(message)
-
-                    })
+//
+//                    },onError = {jsonObject, code, message ->
+//                        PayME.showError(message)
+//
+//                    })
 
 
 

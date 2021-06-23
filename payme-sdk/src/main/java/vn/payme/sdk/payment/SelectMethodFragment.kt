@@ -231,7 +231,7 @@ class SelectMethodFragment : Fragment() {
         if (!event.isCheck) {
             val eventFee = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
             EventBus.getDefault().postSticky(PaymentInfoEvent(event.cardInfo, eventFee.fee))
-            onPay(event.cardInfo)
+            onSubmit(event.cardInfo)
         }
     }
 
