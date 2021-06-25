@@ -223,12 +223,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
                     },
                     onScanQR={
                         val payme = PayME()
-                        payme.scanQR(parentFragmentManager,onSuccess = {
-
-                        },onError = {jsonObject, i, s ->
-                            
-                        })
-
+                        payme.openScanQR(parentFragmentManager,PayME.onSuccess,PayME.onError)
                     },
                     takeImage = { takeImage() },
                     it,

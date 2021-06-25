@@ -38,25 +38,50 @@ public class PayME {
         lateinit var onError: (JSONObject?, Int, String?) -> Unit
         lateinit var fragmentManager: FragmentManager
         fun showError(message: String?) {
-            if(message!=null && message!="null" && message!=""){
+            if (message != null && message != "null" && message != "") {
                 Toasty.error(PayME.context, message, Toast.LENGTH_SHORT, true).show();
             }
         }
     }
 
-    fun scanQR(fragmentManager: FragmentManager, onSuccess: (JSONObject?) -> Unit, onError: (JSONObject?, Int, String?) -> Unit): Unit {
+    fun scanQR(
+        fragmentManager: FragmentManager,
+        onSuccess: (JSONObject?) -> Unit,
+        onError: (JSONObject?, Int, String?) -> Unit
+    ): Unit {
         val checkAccount = CheckAccount()
-        if(checkAccount.check(RULE_CHECK_ACCOUNT.LOGGIN,onError)){
+        if (checkAccount.check(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
             onSuccess(null)
-            PayME.fragmentManager = fragmentManager
-            val scanQR = ScanQR()
-            scanQR.show(fragmentManager, null)
+            openScanQR(fragmentManager, onSuccess = {
+            },
+                onError = { jsonObject, i, s ->
+                    PayME.showError(s)
+                }
+            )
         }
     }
 
-    fun payQRCode(fragmentManager: FragmentManager, qr: String,isShowResultUI:Boolean, onSuccess: (JSONObject?) -> Unit, onError: (JSONObject?, Int, String?) -> Unit) {
+    internal fun openScanQR(
+        fragmentManager: FragmentManager,
+        onSuccess: (JSONObject?) -> Unit,
+        onError: (JSONObject?, Int, String?) -> Unit
+    ) {
+        PayME.fragmentManager = fragmentManager
+        PayME.onSuccess = onSuccess
+        PayME.onError = onError
+        val scanQR = ScanQR()
+        scanQR.show(fragmentManager, null)
+    }
+
+    fun payQRCode(
+        fragmentManager: FragmentManager,
+        qr: String,
+        isShowResultUI: Boolean,
+        onSuccess: (JSONObject?) -> Unit,
+        onError: (JSONObject?, Int, String?) -> Unit
+    ) {
         val checkAccount = CheckAccount()
-        if(checkAccount.check(RULE_CHECK_ACCOUNT.LOGGIN,onError)) {
+        if (checkAccount.check(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
             val paymentApi = PaymentApi()
             val loading = SpinnerDialog()
             loading.show(fragmentManager, null)
@@ -92,7 +117,7 @@ public class PayME {
                             fragmentManager,
                             infoPayment,
                             isShowResultUI,
-                           null,
+                            null,
                             onSuccess,
                             onError
                         )
