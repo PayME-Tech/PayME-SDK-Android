@@ -85,7 +85,7 @@ class ScanQR : DialogFragment() {
                 activity.runOnUiThread {
                     dismiss()
                     val payme = PayME()
-                    payme.payQRCode(PayME.fragmentManager,it.text.toString())
+                    payme.payQRCodeInSDK(PayME.fragmentManager,it.text.toString())
                 }
             }
             cameraAccept = true
@@ -116,7 +116,7 @@ class ScanQR : DialogFragment() {
                     val result = reader.decode(bBitmap)
                     dismiss()
                     val payme = PayME()
-                    payme.payQRCode(PayME.fragmentManager,result.toString())
+                    payme.payQRCodeInSDK(PayME.fragmentManager,result.toString())
                 } catch (e: NotFoundException) {
                     dismiss()
                     var popup: SearchQrResultPopup = SearchQrResultPopup()

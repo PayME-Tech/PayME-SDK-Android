@@ -1,6 +1,8 @@
 package vn.payme.sdk
 
 import android.content.Context
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -18,15 +20,13 @@ import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.kyc.CameraKycActivity
 import vn.payme.sdk.model.*
 import vn.payme.sdk.payment.*
-import vn.payme.sdk.payment.PayFunction
-import vn.payme.sdk.payment.PopupTakeFace
-import vn.payme.sdk.payment.PopupTakeIdentify
-import vn.payme.sdk.payment.PopupTakeVideo
 import vn.payme.sdk.store.Config
 import vn.payme.sdk.store.PaymentInfo
 import vn.payme.sdk.store.Store
 import vn.payme.sdk.store.UserInfo
 import java.security.Security
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 public class PayME {
@@ -35,24 +35,81 @@ public class PayME {
     companion object {
         lateinit var context: Context
         lateinit var onSuccess: ((JSONObject?) -> Unit)
-        lateinit var onError: (JSONObject?, Int?, String) -> Unit
+        lateinit var onError: (JSONObject?, Int, String?) -> Unit
         lateinit var fragmentManager: FragmentManager
-        fun showError(message: String) {
-            Toasty.error(PayME.context, message, Toast.LENGTH_SHORT, true).show();
+        fun showError(message: String?) {
+            if(message!=null && message!="null" && message!=""){
+                Toasty.error(PayME.context, message, Toast.LENGTH_SHORT, true).show();
+            }
         }
     }
 
-    fun scanQR(fragmentManager: FragmentManager): Unit {
-        PayME.fragmentManager = fragmentManager
-        val scanQR = ScanQR()
-        scanQR.show(fragmentManager, null)
+    fun scanQR(fragmentManager: FragmentManager, onSuccess: (JSONObject?) -> Unit, onError: (JSONObject?, Int, String?) -> Unit): Unit {
+        val checkAccount = CheckAccount()
+        if(checkAccount.check(RULE_CHECK_ACCOUNT.LOGGIN,onError)){
+            onSuccess(null)
+            PayME.fragmentManager = fragmentManager
+            val scanQR = ScanQR()
+            scanQR.show(fragmentManager, null)
+        }
     }
 
-    internal fun payQRCode(fragmentManager: FragmentManager, qr: String) {
+    fun payQRCode(fragmentManager: FragmentManager, qr: String,isShowResultUI:Boolean, onSuccess: (JSONObject?) -> Unit, onError: (JSONObject?, Int, String?) -> Unit) {
+        val checkAccount = CheckAccount()
+        if(checkAccount.check(RULE_CHECK_ACCOUNT.LOGGIN,onError)) {
+            val paymentApi = PaymentApi()
+            val loading = SpinnerDialog()
+            loading.show(fragmentManager, null)
+            paymentApi.postCheckDataQr(qr,
+                onSuccess = { jsonObject ->
+                    loading.dismiss()
+                    val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
+                    val Payment = OpenEWallet.optJSONObject("Payment")
+                    val Detect = Payment.optJSONObject("Detect")
+                    val action = Detect.optString("action")
+                    val message = Detect.optString("message")
+                    val note = Detect.optString("note")
+                    val amount = Detect.optInt("amount")
+                    val orderId = Detect.optString("orderId")
+                    val storeId = Detect.optLong("storeId")
+                    val succeeded = Detect.optBoolean("succeeded")
+                    val type = Detect.optString("type")
+                    if (!succeeded) {
+                        onError(null, ERROR_CODE.PAYMENT_ERROR, message)
+                    } else {
+                        val infoPayment =
+                            InfoPayment(
+                                action,
+                                amount,
+                                note,
+                                orderId,
+                                storeId,
+                                type,
+                                Store.paymentInfo.extraData
+                            )
+                        val paymeSDK = PayME()
+                        paymeSDK.pay(
+                            fragmentManager,
+                            infoPayment,
+                            isShowResultUI,
+                           null,
+                            onSuccess,
+                            onError
+                        )
+                    }
+                },
+                onError = { jsonObject, code, message ->
+                    loading.dismiss()
+                    onError
+                }
+            )
+        }
+    }
+
+    internal fun payQRCodeInSDK(fragmentManager: FragmentManager, qr: String) {
         val paymentApi = PaymentApi()
         val loading = SpinnerDialog()
         loading.show(fragmentManager, null)
-
         paymentApi.postCheckDataQr(qr,
             onSuccess = { jsonObject ->
                 loading.dismiss()
@@ -109,6 +166,13 @@ public class PayME {
         env: Env,
         showLog: Boolean
     ) {
+//        val res: Resources = context.resources
+//        val newConfig = Configuration(res.getConfiguration())
+//        val locale = Locale("en")
+//        newConfig.locale = locale
+//        newConfig.setLayoutDirection(locale)
+//        res.updateConfiguration(newConfig, null)
+
         PayME.context = context
         Store.config = Config(
             appPrivateKey,
@@ -122,7 +186,7 @@ public class PayME {
         )
         Store.paymentInfo = PaymentInfo(
             null, 0, "", null, null, null, "", arrayListOf(),
-            arrayListOf(), null, true, true,"",""
+            arrayListOf(), null, true, true, "", ""
         )
         Store.userInfo = UserInfo(0, false, false, false, "", null)
         Security.insertProviderAt(BouncyCastleProvider(), 1)
@@ -146,7 +210,7 @@ public class PayME {
 
     internal fun checkRegisterClient(
         onSuccess: () -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val accountApi = AccountApi()
         val pref = PayME.context.getSharedPreferences("PayME_SDK", Context.MODE_PRIVATE)
@@ -180,7 +244,7 @@ public class PayME {
 
     internal fun getSetting(
         onSuccess: () -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val paymentApi = PaymentApi()
         paymentApi.getSettings(
@@ -241,7 +305,7 @@ public class PayME {
 
     public fun login(
         onSuccess: (AccountStatus) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         getSetting(onSuccess = {
             checkRegisterClient(onSuccess = {
@@ -255,7 +319,7 @@ public class PayME {
     fun openWallet(
         fragmentManager: FragmentManager,
         onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         PayME.fragmentManager = fragmentManager
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
@@ -267,7 +331,7 @@ public class PayME {
     fun openKYC(
         fragmentManager: FragmentManager,
         onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         PayME.onSuccess = onSuccess
         PayME.onError = onError
@@ -355,7 +419,7 @@ public class PayME {
         extraData: String?,
         service: Service?,
         onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         Store.paymentInfo.service = service
         Store.paymentInfo.action = action
@@ -378,7 +442,7 @@ public class PayME {
         amount: Int?,
         closeDepositResult: Boolean,
         onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         PayME.fragmentManager = fragmentManager
 
@@ -408,7 +472,7 @@ public class PayME {
         description: String,
         closeTransferResult: Boolean,
         onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         PayME.fragmentManager = fragmentManager
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
@@ -437,7 +501,7 @@ public class PayME {
         amount: Int?,
         closeWithdrawResult: Boolean,
         onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         PayME.fragmentManager = fragmentManager
 
@@ -464,7 +528,7 @@ public class PayME {
         fragmentManager: FragmentManager,
         service: Service,
         onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         PayME.fragmentManager = fragmentManager
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
@@ -496,7 +560,7 @@ public class PayME {
         isShowResultUI: Boolean,
         methodId: Number?,
         onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val payment = PayFunction()
         Store.config.disableCallBackResult = false
@@ -504,10 +568,9 @@ public class PayME {
     }
 
 
-
     fun getAccountInfo(
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
 
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE, onError)) {
@@ -529,7 +592,7 @@ public class PayME {
 
     private fun loginAccount(
         onSuccess: (AccountStatus) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val accountApi = AccountApi()
         accountApi.intAccount(onSuccess = { jsonObject ->
@@ -593,7 +656,7 @@ public class PayME {
 
     fun getSupportedServices(
         onSuccess: (ArrayList<Service>?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
             onSuccess(Store.paymentInfo.listService)
@@ -603,7 +666,7 @@ public class PayME {
     fun getPaymentMethods(
         storeId: Long,
         onSuccess: (ArrayList<Method>) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
             val paymentApi = PaymentApi()
@@ -649,7 +712,7 @@ public class PayME {
                         }
                         onSuccess(listMethod)
                     } else {
-                        onError(null, null, message)
+                        onError(null, ERROR_CODE.PAYMENT_ERROR, message)
                     }
                 },
                 onError
@@ -659,7 +722,7 @@ public class PayME {
 
     fun getWalletInfo(
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
             val paymentApi = PaymentApi()

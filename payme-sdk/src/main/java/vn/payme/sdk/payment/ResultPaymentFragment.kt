@@ -75,16 +75,16 @@ class ResultPaymentFragment : Fragment() {
         textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
         val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
         var listInfoTop = arrayListOf<Info>()
-        listInfoTop.add(Info("Người nhận", Store.paymentInfo.storeName, null, null, false))
-        listInfoTop.add(Info("Mã dịch vụ", Store.paymentInfo.infoPayment?.orderId, null, null, false))
-        listInfoTop.add(Info("Nội dung", Store.paymentInfo.infoPayment?.note, null, null, true))
+        listInfoTop.add(Info(getString(R.string.receiver), Store.paymentInfo.storeName, null, null, false))
+        listInfoTop.add(Info(getString(R.string.service_code), Store.paymentInfo.infoPayment?.orderId, null, null, false))
+        listInfoTop.add(Info(getString(R.string.content), Store.paymentInfo.infoPayment?.note, null, null, true))
 
         val listInfoBottom: ArrayList<Info> = arrayListOf()
         if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.LINKED) {
-            listInfoBottom.add(Info("Phương thức", "Tài khoản liên kết", null, null, false))
+            listInfoBottom.add(Info(getString(R.string.method), getString(R.string.affiliate_account), null, null, false))
             listInfoBottom.add(
                 Info(
-                    "Số tài khoản",
+                    getString(R.string.account_number),
                     Store.paymentInfo.methodSelected?.title + Store.paymentInfo.methodSelected?.label,
                     null,
                     null,
@@ -94,7 +94,7 @@ class ResultPaymentFragment : Fragment() {
         } else {
             listInfoBottom.add(
                 Info(
-                    "Phương thức",
+                    getString(R.string.method),
                     Store.paymentInfo.methodSelected?.title,
                     null,
                     null,
@@ -110,7 +110,7 @@ class ResultPaymentFragment : Fragment() {
             )
             listInfoBottom.add(
                 Info(
-                    "Số thẻ ATM",
+                    getString(R.string.atm_number),
                     event.cardInfo?.bankShortName + "-" + cardNumber,
                     null,
                     null,
@@ -126,7 +126,7 @@ class ResultPaymentFragment : Fragment() {
             )
             listInfoBottom.add(
                 Info(
-                    "Số thẻ",
+                    getString(R.string.card_number),
                     event.cardInfo?.bankShortName + "-" + cardNumber,
                     null,
                     null,
@@ -135,10 +135,10 @@ class ResultPaymentFragment : Fragment() {
             )
         }
         textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
-        val feeString = if(event.fee==0) "Miễn phí" else "${decimal.format(event.fee)} đ"
+        val feeString = if(event.fee==0) getString(R.string.free)  else "${decimal.format(event.fee)} đ"
         val totalString ="${decimal.format(event.fee + Store.paymentInfo.infoPayment!!.amount)} đ"
-        listInfoBottom.add(Info("Phí",  feeString, null, null, false))
-        listInfoBottom.add(Info("Tổng thanh toán",  totalString, null, ContextCompat.getColor(requireContext(),R.color.red), true))
+        listInfoBottom.add(Info( getString(R.string.fee),  feeString, null, null, false))
+        listInfoBottom.add(Info(getString(R.string.total_payment),  totalString, null, ContextCompat.getColor(requireContext(),R.color.red), true))
         if(state =="PENDING"){
             infoTop.updateData(listInfoTop)
             lottie.setAnimation(R.raw.cho_xu_ly)
@@ -170,11 +170,11 @@ class ResultPaymentFragment : Fragment() {
                     transitionCodeContainer.visibility = View.GONE
                     infoBottom.updateData(listInfoTop)
                     var listInfoTopBankTransfer = arrayListOf<Info>()
-                    listInfoTopBankTransfer.add(Info("Mã giao dịch", Store.paymentInfo.transaction, null, null, false))
-                    listInfoTopBankTransfer.add(Info("Thời gian giao dịch", DateStr, null, null, false))
-                    listInfoTopBankTransfer.add(Info("Phương thức", Store.paymentInfo.methodSelected?.title, null, null, false))
-                    listInfoTopBankTransfer.add(Info("Phí giao dịch",feeString, null, null, false))
-                    listInfoTopBankTransfer.add(Info("Tổng thanh toán",totalString, null, ContextCompat.getColor(requireContext(),R.color.red), true))
+                    listInfoTopBankTransfer.add(Info(getString(R.string.transaction_code), Store.paymentInfo.transaction, null, null, false))
+                    listInfoTopBankTransfer.add(Info(getString(R.string.transaction_time), DateStr, null, null, false))
+                    listInfoTopBankTransfer.add(Info(getString(R.string.method), Store.paymentInfo.methodSelected?.title, null, null, false))
+                    listInfoTopBankTransfer.add(Info(getString(R.string.transaction_fee),feeString, null, null, false))
+                    listInfoTopBankTransfer.add(Info(getString(R.string.total_payment),totalString, null, ContextCompat.getColor(requireContext(),R.color.red), true))
                     infoTop.updateData(listInfoTopBankTransfer)
                 }else{
                     infoTop.updateData(listInfoTop)

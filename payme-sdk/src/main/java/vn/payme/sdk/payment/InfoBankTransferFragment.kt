@@ -92,7 +92,7 @@ class InfoBankTransferFragment : Fragment() {
         val decimal = DecimalFormat("#,###")
         val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
         val amount = "${decimal.format(event.fee + Store.paymentInfo.infoPayment!!.amount)} đ"
-        val spannable: Spannable = SpannableString("Vui lòng chuyển khoản ${amount} tới thông tin tài khoản bên dưới :")
+        val spannable: Spannable = SpannableString("${getString(R.string.please_transfer)} ${amount} ${getString(R.string.go_to_the_account_information_below)} :")
         val str = spannable.toString()
         iStart = str.indexOf(amount)
         iEnd = iStart + amount.length

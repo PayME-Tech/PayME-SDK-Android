@@ -91,7 +91,6 @@ class SelectMethodFragment : Fragment() {
         EventBus.getDefault().register(this)
 
         val storeImage = Store.paymentInfo.storeImage
-        println("storeImage" + storeImage)
         if (storeImage != null && storeImage != "null" && storeImage != "") {
             containerLogoMC.visibility = View.VISIBLE
             val picasso = Picasso.get()
@@ -161,10 +160,10 @@ class SelectMethodFragment : Fragment() {
         val decimal = DecimalFormat("#,###")
         val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
         val fee = event.fee
-        val valueFree = if (fee > 0) "${decimal.format(fee)} đ" else "Miễn phí"
-        listInfoBottom.add(Info("Phí", valueFree, null, null, false))
+        val valueFree = if (fee > 0) "${decimal.format(fee)} đ" else getString(R.string.free)
+        listInfoBottom.add(Info(getString(R.string.fee), valueFree, null, null, false))
         val infoTotal = Info(
-            "Tổng thanh toán", "${
+            getString(R.string.total_payment), "${
                 decimal.format(
                     Store.paymentInfo.infoPayment?.amount?.plus(
                         fee

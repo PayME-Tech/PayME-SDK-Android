@@ -163,7 +163,7 @@ class PopupWebViewNapas : DialogFragment() {
         EventBus.getDefault().unregister(this)
     }
 
-    fun onResult(message: String, state: String) {
+    fun onResult(message: String?, state: String) {
         dismiss()
         val bundle: Bundle = Bundle()
         if (state == "SUCCEEDED") {
@@ -177,7 +177,7 @@ class PopupWebViewNapas : DialogFragment() {
             bundle.putString("state", state)
             if (!Store.config.disableCallBackResult) {
                 val data = JSONObject("""{state:${state}}""")
-                PayME.onError(data, ERROR_CODE.PAYMENT_ERROR, message!!)
+                PayME.onError(data, ERROR_CODE.PAYMENT_ERROR, message)
             }
         }
         if (Store.paymentInfo.isShowResultUI) {

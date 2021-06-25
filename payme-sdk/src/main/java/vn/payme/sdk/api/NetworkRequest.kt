@@ -32,7 +32,7 @@ internal class NetworkRequest(
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun setOnRequestCrypto(
         onSuccess: (response: JSONObject) -> Unit,
-        onError: (data: JSONObject?, code: Int?, message: String) -> Unit,
+        onError: (data: JSONObject?, code: Int, message: String?) -> Unit,
     ) {
         var checkErrorRSA = false
         try {

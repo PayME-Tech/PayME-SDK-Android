@@ -19,7 +19,7 @@ internal class PaymentApi {
     fun getInfoMerchant(
         storeId:Long,
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ){
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
@@ -51,7 +51,7 @@ internal class PaymentApi {
         cardNumber:String?,
         linkedId: Double?,
         onSuccess: (String?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ){
         var timeCheck =  false
 
@@ -114,7 +114,7 @@ internal class PaymentApi {
         cardNumber:String?,
         linkedId:Double?,
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ){
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
@@ -152,7 +152,7 @@ internal class PaymentApi {
 
     fun checkVisa(
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
         ) {
             val path = "/graphql"
             val params: MutableMap<String, Any> = mutableMapOf()
@@ -186,7 +186,7 @@ internal class PaymentApi {
 
     fun getListBanks(
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
@@ -215,7 +215,7 @@ internal class PaymentApi {
         amount:Int,
         method:Method,
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
@@ -239,6 +239,7 @@ internal class PaymentApi {
         params["query"] = query
         params["variables"] = variables
         getFeeInput["clientId"] = Store.config.clientId
+        getFeeInput["storeId"] = Store.paymentInfo.infoPayment?.storeId!!
         getFeeInput["serviceType"] = "OPEN_EWALLET_PAYMENT"
         getFeeInput["amount"] = amount
         variables["getFeeInput"] = getFeeInput
@@ -269,9 +270,8 @@ internal class PaymentApi {
         }
 
         getFeeInput["payment"] = payment
-        val accessToken = if(Store.userInfo.accountKycSuccess)   Store.userInfo.accessToken!! else ""
 
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path,accessToken, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path,Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -280,7 +280,7 @@ internal class PaymentApi {
     }
     fun getSettings(
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
@@ -309,7 +309,7 @@ internal class PaymentApi {
         swiftCode:String,
         cardNumber:String,
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ){
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
@@ -340,7 +340,7 @@ internal class PaymentApi {
     fun getSecurityCode(
         password: String,
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
@@ -382,7 +382,7 @@ internal class PaymentApi {
         recheck: Boolean?,
         referenceId: String?,
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
@@ -508,8 +508,7 @@ internal class PaymentApi {
         }
         variables["payInput"] = payInput
         params["variables"] = variables
-        val accessToken = if(Store.userInfo.accountKycSuccess)   Store.userInfo.accessToken!! else ""
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, accessToken, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -520,7 +519,7 @@ internal class PaymentApi {
     fun getTransferMethods(
         storeId:Long,
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
@@ -572,7 +571,7 @@ internal class PaymentApi {
 
     fun getBalance(
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
@@ -598,7 +597,7 @@ internal class PaymentApi {
     fun postCheckDataQr(
         dataQR: String,
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()

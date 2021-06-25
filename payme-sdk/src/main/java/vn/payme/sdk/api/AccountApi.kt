@@ -8,7 +8,7 @@ internal class AccountApi {
 
     fun registerClient(
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
@@ -43,7 +43,7 @@ internal class AccountApi {
 
     fun getAccountInfo(
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
 
         val path = "/graphql"
@@ -123,7 +123,7 @@ internal class AccountApi {
 
     fun intAccount(
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()

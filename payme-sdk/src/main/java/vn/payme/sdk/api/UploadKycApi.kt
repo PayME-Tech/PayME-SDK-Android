@@ -38,7 +38,7 @@ class UploadKycApi {
         video: ByteArray?,
         identifyType: String?,
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         CoroutineScope(Dispatchers.Main + Job()).launch {
             var urlImageFront: String? = null
@@ -54,7 +54,7 @@ class UploadKycApi {
                 } else {
                     onError(
                         responseImageFront?.data,
-                        responseImageFront?.code,
+                        responseImageFront?.code!!,
                         responseImageFront?.message!!
                     )
                     return@launch
@@ -72,7 +72,7 @@ class UploadKycApi {
                 } else {
                     onError(
                         responseImageBack.data,
-                        responseImageBack.code,
+                        responseImageBack.code!!,
                         responseImageBack.message!!
                     )
                     return@launch
@@ -89,7 +89,7 @@ class UploadKycApi {
                 if (responseVideo.status) {
                     urlVideo = responseVideo.path
                 } else {
-                    onError(responseVideo.data, responseVideo.code, responseVideo.message!!)
+                    onError(responseVideo.data, responseVideo.code!!, responseVideo.message!!)
                     return@launch
 
                 }
@@ -105,7 +105,7 @@ class UploadKycApi {
                 } else {
                     onError(
                         responseImageFace.data,
-                        responseImageFace.code,
+                        responseImageFace.code!!,
                         responseImageFace.message!!
                     )
                     return@launch
@@ -210,7 +210,7 @@ class UploadKycApi {
         video: String?,
         identifyType: String?,
         onSuccess: (JSONObject) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
 
         val path = "/graphql"

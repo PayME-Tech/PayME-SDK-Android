@@ -50,7 +50,7 @@ class ConfirmOtpFragment : Fragment() {
         pinView.isPasswordHidden = false
         Keyboard.showKeyboard(requireContext())
         textNote.text =
-            "Nhập mã OTP ${Store.paymentInfo.methodSelected?.title} đã được gửi qua số điện thoại đăng ký thẻ"
+            "${getString(R.string.enter_the_OTP_code)} ${Store.paymentInfo.methodSelected?.title} ${getString(R.string.that_was_sent_to_the_phone_number_that_registered_the_card)}"
         pinView.addTextChangedListener { text ->
             if (text?.length == 6 && !loading) {
                 checkPassword(text.toString())

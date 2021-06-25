@@ -5,6 +5,7 @@ import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 import vn.payme.sdk.CheckAccount
 import vn.payme.sdk.PayME
+import vn.payme.sdk.R
 import vn.payme.sdk.RULE_CHECK_ACCOUNT
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.enums.ERROR_CODE
@@ -21,7 +22,7 @@ internal class PayFunction {
     val loading = SpinnerDialog()
     private fun getBalance(
         onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val payME = PayME()
         payME.getWalletInfo(
@@ -39,7 +40,7 @@ internal class PayFunction {
 
     fun getListBank(
         fragmentManager: FragmentManager,
-        method: Method, onError: (JSONObject?, Int?, String) -> Unit
+        method: Method, onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val paymentApi = PaymentApi()
         paymentApi.getListBanks(
@@ -81,7 +82,7 @@ internal class PayFunction {
 
     private fun getListBankTransfer(
         fragmentManager: FragmentManager,
-        method: Method, onError: (JSONObject?, Int?, String) -> Unit
+        method: Method, onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val paymentApi = PaymentApi()
         paymentApi.payment(
@@ -144,7 +145,7 @@ internal class PayFunction {
         isShowResultUI: Boolean,
         methodId: Number?,
         onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val payme = PayME()
         val paymentApi = PaymentApi()
@@ -183,7 +184,7 @@ internal class PayFunction {
         isShowResultUI: Boolean,
         methodId: Number?,
         onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         loading.show(fragmentManager, null)
         val arrayBank = arrayListOf<BankTransferInfo>()
@@ -226,7 +227,7 @@ internal class PayFunction {
         isShowResultUI: Boolean,
         methodId: Number?,
         onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
 
         val checkAccount = CheckAccount()
@@ -235,7 +236,7 @@ internal class PayFunction {
             onError(
                 null,
                 ERROR_CODE.LITMIT,
-                "Số tiền giao dịch tối thiểu ${decimal.format(Store.config.limitPayment.min)} VND"
+                "${PayME.context.getString(R.string.min_transaction_amount)} ${decimal.format(Store.config.limitPayment.min)} VND"
             )
             return
         }
@@ -243,7 +244,7 @@ internal class PayFunction {
             onError(
                 null,
                 ERROR_CODE.LITMIT,
-                "Số tiền giao dịch tối đa ${decimal.format(Store.config.limitPayment.max)} VND"
+                "${PayME.context.getString(R.string.maximum_transaction_amount)} ${decimal.format(Store.config.limitPayment.max)} VND"
             )
             return
         }
@@ -265,7 +266,7 @@ internal class PayFunction {
         isShowResultUI: Boolean,
         method: Method?,
         onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit,
+        onError: (JSONObject?, Int, String?) -> Unit,
     ) {
         Store.paymentInfo.methodSelected = method
         Store.paymentInfo.transaction = ""
@@ -303,7 +304,7 @@ internal class PayFunction {
         isShowResultUI: Boolean,
         method: Method?,
         onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit,
+        onError: (JSONObject?, Int, String?) -> Unit,
     ) {
         val checkAccount = CheckAccount()
         if (method != null && !((method?.type == TYPE_PAYMENT.WALLET) ||
@@ -312,14 +313,14 @@ internal class PayFunction {
                     (method?.type == TYPE_PAYMENT.CREDIT_CARD) ||
                     (method?.type == TYPE_PAYMENT.LINKED))
         ) {
-            onError(null, ERROR_CODE.PAYMENT_ERROR, "Phương thức chưa được hỗ trợ")
+            onError(null, ERROR_CODE.PAYMENT_ERROR, PayME.context.getString(R.string.method_not_supported))
             return
         }
         if (method != null && method?.type != TYPE_PAYMENT.WALLET && !Store.config.openPayAndKyc) {
             onError(
                 null,
                 ERROR_CODE.OTHER,
-                "Chức năng chỉ có thể thao tác môi trường production"
+                PayME.context.getString(R.string.function_can_only_manipulate_production)
             )
             return
         }
@@ -374,7 +375,7 @@ internal class PayFunction {
         isShowResultUI: Boolean,
         method: Method?,
         onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val paymentApi = PaymentApi()
         val method = method
@@ -393,7 +394,7 @@ internal class PayFunction {
                     val state = GetFee.optString("state")
                     if (state == "null") {
                         if (method.type == TYPE_PAYMENT.WALLET && (Store.userInfo.balance < (infoPayment.amount + fee))) {
-                            onError(null, ERROR_CODE.BALANCE_ERROR, "Số dư trong ví không đủ")
+                            onError(null, ERROR_CODE.BALANCE_ERROR, PayME.context.getString(R.string.balance_in_wallet_is_insufficient))
                         } else {
                             EventBus.getDefault().postSticky(PaymentInfoEvent(null, fee))
                             showPopupPayment(
@@ -423,7 +424,7 @@ internal class PayFunction {
         isShowResultUI: Boolean,
         methodId: Number?,
         onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int?, String) -> Unit,
+        onError: (JSONObject?, Int, String?) -> Unit,
     ) {
         val paymentApi = PaymentApi()
         paymentApi.getTransferMethods(
@@ -476,7 +477,7 @@ internal class PayFunction {
                         onError(
                             null,
                             ERROR_CODE.PAYMENT_ERROR,
-                            "Không tìm thấy phương thức thanh toán"
+                            PayME.context.getString(R.string.no_payment_method_found)
                         )
                     } else {
                         checkMethod(

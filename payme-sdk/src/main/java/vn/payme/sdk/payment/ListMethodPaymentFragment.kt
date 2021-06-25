@@ -127,7 +127,7 @@ class ListMethodPaymentFragment : Fragment() {
                     PayME.showError(message)
                 }
             },
-            onError = { jsonObject: JSONObject?, code: Int?, message: String ->
+            onError = { jsonObject: JSONObject?, code: Int, message: String? ->
                 if (!isVisible) return@getFee
                 disableLoading()
                 PayME.showError(message)
@@ -254,7 +254,7 @@ class ListMethodPaymentFragment : Fragment() {
                         if (!Store.userInfo.accountActive) {
                             paymeSDK.openWallet(PayME.fragmentManager,PayME.onSuccess, PayME.onError)
                         } else if (!Store.userInfo.accountKycSuccess) {
-                            paymeSDK.openKYC(PayME.fragmentManager,onSuccess = {},onError = { jsonObject: JSONObject?, i: Int?, message: String ->
+                            paymeSDK.openKYC(PayME.fragmentManager,onSuccess = {},onError = { jsonObject: JSONObject?, i: Int, message: String? ->
                                 PayME.showError(message)
                             })
                         } else if (Store.paymentInfo.infoPayment!!.amount > Store.userInfo.balance) {
