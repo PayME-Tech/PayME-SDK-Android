@@ -411,8 +411,9 @@ internal class PaymentApi {
                 "            statePaymentBankCardResponsed : state\n" +
                 "          }\n" +
                 "          ... on PaymentCreditCardResponsed {\n" +
-//                "            html\n" +
+                "            html\n" +
                 "            message\n" +
+                "            transaction\n" +
                 "            statePaymentCreditCardResponsed : state\n" +
                 "          }\n" +
                 "          ... on PaymentBankTransferResponsed {\n" +

@@ -396,23 +396,23 @@ class MainActivity : AppCompatActivity() {
                     )
 //                payme?.getPaymentMethods(storeId,
 //                    onSuccess = {list->
-                        payme?.pay(this.supportFragmentManager, infoPayment, true,null,
-                            onSuccess = { json: JSONObject? ->
-                            },
-                            onError = { jsonObject, code, message ->
-
-                                if (message != null && message.length > 0) {
-                                    PayME.showError(message)
-                                }
-                                if (code == ERROR_CODE.EXPIRED) {
-                                    walletView.setVisibility(View.GONE)
-                                }
-                                if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
-                                    openWallet()
-                                }
-                            }
-
-                        )
+//                        payme?.pay(this.supportFragmentManager, infoPayment, true,null,
+//                            onSuccess = { json: JSONObject? ->
+//                            },
+//                            onError = { jsonObject, code, message ->
+//
+//                                if (message != null && message.length > 0) {
+//                                    PayME.showError(message)
+//                                }
+//                                if (code == ERROR_CODE.EXPIRED) {
+//                                    walletView.setVisibility(View.GONE)
+//                                }
+//                                if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
+//                                    openWallet()
+//                                }
+//                            }
+//
+//                        )
 //
 //                    },onError = {jsonObject, code, message ->
 //                        PayME.showError(message)

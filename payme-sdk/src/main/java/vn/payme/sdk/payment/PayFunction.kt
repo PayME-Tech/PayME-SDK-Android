@@ -186,7 +186,10 @@ internal class PayFunction {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
+        println("methodId2222:"+methodId)
         loading.show(fragmentManager, null)
+        PayME.fragmentManager = fragmentManager
+        Store.paymentInfo.infoPayment = infoPayment
         val arrayBank = arrayListOf<BankTransferInfo>()
         EventBus.getDefault().postSticky(ListBankTransfer(arrayBank))
         PayME.onSuccess = onSuccess
@@ -272,8 +275,6 @@ internal class PayFunction {
         Store.paymentInfo.transaction = ""
         Store.paymentInfo.isChangeMethod = method == null
         Store.paymentInfo.isShowResultUI = isShowResultUI
-        PayME.fragmentManager = fragmentManager
-        Store.paymentInfo.infoPayment = infoPayment
         if (method?.type == TYPE_PAYMENT.BANK_CARD) {
             val listBankAtm = EventBus.getDefault().getStickyEvent(ListBankAtm::class.java)
             if(listBankAtm !=null && listBankAtm.listBankATM.size>0){
