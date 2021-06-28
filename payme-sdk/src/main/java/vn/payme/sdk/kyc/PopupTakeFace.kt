@@ -23,7 +23,7 @@ import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.evenbus.ChangeFragmentKYC
-import vn.payme.sdk.kyc.CameraKycActivity
+import vn.payme.sdk.kyc.CameraKycPopup
 import vn.payme.sdk.store.Store
 
 internal class PopupTakeFace : BottomSheetDialogFragment() {
@@ -56,7 +56,7 @@ internal class PopupTakeFace : BottomSheetDialogFragment() {
         buttonNext.setOnClickListener {
             val openKycActivity = arguments?.getBoolean("openKycActivity")
             if(openKycActivity==true){
-                val cameraKycActivity = CameraKycActivity()
+                val cameraKycActivity = CameraKycPopup()
                 cameraKycActivity.show(PayME.fragmentManager,null)
             }else{
                EventBus.getDefault().post(ChangeFragmentKYC.KYC_FACE)

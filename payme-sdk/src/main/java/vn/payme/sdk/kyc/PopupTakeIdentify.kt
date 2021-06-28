@@ -1,7 +1,6 @@
 package vn.payme.sdk.payment
 
 import android.app.Dialog
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.PorterDuff
@@ -23,7 +22,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
-import vn.payme.sdk.kyc.CameraKycActivity
+import vn.payme.sdk.kyc.CameraKycPopup
 import vn.payme.sdk.store.Store
 
 internal class PopupTakeIdentify : BottomSheetDialogFragment() {
@@ -60,7 +59,7 @@ internal class PopupTakeIdentify : BottomSheetDialogFragment() {
             dialog?.dismiss()
         }
         buttonNext.setOnClickListener {
-            val cameraKycActivity = CameraKycActivity()
+            val cameraKycActivity = CameraKycPopup()
             cameraKycActivity.show(PayME.fragmentManager,null)
             dismiss()
         }

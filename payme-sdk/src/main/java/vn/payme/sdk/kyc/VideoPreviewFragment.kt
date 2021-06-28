@@ -87,7 +87,7 @@ class VideoPreviewFragment : Fragment() {
         imagePreView!!.setOnClickListener { playVideo() }
 
         buttonNext!!.setOnClickListener {
-            CameraKycActivity.video = saveVideo
+            CameraKycPopup.video = saveVideo
             val newFragment = UploadKycFragment()
             val fragment = parentFragmentManager.beginTransaction()
             fragment?.addToBackStack(null)

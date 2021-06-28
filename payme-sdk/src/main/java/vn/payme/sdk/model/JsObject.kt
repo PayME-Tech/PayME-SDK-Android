@@ -6,7 +6,7 @@ import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.PayMEOpenSDKPopup
 import vn.payme.sdk.enums.ERROR_CODE
-import vn.payme.sdk.kyc.CameraKycActivity
+import vn.payme.sdk.kyc.CameraKycPopup
 import vn.payme.sdk.store.Store
 
 
@@ -176,8 +176,8 @@ public class JsObject(
         Store.config.kycVideo = false
         Store.config.kycIdentify = true
         Store.config.kycFace = false
-        CameraKycActivity.updateOnlyIdentify  = true
-        val cameraKycActivity = CameraKycActivity()
+        CameraKycPopup.updateOnlyIdentify  = true
+        val cameraKycActivity = CameraKycPopup()
         cameraKycActivity.show(PayME.fragmentManager,null)
 
     }

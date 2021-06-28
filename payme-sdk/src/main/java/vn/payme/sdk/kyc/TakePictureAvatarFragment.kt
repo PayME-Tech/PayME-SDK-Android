@@ -1,8 +1,6 @@
 package vn.payme.sdk.kyc
 
-import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -87,7 +85,7 @@ class TakePictureAvatarFragment : Fragment() {
         cameraKitView!!.open()
 
         buttonNext!!.setOnClickListener {
-            CameraKycActivity.imageFace = saveImage
+            CameraKycPopup.imageFace = saveImage
             if (Store.config.kycVideo) {
                 val popupTakeVideo = PopupTakeVideo()
                 popupTakeVideo.show(parentFragmentManager, "ModalBottomSheet")

@@ -17,7 +17,6 @@ import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.adapter.TypeIndentifyAdapter
-import vn.payme.sdk.kyc.CameraKycActivity
 import vn.payme.sdk.model.TypeIdentify
 
 internal class PopupSelectTypeIdentify : BottomSheetDialogFragment() {

@@ -5,7 +5,7 @@ import com.android.volley.toolbox.Volley
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import vn.payme.sdk.PayME
-import vn.payme.sdk.kyc.CameraKycActivity
+import vn.payme.sdk.kyc.CameraKycPopup
 import vn.payme.sdk.store.Store
 import java.nio.charset.StandardCharsets
 import java.util.HashMap
@@ -229,7 +229,7 @@ class UploadKycApi {
         if (imageBackSide != null && imageFront != null) {
             image["back"] = imageBackSide!!
             image["front"] = imageFront!!
-            if(CameraKycActivity.updateOnlyIdentify){
+            if(CameraKycPopup.updateOnlyIdentify){
                 kycInput["identifyIC"] = image!!
             }else{
                 kycInput["image"] = image!!

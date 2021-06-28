@@ -29,7 +29,9 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.enums.TypeCallBack
+import vn.payme.sdk.evenbus.ActivityResult
 import vn.payme.sdk.evenbus.MyEven
+import vn.payme.sdk.evenbus.RequestPermissionsResult
 import vn.payme.sdk.kyc.*
 import vn.payme.sdk.store.Store
 
@@ -64,7 +66,14 @@ class ScanQR : DialogFragment() {
             dismiss()
         }
     }
-
+    @Subscribe
+    fun eventActivityResult(event: ActivityResult){
+        checkActivityResult(event.requestCode,event.resultCode,event.data)
+    }
+    @Subscribe
+    fun eventRequestPermissionsResult(event:RequestPermissionsResult){
+        checkRequestPermissionsResult(event.requestCode,event.permissions,event.grantResults)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -98,8 +107,7 @@ class ScanQR : DialogFragment() {
 
 
     }
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    fun checkActivityResult(requestCode: Int, resultCode: Int, data: Intent?){
         if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
             val selectedImage: Uri? = data.data
             val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, selectedImage)
@@ -125,6 +133,8 @@ class ScanQR : DialogFragment() {
             }
         }
     }
+
+
 
     private fun mappingView(v:View) {
         btnPicker = v.findViewById(R.id.button_picker)
@@ -167,13 +177,11 @@ class ScanQR : DialogFragment() {
         }
 
     }
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
+    fun checkRequestPermissionsResult(  requestCode: Int,
+                                        permissions: Array<out String>,
+                                        grantResults: IntArray
+    ){
         val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
         if (valid) {
             val activity = requireActivity()
@@ -200,6 +208,22 @@ class ScanQR : DialogFragment() {
                 containerErrorCamera?.visibility = View.VISIBLE
             }
         }
+
+
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        checkActivityResult(requestCode, resultCode, data)
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//        EventBus.getDefault().post(RequestPermissionsResult(requestCode, permissions, grantResults))
+        checkRequestPermissionsResult(requestCode, permissions, grantResults)
+
     }
 
     override fun onResume() {

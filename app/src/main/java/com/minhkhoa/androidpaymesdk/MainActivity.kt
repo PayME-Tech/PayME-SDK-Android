@@ -139,6 +139,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var buttonDeposit: Button
     lateinit var buttonWithdraw: Button
     lateinit var buttonTransfer: Button
+    lateinit var buttonScanQr: Button
     lateinit var buttonPayNotAccount: Button
     lateinit var buttonKYC: Button
     lateinit var buttonPay: Button
@@ -198,6 +199,7 @@ class MainActivity : AppCompatActivity() {
         buttonLogout = findViewById(R.id.buttonLogout)
         buttonSetting = findViewById(R.id.buttonSetting)
         buttonKYC = findViewById(R.id.buttonKYC)
+        buttonScanQr = findViewById(R.id.buttonScanQr)
         buttonReload = findViewById(R.id.buttonReload)
         buttonDeposit = findViewById(R.id.buttonDeposit)
         buttonTransfer = findViewById(R.id.buttonTransfer)
@@ -234,6 +236,13 @@ class MainActivity : AppCompatActivity() {
                 updateWalletInfo()
             }
 
+        }
+        buttonScanQr.setOnClickListener {
+//            PayME.showError("helooo")
+
+            payme?.scanQR(this.supportFragmentManager,onSuccess = {
+                
+            },onError = {jsonObject, i, s ->  })
         }
         buttonKYC.setOnClickListener {
             payme?.openKYC(this.supportFragmentManager, onSuccess = {

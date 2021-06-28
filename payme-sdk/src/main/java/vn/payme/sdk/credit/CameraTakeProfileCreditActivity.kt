@@ -26,7 +26,9 @@ import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.enums.TypeCallBack
+import vn.payme.sdk.evenbus.ActivityResult
 import vn.payme.sdk.evenbus.MyEven
+import vn.payme.sdk.evenbus.RequestPermissionsResult
 import vn.payme.sdk.kyc.*
 import vn.payme.sdk.store.Store
 import java.io.ByteArrayOutputStream
@@ -162,7 +164,27 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
             PermisionCamera().requestCameraFragment(requireContext(),this)
         }
     }
+    @Subscribe
+    fun eventActivityResult(event: ActivityResult){
+        checkActivityResult(event.requestCode,event.resultCode,event.data)
+    }
+    @Subscribe
+    fun eventRequestPermissionsResult(event: RequestPermissionsResult){
+        checkRequestPermissionsResult(event.requestCode,event.permissions,event.grantResults)
+    }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        checkActivityResult(requestCode, resultCode, data)
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        checkRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+   fun checkActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
             val selectedImage: Uri? = data.data
@@ -178,10 +200,10 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String?>,
-        grantResults: IntArray
+     fun checkRequestPermissionsResult(
+         requestCode: Int,
+         permissions: Array<out String>,
+         grantResults: IntArray
     ) {
         val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
         if (valid && !cameraKitView!!.isOpened) {

@@ -1,8 +1,7 @@
 package vn.payme.sdk
 
 import android.content.Context
-import android.content.res.Configuration
-import android.content.res.Resources
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -15,9 +14,11 @@ import vn.payme.sdk.api.AccountApi
 import vn.payme.sdk.api.ENV_API
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.enums.*
+import vn.payme.sdk.evenbus.ActivityResult
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.kyc.CameraKycActivity
+import vn.payme.sdk.evenbus.RequestPermissionsResult
+import vn.payme.sdk.kyc.CameraKycPopup
 import vn.payme.sdk.model.*
 import vn.payme.sdk.payment.*
 import vn.payme.sdk.store.Config
@@ -25,8 +26,6 @@ import vn.payme.sdk.store.PaymentInfo
 import vn.payme.sdk.store.Store
 import vn.payme.sdk.store.UserInfo
 import java.security.Security
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 public class PayME {
@@ -42,7 +41,19 @@ public class PayME {
                 Toasty.error(PayME.context, message, Toast.LENGTH_SHORT, true).show();
             }
         }
+        fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+            EventBus.getDefault().post(ActivityResult(requestCode,resultCode,data))
+        }
+        fun onRequestPermissionsResult(
+            requestCode: Int,
+            permissions: Array<out String>,
+            grantResults: IntArray
+        ) {
+            EventBus.getDefault().post(RequestPermissionsResult(requestCode,permissions,grantResults))
+        }
+
     }
+
 
     fun scanQR(
         fragmentManager: FragmentManager,
@@ -413,7 +424,7 @@ public class PayME {
         kycIdentity: Boolean,
         kycFace: Boolean
     ) {
-        CameraKycActivity.updateOnlyIdentify = false
+        CameraKycPopup.updateOnlyIdentify = false
         Store.config.kycVideo = kycVideo
         Store.config.kycIdentify = kycIdentity
         Store.config.kycFace = kycFace

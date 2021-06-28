@@ -25,7 +25,7 @@ class UploadKycFragment : Fragment() {
     private var loadingUploadKycApi = false
     suspend fun uploadKYC() {
         val uploadKycApi = UploadKycApi()
-        uploadKycApi.upLoadKYC(CameraKycActivity.imageFront, CameraKycActivity.imageBackSide, CameraKycActivity.imageFace, CameraKycActivity.video,CameraKycActivity.typeIdentify,
+        uploadKycApi.upLoadKYC(CameraKycPopup.imageFront, CameraKycPopup.imageBackSide, CameraKycPopup.imageFace, CameraKycPopup.video,CameraKycPopup.typeIdentify,
             onSuccess = {jsonObject->
                 loadingUploadKycApi = false
                 val Account = jsonObject.optJSONObject("Account")
@@ -34,7 +34,7 @@ class UploadKycFragment : Fragment() {
                 val succeeded = KYC.optBoolean("succeeded")
                 if(succeeded){
                     if(PayMEOpenSDKPopup.isVisible){
-                        if(CameraKycActivity.updateOnlyIdentify){
+                        if(CameraKycPopup.updateOnlyIdentify){
                             var even: EventBus = EventBus.getDefault()
                             var myEven: MyEven = MyEven(TypeCallBack.onUpdateIdentify, "")
                             even.post(myEven)

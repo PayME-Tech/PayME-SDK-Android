@@ -84,17 +84,17 @@ class TakePictureIdentifyFragment : Fragment() {
         buttonDropdown = view.findViewById(R.id.buttonDropdown)
         cameraKitView!!.open()
         ChangeColorImage().changeColor(requireContext(),buttonTakePicture!!,R.drawable.ic_buttontakepic,1)
-        if(CameraKycActivity.updateOnlyIdentify){
+        if(CameraKycPopup.updateOnlyIdentify){
             buttonDropdown.visibility  = View.GONE
         }
 
 
-        if(CameraKycActivity.updateOnlyIdentify){
-            CameraKycActivity.typeIdentify = "CCCD"
+        if(CameraKycPopup.updateOnlyIdentify){
+            CameraKycPopup.typeIdentify = "CCCD"
             textTypeIdentify?.text = "Căn cước công dân"
 
         }else{
-            CameraKycActivity.typeIdentify = "CMND"
+            CameraKycPopup.typeIdentify = "CMND"
         }
 
 
@@ -113,8 +113,8 @@ class TakePictureIdentifyFragment : Fragment() {
         buttonNext!!.setOnClickListener {
             if (imageFront != null) {
                 imageBackSide = saveImage
-                CameraKycActivity.imageBackSide = imageBackSide
-                CameraKycActivity.imageFront = imageFront
+                CameraKycPopup.imageBackSide = imageBackSide
+                CameraKycPopup.imageFront = imageFront
                 if (Store.config.kycFace) {
                     val popupTakeFace = PopupTakeFace()
                     popupTakeFace.show(parentFragmentManager, "ModalBottomSheet")
@@ -141,7 +141,7 @@ class TakePictureIdentifyFragment : Fragment() {
             }
         }
         buttonSelectTypeIdentify?.setOnClickListener {
-            if(imageFront==null && !CameraKycActivity.updateOnlyIdentify){
+            if(imageFront==null && !CameraKycPopup.updateOnlyIdentify){
                 val popupSelectTypeIdentify = PopupSelectTypeIdentify()
                 popupSelectTypeIdentify.show(childFragmentManager, "ModalBottomSheet")
             }
@@ -162,7 +162,7 @@ class TakePictureIdentifyFragment : Fragment() {
     @Subscribe
     fun onChange(myEven: TypeIdentify) {
         textTypeIdentify?.text = myEven.title
-        CameraKycActivity.typeIdentify = myEven.type
+        CameraKycPopup.typeIdentify = myEven.type
     }
 
     override fun onDestroy() {

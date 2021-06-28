@@ -20,28 +20,29 @@ import vn.payme.sdk.component.Button
 import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.ChangeFragmentKYC
 import vn.payme.sdk.evenbus.MyEven
+import vn.payme.sdk.evenbus.RequestPermissionsResult
 import vn.payme.sdk.store.Store
 
-class CameraKycActivity : DialogFragment() {
-    companion object{
-        var video :ByteArray? = null
-        var imageFace :ByteArray? = null
-        var imageFront :ByteArray? = null
-        var imageBackSide :ByteArray? = null
-        var typeIdentify :String? = null
+class CameraKycPopup : DialogFragment() {
+    companion object {
+        var video: ByteArray? = null
+        var imageFace: ByteArray? = null
+        var imageFront: ByteArray? = null
+        var imageBackSide: ByteArray? = null
+        var typeIdentify: String? = null
         var updateOnlyIdentify = false
         private var buttonBackHeaderErrorCamera: ImageView? = null
         private var enableSetting = false
         private var containerErrorCamera: ConstraintLayout? = null
         private var buttonOpenSetting: Button? = null
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         EventBus.getDefault().register(this)
         super.onCreate(savedInstanceState)
         isCancelable = false
-        setStyle(STYLE_NO_FRAME,R.style.DialogStyle);
+        setStyle(STYLE_NO_FRAME, R.style.DialogStyle);
     }
-
 
 
     override fun onCreateView(
@@ -71,22 +72,22 @@ class CameraKycActivity : DialogFragment() {
 
         video = null
         imageFace = null
-        imageFront= null
+        imageFront = null
         imageBackSide = null
         typeIdentify = null
         dialog?.window?.setStatusBarColor(Color.TRANSPARENT);
         dialog?.window?.setBackgroundDrawable(Store.config.colorApp.backgroundColor);
 
-        return  v
+        return v
 
     }
-
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_GRANTED){
+            == PackageManager.PERMISSION_GRANTED
+        ) {
             containerErrorCamera?.visibility = View.GONE
             if (Store.config.kycIdentify) {
                 childFragmentManager.commit {
@@ -104,16 +105,16 @@ class CameraKycActivity : DialogFragment() {
                     add<TakeVideoKycFragment>(R.id.content_kyc)
                 }
             }
-        }else{
-            PermisionCamera().requestCameraFragment(requireContext(),this)
+        } else {
+            PermisionCamera().requestCameraFragment(requireContext(), this)
         }
     }
-    override fun onRequestPermissionsResult(
+
+    fun checkRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-
         val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
         if (valid) {
             if (Store.config.kycIdentify) {
@@ -144,21 +145,36 @@ class CameraKycActivity : DialogFragment() {
                 containerErrorCamera?.visibility = View.VISIBLE
             }
         }
+
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        checkRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    @Subscribe
+    fun eventRequestPermissionsResult(event: RequestPermissionsResult) {
+      checkRequestPermissionsResult(event.requestCode, event.permissions, event.grantResults)
     }
 
 
     @Subscribe
-    fun close(event : MyEven){
-        if(event.type == TypeCallBack.onExpired){
+    fun close(event: MyEven) {
+        if (event.type == TypeCallBack.onExpired) {
             dismiss()
         }
     }
+
     @Subscribe
-    fun changeFragment(event : ChangeFragmentKYC){
-        if (event ==ChangeFragmentKYC.CLOSE){
+    fun changeFragment(event: ChangeFragmentKYC) {
+        if (event == ChangeFragmentKYC.CLOSE) {
             dismiss()
         }
-        if(event==ChangeFragmentKYC.KYC_FACE){
+        if (event == ChangeFragmentKYC.KYC_FACE) {
             val fragment = childFragmentManager?.beginTransaction()
             fragment?.replace(
                 R.id.content_kyc,
@@ -166,7 +182,7 @@ class CameraKycActivity : DialogFragment() {
             )
             fragment?.commit()
         }
-        if(event==ChangeFragmentKYC.KYC_VIDEO){
+        if (event == ChangeFragmentKYC.KYC_VIDEO) {
             val fragment = childFragmentManager?.beginTransaction()
             fragment?.replace(
                 R.id.content_kyc,
