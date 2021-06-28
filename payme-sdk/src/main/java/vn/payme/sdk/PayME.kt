@@ -39,9 +39,9 @@ public class PayME {
                 Toasty.error(PayME.context, message, Toast.LENGTH_SHORT, true).show();
             }
         }
-        fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-            activityResult = ActivityResult(requestCode,resultCode,data)
-            EventBus.getDefault().post(CheckActivityResult())
+        fun onActivityResult(data:String) {
+//            activityResult = ActivityResult(requestCode,resultCode,data)
+            EventBus.getDefault().post(CheckActivityResult(data))
         }
         fun onRequestPermissionsResult(
             requestCode: Int,

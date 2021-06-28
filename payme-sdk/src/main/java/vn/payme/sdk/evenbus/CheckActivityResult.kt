@@ -1,4 +1,7 @@
 package vn.payme.sdk.evenbus
 
-class CheckActivityResult {
+class CheckActivityResult(
+    val data: String
+) {
+
 }

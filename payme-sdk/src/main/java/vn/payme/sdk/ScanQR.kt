@@ -67,12 +67,13 @@ class ScanQR : DialogFragment() {
     }
     @Subscribe
     fun eventActivityResult(event: CheckActivityResult){
+        PayME.showError(event.data.length.toString())
 
 //        PayME.showError("event.resultCode"+event.resultCode)
-        if(PayME.activityResult !=null){
-            checkActivityResult(PayME.activityResult!!.requestCode,PayME.activityResult!!.resultCode,PayME.activityResult!!.data)
-            PayME.activityResult = null
-        }
+//        if(PayME.activityResult !=null){
+//            checkActivityResult(PayME.activityResult!!.requestCode,PayME.activityResult!!.resultCode,PayME.activityResult!!.data)
+//            PayME.activityResult = null
+//        }
     }
     @Subscribe
     fun eventRequestPermissionsResult(event:RequestPermissionsResult){
@@ -217,6 +218,7 @@ class ScanQR : DialogFragment() {
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+//        PayME.onActivityResult(requestCode, resultCode, data)
         checkActivityResult(requestCode, resultCode, data)
     }
     override fun onRequestPermissionsResult(

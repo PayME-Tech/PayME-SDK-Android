@@ -166,10 +166,12 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
     }
     @Subscribe
     fun eventActivityResult(event: CheckActivityResult){
-        if(PayME.activityResult !=null){
-            checkActivityResult(PayME.activityResult!!.requestCode,PayME.activityResult!!.resultCode,PayME.activityResult!!.data)
-            PayME.activityResult = null
-        }
+        PayME.showError(event.data.length.toString())
+
+//        if(PayME.activityResult !=null){
+//            checkActivityResult(PayME.activityResult!!.requestCode,PayME.activityResult!!.resultCode,PayME.activityResult!!.data)
+//            PayME.activityResult = null
+//        }
 
     }
     @Subscribe
