@@ -67,8 +67,27 @@ class ScanQR : DialogFragment() {
     }
     @Subscribe
     fun eventActivityResult(event: CheckActivityResult){
-        PayME.showError(event.data.length.toString())
-
+        val bitmap = event.data
+        if (bitmap != null) {
+            val width: Int = bitmap.width
+            val height: Int = bitmap.height
+            val pixels = IntArray(width * height)
+            bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
+            bitmap.recycle()
+            val source = RGBLuminanceSource(width, height, pixels)
+            val bBitmap = BinaryBitmap(HybridBinarizer(source))
+            val reader = MultiFormatReader()
+            try {
+                val result = reader.decode(bBitmap)
+                dismiss()
+                val payme = PayME()
+                payme.payQRCodeInSDK(PayME.fragmentManager,result.toString())
+            } catch (e: NotFoundException) {
+                dismiss()
+                var popup: SearchQrResultPopup = SearchQrResultPopup()
+                popup.show(parentFragmentManager, "ModalBottomSheet")
+            }
+        }
 //        PayME.showError("event.resultCode"+event.resultCode)
 //        if(PayME.activityResult !=null){
 //            checkActivityResult(PayME.activityResult!!.requestCode,PayME.activityResult!!.resultCode,PayME.activityResult!!.data)
@@ -112,6 +131,8 @@ class ScanQR : DialogFragment() {
 
 
     }
+
+
     fun checkActivityResult(requestCode: Int, resultCode: Int, data: Intent?){
         if (resultCode == Activity.RESULT_OK && data != null) {
             val selectedImage: Uri? = data.data

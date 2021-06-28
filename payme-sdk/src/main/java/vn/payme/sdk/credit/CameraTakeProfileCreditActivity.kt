@@ -166,13 +166,13 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
     }
     @Subscribe
     fun eventActivityResult(event: CheckActivityResult){
-        PayME.showError(event.data.length.toString())
-
-//        if(PayME.activityResult !=null){
-//            checkActivityResult(PayME.activityResult!!.requestCode,PayME.activityResult!!.resultCode,PayME.activityResult!!.data)
-//            PayME.activityResult = null
-//        }
-
+        val image: String? = BitMapToString(event.data)
+        if (image !== null) {
+            var even: EventBus = EventBus.getDefault()
+            var myEven: MyEven = MyEven(TypeCallBack.onTakeImageResult, image)
+            even.post(myEven)
+            dismiss()
+        }
     }
     @Subscribe
     fun eventRequestPermissionsResult(event: RequestPermissionsResult){
@@ -205,6 +205,7 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
 
         }
     }
+
 
      fun checkRequestPermissionsResult(
          requestCode: Int,

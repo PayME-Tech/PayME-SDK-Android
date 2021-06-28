@@ -2,6 +2,7 @@ package vn.payme.sdk
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -30,7 +31,6 @@ public class PayME {
 
     companion object {
         lateinit internal var context: Context
-         internal var activityResult: ActivityResult? = null
         lateinit internal var onSuccess: ((JSONObject?) -> Unit)
         lateinit internal var onError: (JSONObject?, Int, String?) -> Unit
         lateinit internal var fragmentManager: FragmentManager
@@ -39,8 +39,7 @@ public class PayME {
                 Toasty.error(PayME.context, message, Toast.LENGTH_SHORT, true).show();
             }
         }
-        fun onActivityResult(data:String) {
-//            activityResult = ActivityResult(requestCode,resultCode,data)
+        fun onActivityResult(data:Bitmap) {
             EventBus.getDefault().post(CheckActivityResult(data))
         }
         fun onRequestPermissionsResult(
