@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,7 +28,6 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.enums.TypeCallBack
-import vn.payme.sdk.evenbus.ActivityResult
 import vn.payme.sdk.evenbus.CheckActivityResult
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.evenbus.RequestPermissionsResult
@@ -108,13 +106,13 @@ class ScanQR : DialogFragment() {
             containerErrorCamera?.visibility = View.GONE
 
         }else{
-            PermisionCamera().requestCameraFragment(requireContext(),this)
+            PermissionCamera().requestCameraFragment(requireContext(),this)
         }
 
 
     }
     fun checkActivityResult(requestCode: Int, resultCode: Int, data: Intent?){
-        if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
+        if (resultCode == Activity.RESULT_OK && data != null) {
             val selectedImage: Uri? = data.data
             val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, selectedImage)
             if (bitmap != null) {
@@ -165,9 +163,9 @@ class ScanQR : DialogFragment() {
 
         buttonOpenSetting!!.setOnClickListener {
             if (enableSetting) {
-                PermisionCamera().openSetting(requireActivity())
+                PermissionCamera().openSetting(requireActivity())
             } else {
-                PermisionCamera().requestCamera(requireContext(), requireActivity())
+                PermissionCamera().requestCamera(requireContext(), requireActivity())
             }
         }
         btnTorch!!.setOnClickListener {

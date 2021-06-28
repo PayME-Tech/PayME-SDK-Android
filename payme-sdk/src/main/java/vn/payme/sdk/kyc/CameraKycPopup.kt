@@ -60,9 +60,9 @@ class CameraKycPopup : DialogFragment() {
         containerErrorCamera?.visibility = View.VISIBLE
         buttonOpenSetting!!.setOnClickListener {
             if (enableSetting) {
-                PermisionCamera().openSetting(requireActivity())
+                PermissionCamera().openSetting(requireActivity())
             } else {
-                PermisionCamera().requestCameraFragment(requireContext(), this)
+                PermissionCamera().requestCameraFragment(requireContext(), this)
             }
         }
         buttonBackHeaderErrorCamera!!.setOnClickListener {
@@ -106,7 +106,7 @@ class CameraKycPopup : DialogFragment() {
                 }
             }
         } else {
-            PermisionCamera().requestCameraFragment(requireContext(), this)
+            PermissionCamera().requestCameraFragment(requireContext(), this)
         }
     }
 

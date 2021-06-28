@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 
-class PermisionCamera() {
+class PermissionCamera() {
     fun isGrantedCamera(context: Context): Boolean {
         if (ContextCompat.checkSelfPermission(
                 context,

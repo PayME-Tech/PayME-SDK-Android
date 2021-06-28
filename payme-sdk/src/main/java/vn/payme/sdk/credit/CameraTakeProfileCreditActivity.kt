@@ -27,7 +27,6 @@ import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.enums.TypeCallBack
-import vn.payme.sdk.evenbus.ActivityResult
 import vn.payme.sdk.evenbus.CheckActivityResult
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.evenbus.RequestPermissionsResult
@@ -115,9 +114,9 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
         }
         buttonOpenSetting!!.setOnClickListener {
             if (enableSetting) {
-                PermisionCamera().openSetting(requireActivity())
+                PermissionCamera().openSetting(requireActivity())
             } else {
-                PermisionCamera().requestCameraFragment(requireContext(), this)
+                PermissionCamera().requestCameraFragment(requireContext(), this)
             }
         }
         buttonBackHeaderErrorCamera!!.setOnClickListener {
@@ -162,7 +161,7 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
             == PackageManager.PERMISSION_GRANTED){
             cameraKitView!!.open()
         }else{
-            PermisionCamera().requestCameraFragment(requireContext(),this)
+            PermissionCamera().requestCameraFragment(requireContext(),this)
         }
     }
     @Subscribe
@@ -191,7 +190,7 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
     }
    fun checkActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
+        if (resultCode == Activity.RESULT_OK && data != null) {
             val selectedImage: Uri? = data.data
             val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, selectedImage)
             val image: String? = BitMapToString(bitmap)
