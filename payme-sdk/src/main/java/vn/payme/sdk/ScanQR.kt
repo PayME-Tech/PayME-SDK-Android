@@ -30,6 +30,7 @@ import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.ActivityResult
+import vn.payme.sdk.evenbus.CheckActivityResult
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.evenbus.RequestPermissionsResult
 import vn.payme.sdk.kyc.*
@@ -67,8 +68,13 @@ class ScanQR : DialogFragment() {
         }
     }
     @Subscribe
-    fun eventActivityResult(event: ActivityResult){
-        checkActivityResult(event.requestCode,event.resultCode,event.data)
+    fun eventActivityResult(event: CheckActivityResult){
+
+//        PayME.showError("event.resultCode"+event.resultCode)
+        if(PayME.activityResult !=null){
+            checkActivityResult(PayME.activityResult!!.requestCode,PayME.activityResult!!.resultCode,PayME.activityResult!!.data)
+            PayME.activityResult = null
+        }
     }
     @Subscribe
     fun eventRequestPermissionsResult(event:RequestPermissionsResult){

@@ -33,6 +33,10 @@ class UploadKycFragment : Fragment() {
                 val message = KYC.optString("message")
                 val succeeded = KYC.optBoolean("succeeded")
                 if(succeeded){
+                    CameraKycPopup.imageBackSide = null
+                    CameraKycPopup.imageFace = null
+                    CameraKycPopup.imageFront = null
+                    CameraKycPopup.video = null
                     if(PayMEOpenSDKPopup.isVisible){
                         if(CameraKycPopup.updateOnlyIdentify){
                             var even: EventBus = EventBus.getDefault()

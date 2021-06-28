@@ -23,10 +23,12 @@ import com.otaliastudios.cameraview.PictureResult
 import com.otaliastudios.cameraview.controls.Flash
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.ActivityResult
+import vn.payme.sdk.evenbus.CheckActivityResult
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.evenbus.RequestPermissionsResult
 import vn.payme.sdk.kyc.*
@@ -63,7 +65,6 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         isCancelable = false
         EventBus.getDefault().register(this)
@@ -165,8 +166,12 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
         }
     }
     @Subscribe
-    fun eventActivityResult(event: ActivityResult){
-        checkActivityResult(event.requestCode,event.resultCode,event.data)
+    fun eventActivityResult(event: CheckActivityResult){
+        if(PayME.activityResult !=null){
+            checkActivityResult(PayME.activityResult!!.requestCode,PayME.activityResult!!.resultCode,PayME.activityResult!!.data)
+            PayME.activityResult = null
+        }
+
     }
     @Subscribe
     fun eventRequestPermissionsResult(event: RequestPermissionsResult){

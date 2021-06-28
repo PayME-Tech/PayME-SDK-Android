@@ -14,10 +14,7 @@ import vn.payme.sdk.api.AccountApi
 import vn.payme.sdk.api.ENV_API
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.enums.*
-import vn.payme.sdk.evenbus.ActivityResult
-import vn.payme.sdk.evenbus.ChangeFragmentPayment
-import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.evenbus.RequestPermissionsResult
+import vn.payme.sdk.evenbus.*
 import vn.payme.sdk.kyc.CameraKycPopup
 import vn.payme.sdk.model.*
 import vn.payme.sdk.payment.*
@@ -32,17 +29,19 @@ public class PayME {
     private val payMEOpenSDKPopup = PayMEOpenSDKPopup()
 
     companion object {
-        lateinit var context: Context
-        lateinit var onSuccess: ((JSONObject?) -> Unit)
-        lateinit var onError: (JSONObject?, Int, String?) -> Unit
-        lateinit var fragmentManager: FragmentManager
+        lateinit internal var context: Context
+         internal var activityResult: ActivityResult? = null
+        lateinit internal var onSuccess: ((JSONObject?) -> Unit)
+        lateinit internal var onError: (JSONObject?, Int, String?) -> Unit
+        lateinit internal var fragmentManager: FragmentManager
         fun showError(message: String?) {
             if (message != null && message != "null" && message != "") {
                 Toasty.error(PayME.context, message, Toast.LENGTH_SHORT, true).show();
             }
         }
         fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-            EventBus.getDefault().post(ActivityResult(requestCode,resultCode,data))
+            activityResult = ActivityResult(requestCode,resultCode,data)
+            EventBus.getDefault().post(CheckActivityResult())
         }
         fun onRequestPermissionsResult(
             requestCode: Int,
