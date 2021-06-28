@@ -140,6 +140,7 @@ internal class PaymentApi {
         if(linkedId!=null){
             authCreditCardInput["linkedId"] = linkedId!!
         }
+        authCreditCardInput["storeId"] = Store.paymentInfo.infoPayment?.storeId!!
         params["query"] = query
         variables["authCreditCardInput"]= authCreditCardInput
         params["variables"] = variables
