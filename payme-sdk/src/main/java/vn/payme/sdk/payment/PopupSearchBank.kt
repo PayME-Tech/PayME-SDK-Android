@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -18,7 +20,9 @@ import vn.payme.sdk.R
 import vn.payme.sdk.adapter.BankAdapter
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
+import vn.payme.sdk.evenbus.ListBankAtm
 import vn.payme.sdk.evenbus.ListBankTransfer
+import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.model.BankTransferInfo
 
 
@@ -26,26 +30,13 @@ class PopupSearchBank : DialogFragment() {
     lateinit var inputSearch: EditText
     lateinit var buttonClose: ImageView
     lateinit var buttonBack: ImageView
+    lateinit var imageSearchBank: ImageView
+    lateinit var containerNotFoundBank: LinearLayout
+    lateinit var title: TextView
+    var listBankInfo = arrayListOf<BankTransferInfo>()
+
     fun changeAliasCardHolder(alias:String) : String {
         var str = alias
-
-//                    str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
-//                    str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
-//                    str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i')
-//                    str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
-//                    str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
-//                    str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
-//                    str = str.replace(/đ/g, 'd')
-//                    str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, 'A')
-//                    str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, 'E')
-//                    str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, 'I')
-//                    str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, 'O')
-//                    str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, 'U')
-//                    str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, 'Y')
-//                    str = str.replace(/Đ/g, 'D')
-//                    // Combining Diacritical Marks
-//                    str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, '') // huyền, sắc, hỏi, ngã, nặng
-//                    str = str.replace(/\u02C6|\u0306|\u031B/g, '') // mũ â (ê), mũ ă, mũ ơ (ư)
 
                     return str
 
@@ -71,23 +62,50 @@ class PopupSearchBank : DialogFragment() {
         inputSearch = v.findViewById(R.id.inputSearch)
         buttonClose = v.findViewById(R.id.buttonClose)
         buttonBack = v.findViewById(R.id.buttonBack)
-        onClick()
+        imageSearchBank = v.findViewById(R.id.imageSearchBank)
+        containerNotFoundBank = v.findViewById(R.id.containerNotFoundBank)
+        title = v.findViewById(R.id.title)
+        val isListBankSupport = arguments?.getBoolean("isListBankSupport")
+        println("EventBus.getDefault().getStickyEvent(ListBankAtm::class.java).listBankATM"+EventBus.getDefault().getStickyEvent(ListBankAtm::class.java).listBankATM[0])
+        val listBanks = EventBus.getDefault().getStickyEvent(ListBankAtm::class.java).listBankATM.filter { bankInfo -> bankInfo.vietQRAccepted }
+        recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+        ChangeColorImage().changeColor(requireContext(),imageSearchBank,R.drawable.ic_not_found_bank,3)
+        if(isListBankSupport != null && isListBankSupport){
+            title.setText(getString(R.string.list_bank_support))
+            val listBankVietQR : ArrayList<BankTransferInfo> = arrayListOf<BankTransferInfo>()
+            for (i in 0 until listBanks.size){
+                listBankVietQR.add(BankTransferInfo("","","","",listBanks[i].shortName,"",listBanks[i].swiftCode,""))
+            }
+            listBankInfo = listBankVietQR
+        }else{
+            val listBankTransfer = EventBus.getDefault().getStickyEvent(ListBankTransfer::class.java)
+            listBankInfo = listBankTransfer.listBankTransferInfo
+        }
+
+        flowersAdapter.submitList( this.listBankInfo as MutableList<BankTransferInfo>)
+        recyclerView.adapter = flowersAdapter
+        if(listBankInfo.size==0){
+            containerNotFoundBank.visibility = View.VISIBLE
+        }else{
+            containerNotFoundBank.visibility = View.GONE
+        }
         inputSearch.addTextChangedListener { text ->
             val listBankNew = arrayListOf<BankTransferInfo>()
-            val listBankInfo = EventBus.getDefault().getStickyEvent(ListBankTransfer::class.java)
-            listBankInfo.listBankTransferInfo.forEach { bank->
+            listBankInfo.forEach { bank->
                 if (bank.bankName.contains(text.toString(),ignoreCase = true)){
                     listBankNew.add(bank)
                 }
             }
+            if(listBankNew.size==0){
+                containerNotFoundBank.visibility = View.VISIBLE
+            }else{
+                containerNotFoundBank.visibility = View.GONE
+
+            }
             flowersAdapter.submitList(listBankNew as MutableList<BankTransferInfo>)
 
         }
-        val listBankInfo = EventBus.getDefault().getStickyEvent(ListBankTransfer::class.java)
-        recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
-
-        flowersAdapter.submitList(listBankInfo.listBankTransferInfo as MutableList<BankTransferInfo>)
-        recyclerView.adapter = flowersAdapter
+        onClick()
 
         return  v
     }
@@ -102,8 +120,12 @@ class PopupSearchBank : DialogFragment() {
 
     }
     private fun adapterOnClick(bank: BankTransferInfo) {
-        EventBus.getDefault().post(bank)
-        dismiss()
+        val isListBankSupport = arguments?.getBoolean("isListBankSupport")
+        if(isListBankSupport ==null ){
+            EventBus.getDefault().post(bank)
+            dismiss()
+        }
+
 
     }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

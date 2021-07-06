@@ -200,6 +200,7 @@ internal class PaymentApi {
                 "      depositable\n" +
                 "      shortName\n" +
                 "      swiftCode\n" +
+                "      vietQRAccepted\n" +
                 "    }\n" +
                 "  }\n" +
                 "}"
@@ -427,6 +428,7 @@ internal class PaymentApi {
                 "              swiftCode\n" +
                 "              bankAccountNumber\n" +
                 "              fastSupport\n" +
+                "              qrContent\n" +
                 "            }\n" +
                 "            message\n" +
                 "            statePaymentBankTransferResponsed : state\n" +

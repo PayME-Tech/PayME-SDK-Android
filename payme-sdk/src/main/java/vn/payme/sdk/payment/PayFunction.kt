@@ -38,105 +38,114 @@ internal class PayFunction {
 
     }
 
-    fun getListBank(
-        fragmentManager: FragmentManager,
-        method: Method, onError: (JSONObject?, Int, String?) -> Unit
+    internal fun getListBank(
+        onSuccess: () -> Unit,
+        onError: (JSONObject?, Int, String?) -> Unit
     ) {
-        val paymentApi = PaymentApi()
-        paymentApi.getListBanks(
-            onSuccess = { jsonObject ->
-                val Setting = jsonObject.optJSONObject("Setting")
-                val banks = Setting.optJSONArray("banks")
-                val listBanks = arrayListOf<BankInfo>()
-                for (i in 0 until banks.length()) {
-                    val bank = banks.optJSONObject(i)
-                    val cardPrefix = bank.optString("cardPrefix")
-                    val depositable = bank.optBoolean("depositable")
-                    val cardNumberLength = bank.optInt("cardNumberLength")
-                    val shortName = bank.optString("shortName")
-                    val swiftCode = bank.optString("swiftCode")
-                    if (depositable) {
+        val listBank =
+            EventBus.getDefault().getStickyEvent(ListBankAtm::class.java)
+        if (listBank != null && listBank.listBankATM.size > 0) {
+            onSuccess()
+        } else {
+            val paymentApi = PaymentApi()
+            paymentApi.getListBanks(
+                onSuccess = { jsonObject ->
+                    val Setting = jsonObject.optJSONObject("Setting")
+                    val banks = Setting.optJSONArray("banks")
+                    val listBanks = arrayListOf<BankInfo>()
+                    for (i in 0 until banks.length()) {
+                        val bank = banks.optJSONObject(i)
+                        val cardPrefix = bank.optString("cardPrefix")
+                        val depositable = bank.optBoolean("depositable")
+                        val vietQRAccepted = bank.optBoolean("vietQRAccepted")
+                        val cardNumberLength = bank.optInt("cardNumberLength")
+                        val shortName = bank.optString("shortName")
+                        val swiftCode = bank.optString("swiftCode")
                         val bankInfo = BankInfo(
                             depositable,
+                            vietQRAccepted,
                             cardPrefix,
                             cardNumberLength,
                             shortName,
                             swiftCode
                         )
                         listBanks.add(bankInfo)
-                    }
 
-                }
-                EventBus.getDefault().postSticky(ListBankAtm(listBanks))
-                val popupPayment: PopupPayment = PopupPayment()
-                loading.dismiss()
-                popupPayment.show(
-                    fragmentManager,
-                    "ModalBottomSheet"
-                )
-            },
-            onError
-        )
+                    }
+                    EventBus.getDefault().postSticky(ListBankAtm(listBanks))
+                    onSuccess()
+
+                },
+                onError
+            )
+        }
+
 
     }
 
-    private fun getListBankTransfer(
-        fragmentManager: FragmentManager,
+    internal fun getListBankTransfer(
+        onSuccess: () -> Unit,
         method: Method, onError: (JSONObject?, Int, String?) -> Unit
     ) {
-        val paymentApi = PaymentApi()
-        paymentApi.payment(
-            method,
-            "",
-            null,
-            "",
-            "",
-            false,
-            null,
-            onSuccess = { jsonObject ->
-                val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
-                val Payment = OpenEWallet.optJSONObject("Payment")
-                val Pay = Payment.optJSONObject("Pay")
-                val succeeded = Pay.optBoolean("succeeded")
-                val payment = Pay.optJSONObject("payment")
-                val message = Pay.optString("message")
-                if (succeeded) {
-                    val listBank = arrayListOf<BankTransferInfo>()
-                    val bankList = payment.optJSONArray("bankList")
-                    for (i in 0 until bankList.length()) {
-                        val bank = bankList.optJSONObject(i)
-                        val bankAccountName = bank.optString("bankAccountName")
-                        val bankAccountNumber = bank.optString("bankAccountNumber")
-                        val bankBranch = bank.optString("bankBranch")
-                        val bankCity = bank.optString("bankCity")
-                        val bankName = bank.optString("bankName")
-                        val content = bank.optString("content")
-                        val swiftCode = bank.optString("swiftCode")
-                        val bankTransferInfo = BankTransferInfo(
-                            bankAccountName,
-                            bankAccountNumber,
-                            bankBranch,
-                            bankCity,
-                            bankName,
-                            content,
-                            swiftCode
-                        )
-                        listBank.add(bankTransferInfo)
+        val listBank =
+            EventBus.getDefault().getStickyEvent(ListBankTransfer::class.java)
+        if (listBank != null && listBank.listBankTransferInfo.size > 0) {
+            onSuccess()
+        } else {
+
+            val paymentApi = PaymentApi()
+
+            paymentApi.payment(
+                method,
+                "",
+                null,
+                "",
+                "",
+                false,
+                null,
+                onSuccess = { jsonObject ->
+                    val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
+                    val Payment = OpenEWallet.optJSONObject("Payment")
+                    val Pay = Payment.optJSONObject("Pay")
+                    val succeeded = Pay.optBoolean("succeeded")
+                    val payment = Pay.optJSONObject("payment")
+                    val message = Pay.optString("message")
+                    if (succeeded) {
+                        val listBank = arrayListOf<BankTransferInfo>()
+                        val bankList = payment.optJSONArray("bankList")
+                        for (i in 0 until bankList.length()) {
+                            val bank = bankList.optJSONObject(i)
+                            val bankAccountName = bank.optString("bankAccountName")
+                            val bankAccountNumber = bank.optString("bankAccountNumber")
+                            val bankBranch = bank.optString("bankBranch")
+                            val bankCity = bank.optString("bankCity")
+                            val bankName = bank.optString("bankName")
+                            val content = bank.optString("content")
+                            val swiftCode = bank.optString("swiftCode")
+                            val qrContent = bank.optString("qrContent")
+                            val bankTransferInfo = BankTransferInfo(
+                                bankAccountName,
+                                bankAccountNumber,
+                                bankBranch,
+                                bankCity,
+                                bankName,
+                                content,
+                                swiftCode,
+                                qrContent,
+                            )
+                            listBank.add(bankTransferInfo)
+                        }
+                        EventBus.getDefault().postSticky(listBank[0])
+                        EventBus.getDefault().postSticky(ListBankTransfer(listBank))
+                        onSuccess()
+
+                    } else {
+                        onError(null, ERROR_CODE.PAYMENT_ERROR, message)
                     }
-                    EventBus.getDefault().postSticky(listBank[0])
-                    EventBus.getDefault().postSticky(ListBankTransfer(listBank))
-                    val popupPayment: PopupPayment = PopupPayment()
-                    loading.dismiss()
-                    popupPayment.show(
-                        fragmentManager,
-                        "ModalBottomSheet"
-                    )
-                } else {
-                    onError(null, ERROR_CODE.PAYMENT_ERROR, message)
-                }
-            },
-            onError
-        )
+                },
+                onError
+            )
+        }
     }
 
     private fun payNotAccount(
@@ -186,7 +195,7 @@ internal class PayFunction {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
-        println("methodId2222:"+methodId)
+        println("methodId2222:" + methodId)
         loading.show(fragmentManager, null)
         PayME.fragmentManager = fragmentManager
         Store.paymentInfo.infoPayment = infoPayment
@@ -247,7 +256,11 @@ internal class PayFunction {
             onError(
                 null,
                 ERROR_CODE.LITMIT,
-                "${PayME.context.getString(R.string.maximum_transaction_amount)} ${decimal.format(Store.config.limitPayment.max)} VND"
+                "${PayME.context.getString(R.string.maximum_transaction_amount)} ${
+                    decimal.format(
+                        Store.config.limitPayment.max
+                    )
+                } VND"
             )
             return
         }
@@ -277,18 +290,27 @@ internal class PayFunction {
         Store.paymentInfo.isShowResultUI = isShowResultUI
         if (method?.type == TYPE_PAYMENT.BANK_CARD) {
             val listBankAtm = EventBus.getDefault().getStickyEvent(ListBankAtm::class.java)
-            if(listBankAtm !=null && listBankAtm.listBankATM.size>0){
+
+            getListBank(onSuccess = {
                 val popupPayment: PopupPayment = PopupPayment()
                 loading.dismiss()
                 popupPayment.show(
                     fragmentManager,
                     "ModalBottomSheet"
                 )
-            }else{
-                getListBank(fragmentManager, method, onError)
-            }
+            }, onError)
         } else if (method?.type == TYPE_PAYMENT.BANK_TRANSFER) {
-            getListBankTransfer(fragmentManager, method, onError)
+            getListBank(onSuccess = {
+                getListBankTransfer(onSuccess = {
+                    val popupPayment: PopupPayment = PopupPayment()
+                    loading.dismiss()
+                    popupPayment.show(
+                        fragmentManager,
+                        "ModalBottomSheet"
+                    )
+                }, method, onError)
+            }, onError)
+
         } else {
             val popupPayment: PopupPayment = PopupPayment()
             loading.dismiss()
@@ -314,7 +336,11 @@ internal class PayFunction {
                     (method?.type == TYPE_PAYMENT.CREDIT_CARD) ||
                     (method?.type == TYPE_PAYMENT.LINKED))
         ) {
-            onError(null, ERROR_CODE.PAYMENT_ERROR, PayME.context.getString(R.string.method_not_supported))
+            onError(
+                null,
+                ERROR_CODE.PAYMENT_ERROR,
+                PayME.context.getString(R.string.method_not_supported)
+            )
             return
         }
         if (method != null && method?.type != TYPE_PAYMENT.WALLET && !Store.config.openPayAndKyc) {
@@ -395,7 +421,11 @@ internal class PayFunction {
                     val state = GetFee.optString("state")
                     if (state == "null") {
                         if (method.type == TYPE_PAYMENT.WALLET && (Store.userInfo.balance < (infoPayment.amount + fee))) {
-                            onError(null, ERROR_CODE.BALANCE_ERROR, PayME.context.getString(R.string.balance_in_wallet_is_insufficient))
+                            onError(
+                                null,
+                                ERROR_CODE.BALANCE_ERROR,
+                                PayME.context.getString(R.string.balance_in_wallet_is_insufficient)
+                            )
                         } else {
                             EventBus.getDefault().postSticky(PaymentInfoEvent(null, fee))
                             showPopupPayment(

@@ -86,6 +86,8 @@ class EnterAtmCardFragment : Fragment() {
         inputCardNumber = view.findViewById(R.id.inputCardNumber)
         inputCardHolder = view.findViewById(R.id.inputCardHolder)
         inputCardDate = view.findViewById(R.id.inputCardDate)
+        val listBanks = EventBus.getDefault().getStickyEvent(ListBankAtm::class.java).listBankATM.filter {bankInfo -> bankInfo.depositable }
+
 //
 //
         inputCardNumber.input.addTextChangedListener(object : TextWatcher {
@@ -101,7 +103,6 @@ class EnterAtmCardFragment : Fragment() {
                 inputCardNumber.txtTitleRight.text = ""
                 inputCardHolder.input.setText("")
                 var maxLength = 16
-                val listBanks = EventBus.getDefault().getStickyEvent(ListBankAtm::class.java).listBankATM
                 if (cardNumber?.length!! >= 6) {
                     val cardPrefix = cardNumber.substring(0, 6)
                     var bankVerify = false

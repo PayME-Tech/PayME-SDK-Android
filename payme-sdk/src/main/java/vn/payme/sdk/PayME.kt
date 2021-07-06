@@ -596,6 +596,7 @@ public class PayME {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
+        println("methodId"+methodId)
         val payment = PayFunction()
         Store.config.disableCallBackResult = false
         payment.pay(fragmentManager, infoPayment, isShowResultUI, methodId, onSuccess, onError)

@@ -33,50 +33,15 @@ class ListMethodPaymentFragment : Fragment() {
     private lateinit var listView: ListView
     private lateinit var loadingProcess: ProgressBar
     private lateinit var methodAdapter: MethodAdapter
-    private  var loadingPopup =  SpinnerDialog()
+    private var loadingPopup = SpinnerDialog()
     private fun showLoading() {
-        loadingPopup.show(parentFragmentManager,null)
+        loadingPopup.show(parentFragmentManager, null)
     }
+
     private fun disableLoading() {
         loadingPopup.dismiss()
     }
-    fun getListBank (method: Method){
-        val paymentApi = PaymentApi()
-        paymentApi.getListBanks(onSuccess = { jsonObject ->
-            if(!isVisible) return@getListBanks
-            disableLoading()
-            val Setting = jsonObject.optJSONObject("Setting")
-            val banks = Setting.optJSONArray("banks")
-            val listBanks = arrayListOf<BankInfo>()
-            for (i in 0 until banks.length()) {
-                val bank = banks.optJSONObject(i)
-                val cardPrefix = bank.optString("cardPrefix")
-                val depositable = bank.optBoolean("depositable")
-                val cardNumberLength = bank.optInt("cardNumberLength")
-                val shortName = bank.optString("shortName")
-                val swiftCode = bank.optString("swiftCode")
-                if (depositable) {
-                    val bankInfo = BankInfo(
-                        depositable,
-                        cardPrefix,
-                        cardNumberLength,
-                        shortName,
-                        swiftCode
-                    )
-                    listBanks.add(bankInfo)
-                }
 
-            }
-            EventBus.getDefault().postSticky(ListBankAtm(listBanks))
-            EventBus.getDefault().post(method)
-        },
-            onError = { jsonObject, code, message ->
-                if(!isVisible) return@getListBanks
-                PayME.showError(message)
-            }
-        )
-
-    }
     private fun checkFee(method: Method) {
         val paymentApi = PaymentApi()
         showLoading()
@@ -94,27 +59,34 @@ class ListMethodPaymentFragment : Fragment() {
                     val fee = feeObject.getInt("fee")
                     val state = GetFee.getString("state")
                     if (state == "null") {
-                        if(method.type == TYPE_PAYMENT.BANK_CARD){
-                            EventBus.getDefault().postSticky(PaymentInfoEvent(null,fee))
-                            val listBank = EventBus.getDefault().getStickyEvent(ListBankAtm::class.java)
-                            if( listBank !=null && listBank.listBankATM.size >0 ){
+                        EventBus.getDefault().postSticky(PaymentInfoEvent(null, fee))
+                        if (method.type == TYPE_PAYMENT.BANK_CARD) {
+                            val payFunction = PayFunction()
+                            payFunction.getListBank(onSuccess = {
                                 disableLoading()
                                 EventBus.getDefault().post(method)
-                            }else{
-                                getListBank(method)
-                            }
-                        }else if(method.type == TYPE_PAYMENT.BANK_TRANSFER){
-                            EventBus.getDefault().postSticky(PaymentInfoEvent(null,fee))
-                            val listBank = EventBus.getDefault().getStickyEvent(ListBankTransfer::class.java)
-                            if( listBank !=null && listBank.listBankTransferInfo.size >0 ){
+                            }, onError = { jsonObject, i, s ->
                                 disableLoading()
-                                EventBus.getDefault().post(method)
-                            }else{
-                                getListBankTransfer(method)
-                            }
-                        }else{
+                                PayME.showError(s)
+                            })
+                        } else if (method.type == TYPE_PAYMENT.BANK_TRANSFER) {
+                            val payFunction = PayFunction()
+                            payFunction.getListBank(onSuccess = {
+                                payFunction.getListBankTransfer(onSuccess = {
+                                    disableLoading()
+                                    EventBus.getDefault().post(method)
+                                }, method, onError = { jsonObject, i, s ->
+                                    disableLoading()
+                                    PayME.showError(s)
+                                })
+                            }, onError = { jsonObject, i, s ->
+                                disableLoading()
+                                PayME.showError(s)
+                            })
+
+                        } else {
                             disableLoading()
-                            EventBus.getDefault().postSticky(PaymentInfoEvent(null,fee))
+
                             EventBus.getDefault().post(method)
                         }
                     } else {
@@ -154,10 +126,10 @@ class ListMethodPaymentFragment : Fragment() {
                 val succeeded = Pay.optBoolean("succeeded")
                 val payment = Pay.optJSONObject("payment")
                 val message = Pay.optString("message")
-                if(succeeded){
+                if (succeeded) {
                     val listBank = arrayListOf<BankTransferInfo>()
                     val bankList = payment.optJSONArray("bankList")
-                    for (i in 0 until bankList.length()){
+                    for (i in 0 until bankList.length()) {
                         val bank = bankList.optJSONObject(i)
                         val bankAccountName = bank.optString("bankAccountName")
                         val bankAccountNumber = bank.optString("bankAccountNumber")
@@ -166,13 +138,23 @@ class ListMethodPaymentFragment : Fragment() {
                         val bankName = bank.optString("bankName")
                         val content = bank.optString("content")
                         val swiftCode = bank.optString("swiftCode")
-                        val bankTransferInfo = BankTransferInfo(bankAccountName,bankAccountNumber,bankBranch,bankCity,bankName,content,swiftCode)
+                        val qrContent = bank.optString("qrContent")
+                        val bankTransferInfo = BankTransferInfo(
+                            bankAccountName,
+                            bankAccountNumber,
+                            bankBranch,
+                            bankCity,
+                            bankName,
+                            content,
+                            swiftCode,
+                            qrContent
+                        )
                         listBank.add(bankTransferInfo)
                     }
                     EventBus.getDefault().postSticky(listBank[0])
                     EventBus.getDefault().postSticky(ListBankTransfer(listBank))
                     EventBus.getDefault().post(method)
-                }else{
+                } else {
                     PayME.showError(message)
                 }
             },
@@ -182,9 +164,6 @@ class ListMethodPaymentFragment : Fragment() {
                 PayME.showError(message)
             })
     }
-
-
-
 
 
     fun setListViewHeightBasedOnChildren(listView: ListView) {
@@ -210,7 +189,8 @@ class ListMethodPaymentFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater?.inflate(R.layout.payment_list_method_payme_fragment, container, false)
+        val view: View =
+            inflater?.inflate(R.layout.payment_list_method_payme_fragment, container, false)
         Keyboard.closeKeyboard(requireContext())
         listView = view.findViewById(R.id.recipe_list_view)
         loadingProcess = view.findViewById(R.id.loadingListMethodPayment)
@@ -234,35 +214,49 @@ class ListMethodPaymentFragment : Fragment() {
             if (!loadingPopup.isVisible) {
                 val method = Store.paymentInfo.listMethod[i]
                 Store.paymentInfo.methodSelected = method
-                if(method.type!=TYPE_PAYMENT.WALLET && !Store.config.openPayAndKyc){
+                if (method.type != TYPE_PAYMENT.WALLET && !Store.config.openPayAndKyc) {
                     PayME.showError("Chức năng chỉ có thể thao tác môi trường production")
                     return@setOnItemClickListener
                 }
-                if(method.type == TYPE_PAYMENT.CREDIT_CARD ||
+                if (method.type == TYPE_PAYMENT.CREDIT_CARD ||
                     method.type == TYPE_PAYMENT.BANK_CARD ||
                     method?.type == TYPE_PAYMENT.LINKED ||
                     method?.type == TYPE_PAYMENT.BANK_TRANSFER
-                ){
+                ) {
                     checkFee(method)
                     return@setOnItemClickListener
                 }
-                if(method?.type == TYPE_PAYMENT.WALLET){
+                if (method?.type == TYPE_PAYMENT.WALLET) {
                     if (
-                        ( !Store.userInfo.accountActive || !Store.userInfo.accountKycSuccess ||Store.paymentInfo.infoPayment!!.amount > Store.userInfo.balance)
-                    ){
+                        (!Store.userInfo.accountActive || !Store.userInfo.accountKycSuccess || Store.paymentInfo.infoPayment!!.amount > Store.userInfo.balance)
+                    ) {
                         val paymeSDK = PayME()
                         if (!Store.userInfo.accountActive) {
-                            paymeSDK.openWallet(PayME.fragmentManager,PayME.onSuccess, PayME.onError)
+                            paymeSDK.openWallet(
+                                PayME.fragmentManager,
+                                PayME.onSuccess,
+                                PayME.onError
+                            )
                         } else if (!Store.userInfo.accountKycSuccess) {
-                            paymeSDK.openKYC(PayME.fragmentManager,onSuccess = {},onError = { jsonObject: JSONObject?, i: Int, message: String? ->
-                                PayME.showError(message)
-                            })
+                            paymeSDK.openKYC(
+                                PayME.fragmentManager,
+                                onSuccess = {},
+                                onError = { jsonObject: JSONObject?, i: Int, message: String? ->
+                                    PayME.showError(message)
+                                })
                         } else if (Store.paymentInfo.infoPayment!!.amount > Store.userInfo.balance) {
-                            paymeSDK.deposit(PayME.fragmentManager,0, false,PayME.onSuccess, PayME.onError)
+                            paymeSDK.deposit(
+                                PayME.fragmentManager,
+                                0,
+                                false,
+                                PayME.onSuccess,
+                                PayME.onError
+                            )
                         }
-                        EventBus.getDefault().post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT,null))
+                        EventBus.getDefault()
+                            .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, null))
 
-                    }else{
+                    } else {
                         checkFee(method)
                     }
                     return@setOnItemClickListener
