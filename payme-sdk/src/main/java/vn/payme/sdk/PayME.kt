@@ -222,7 +222,6 @@ public class PayME {
         env: Env,
         showLog: Boolean
     ) {
-        setLanguage(context,language)
 
         PayME.context = context
         Store.config = Config(
@@ -242,6 +241,8 @@ public class PayME {
         Store.userInfo = UserInfo(0, false, false, false, "", null)
         Security.insertProviderAt(BouncyCastleProvider(), 1)
         ENV_API.updateEnv()
+        setLanguage(context,language)
+
     }
 
     constructor() {
