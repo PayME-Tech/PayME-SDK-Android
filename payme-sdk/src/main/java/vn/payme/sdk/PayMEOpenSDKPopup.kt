@@ -239,6 +239,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
                       appToken: '${Store.config.appToken}',
                       publicKey: '${Store.config.publicKey}',
                       privateKey: '${Store.config.appPrivateKey}',
+                      language: '${Store.config.language.toString().toLowerCase()}',
                       xApi: '${Store.config.appID}',
                       env: '${Store.config.env.toString()}',
                       showLog: '${showLog}',

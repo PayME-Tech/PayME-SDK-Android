@@ -2,6 +2,8 @@ package vn.payme.sdk
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
@@ -24,6 +26,8 @@ import vn.payme.sdk.store.PaymentInfo
 import vn.payme.sdk.store.Store
 import vn.payme.sdk.store.UserInfo
 import java.security.Security
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 public class PayME {
@@ -188,6 +192,24 @@ public class PayME {
             }
         )
     }
+    fun setLanguage(context: Context,language: LANGUAGES){
+        Store.config.language = language
+        if(language == LANGUAGES.EN){
+            val res: Resources = context.resources
+            val newConfig = Configuration(res.getConfiguration())
+            val locale = Locale("en")
+            newConfig.locale = locale
+            newConfig.setLayoutDirection(locale)
+            res.updateConfiguration(newConfig, null)
+        }else{
+            val res: Resources = context.resources
+            val newConfig = Configuration(res.getConfiguration())
+            val locale = Locale("vi")
+            newConfig.locale = locale
+            newConfig.setLayoutDirection(locale)
+            res.updateConfiguration(newConfig, null)
+        }
+    }
 
     constructor(
         context: Context,
@@ -200,12 +222,7 @@ public class PayME {
         env: Env,
         showLog: Boolean
     ) {
-//        val res: Resources = context.resources
-//        val newConfig = Configuration(res.getConfiguration())
-//        val locale = Locale("en")
-//        newConfig.locale = locale
-//        newConfig.setLayoutDirection(locale)
-//        res.updateConfiguration(newConfig, null)
+        setLanguage(context,language)
 
         PayME.context = context
         Store.config = Config(

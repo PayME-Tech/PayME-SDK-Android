@@ -312,7 +312,7 @@ class MainActivity : AppCompatActivity() {
                         ConnectToken,
                         if (env == Env.PRODUCTION) PrivateKey else if (env == Env.DEV) PRIVATE_KEY_DEFAULT_DEV else PRIVATE_KEY_DEFAULT_SANDBOX,
                         configColor,
-                        LANGUAGES.VN,
+                        LANGUAGES.EN,
                         env,
                         showLog
                     )
@@ -356,84 +356,7 @@ class MainActivity : AppCompatActivity() {
 
 
         }
-        buttonPayNotAccount.setOnClickListener {
 
-            if (inputPhoneNumber.text.toString().length >= 10 && inputUserId.text.toString().length > 0 && (inputPhoneNumber.text.toString().length == 10 || inputPhoneNumber.text.toString().length == 0) && loading.visibility != View.VISIBLE) {
-                val params: MutableMap<String, Any> = mutableMapOf()
-                val tz = TimeZone.getTimeZone("UTC")
-                val df: DateFormat =
-                    SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'") // Quoted "Z" to indicate UTC, no timezone offset
-
-                df.setTimeZone(tz)
-                val nowAsISO: String = df.format(Date())
-
-                val dataExample =
-                    "{\"userId\":\"${inputUserId.text.toString()}\",\"timestamp\":\"${nowAsISO}\",\"phone\":\"${inputPhoneNumber.text.toString()}\"}"
-
-                val connectToken = CryptoAES.encrypt(
-                    dataExample,
-                    if (env == Env.PRODUCTION) SecretKey else if (env == Env.DEV) SECRET_KEY_DEFAULT_DEV else SECRET_KEY_DEFAULT_SANDBOX
-                )
-                ConnectToken = connectToken
-                payme =
-                    PayME(
-                        this,
-                        if (env == Env.PRODUCTION) AppToken else if (env == Env.DEV) APP_TOKEN_DEFAULT_DEV else APP_TOKEN_DEFAULT_SANDBOX,
-                        if (env == Env.PRODUCTION) PublicKey else if (env == Env.DEV) PUBLIC_KEY_DEFAULT_DEV else PUBLIC_KEY_DEFAULT_SANDBOX,
-                        ConnectToken,
-                        if (env == Env.PRODUCTION) PrivateKey else if (env == Env.DEV) PRIVATE_KEY_DEFAULT_DEV else PRIVATE_KEY_DEFAULT_SANDBOX,
-                        configColor,
-                        LANGUAGES.VN,
-                        env,
-                        showLog
-                    )
-                val nextValues = Random.nextInt(0, 100000)
-
-                val amount = convertInt(moneyPay.text.toString())
-
-                val storeId: Long =
-                    if (env == Env.PRODUCTION) 57956431 else if (env == Env.SANDBOX) 37048160 else 9
-                val infoPayment =
-                    InfoPayment(
-                        "PAY",
-                        amount,
-                        "Nội dung đơn hàng",
-                        nextValues.toString(),
-                        storeId,
-                        "OpenEWallet",
-                        ""
-                    )
-//                payme?.getPaymentMethods(storeId,
-//                    onSuccess = {list->
-//                        payme?.pay(this.supportFragmentManager, infoPayment, true,null,
-//                            onSuccess = { json: JSONObject? ->
-//                            },
-//                            onError = { jsonObject, code, message ->
-//
-//                                if (message != null && message.length > 0) {
-//                                    PayME.showError(message)
-//                                }
-//                                if (code == ERROR_CODE.EXPIRED) {
-//                                    walletView.setVisibility(View.GONE)
-//                                }
-//                                if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
-//                                    openWallet()
-//                                }
-//                            }
-//
-//                        )
-//
-//                    },onError = {jsonObject, code, message ->
-//                        PayME.showError(message)
-//
-//                    })
-
-
-
-            }
-
-
-        }
 
 
 

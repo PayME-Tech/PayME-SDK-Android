@@ -166,6 +166,7 @@ internal class NetworkRequest(
                     headers["Authorization"] = token
                     headers["Accept"] = "application/json"
                     headers["Content-Type"] = "application/json"
+                    headers["language"] =  Store.config.language.toString().toLowerCase()
                     if (isSecurity) {
                         headers["x-api-client"] = Store.config.appID.toString()
                         headers["x-api-key"] = xAPIKey
