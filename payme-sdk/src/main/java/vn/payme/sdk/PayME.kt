@@ -204,7 +204,7 @@ public class PayME {
         }else{
             val res: Resources = context.resources
             val newConfig = Configuration(res.getConfiguration())
-            val locale = Locale("vi")
+            val locale = Locale("vn")
             newConfig.locale = locale
             newConfig.setLayoutDirection(locale)
             res.updateConfiguration(newConfig, null)
@@ -222,7 +222,7 @@ public class PayME {
         env: Env,
         showLog: Boolean
     ) {
-
+        println("language:"+language.toString())
         PayME.context = context
         Store.config = Config(
             appPrivateKey,
