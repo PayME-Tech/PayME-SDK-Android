@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="confirm">Confirm</string>
+    <string name="confirm">Xác nhận</string>
     <string name="domestic_atm_card">Thẻ ATM nội địa</string>
     <string name="next">Tiếp tục</string>
     <string name="enter_number_card">Nhập số thẻ</string>

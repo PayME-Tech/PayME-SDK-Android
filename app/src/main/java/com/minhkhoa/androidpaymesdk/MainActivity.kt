@@ -393,26 +393,27 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonDeposit.setOnClickListener {
+            payme?.setLanguage(context,LANGUAGES.EN)
 
 
-            val amount = convertInt(moneyDeposit.text.toString())
-            payme?.deposit(
-                this.supportFragmentManager,
-                amount,
-                true,
-                onSuccess = { json: JSONObject? ->
-                },
-                onError = { jsonObject, code, message ->
-                    PayME.showError(message)
-                    println("code"+code+"message"+message)
-
-                    if (code == ERROR_CODE.EXPIRED) {
-                        walletView.setVisibility(View.GONE)
-                    }
-                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
-                        openWallet()
-                    }
-                })
+//            val amount = convertInt(moneyDeposit.text.toString())
+//            payme?.deposit(
+//                this.supportFragmentManager,
+//                amount,
+//                true,
+//                onSuccess = { json: JSONObject? ->
+//                },
+//                onError = { jsonObject, code, message ->
+//                    PayME.showError(message)
+//                    println("code"+code+"message"+message)
+//
+//                    if (code == ERROR_CODE.EXPIRED) {
+//                        walletView.setVisibility(View.GONE)
+//                    }
+//                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
+//                        openWallet()
+//                    }
+//                })
 
 
         }
