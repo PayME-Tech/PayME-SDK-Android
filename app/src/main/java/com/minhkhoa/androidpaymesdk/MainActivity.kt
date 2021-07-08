@@ -312,7 +312,7 @@ class MainActivity : AppCompatActivity() {
                         ConnectToken,
                         if (env == Env.PRODUCTION) PrivateKey else if (env == Env.DEV) PRIVATE_KEY_DEFAULT_DEV else PRIVATE_KEY_DEFAULT_SANDBOX,
                         configColor,
-                        LANGUAGES.VN,
+                        LANGUAGES.EN,
                         env,
                         showLog
                     )

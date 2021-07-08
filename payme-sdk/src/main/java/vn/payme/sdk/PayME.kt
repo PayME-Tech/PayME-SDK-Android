@@ -1,7 +1,6 @@
 package vn.payme.sdk
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Bitmap
@@ -193,22 +192,16 @@ public class PayME {
         )
     }
     fun setLanguage(context: Context,language: LANGUAGES){
-        Store.config.language = language
-        if(language == LANGUAGES.EN){
-            val res: Resources = context.resources
-            val newConfig = Configuration(res.getConfiguration())
-            val locale = Locale("en")
-            newConfig.locale = locale
-            newConfig.setLayoutDirection(locale)
-            res.updateConfiguration(newConfig, null)
-        }else{
-            val res: Resources = context.resources
-            val newConfig = Configuration(res.getConfiguration())
-            val locale = Locale("vn")
-            newConfig.locale = locale
-            newConfig.setLayoutDirection(locale)
-            res.updateConfiguration(newConfig, null)
-        }
+        val myLocale: Locale
+        myLocale = Locale(language.toString().toLowerCase())
+        Locale.setDefault(myLocale)
+        val config = Configuration()
+        config.locale = myLocale
+        context.getResources().updateConfiguration(
+            config,
+            context.getResources().getDisplayMetrics()
+        )
+
     }
 
     constructor(
