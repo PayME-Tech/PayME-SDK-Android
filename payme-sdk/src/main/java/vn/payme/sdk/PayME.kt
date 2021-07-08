@@ -192,15 +192,28 @@ public class PayME {
         )
     }
     fun setLanguage(context: Context,language: LANGUAGES){
-        val myLocale: Locale
-        myLocale = Locale(language.toString().toLowerCase())
-        Locale.setDefault(myLocale)
-        val config = Configuration()
-        config.locale = myLocale
-        context.getResources().updateConfiguration(
-            config,
-            context.getResources().getDisplayMetrics()
-        )
+        if(language == LANGUAGES.EN){
+            val myLocale: Locale
+            myLocale = Locale("ee")
+            Locale.setDefault(myLocale)
+            val config = Configuration()
+            config.locale = myLocale
+            context.getResources().updateConfiguration(
+                config,
+                context.getResources().getDisplayMetrics()
+            )
+        }else{
+            val myLocale: Locale
+            myLocale = Locale("vn")
+            Locale.setDefault(myLocale)
+            val config = Configuration()
+            config.locale = myLocale
+            context.getResources().updateConfiguration(
+                config,
+                context.getResources().getDisplayMetrics()
+            )
+        }
+
 
     }
 
