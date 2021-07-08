@@ -17,8 +17,9 @@
     <uses-feature android:name="android.hardware.camera.flash" />
     <uses-sdk tools:overrideLibrary="vn.payme.sdk" />
     <application
+        android:extractNativeLibs="true"
         android:requestLegacyExternalStorage="true"
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -26,7 +27,11 @@
         tools:replace="android:allowBackup"
         android:theme="@style/AppTheme">
         <meta-data android:name="io.sentry.dsn" android:value="https://39e5d24717984edeb77341fbe980b336@o477744.ingest.sentry.io/5558876" />
-        <activity android:name=".MainActivity">
+        <activity
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
+            android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

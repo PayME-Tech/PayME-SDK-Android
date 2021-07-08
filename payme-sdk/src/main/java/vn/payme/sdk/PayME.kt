@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Bitmap
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -191,28 +192,25 @@ public class PayME {
             }
         )
     }
+    @SuppressWarnings("deprecation")
     fun setLanguage(context: Context,language: LANGUAGES){
-        if(language == LANGUAGES.EN){
-            val myLocale: Locale
-            myLocale = Locale("ee")
-            Locale.setDefault(myLocale)
-            val config = Configuration()
-            config.locale = myLocale
-            context.getResources().updateConfiguration(
-                config,
-                context.getResources().getDisplayMetrics()
-            )
-        }else{
-            val myLocale: Locale
-            myLocale = Locale("vn")
-            Locale.setDefault(myLocale)
-            val config = Configuration()
-            config.locale = myLocale
-            context.getResources().updateConfiguration(
-                config,
-                context.getResources().getDisplayMetrics()
-            )
-        }
+
+        val config = context.resources.configuration
+        val lang = language.toString().toLowerCase() // your language code
+        val locale = Locale(lang)
+        Locale.setDefault(locale)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+            config.setLocale(locale)
+        else
+            config.locale = locale
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            context.createConfigurationContext(config)
+        context.getResources().updateConfiguration(
+            config,
+            context.getResources().getDisplayMetrics()
+        )
+
 
 
     }
