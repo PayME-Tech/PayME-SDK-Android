@@ -20,7 +20,7 @@ import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.model.TypeIdentify
 import vn.payme.sdk.store.Store
 
-internal class PopupConfirmPassport : BottomSheetDialogFragment() {
+internal class PopupConfirmPassport : DialogFragment() {
 
     private lateinit var buttonNext: Button
     private lateinit var buttonClose: Button
@@ -28,7 +28,7 @@ internal class PopupConfirmPassport : BottomSheetDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(DialogFragment.STYLE_NO_FRAME, R.style.DialogStyle)
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle)
     }
 
     override fun onCreateView(
@@ -43,6 +43,8 @@ internal class PopupConfirmPassport : BottomSheetDialogFragment() {
         buttonNext = view.findViewById(R.id.buttonNext)
         buttonClose = view.findViewById(R.id.buttonBack)
         imagePassport = view.findViewById(R.id.imagePassport)
+        buttonClose.setButtonTypeBorder()
+
 
         ChangeColorImage().changeColor(requireContext(),imagePassport,R.drawable.ic_passpost,3)
         buttonClose.setOnClickListener {
@@ -65,17 +67,22 @@ internal class PopupConfirmPassport : BottomSheetDialogFragment() {
         return view
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = BottomSheetDialog(requireContext(), theme)
-        dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        dialog.behavior.skipCollapsed = true
-        return dialog
-    }
-
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        val contentView = View.inflate(context, R.layout.payment_layout, null)
-        dialog.setContentView(contentView)
-        (contentView.parent as View).setBackgroundColor(resources.getColor(android.R.color.transparent))
-    }
+//    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+//        val dialog = BottomSheetDialog(requireContext(), theme)
+//        dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+//        dialog.behavior.skipCollapsed = true
+//        return dialog
+//    }
+//override fun setupDialog(dialog: Dialog, style: Int) {
+//    val contentView = View.inflate(context, R.layout.payment_layout, null)
+//    dialog.setContentView(contentView)
+//    (contentView.parent as View).setBackgroundColor(resources.getColor(android.R.color.transparent))
+//}
+//
+//    override fun setupDialog(dialog: Dialog, style: Int) {
+////        val contentView = View.inflate(context, R.layout.payment_layout, null)
+////        dialog.setContentView(contentView)
+////        (contentView.parent as View).setBackgroundColor(resources.getColor(android.R.color.transparent))
+//    }
 
 }

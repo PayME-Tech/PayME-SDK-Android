@@ -20,6 +20,7 @@ class EnterCreditCardFragment : Fragment() {
 
     private lateinit var inputCardNumber: InputInfo
     private lateinit var inputCardDate: InputInfo
+    private lateinit var inputCardHolder: InputInfo
     private lateinit var inputCvv: InputInfo
     private var cardDate: String = ""
     private var cardNumberValue: String = ""
@@ -35,6 +36,7 @@ class EnterCreditCardFragment : Fragment() {
             inflater?.inflate(R.layout.payment_enter_credit_card_fragment, container, false)
         EventBus.getDefault().register(this)
         inputCardNumber = view.findViewById(R.id.inputCardNumber)
+        inputCardHolder = view.findViewById(R.id.inputCardHolder)
         inputCardDate = view.findViewById(R.id.inputCardDate)
         inputCvv = view.findViewById(R.id.inputCvv)
         inputCardDate.imageRight.visibility = View.VISIBLE
@@ -157,13 +159,13 @@ class EnterCreditCardFragment : Fragment() {
 
     @Subscribe
     fun checkAtm(event: CheckInputAtm) {
-        if (event.isCheck && cardDate.length > 0 && cardNumberValue.length > 0 && inputCvv.input.text.length==3) {
+        if (event.isCheck && inputCardHolder.input.text.length>0  && cardDate.length > 0 && cardNumberValue.length > 0 && inputCvv.input.text.length==3)  {
             val cardInfo = CardInfo(
                 inputCardDate.input.text.toString(),
                 inputCardNumber.input.text.toString(),
                 bankShortName,
                 cardNumberValue,
-                "",
+                inputCardHolder.input.text.toString(),
                 cardDate,
                 inputCvv.input.text.toString()
             )

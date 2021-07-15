@@ -11,6 +11,7 @@ import android.widget.AdapterView.OnItemSelectedListener
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.enums.*
@@ -97,7 +98,7 @@ class MainActivity : AppCompatActivity() {
 
         var payme: PayME? = null
         lateinit var context: Context
-        var env = Env.DEV
+        var env = Env.SANDBOX
         lateinit var paymePref: SharedPreferences
         var showLog: Boolean = false
     }
@@ -137,14 +138,18 @@ class MainActivity : AppCompatActivity() {
     lateinit var buttonLogout: Button
     lateinit var buttonReload: ImageView
     lateinit var buttonDeposit: Button
+    lateinit var buttonPayQR: Button
+    lateinit var buttonScanQR: Button
     lateinit var buttonWithdraw: Button
     lateinit var buttonTransfer: Button
     lateinit var buttonScanQr: Button
     lateinit var buttonPayNotAccount: Button
     lateinit var buttonKYC: Button
     lateinit var buttonPay: Button
+    lateinit var buttonOpenService: Button
     lateinit var textView: TextView
     lateinit var inputUserId: EditText
+    lateinit var inputQRString: EditText
     lateinit var inputPhoneNumber: EditText
     lateinit var moneyDeposit: EditText
     lateinit var moneyPay: EditText
@@ -153,6 +158,11 @@ class MainActivity : AppCompatActivity() {
     lateinit var walletView: LinearLayout
     lateinit var buttonSetting: ImageView
     lateinit var spinnerEnvironment: Spinner
+    lateinit var spinnerLanguage: Spinner
+    lateinit var spinnerPayCode: Spinner
+    lateinit var spinnerPayQRPayCode: Spinner
+    lateinit var spinnerScanQRPayCode: Spinner
+    lateinit var spinnerService: Spinner
     lateinit var loading: ProgressBar
 
     var ConnectToken: String =
@@ -207,8 +217,11 @@ class MainActivity : AppCompatActivity() {
         loading = findViewById(R.id.loading)
         buttonWithdraw = findViewById(R.id.buttonWithdraw)
         buttonPay = findViewById(R.id.buttonPay)
+        buttonScanQR = findViewById(R.id.buttonScanQr)
+        buttonPayQR = findViewById(R.id.buttonPayQR)
         textView = findViewById(R.id.textBalance)
         inputUserId = findViewById(R.id.inputUserId)
+        inputQRString = findViewById(R.id.inputPayQR)
         inputPhoneNumber = findViewById(R.id.inputPhoneNumber)
         moneyDeposit = findViewById(R.id.moneyDeposit)
         moneyPay = findViewById(R.id.moneyPay)
@@ -216,6 +229,12 @@ class MainActivity : AppCompatActivity() {
         moneyTransfer = findViewById(R.id.moneyTransfer)
         walletView = findViewById(R.id.walletView)
         spinnerEnvironment = findViewById(R.id.enviromentSpiner)
+        spinnerPayCode = findViewById(R.id.payCodeSpiner)
+        spinnerPayQRPayCode = findViewById(R.id.payQrPayCodeSpinner)
+        spinnerScanQRPayCode= findViewById(R.id.scanQrPayCodeSpinner)
+        spinnerLanguage = findViewById(R.id.languageSpinner)
+        spinnerService = findViewById(R.id.serviceSpinner)
+        buttonOpenService = findViewById(R.id.buttonOpenService)
         inputUserId.setText(userId)
         inputPhoneNumber.setText(phoneNumber)
         inputUserId.addTextChangedListener {
@@ -237,13 +256,24 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-        buttonScanQr.setOnClickListener {
-//            PayME.showError("helooo")
+        buttonPayQR.setOnClickListener {
+            payme?.payQRCode(supportFragmentManager,inputQRString.text.toString(),spinnerPayQRPayCode.selectedItem.toString(),true,onSuccess = {
 
-            payme?.scanQR(this.supportFragmentManager,onSuccess = {
-                
+            },onError = {jsonObject, i, s ->
+            PayME.showError(s)
+            })
+        }
+        buttonScanQr.setOnClickListener {
+            payme?.scanQR(this.supportFragmentManager,spinnerScanQRPayCode.selectedItem.toString(),onSuccess = {
+
             },onError = {jsonObject, i, s ->  })
         }
+        buttonOpenService.setOnClickListener {
+            payme?.openService(supportFragmentManager,Service(spinnerService.selectedItem.toString(),""),onSuccess = {},onError = {jsonObject, i, s ->
+                PayME.showError(s)
+            })
+        }
+
         buttonKYC.setOnClickListener {
             payme?.openKYC(this.supportFragmentManager, onSuccess = {
                 println("mo kyc thanh cong")
@@ -258,33 +288,34 @@ class MainActivity : AppCompatActivity() {
         list.add(Env.DEV.toString())
         list.add(Env.PRODUCTION.toString())
         list.add(Env.SANDBOX.toString())
-        val spinnerAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, list)
-        spinnerEnvironment.adapter = spinnerAdapter
-
-        spinnerEnvironment.setOnItemSelectedListener(object : OnItemSelectedListener {
+        spinnerLanguage.setOnItemSelectedListener(object : OnItemSelectedListener {
             override fun onItemSelected(
                 parentView: AdapterView<*>?,
                 selectedItemView: View,
                 position: Int,
                 id: Long
             ) {
+                if(payme!=null){
+                    payme?.setLanguage(context,if(spinnerLanguage.selectedItem.toString() == LANGUAGES.VN.toString()) LANGUAGES.VN else LANGUAGES.EN)
+                }
 
-                if (list.get(position) == Env.SANDBOX.toString()) {
-                    env = Env.SANDBOX
-                }
-                if (list.get(position) == Env.DEV.toString()) {
-                    env = Env.DEV
-                }
-                if (list.get(position) == Env.PRODUCTION.toString()) {
-                    env = Env.PRODUCTION
-                }
-                walletView.visibility = View.GONE
             }
 
             override fun onNothingSelected(parentView: AdapterView<*>?) {
             }
         })
+
         buttonLogin.setOnClickListener {
+            println("spinnerEnvironment.selectedItem.toString()"+spinnerEnvironment.selectedItem.toString())
+            if (spinnerEnvironment.selectedItem.toString() == Env.SANDBOX.toString()) {
+                env = Env.SANDBOX
+            }
+            if (spinnerEnvironment.selectedItem.toString() == Env.DEV.toString()) {
+                env = Env.DEV
+            }
+            if (spinnerEnvironment.selectedItem.toString() == Env.PRODUCTION.toString()) {
+                env = Env.PRODUCTION
+            }
 
             if (inputPhoneNumber.text.toString().length >= 10 && inputUserId.text.toString().length > 0 && (inputPhoneNumber.text.toString().length == 10 || inputPhoneNumber.text.toString().length == 0) && loading.visibility != View.VISIBLE) {
                 val params: MutableMap<String, Any> = mutableMapOf()
@@ -304,6 +335,7 @@ class MainActivity : AppCompatActivity() {
                 )
                 ConnectToken = connectToken
                 loading.visibility = View.VISIBLE
+                println("env"+env.toString())
                 payme =
                     PayME(
                         this,
@@ -312,7 +344,7 @@ class MainActivity : AppCompatActivity() {
                         ConnectToken,
                         if (env == Env.PRODUCTION) PrivateKey else if (env == Env.DEV) PRIVATE_KEY_DEFAULT_DEV else PRIVATE_KEY_DEFAULT_SANDBOX,
                         configColor,
-                        LANGUAGES.VN,
+                        if(spinnerLanguage.selectedItem.toString() == LANGUAGES.VN.toString()) LANGUAGES.VN else LANGUAGES.EN,
                         env,
                         showLog
                     )
@@ -334,6 +366,19 @@ class MainActivity : AppCompatActivity() {
                     }, onError = { jsonObject, i, s ->
 
                     })
+                    payme?.getSupportedServices(onSuccess = {arrayList ->
+                        var list = arrayListOf<String>()
+
+                        arrayList?.forEach { service ->
+                            list.add(service.code)
+                        }
+                        val spinnerAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, list)
+                        spinnerService.adapter = spinnerAdapter
+
+                    },onError = {jsonObject, i, s ->
+
+                    })
+
                     loading.visibility = View.GONE
                     paymePref.edit().putString(APP_USER_ID, inputUserId.text.toString()).commit()
                     paymePref.edit().putString(APP_PHONE, inputPhoneNumber.text.toString())
@@ -393,27 +438,26 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonDeposit.setOnClickListener {
-            payme?.setLanguage(context,LANGUAGES.EN)
 
 
-//            val amount = convertInt(moneyDeposit.text.toString())
-//            payme?.deposit(
-//                this.supportFragmentManager,
-//                amount,
-//                true,
-//                onSuccess = { json: JSONObject? ->
-//                },
-//                onError = { jsonObject, code, message ->
-//                    PayME.showError(message)
-//                    println("code"+code+"message"+message)
-//
-//                    if (code == ERROR_CODE.EXPIRED) {
-//                        walletView.setVisibility(View.GONE)
-//                    }
-//                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
-//                        openWallet()
-//                    }
-//                })
+            val amount = convertInt(moneyDeposit.text.toString())
+            payme?.deposit(
+                this.supportFragmentManager,
+                amount,
+                true,
+                onSuccess = { json: JSONObject? ->
+                },
+                onError = { jsonObject, code, message ->
+                    PayME.showError(message)
+                    println("code"+code+"message"+message)
+
+                    if (code == ERROR_CODE.EXPIRED) {
+                        walletView.setVisibility(View.GONE)
+                    }
+                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
+                        openWallet()
+                    }
+                })
 
 
         }
@@ -474,9 +518,7 @@ class MainActivity : AppCompatActivity() {
                     "OpenEWallet",
                     ""
                 )
-            payme?.getPaymentMethods(storeId,
-                onSuccess = {list->
-                    payme?.pay(this.supportFragmentManager, infoPayment, true,null,
+                    payme?.pay(this.supportFragmentManager, infoPayment, true,spinnerPayCode.selectedItem.toString(),
                         onSuccess = { json: JSONObject? ->
                         },
                         onError = { jsonObject, code, message ->
@@ -494,9 +536,7 @@ class MainActivity : AppCompatActivity() {
 
                     )
 
-            },onError = {jsonObject, code, message ->
 
-            })
 
 
 

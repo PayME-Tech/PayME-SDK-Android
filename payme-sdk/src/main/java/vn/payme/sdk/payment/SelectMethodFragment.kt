@@ -24,11 +24,10 @@ import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.component.InfoPayment
+import vn.payme.sdk.enums.PAY_CODE
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
-import vn.payme.sdk.evenbus.ChangeFragmentPayment
-import vn.payme.sdk.evenbus.CheckInputAtm
-import vn.payme.sdk.evenbus.PaymentInfoEvent
+import vn.payme.sdk.evenbus.*
 import vn.payme.sdk.hepper.AddInfoMethod
 import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.model.CardInfo
@@ -40,22 +39,24 @@ import java.text.DecimalFormat
 
 class SelectMethodFragment : Fragment() {
     private lateinit var textAmount: TextView
+    private lateinit var textAmountHiden: TextView
     private lateinit var textNote: TextView
+    private lateinit var textMessageError: TextView
     private lateinit var textPersonReserving: TextView
     private lateinit var textIdService: TextView
     private lateinit var textTitleMethodSelected: TextView
-    private lateinit var textNoteMethodSelected: TextView
-    private lateinit var textFeeMethodSelected: TextView
-    private lateinit var buttonChangeMethod: CardView
+    private lateinit var buttonChangeMethod: ConstraintLayout
     private lateinit var layout: ConstraintLayout
-    private lateinit var textChangeMethod: TextView
+    private lateinit var headerVisibility: ConstraintLayout
+    private lateinit var headerHidden: ConstraintLayout
     private lateinit var imageMethod: ImageView
     private lateinit var imageLogoMC: ImageView
     private lateinit var containerLogoMC: CardView
-    private lateinit var infoFee: InfoPayment
     private lateinit var frameLayout: FrameLayout
     private var loading: Boolean = false
     private lateinit var buttonSubmit: Button
+    private lateinit var infoFee: InfoPayment
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,98 +69,159 @@ class SelectMethodFragment : Fragment() {
             inflater?.inflate(R.layout.payment_select_method_fragment, container, false)
 
         textAmount = view.findViewById(R.id.money)
+        textAmountHiden = view.findViewById(R.id.money_hidden)
+        headerVisibility = view.findViewById(R.id.containerIsVisibleHeader)
+        headerHidden = view.findViewById(R.id.containerHiddenHeader)
         textNote = view.findViewById(R.id.note)
+        textMessageError = view.findViewById(R.id.txtMessageError)
         layout = view.findViewById(R.id.content)
 
         textPersonReserving = view.findViewById(R.id.txtPersonReserving)
         textIdService = view.findViewById(R.id.txtIdService)
 
-        textChangeMethod = view.findViewById(R.id.txtChangeMethod)
         textTitleMethodSelected = view.findViewById(R.id.txtTitle)
-        textNoteMethodSelected = view.findViewById(R.id.txtNote)
-        textFeeMethodSelected = view.findViewById(R.id.txtFee)
         buttonChangeMethod = view.findViewById(R.id.wrapButtonChangeMethod)
         imageMethod = view.findViewById(R.id.imageMethod)
 
         containerLogoMC = view.findViewById(R.id.wrapLogoMC)
         imageLogoMC = view.findViewById(R.id.imageLogoMC)
 
-        infoFee = view.findViewById(R.id.infoFee)
         frameLayout = view.findViewById(R.id.frame_container_select_method)
 
         buttonSubmit = view.findViewById(R.id.buttonSubmit)
+        buttonSubmit.iconLeft.visibility = View.VISIBLE
+        infoFee = view.findViewById(R.id.infoFee)
         EventBus.getDefault().register(this)
-
-        val storeImage = Store.paymentInfo.storeImage
-        if (storeImage != null && storeImage != "null" && storeImage != "") {
-            containerLogoMC.visibility = View.VISIBLE
-            val picasso = Picasso.get()
-            picasso.setIndicatorsEnabled(false)
-            picasso.load(storeImage)
-                .resize(50, 50)
-                .centerInside()
-                .into(imageLogoMC)
-        }
         layout.background = Store.config.colorApp.backgroundColorRadiusTop
         val decimal = DecimalFormat("#,###")
-        textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
-        textIdService.text = Store.paymentInfo.infoPayment?.orderId
-        textPersonReserving.text = Store.userInfo.dataInit?.optString("storeName")
-        textNote.text = Store.paymentInfo.infoPayment?.note
+        val total = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
+        textAmount.text = total
+        textAmountHiden.text = total
 
-        buttonChangeMethod.setOnClickListener {
-            if (Store.paymentInfo.isChangeMethod) {
-                Store.paymentInfo.methodSelected = null
-                buttonChangeMethod.visibility = View.GONE
-                buttonSubmit.visibility = View.GONE
-                buttonSubmit.visibility = View.GONE
-                infoFee.visibility = View.GONE
-                frameLayout.visibility = View.VISIBLE
-                if (Store.paymentInfo.isChangeMethod) {
-                    val fragment = childFragmentManager?.beginTransaction()
-                    fragment?.replace(
-                        R.id.frame_container_select_method,
-                        ListMethodPaymentFragment()
-                    )
-                    fragment?.commit()
-                }
 
+        val storeInfo = EventBus.getDefault().getStickyEvent(StoreInfo::class.java)
+        if (storeInfo.isVisibleHeader) {
+            headerVisibility.visibility = View.VISIBLE
+            headerHidden.visibility = View.GONE
+            textPersonReserving.text = storeInfo.storeName
+            textNote.text = Store.paymentInfo.infoPayment?.note
+            textIdService.text = Store.paymentInfo.infoPayment?.orderId
+            if (storeInfo.storeImage != null && storeInfo.storeImage != "") {
+                containerLogoMC.visibility = View.VISIBLE
+                val picasso = Picasso.get()
+                picasso.setIndicatorsEnabled(false)
+                picasso.load(storeInfo.storeImage)
+                    .resize(50, 50)
+                    .centerInside()
+                    .into(imageLogoMC)
             }
         }
         buttonSubmit.setOnClickListener {
-            if (buttonSubmit.isLoadingShowing) {
-                return@setOnClickListener
-            }
-            if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.BANK_TRANSFER) {
-                val popupCheckBankTransfer = PopupCheckBankTransfer()
-                popupCheckBankTransfer.show(parentFragmentManager, null)
-            } else if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.BANK_CARD || Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.CREDIT_CARD) {
-                EventBus.getDefault().post(CheckInputAtm(true, null))
-            } else {
-                onSubmit(null)
-            }
+            if (buttonSubmit.isActive) {
+                if (buttonSubmit.isLoadingShowing) {
+                    return@setOnClickListener
+                }
+                val method = Store.paymentInfo.methodSelected
+                if(!(
+                    method?.type == TYPE_PAYMENT.BANK_TRANSFER ||
+                    method?.type == TYPE_PAYMENT.WALLET ||
+                    method?.type == TYPE_PAYMENT.CREDIT_CARD ||
+                    method?.type == TYPE_PAYMENT.BANK_CARD
+                            )
+                ){
+                    PayME.showError(getString(R.string.method_not_supported))
+                    return@setOnClickListener
 
+                }
 
+                if(ListMethodPaymentFragment.isVisible){
+                    val payFunction = PayFunction()
+                    if(method?.type == TYPE_PAYMENT.BANK_CARD){
+                        buttonSubmit.enableLoading()
+                        payFunction.getListBank(onSuccess = {
+                            buttonSubmit.disableLoading()
+                            changeMethod(Store.paymentInfo.methodSelected!!)
+
+                        },onError = {jsonObject, i, s ->
+                            buttonSubmit.disableLoading()
+                            PayME.showError(s)
+                        })
+                        return@setOnClickListener
+
+                    }
+                    if(method?.type == TYPE_PAYMENT.BANK_TRANSFER){
+                        buttonSubmit.enableLoading()
+                        payFunction.getListBank(onSuccess = {
+                            payFunction.getListBankTransfer(onSuccess = {
+                                buttonSubmit.disableLoading()
+                                changeMethod(Store.paymentInfo.methodSelected!!)
+                            },Store.paymentInfo.methodSelected!!,onError = {jsonObject, i, s ->
+                                buttonSubmit.disableLoading()
+                                PayME.showError(s)
+                            })
+                        },onError = {jsonObject, i, s ->
+                            buttonSubmit.disableLoading()
+                            PayME.showError(s)
+                        })
+                        return@setOnClickListener
+
+                    }
+                }
+
+                if (method?.type == TYPE_PAYMENT.BANK_TRANSFER) {
+                    val popupCheckBankTransfer = PopupCheckBankTransfer()
+                    popupCheckBankTransfer.show(parentFragmentManager, null)
+                } else if (method?.type == TYPE_PAYMENT.BANK_CARD || method?.type == TYPE_PAYMENT.CREDIT_CARD) {
+                    EventBus.getDefault().post(CheckInputAtm(true, null))
+                } else {
+                    onSubmit(null)
+                }
+            }
         }
-        buttonSubmit.iconLeft.visibility = View.VISIBLE
-        if (Store.paymentInfo.methodSelected != null) {
-            textChangeMethod.visibility = View.GONE
-            changeMethod(Store.paymentInfo.methodSelected!!)
-        } else {
+
+
+        if (Store.paymentInfo.payCode == PAY_CODE.PAYME) {
             val fragment = childFragmentManager?.beginTransaction()
             fragment?.replace(R.id.frame_container_select_method, ListMethodPaymentFragment())
             fragment?.commit()
+            if (Store.userInfo.accountKycSuccess && Store.userInfo.accountKycSuccess) {
+                getFee()
+            } else {
+                buttonSubmit.setVisible(false)
+            }
+        } else {
+            buttonChangeMethod.visibility = View.VISIBLE
+            changeMethod(Store.paymentInfo.methodSelected!!)
+            infoFee.visibility = View.GONE
+
         }
-        textChangeMethod.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
+
         return view
     }
-
-
+    @Subscribe
+    fun evenChangeMethod(event :Method){
+        getFee()
+    }
     fun getFee() {
         var listInfoBottom = arrayListOf<Info>()
         val decimal = DecimalFormat("#,###")
-        val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
+        val event = EventBus.getDefault().getStickyEvent(FeeInfo::class.java)
         val fee = event.fee
+        infoFee.visibility = View.VISIBLE
+        if (event.state == "OVER_DAY_QUOTA" || event.state == "OVER_MONTH_QUOTA") {
+            textMessageError.text = event.message
+            textMessageError.visibility = View.VISIBLE
+            buttonSubmit.setVisible(false)
+        } else {
+            val total = Store.paymentInfo.infoPayment!!.amount + EventBus.getDefault().getStickyEvent(FeeInfo::class.java).feeWallet
+            if(Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.WALLET && total> Store.userInfo.balance ){
+                buttonSubmit.setVisible(false)
+            }else{
+                textMessageError.visibility = View.GONE
+                buttonSubmit.setVisible(true)
+            }
+
+        }
         val valueFree = if (fee > 0) "${decimal.format(fee)} đ" else getString(R.string.free)
         listInfoBottom.add(Info(getString(R.string.fee), valueFree, null, null, false))
         val infoTotal = Info(
@@ -178,20 +240,12 @@ class SelectMethodFragment : Fragment() {
         infoFee.updateData(listInfoBottom)
     }
 
-    @Subscribe
-    fun onChangeFragment(method: Method) {
-        Store.paymentInfo.methodSelected = method
-        changeMethod(method)
-    }
-
     fun changeMethod(method: Method) {
-        buttonChangeMethod.visibility = View.VISIBLE
         AddInfoMethod().addImage(method, imageMethod)
         AddInfoMethod().setTitle(
             method,
             textTitleMethodSelected,
-            textNoteMethodSelected,
-            textFeeMethodSelected
+            null,null
         )
         if (method.type == TYPE_PAYMENT.BANK_TRANSFER) {
             buttonSubmit.iconLeft.visibility = View.GONE
@@ -213,41 +267,36 @@ class SelectMethodFragment : Fragment() {
             fragment?.replace(R.id.frame_container_select_method, EnterAtmCardFragment())
             fragment?.commit()
         } else {
-
             frameLayout.visibility = View.GONE
-
         }
-        if (method.type == TYPE_PAYMENT.BANK_TRANSFER) {
-            infoFee.visibility = View.GONE
-        } else {
-            getFee()
-            infoFee.visibility = View.VISIBLE
-        }
-        buttonSubmit.visibility = View.VISIBLE
     }
+
 
     @Subscribe
     fun checkAtmResponse(event: CheckInputAtm) {
         if (!event.isCheck) {
-            val eventFee = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
-            EventBus.getDefault().postSticky(PaymentInfoEvent(event.cardInfo, eventFee.fee))
+            EventBus.getDefault().postSticky(PaymentInfoEvent(event.cardInfo))
             onSubmit(event.cardInfo)
         }
     }
 
     fun authCreditCard(cardInfo: CardInfo?) {
         val paymentApi = PaymentApi()
-        paymentApi.checkAuthCard(requireContext(), cardInfo?.cardDateView,cardInfo?.cardNumber,null,
-            onSuccess = {ref->
-                if(!isVisible) return@checkAuthCard
-                onPay(ref,cardInfo)
-        }) { jsonObject, i, s ->
-            if(!isVisible) return@checkAuthCard
+        paymentApi.checkAuthCard(requireContext(),
+            cardInfo?.cardDateView,
+            cardInfo?.cardNumber,
+            null,
+            onSuccess = { ref ->
+                if (!isVisible) return@checkAuthCard
+                onPay(ref, cardInfo)
+            }) { jsonObject, i, s ->
+            if (!isVisible) return@checkAuthCard
             buttonSubmit.disableLoading()
             PayME.showError(s)
         }
     }
-    fun onPay(referenceId :String?,cardInfo:CardInfo?){
+
+    fun onPay(referenceId: String?, cardInfo: CardInfo?) {
         val paymentApi = PaymentApi()
         paymentApi.payment(
             Store.paymentInfo.methodSelected!!,
@@ -360,7 +409,7 @@ class SelectMethodFragment : Fragment() {
             Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.CREDIT_CARD ||
             Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.BANK_TRANSFER
         ) {
-            onPay(null,cardInfo)
+            onPay(null, cardInfo)
         } else {
             EventBus.getDefault()
                 .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CONFIRM_PASS, null))

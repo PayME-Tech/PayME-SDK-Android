@@ -171,7 +171,7 @@
                 android:layout_marginHorizontal="16dp"
                 android:layout_weight="0.5"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:pbText="LÀM LẠI" />
+                app:pbText="@string/take_again" />
 
             <vn.payme.sdk.component.Button
                 android:id="@+id/buttonNext"
@@ -180,7 +180,7 @@
                 android:layout_marginHorizontal="16dp"
                 android:layout_weight="0.5"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:pbText="HOÀN TẤT" />
+                app:pbText="@string/done" />
         </LinearLayout>
 
 

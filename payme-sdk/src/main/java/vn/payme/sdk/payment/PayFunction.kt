@@ -9,10 +9,9 @@ import vn.payme.sdk.R
 import vn.payme.sdk.RULE_CHECK_ACCOUNT
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.enums.ERROR_CODE
+import vn.payme.sdk.enums.PAY_CODE
 import vn.payme.sdk.enums.TYPE_PAYMENT
-import vn.payme.sdk.evenbus.ListBankAtm
-import vn.payme.sdk.evenbus.ListBankTransfer
-import vn.payme.sdk.evenbus.PaymentInfoEvent
+import vn.payme.sdk.evenbus.*
 import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.model.*
 import vn.payme.sdk.store.Store
@@ -28,13 +27,31 @@ internal class PayFunction {
         payME.getWalletInfo(
             onSuccess = { jsonObject ->
                 val walletBalance = jsonObject.getJSONObject("Wallet")
-                val balance = walletBalance.getLong("balance")
+                val balance = walletBalance.optLong("balance")
                 Store.userInfo.balance = balance
                 onSuccess(null)
             },
             onError
         )
 
+
+    }
+
+    private fun getStoreInfo(
+        infoPayment: InfoPayment,
+        onSuccess: () -> Unit,
+        onError: (JSONObject?, Int, String?) -> Unit
+    ) {
+        val paymentApi = PaymentApi()
+        paymentApi.getInfoMerchant(infoPayment.storeId, onSuccess = { jsonObject ->
+            val OpenEWallet = jsonObject.getJSONObject("OpenEWallet")
+            val GetInfoMerchant = OpenEWallet.getJSONObject("GetInfoMerchant")
+            val storeImage = GetInfoMerchant.optString("storeImage")
+            val storeName = GetInfoMerchant.optString("storeName")
+            val isVisibleHeader = GetInfoMerchant.optBoolean("isVisibleHeader")
+            EventBus.getDefault().postSticky(StoreInfo(storeImage, storeName, isVisibleHeader))
+            onSuccess()
+        }, onError)
 
     }
 
@@ -148,86 +165,82 @@ internal class PayFunction {
         }
     }
 
-    private fun payNotAccount(
-        fragmentManager: FragmentManager,
-        infoPayment: InfoPayment,
-        isShowResultUI: Boolean,
-        methodId: Number?,
-        onSuccess: (JSONObject?) -> Unit,
-        onError: (JSONObject?, Int, String?) -> Unit
-    ) {
-        val payme = PayME()
-        val paymentApi = PaymentApi()
-        paymentApi.getInfoMerchant(infoPayment.storeId, onSuccess = { jsonObject ->
-            val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
-            val GetInfoMerchant = OpenEWallet.optJSONObject("GetInfoMerchant")
-            val succeeded = GetInfoMerchant.optBoolean("succeeded")
-            val storeName = GetInfoMerchant.optString("storeName")
-            val storeImage = GetInfoMerchant.optString("storeImage")
-            val message = GetInfoMerchant.optString("message")
-            if (succeeded) {
-                Store.paymentInfo.storeName = storeName
-                Store.paymentInfo.storeImage = storeImage
-                payme.getSetting(onSuccess = {
-                    payme.checkRegisterClient(onSuccess = {
-                        checkInfoPayment(
-                            fragmentManager,
-                            infoPayment,
-                            isShowResultUI,
-                            methodId,
-                            onSuccess,
-                            onError
-                        )
-                    }, onError)
-                }, onError)
-            } else {
-                onError(null, ERROR_CODE.PAYMENT_ERROR, message)
-            }
-
-        }, onError)
-    }
+//    private fun payNotAccount(
+//        fragmentManager: FragmentManager,
+//        infoPayment: InfoPayment,
+//        isShowResultUI: Boolean,
+//        methodId: Number?,
+//        onSuccess: (JSONObject?) -> Unit,
+//        onError: (JSONObject?, Int, String?) -> Unit
+//    ) {
+//        val payme = PayME()
+//        val paymentApi = PaymentApi()
+//        paymentApi.getInfoMerchant(infoPayment.storeId, onSuccess = { jsonObject ->
+//            val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
+//            val GetInfoMerchant = OpenEWallet.optJSONObject("GetInfoMerchant")
+//            val succeeded = GetInfoMerchant.optBoolean("succeeded")
+//            val storeName = GetInfoMerchant.optString("storeName")
+//            val storeImage = GetInfoMerchant.optString("storeImage")
+//            val message = GetInfoMerchant.optString("message")
+//            if (succeeded) {
+//                Store.paymentInfo.storeName = storeName
+//                Store.paymentInfo.storeImage = storeImage
+//                payme.getSetting(onSuccess = {
+//                    payme.checkRegisterClient(onSuccess = {
+//                        checkInfoPayment(
+//                            fragmentManager,
+//                            infoPayment,
+//                            isShowResultUI,
+//                            methodId,
+//                            onSuccess,
+//                            onError
+//                        )
+//                    }, onError)
+//                }, onError)
+//            } else {
+//                onError(null, ERROR_CODE.PAYMENT_ERROR, message)
+//            }
+//
+//        }, onError)
+//    }
 
     fun pay(
         fragmentManager: FragmentManager,
         infoPayment: InfoPayment,
         isShowResultUI: Boolean,
-        methodId: Number?,
+        payCode: String,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
-        println("methodId2222:" + methodId)
         loading.show(fragmentManager, null)
+        Store.paymentInfo.isShowResultUI = isShowResultUI
         PayME.fragmentManager = fragmentManager
         Store.paymentInfo.infoPayment = infoPayment
+        Store.paymentInfo.payCode = payCode
         val arrayBank = arrayListOf<BankTransferInfo>()
         EventBus.getDefault().postSticky(ListBankTransfer(arrayBank))
+        EventBus.getDefault().postSticky(FeeInfo(0,0, "", ""))
         PayME.onSuccess = onSuccess
         PayME.onError = onError
         val checkAccount = CheckAccount()
         if (checkAccount.check(RULE_CHECK_ACCOUNT.LOGGIN, onError = { jsonObject, i, s ->
                 onError(jsonObject, i, s)
                 loading.dismiss()
-//                payNotAccount(
-//                    fragmentManager,
-//                    infoPayment,
-//                    isShowResultUI,
-//                    methodId,
-//                    onSuccess,
-//                    onError = { jsonObject, i, s ->
-//                        onError(jsonObject, i, s)
-//                        loading.dismiss()
-//                    })
             })) {
-            this.checkInfoPayment(
-                fragmentManager,
-                infoPayment,
-                isShowResultUI,
-                methodId,
-                onSuccess,
-                onError = { jsonObject, i, s ->
-                    onError(jsonObject, i, s)
-                    loading.dismiss()
-                })
+            getStoreInfo(infoPayment, onSuccess = {
+                checkInfoPayment(
+                    fragmentManager,
+                    infoPayment,
+                    payCode,
+                    onError = { jsonObject, i, s ->
+                        onError(jsonObject, i, s)
+                        loading.dismiss()
+                    })
+            }, onError = { jsonObject, i, s ->
+                onError(jsonObject, i, s)
+                loading.dismiss()
+            })
+
         }
 
 
@@ -236,14 +249,30 @@ internal class PayFunction {
     private fun checkInfoPayment(
         fragmentManager: FragmentManager,
         infoPayment: InfoPayment,
-        isShowResultUI: Boolean,
-        methodId: Number?,
-        onSuccess: (JSONObject?) -> Unit,
+        payCode: String,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
-
-        val checkAccount = CheckAccount()
         val decimal = DecimalFormat("#,###")
+        if (!((payCode == PAY_CODE.PAYME) ||
+                    (payCode == PAY_CODE.ATM) ||
+                    (payCode == PAY_CODE.MANUAL_BANK) ||
+                    (payCode == PAY_CODE.CREDIT))
+        ) {
+            onError(
+                null,
+                ERROR_CODE.PAYMENT_ERROR,
+                PayME.context.getString(R.string.method_not_supported)
+            )
+            return
+        }
+        if (payCode != PAY_CODE.PAYME && !Store.config.openPayAndKyc) {
+            onError(
+                null,
+                ERROR_CODE.OTHER,
+                PayME.context.getString(R.string.function_can_only_manipulate_production)
+            )
+            return
+        }
         if (infoPayment.amount!! < Store.config.limitPayment.min) {
             onError(
                 null,
@@ -268,9 +297,7 @@ internal class PayFunction {
         getListMethod(
             fragmentManager,
             infoPayment,
-            isShowResultUI,
-            methodId,
-            onSuccess,
+            payCode,
             onError
         )
 
@@ -278,19 +305,12 @@ internal class PayFunction {
 
     fun showPopupPayment(
         fragmentManager: FragmentManager,
-        infoPayment: InfoPayment,
-        isShowResultUI: Boolean,
         method: Method?,
-        onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit,
     ) {
         Store.paymentInfo.methodSelected = method
         Store.paymentInfo.transaction = ""
-        Store.paymentInfo.isChangeMethod = method == null
-        Store.paymentInfo.isShowResultUI = isShowResultUI
         if (method?.type == TYPE_PAYMENT.BANK_CARD) {
-            val listBankAtm = EventBus.getDefault().getStickyEvent(ListBankAtm::class.java)
-
             getListBank(onSuccess = {
                 val popupPayment: PopupPayment = PopupPayment()
                 loading.dismiss()
@@ -324,89 +344,38 @@ internal class PayFunction {
     fun checkMethod(
         fragmentManager: FragmentManager,
         infoPayment: InfoPayment,
-        isShowResultUI: Boolean,
-        method: Method?,
-        onSuccess: (JSONObject?) -> Unit,
+        payCode: String,
         onError: (JSONObject?, Int, String?) -> Unit,
     ) {
         val checkAccount = CheckAccount()
-        if (method != null && !((method?.type == TYPE_PAYMENT.WALLET) ||
-                    (method?.type == TYPE_PAYMENT.BANK_CARD) ||
-                    (method?.type == TYPE_PAYMENT.BANK_TRANSFER) ||
-                    (method?.type == TYPE_PAYMENT.CREDIT_CARD) ||
-                    (method?.type == TYPE_PAYMENT.LINKED))
-        ) {
-            onError(
-                null,
-                ERROR_CODE.PAYMENT_ERROR,
-                PayME.context.getString(R.string.method_not_supported)
-            )
-            return
-        }
-        if (method != null && method?.type != TYPE_PAYMENT.WALLET && !Store.config.openPayAndKyc) {
-            onError(
-                null,
-                ERROR_CODE.OTHER,
-                PayME.context.getString(R.string.function_can_only_manipulate_production)
-            )
-            return
-        }
-        if (method?.type == TYPE_PAYMENT.WALLET) {
-            if (checkAccount.check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
-                getBalance(onSuccess = {
-                    checkFee(
+        if (payCode == PAY_CODE.PAYME && Store.userInfo.accountActive && Store.userInfo.accountKycSuccess) {
+            getBalance(onSuccess = {
+                checkFee(infoPayment, Store.paymentInfo.listMethod[0], onSuccess = {
+                    showPopupPayment(
                         fragmentManager,
-                        infoPayment,
-                        isShowResultUI,
-                        method,
-                        onSuccess,
+                        Store.paymentInfo.listMethod[0],
                         onError
                     )
                 }, onError)
-            }
-            return
-        }
-        if (method == null && Store.userInfo.accountKycSuccess && Store.userInfo.accountActive) {
-            getBalance(onSuccess = {
-                showPopupPayment(
-                    fragmentManager,
-                    infoPayment,
-                    isShowResultUI,
-                    method,
-                    onSuccess,
-                    onError
-                )
             }, onError)
             return
         }
-        if (method != null) {
-            checkFee(
-                fragmentManager,
-                infoPayment,
-                isShowResultUI,
-                method,
-                onSuccess,
-                onError
-            )
-            return
-        }
-        showPopupPayment(fragmentManager, infoPayment, isShowResultUI, method, onSuccess, onError)
-
-
+        showPopupPayment(
+            fragmentManager,
+            Store.paymentInfo.listMethod[0],
+            onError
+        )
     }
 
 
-    private fun checkFee(
-        fragmentManager: FragmentManager,
+    fun checkFee(
         infoPayment: InfoPayment,
-        isShowResultUI: Boolean,
         method: Method?,
-        onSuccess: (JSONObject?) -> Unit,
+        onSuccess: () -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val paymentApi = PaymentApi()
         val method = method
-        val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
         paymentApi.getFee(
             infoPayment!!.amount,
             method!!,
@@ -419,28 +388,15 @@ internal class PayFunction {
                     val feeObject = GetFee.getJSONObject("fee")
                     val fee = feeObject.getInt("fee")
                     val state = GetFee.optString("state")
-                    if (state == "null") {
-                        if (method.type == TYPE_PAYMENT.WALLET && (Store.userInfo.balance < (infoPayment.amount + fee))) {
-                            onError(
-                                null,
-                                ERROR_CODE.BALANCE_ERROR,
-                                PayME.context.getString(R.string.balance_in_wallet_is_insufficient)
-                            )
-                        } else {
-                            EventBus.getDefault().postSticky(PaymentInfoEvent(null, fee))
-                            showPopupPayment(
-                                fragmentManager,
-                                infoPayment,
-                                isShowResultUI,
-                                method,
-                                onSuccess,
-                                onError
-                            )
-                        }
-
-                    } else {
-                        onError(GetFee, ERROR_CODE.PAYMENT_ERROR, message)
+                    val message = GetFee.optString("message")
+                    var feeWallet = EventBus.getDefault().getStickyEvent(FeeInfo::class.java).feeWallet
+                    if(method.type == TYPE_PAYMENT.WALLET){
+                        feeWallet =  fee
                     }
+                    EventBus.getDefault().postSticky(FeeInfo(fee,feeWallet, state, message))
+                    onSuccess()
+
+
                 } else {
                     onError(GetFee, ERROR_CODE.PAYMENT_ERROR, message)
                 }
@@ -452,14 +408,13 @@ internal class PayFunction {
     private fun getListMethod(
         fragmentManager: FragmentManager,
         infoPayment: InfoPayment,
-        isShowResultUI: Boolean,
-        methodId: Number?,
-        onSuccess: (JSONObject?) -> Unit,
+        payCode: String,
         onError: (JSONObject?, Int, String?) -> Unit,
     ) {
         val paymentApi = PaymentApi()
         paymentApi.getTransferMethods(
             infoPayment!!.storeId,
+            payCode,
             onSuccess = { jsonObject ->
                 val Utility = jsonObject.optJSONObject("Utility")
                 val GetPaymentMethod = Utility.optJSONObject("GetPaymentMethod")
@@ -467,8 +422,8 @@ internal class PayFunction {
                 val succeeded = GetPaymentMethod.optBoolean("succeeded")
                 val methods = GetPaymentMethod.optJSONArray("methods")
                 if (succeeded) {
-                    var methodSelected: Method? = null
                     Store.paymentInfo.listMethod = arrayListOf()
+                    val listMethod = arrayListOf<Method>()
                     for (i in 0 until methods.length()) {
                         val jsonObject = methods.getJSONObject(i)
                         var data = jsonObject.optJSONObject("data")
@@ -496,15 +451,22 @@ internal class PayFunction {
                             title,
                             type,
                         )
-                        Store.paymentInfo.listMethod.add(
-                            methodRes
-                        )
-                        if (methodId != null && methodId == methodIdRes) {
-                            methodSelected = methodRes
-                        }
+                        listMethod.add(methodRes)
+
+
+                    }
+                    Store.paymentInfo.listMethod = listMethod
+                    if(payCode==PAY_CODE.CREDIT){
+                        Store.paymentInfo.listMethod = listMethod.filter { method -> method.type == TYPE_PAYMENT.CREDIT_CARD  } as ArrayList<Method>
+                    }
+                    if(payCode==PAY_CODE.ATM){
+                        Store.paymentInfo.listMethod = listMethod.filter { method -> method.type == TYPE_PAYMENT.BANK_CARD  } as ArrayList<Method>
+                    }
+                    if(payCode==PAY_CODE.MANUAL_BANK){
+                        Store.paymentInfo.listMethod = listMethod.filter { method -> method.type == TYPE_PAYMENT.BANK_TRANSFER  } as ArrayList<Method>
                     }
 
-                    if (methodId != null && methodSelected == null) {
+                    if (Store.paymentInfo.listMethod.size == 0) {
                         onError(
                             null,
                             ERROR_CODE.PAYMENT_ERROR,
@@ -514,9 +476,7 @@ internal class PayFunction {
                         checkMethod(
                             fragmentManager,
                             infoPayment,
-                            isShowResultUI,
-                            methodSelected,
-                            onSuccess,
+                            payCode,
                             onError
                         )
 

@@ -1,6 +1,7 @@
 package vn.payme.sdk.component
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.Typeface
 import android.util.AttributeSet
@@ -13,6 +14,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import com.airbnb.lottie.parser.ColorParser
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.store.Store
@@ -24,6 +26,7 @@ class Button : RelativeLayout {
     lateinit var iconLeft: ImageView
     lateinit var textView: TextView
     var isLoadingShowing: Boolean = false
+    var isActive: Boolean = true
 
 
     //endregion
@@ -48,6 +51,15 @@ class Button : RelativeLayout {
         textView.text = text
 
     }
+    fun setVisible(isVisible:Boolean){
+        isActive  = isVisible
+        if(isVisible){
+            this.background = Store.config.colorApp.backgroundColorRadius
+        }else{
+            this.background = resources.getDrawable(R.drawable.background_button_unactive)
+        }
+    }
+
 
 
     fun enableLoading() {
@@ -60,6 +72,10 @@ class Button : RelativeLayout {
         progressBar!!.visibility = View.GONE
         containerTitle!!.visibility = View.VISIBLE
         isLoadingShowing = false
+    }
+    fun setButtonTypeBorder(){
+        this.background  = Store.config.colorApp.backgroundColorRadiusBorder
+        textView.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
     }
 
 

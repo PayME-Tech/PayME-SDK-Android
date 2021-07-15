@@ -7,6 +7,7 @@ import vn.payme.sdk.PayME
 import vn.payme.sdk.enums.Action
 import vn.payme.sdk.enums.Env
 import vn.payme.sdk.enums.LANGUAGES
+import vn.payme.sdk.enums.PAY_CODE
 import vn.payme.sdk.model.*
 
 class PaymentInfo(
@@ -21,9 +22,7 @@ class PaymentInfo(
     var listMethod: ArrayList<Method> = arrayListOf(),
     var service: Service? = null,
     var isShowResultUI : Boolean = true,
-    var isChangeMethod : Boolean = true,
-    var storeName : String = "",
-    var storeImage : String = "",
+    var payCode: String = "",
 ) {
 
 }

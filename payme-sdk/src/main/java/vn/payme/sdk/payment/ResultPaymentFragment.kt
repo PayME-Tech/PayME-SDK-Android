@@ -23,8 +23,7 @@ import vn.payme.sdk.component.Button
 import vn.payme.sdk.component.InfoPayment
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
-import vn.payme.sdk.evenbus.ChangeFragmentPayment
-import vn.payme.sdk.evenbus.PaymentInfoEvent
+import vn.payme.sdk.evenbus.*
 import vn.payme.sdk.model.Info
 import vn.payme.sdk.store.Store
 import java.text.DecimalFormat
@@ -37,13 +36,10 @@ class ResultPaymentFragment : Fragment() {
     private lateinit var textAmount: TextView
     private lateinit var textResult: TextView
     private lateinit var textError: TextView
-    private lateinit var textTransactionCode: TextView
-    private lateinit var textTransactionTime: TextView
     private lateinit var textHotline: TextView
     private lateinit var lottie: LottieAnimationView
     private lateinit var infoTop: InfoPayment
     private lateinit var infoBottom: InfoPayment
-    private lateinit var transitionCodeContainer: ConstraintLayout
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,45 +50,40 @@ class ResultPaymentFragment : Fragment() {
         buttonSubmit = view.findViewById(R.id.buttonSubmit)
         textAmount = view.findViewById(R.id.money)
         textError = view.findViewById(R.id.note_error)
-        textTransactionCode = view.findViewById(R.id.transition_code_value)
-        textTransactionTime = view.findViewById(R.id.transition_time_value)
-        transitionCodeContainer = view.findViewById(R.id.transition_code_container)
         textHotline = view.findViewById(R.id.txtHotline)
         infoTop = view.findViewById(R.id.infoTop)
         infoBottom = view.findViewById(R.id.infoBottom)
 
-        val dateFormat = SimpleDateFormat("HH:mm DD/MM/yyyy")
+        val dateFormat = SimpleDateFormat("HH:mm dd/MM/yyyy")
         val GetDate = Date()
         var DateStr: String? = dateFormat.format(GetDate)
-        textTransactionTime.text = DateStr
-        textTransactionCode.setText(Store.paymentInfo.transaction)
         textResult = view.findViewById(R.id.title_result)
         lottie = view.findViewById(R.id.animation_view)
         val message = arguments?.getString("message")
         val state = arguments?.getString("state")
 
         val decimal = DecimalFormat("#,###")
-        textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
+        val fee = EventBus.getDefault().getStickyEvent(FeeInfo::class.java).fee
+        textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount!! +fee)} đ"
         val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
         var listInfoTop = arrayListOf<Info>()
-        listInfoTop.add(Info(getString(R.string.receiver), Store.paymentInfo.storeName, null, null, false))
-        listInfoTop.add(Info(getString(R.string.service_code), Store.paymentInfo.infoPayment?.orderId, null, null, false))
-        listInfoTop.add(Info(getString(R.string.content), Store.paymentInfo.infoPayment?.note, null, null, true))
+        listInfoTop.add(Info(getString(R.string.transaction_code), Store.paymentInfo.transaction, null, null, false))
+        listInfoTop.add(Info(getString(R.string.transaction_time), DateStr, null, null, false))
 
-        val listInfoBottom: ArrayList<Info> = arrayListOf()
+
         if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.LINKED) {
-            listInfoBottom.add(Info(getString(R.string.method), getString(R.string.affiliate_account), null, null, false))
-            listInfoBottom.add(
+            listInfoTop.add(Info(getString(R.string.method), getString(R.string.affiliate_account), null, null, false))
+            listInfoTop.add(
                 Info(
                     getString(R.string.account_number),
                     Store.paymentInfo.methodSelected?.title + Store.paymentInfo.methodSelected?.label,
                     null,
                     null,
-                    false
+                    true
                 )
             )
         } else {
-            listInfoBottom.add(
+            listInfoTop.add(
                 Info(
                     getString(R.string.method),
                     Store.paymentInfo.methodSelected?.title,
@@ -108,9 +99,9 @@ class ResultPaymentFragment : Fragment() {
                 lengthCard!! - 4,
                 lengthCard!!
             )
-            listInfoBottom.add(
+            listInfoTop.add(
                 Info(
-                    getString(R.string.atm_number),
+                    getString(R.string.card_number),
                     event.cardInfo?.bankShortName + "-" + cardNumber,
                     null,
                     null,
@@ -124,7 +115,7 @@ class ResultPaymentFragment : Fragment() {
                 lengthCard!! - 4,
                 lengthCard!!
             )
-            listInfoBottom.add(
+            listInfoTop.add(
                 Info(
                     getString(R.string.card_number),
                     event.cardInfo?.bankShortName + "-" + cardNumber,
@@ -134,56 +125,39 @@ class ResultPaymentFragment : Fragment() {
                 )
             )
         }
-        textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
-        val feeString = if(event.fee==0) getString(R.string.free)  else "${decimal.format(event.fee)} đ"
-        val totalString ="${decimal.format(event.fee + Store.paymentInfo.infoPayment!!.amount)} đ"
-        listInfoBottom.add(Info( getString(R.string.fee),  feeString, null, null, false))
-        listInfoBottom.add(Info(getString(R.string.total_payment),  totalString, null, ContextCompat.getColor(requireContext(),R.color.red), true))
+        val listInfoBottom: ArrayList<Info> = arrayListOf()
+        val storeInfo = EventBus.getDefault().getStickyEvent(StoreInfo::class.java)
+        listInfoBottom.add(Info(getString(R.string.receiver),storeInfo.storeName , null, null, false))
+        listInfoBottom.add(Info(getString(R.string.content), Store.paymentInfo.infoPayment?.note, null, null, true))
         if(state =="PENDING"){
-            infoTop.updateData(listInfoTop)
             lottie.setAnimation(R.raw.cho_xu_ly)
             textResult.text = getString(R.string.payment_pending)
             textError.text = getString(R.string.payment_pending_description)
             textError.visibility = View.VISIBLE
             textHotline.visibility = View.VISIBLE
             buttonSubmit.textView.text = getString(R.string.understood)
-            infoBottom.visibility = View.GONE
             var backgroundColorRadius = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(ContextCompat.getColor(requireContext(),R.color.red60),ContextCompat.getColor(requireContext(),R.color.red60)))
             backgroundColorRadius.cornerRadius = 60F
             buttonSubmit.background = backgroundColorRadius
             lottie.playAnimation()
         }else if(message != null || state=="FAILED"){
-            infoTop.updateData(listInfoTop)
             textError.text = message
             textError.visibility = View.VISIBLE
             lottie.setAnimation(R.raw.thatbai)
             textResult.text = getString(R.string.payment_fail)
             buttonSubmit.textView.text = getString(R.string.understood)
-            infoBottom.visibility = View.GONE
            var backgroundColorRadius = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(ContextCompat.getColor(requireContext(),R.color.red),ContextCompat.getColor(requireContext(),R.color.red)))
             backgroundColorRadius.cornerRadius = 60F
             buttonSubmit.background = backgroundColorRadius
             lottie.playAnimation()
         }else{
-            //Thành công
-                if(Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.BANK_TRANSFER){
-                    transitionCodeContainer.visibility = View.GONE
-                    infoBottom.updateData(listInfoTop)
-                    var listInfoTopBankTransfer = arrayListOf<Info>()
-                    listInfoTopBankTransfer.add(Info(getString(R.string.transaction_code), Store.paymentInfo.transaction, null, null, false))
-                    listInfoTopBankTransfer.add(Info(getString(R.string.transaction_time), DateStr, null, null, false))
-                    listInfoTopBankTransfer.add(Info(getString(R.string.method), Store.paymentInfo.methodSelected?.title, null, null, false))
-                    listInfoTopBankTransfer.add(Info(getString(R.string.transaction_fee),feeString, null, null, false))
-                    listInfoTopBankTransfer.add(Info(getString(R.string.total_payment),totalString, null, ContextCompat.getColor(requireContext(),R.color.red), true))
-                    infoTop.updateData(listInfoTopBankTransfer)
-                }else{
-                    infoTop.updateData(listInfoTop)
-                    infoBottom.updateData(listInfoBottom)
-                }
-
-            loadAnimation()
             textAmount.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
+            loadAnimation()
+
         }
+        listInfoTop[listInfoTop.size-1].isEnd  = true
+        infoTop.updateData(listInfoTop)
+        infoBottom.updateData(listInfoBottom)
 
         buttonSubmit.setOnClickListener {
             EventBus.getDefault()

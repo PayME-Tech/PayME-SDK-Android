@@ -1,8 +1,9 @@
 package vn.payme.sdk.model
 
-import android.R.attr.shape
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.util.TypedValue
+import vn.payme.sdk.PayME
 
 
 class ColorApp {
@@ -13,6 +14,8 @@ class ColorApp {
         intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor))
     )
     var backgroundColorRadiusBorder: GradientDrawable = GradientDrawable()
+    var backgroundColorRadiusBorder30: GradientDrawable = GradientDrawable()
+
     var backgroundColorRadiusAlpha: GradientDrawable = GradientDrawable(
         GradientDrawable.Orientation.LEFT_RIGHT,
         intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor))
@@ -29,17 +32,26 @@ class ColorApp {
         GradientDrawable.Orientation.LEFT_RIGHT,
         intArrayOf(Color.parseColor("#ffffff"), Color.parseColor("#ffffff"))
     )
+    fun dbToFloat (f: Float) : Float{
+       return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, f,
+            PayME.context.getResources().getDisplayMetrics()
+        )
+
+    }
 
     constructor(startColor: String, endColor: String) {
         this.startColor = startColor
         this.endColor = endColor
-        this.backgroundColorRadiusBorder.cornerRadius = 30f
-        this.backgroundColorRadiusBorder.setStroke(1, Color.parseColor(startColor))
+        this.backgroundColorRadiusBorder.cornerRadius = dbToFloat(15f)
+        this.backgroundColorRadiusBorder30.cornerRadius = dbToFloat(15f)
+        this.backgroundColorRadiusBorder.setStroke(2, Color.parseColor(startColor))
+        this.backgroundColorRadiusBorder30.setStroke(2, Color.parseColor(startColor))
         this.backgroundColorRadius = GradientDrawable(
             GradientDrawable.Orientation.LEFT_RIGHT,
             intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor))
         )
-        this.backgroundColorRadius.cornerRadius = 60F
+        this.backgroundColorRadius.cornerRadius =dbToFloat(30f)
         this.backgroundColor = GradientDrawable(
             GradientDrawable.Orientation.LEFT_RIGHT,
             intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor))
@@ -48,8 +60,8 @@ class ColorApp {
             GradientDrawable.Orientation.LEFT_RIGHT,
             intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor))
         )
-        backgroundColorRadiusTop.cornerRadii = (floatArrayOf(60f, 60f, 60f, 60f, 0f, 0f, 0f, 0f))
-        backgroundColorRadiusTopWhite.cornerRadii = (floatArrayOf(65f, 65f, 65f, 65f, 0f, 0f, 0f, 0f))
+        backgroundColorRadiusTop.cornerRadii = (floatArrayOf(dbToFloat(30f), dbToFloat(30f), dbToFloat(30f), dbToFloat(30f), 0f, 0f, 0f, 0f))
+        backgroundColorRadiusTopWhite.cornerRadii = (floatArrayOf(dbToFloat(35f), dbToFloat(35f), dbToFloat(35f), dbToFloat(35f), 0f, 0f, 0f, 0f))
         backgroundColorRadiusAlpha  = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor)))
 
         this.backgroundColorRadiusAlpha.alpha = 100

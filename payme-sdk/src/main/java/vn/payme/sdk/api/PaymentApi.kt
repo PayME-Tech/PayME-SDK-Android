@@ -8,6 +8,7 @@ import android.webkit.WebViewClient
 import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 import vn.payme.sdk.PayME
+import vn.payme.sdk.enums.PAY_CODE
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
@@ -31,11 +32,12 @@ internal class PaymentApi {
                 "      storeName\n" +
                 "      succeeded\n" +
                 "      message\n" +
+                "      isVisibleHeader\n" +
                 "    }\n" +
                 "  }\n" +
                 "}"
         val getInfoMerchantInput: MutableMap<String, Any> = mutableMapOf()
-        getInfoMerchantInput["appId"] = Store.config.appID.toString()
+        getInfoMerchantInput["storeId"] = storeId
         params["query"] = query
         variables["getInfoMerchantInput"]= getInfoMerchantInput
         params["variables"] = variables
@@ -482,6 +484,7 @@ internal class PaymentApi {
         } else if(method.type==TYPE_PAYMENT.CREDIT_CARD){
             val creditCard: MutableMap<String, Any> = mutableMapOf()
             creditCard["cardNumber"] = cardInfo?.cardNumber!!
+            creditCard["cardHolder"] = cardInfo?.cardHolder!!
             creditCard["expiredAt"] = cardInfo?.cardDateView
             creditCard["cvv"] = cardInfo?.cvv!!
             if(referenceId!=null){
@@ -522,6 +525,7 @@ internal class PaymentApi {
 
     fun getTransferMethods(
         storeId:Long,
+        payCode:String,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
@@ -561,6 +565,7 @@ internal class PaymentApi {
         getPaymentMethodInput["serviceType"] = "OPEN_EWALLET_PAYMENT"
         extraData["storeId"] = storeId
         getPaymentMethodInput["extraData"] = extraData
+        getPaymentMethodInput["payCode"] = payCode
         variables["getPaymentMethodInput"] = getPaymentMethodInput
         params["query"] = query
         params["variables"] = variables

@@ -67,6 +67,7 @@ class TakePictureAvatarFragment : Fragment() {
         buttonBack = view.findViewById(R.id.buttonBack)
         buttonNext = view.findViewById(R.id.buttonNext)
         buttonBackHeader = view.findViewById(R.id.buttonBackHeader)
+        buttonBack?.setButtonTypeBorder()
 
         buttonBackHeader2 = view.findViewById(R.id.buttonBackHeader2)
         cardViewCamera = view.findViewById(R.id.cardViewCamera)

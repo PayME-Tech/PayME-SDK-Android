@@ -50,7 +50,7 @@ class VideoPreviewFragment : Fragment() {
         buttonBackHeader2 = view.findViewById(R.id.buttonBackHeader2)
         containerVideo = view.findViewById(R.id.containerPreviewVideo)
         buttonPlay = view.findViewById(R.id.buttonPlay)
-
+        buttonBack?.setButtonTypeBorder()
         val controller = MediaController(context)
         controller.setAnchorView(imagePreView)
         controller.setMediaPlayer(imagePreView)

@@ -24,6 +24,7 @@ import vn.payme.sdk.api.CryptoAES
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.credit.CameraTakeProfileCreditActivity
 import vn.payme.sdk.enums.Env
+import vn.payme.sdk.enums.PAY_CODE
 import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.JsObject
@@ -223,7 +224,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
                     },
                     onScanQR={
                         val payme = PayME()
-                        payme.openScanQR(parentFragmentManager,PayME.onSuccess,PayME.onError)
+                        payme.openScanQR(parentFragmentManager,PAY_CODE.PAYME,PayME.onSuccess,PayME.onError)
                     },
                     takeImage = { takeImage() },
                     it,

@@ -12,6 +12,7 @@
     <string name="number_card_error">Số thẻ không đúng định dạng</string>
     <string name="please_check_the_correct_name_printed_on_the_card">Vui lòng kiểm tra đúng tên in trên thẻ</string>
     <string name="enter_the_cardholder_full_name">Nhập họ tên chủ thẻ</string>
+    <string name="the_cardholder_full_name">Tên chủ thẻ</string>
     <string name="done">Hoàn tất</string>
     <string name="resend_otp">Gửi lại OTP</string>
     <string name="take_picture_again">Chụp lại</string>
@@ -61,7 +62,7 @@
     <string name="payment_pending">Thanh toán đang chờ xử </string>
     <string name="payment_pending_description">Cần thời gian thêm để xử lý. Vui lòng không thực hiện lại tránh bị trùng. Liên hệ CSKH để hỗ trợ</string>
     <string name="payment_pending_hotline">1900 88 66 65</string>
-    <string name="select_method_payment">Nguồn thanh toán</string>
+    <string name="select_method_payment">Chọn nguồn thanh toán</string>
     <string name="please_enter_otp_from_phone_number">Vui lòng nhập mã OTP được gửi tới số điện thoại</string>
     <string name="please_enter_pass">Nhập mật khẩu ví PayME  để xác thực</string>
     <string name="active_now">Kích hoạt ngay</string>
@@ -87,7 +88,6 @@
     <string name="note_bank_transfer">(*) Giao dịch sẽ được thực hiện ngay sau khi xác nhận chuyển khoản </string>
     <string name="check_bank_transfer">Hệ thống đang kiểm tra trạng thái lệnh chuyển tiền của bạn. Vui lòng chờ trong giây lát...</string>
     <string name="result_bank_transfer">Hệ thống vẫn chưa ghi nhận lệnh chuyển tiền của bạn. Tài khoản của bạn sẽ được ghi có ngay khi hệ thống ghi nhận thành công.</string>
-    <string name="atm_number">ATM card number</string>
     <string name="free">Miễn phí</string>
     <string name="card_number">Số thẻ</string>
     <string name="receiver">Người nhận</string>
@@ -118,6 +118,6 @@
     <string name="list_bank_support_u"><u>Danh sách ngân hàng hỗ trợ</u></string>
     <string name="list_bank_support">Danh sách ngân hàng hỗ trợ</string>
     <string name="not_found_bank">Không tìm thấy ngân hàng nào</string>
-
+    <string name="checking">Đang kiểm tra...</string>
 
 </resources>

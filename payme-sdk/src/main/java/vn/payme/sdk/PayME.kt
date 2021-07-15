@@ -59,13 +59,27 @@ public class PayME {
 
     fun scanQR(
         fragmentManager: FragmentManager,
+        payCode: String,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ): Unit {
         val checkAccount = CheckAccount()
         if (checkAccount.check(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
+            if (!((payCode == PAY_CODE.PAYME) ||
+                        (payCode == PAY_CODE.ATM) ||
+                        (payCode == PAY_CODE.MANUAL_BANK) ||
+                        (payCode == PAY_CODE.CREDIT))
+            ) {
+                onError(
+                    null,
+                    ERROR_CODE.PAYMENT_ERROR,
+                    PayME.context.getString(R.string.method_not_supported)
+                )
+                return
+            }
+
             onSuccess(null)
-            openScanQR(fragmentManager, onSuccess = {
+            openScanQR(fragmentManager,payCode, onSuccess = {
             },
                 onError = { jsonObject, i, s ->
                     PayME.showError(s)
@@ -76,6 +90,7 @@ public class PayME {
 
     internal fun openScanQR(
         fragmentManager: FragmentManager,
+        payCode: String,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
@@ -83,18 +98,34 @@ public class PayME {
         PayME.onSuccess = onSuccess
         PayME.onError = onError
         val scanQR = ScanQR()
+        val bundle = Bundle()
+        bundle.putString("payCode",payCode)
+        scanQR.arguments = bundle
         scanQR.show(fragmentManager, null)
     }
 
     fun payQRCode(
         fragmentManager: FragmentManager,
         qr: String,
+        payCode: String,
         isShowResultUI: Boolean,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
         val checkAccount = CheckAccount()
         if (checkAccount.check(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
+            if (!((payCode == PAY_CODE.PAYME) ||
+                        (payCode == PAY_CODE.ATM) ||
+                        (payCode == PAY_CODE.MANUAL_BANK) ||
+                        (payCode == PAY_CODE.CREDIT))
+            ) {
+                onError(
+                    null,
+                    ERROR_CODE.PAYMENT_ERROR,
+                    PayME.context.getString(R.string.method_not_supported)
+                )
+                return
+            }
             val paymentApi = PaymentApi()
             val loading = SpinnerDialog()
             loading.show(fragmentManager, null)
@@ -130,7 +161,7 @@ public class PayME {
                             fragmentManager,
                             infoPayment,
                             isShowResultUI,
-                            null,
+                            payCode,
                             onSuccess,
                             onError
                         )
@@ -144,7 +175,7 @@ public class PayME {
         }
     }
 
-    internal fun payQRCodeInSDK(fragmentManager: FragmentManager, qr: String) {
+    internal fun payQRCodeInSDK(fragmentManager: FragmentManager, qr: String,payCode:String) {
         val paymentApi = PaymentApi()
         val loading = SpinnerDialog()
         loading.show(fragmentManager, null)
@@ -181,6 +212,7 @@ public class PayME {
                     val paymeSDK = PayME()
                     paymeSDK.payInSDK(
                         fragmentManager,
+                        payCode,
                         infoPayment,
                     )
                 }
@@ -226,7 +258,6 @@ public class PayME {
         env: Env,
         showLog: Boolean
     ) {
-        println("language:"+language.toString())
         PayME.context = context
         Store.config = Config(
             appPrivateKey,
@@ -240,7 +271,7 @@ public class PayME {
         )
         Store.paymentInfo = PaymentInfo(
             null, 0, "", null, null, null, "", arrayListOf(),
-            arrayListOf(), null, true, true, "", ""
+            arrayListOf(), null,  true
         )
         Store.userInfo = UserInfo(0, false, false, false, "", null)
         Security.insertProviderAt(BouncyCastleProvider(), 1)
@@ -603,25 +634,25 @@ public class PayME {
 
     internal fun payInSDK(
         fragmentManager: FragmentManager,
+        payCode: String,
         infoPayment: InfoPayment,
     ) {
         val payment = PayFunction()
         Store.config.disableCallBackResult = true
-        payment.pay(fragmentManager, infoPayment, true, null, onSuccess, onError)
+        payment.pay(fragmentManager, infoPayment, true, payCode, onSuccess, onError)
     }
 
     fun pay(
         fragmentManager: FragmentManager,
         infoPayment: InfoPayment,
         isShowResultUI: Boolean,
-        methodId: Number?,
+        payCode: String,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
-        println("methodId"+methodId)
         val payment = PayFunction()
         Store.config.disableCallBackResult = false
-        payment.pay(fragmentManager, infoPayment, isShowResultUI, methodId, onSuccess, onError)
+        payment.pay(fragmentManager, infoPayment, isShowResultUI, payCode, onSuccess, onError)
     }
 
 
@@ -659,10 +690,6 @@ public class PayME {
             val kyc = Init.optJSONObject("kyc")
             val appEnv = Init.optString("appEnv")
             val succeeded = Init.optBoolean("succeeded")
-            val storeName = Init.optString("storeName")
-            val storeImage = Init.optString("storeImage")
-            Store.paymentInfo.storeName = storeName
-            Store.paymentInfo.storeImage = storeImage
             Store.userInfo.accountActive = succeeded
             if (appEnv == Env.SANDBOX.toString()) {
                 Store.config.openPayAndKyc = false
@@ -719,64 +746,6 @@ public class PayME {
             onSuccess(Store.paymentInfo.listService)
         }
     }
-
-    fun getPaymentMethods(
-        storeId: Long,
-        onSuccess: (ArrayList<Method>) -> Unit,
-        onError: (JSONObject?, Int, String?) -> Unit
-    ) {
-        if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
-            val paymentApi = PaymentApi()
-            val listMethod: ArrayList<Method> = ArrayList<Method>()
-            paymentApi.getTransferMethods(
-                storeId,
-                onSuccess = { jsonObject ->
-                    val Utility = jsonObject.optJSONObject("Utility")
-                    val GetPaymentMethod = Utility.optJSONObject("GetPaymentMethod")
-                    val message = GetPaymentMethod.optString("message")
-                    val succeeded = GetPaymentMethod.optBoolean("succeeded")
-                    val methods = GetPaymentMethod.optJSONArray("methods")
-                    if (succeeded) {
-                        for (i in 0 until methods.length()) {
-                            val jsonObject = methods.getJSONObject(i)
-                            var data = jsonObject.optJSONObject("data")
-                            var dataMethod = DataMethod(null, "", "")
-                            if (data != null) {
-                                val linkedId = data.optDouble("linkedId")
-                                val swiftCode = data.optString("swiftCode")
-                                val issuer = data.optString("issuer")
-                                dataMethod = DataMethod(linkedId, swiftCode, issuer)
-                            }
-                            var fee = jsonObject.optInt("fee")
-                            var label = jsonObject.optString("label")
-                            var feeDescription = jsonObject.optString("feeDescription")
-                            var methodId = jsonObject.optInt("methodId")
-                            var minFee = jsonObject.optInt("minFee")
-                            var title = jsonObject.optString("title")
-                            var type = jsonObject.optString("type")
-                            listMethod.add(
-                                Method(
-                                    dataMethod,
-                                    fee,
-                                    label,
-                                    methodId,
-                                    minFee,
-                                    feeDescription,
-                                    title,
-                                    type,
-                                )
-                            )
-                        }
-                        onSuccess(listMethod)
-                    } else {
-                        onError(null, ERROR_CODE.PAYMENT_ERROR, message)
-                    }
-                },
-                onError
-            )
-        }
-    }
-
     fun getWalletInfo(
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit

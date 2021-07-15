@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import com.squareup.picasso.Picasso
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.PayME
@@ -40,7 +41,7 @@ class EnterAtmCardFragment : Fragment() {
     fun detechCardHoder(cardNumber: String,count:Int) {
 
         val paymentApi = PaymentApi()
-        inputCardNumber.progressBar.visibility = View.VISIBLE
+        inputCardNumber.txtTitleRight.text  = getString(R.string.checking)
         paymentApi.detectCardHolder(bankSelected?.swiftCode!!,
             cardNumber,
             onSuccess = { jsonObject ->
@@ -52,17 +53,15 @@ class EnterAtmCardFragment : Fragment() {
                 val accountName = GetBankName.optString("accountName")
                 val message = GetBankName.optString("message")
                 val succeeded = GetBankName.optBoolean("succeeded")
+                inputCardNumber.txtTitleRight.text = ""
+
                 if (succeeded) {
+                    inputCardHolder.input.setText(accountName)
                     if (accountName.length >= 19) {
-                        inputCardHolder.visibility = View.VISIBLE
-                        inputCardHolder.txtTitleRight.text = accountName
                         cardHolder = accountName
                     } else {
-                        inputCardNumber.txtTitleRight.text = accountName
                         cardHolder = accountName
                     }
-                } else {
-                    inputCardHolder.visibility = View.VISIBLE
                 }
 
             },
@@ -93,12 +92,12 @@ class EnterAtmCardFragment : Fragment() {
         inputCardNumber.input.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 count = count+1
-                inputCardNumber.progressBar.visibility = View.GONE
+                inputCardNumber.imageRight.visibility  = View.GONE
+
 
                 val cardNumber = s?.replace("[^0-9]".toRegex(), "")
                 cardHolder = ""
                 cardNumberValue = ""
-                inputCardHolder.visibility = View.GONE
                 inputCardHolder.setDefault()
                 inputCardNumber.txtTitleRight.text = ""
                 inputCardHolder.input.setText("")
@@ -111,7 +110,15 @@ class EnterAtmCardFragment : Fragment() {
                     for (i in 0 until listBanks.size) {
                         cardPrefixBank = listBanks[i].cardPrefix
                         if (cardPrefix == cardPrefixBank) {
+                            inputCardNumber.imageRight.visibility  = View.VISIBLE
                             bankSelected = listBanks[i]
+                            val picasso = Picasso.get()
+                            picasso.setIndicatorsEnabled(false)
+                            picasso.load("https://firebasestorage.googleapis.com/v0/b/vn-mecorp-payme-wallet.appspot.com/o/image_bank%2Fimage_method%2Fmethod${bankSelected?.swiftCode}.png?alt=media&token=28cdb30e-fa9b-430c-8c0e-5369f500612e")
+                                .resize(50, 50)
+                                .centerInside()
+                                .into(inputCardNumber.imageRight)
+
                             cardNumberLength = listBanks[i].cardNumberLength
                             maxLength = cardNumberLength + 3
                             val filters = arrayOfNulls<InputFilter>(1)
@@ -237,6 +244,10 @@ class EnterAtmCardFragment : Fragment() {
     }
     @Subscribe
     fun checkAtm (event :CheckInputAtm){
+        println("event.isCheck"+event.isCheck)
+        println("cardDate.length"+cardDate.length)
+        println("cardHolder.length"+cardHolder.length)
+        println(" cardNumberValue.length"+ cardNumberValue.length)
 
         if (event.isCheck && cardDate.length > 0 && cardHolder.length > 0 && cardNumberValue.length > 0) {
             val cardInfo = CardInfo(

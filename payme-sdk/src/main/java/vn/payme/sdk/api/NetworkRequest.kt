@@ -154,6 +154,8 @@ internal class NetworkRequest(
                 },
                 Response.ErrorListener { error ->
 
+                    error.printStackTrace()
+
                     onError(
                         null,
                         ERROR_CODE.NETWORK,

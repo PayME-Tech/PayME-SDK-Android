@@ -87,6 +87,8 @@ class TakePictureIdentifyFragment : Fragment() {
         if(CameraKycPopup.updateOnlyIdentify){
             buttonDropdown.visibility  = View.GONE
         }
+        buttonBack?.setButtonTypeBorder()
+
 
 
         if(CameraKycPopup.updateOnlyIdentify){

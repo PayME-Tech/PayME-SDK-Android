@@ -26,7 +26,7 @@ class AddInfoMethod {
             imageView.setImageResource(R.drawable.ic_atm)
         } else if (method.type == TYPE_PAYMENT.WALLET) {
             imageView.setImageResource(R.drawable.ic_payme)
-        } else if (method.type == TYPE_PAYMENT.NAPAS || method.type == TYPE_PAYMENT.LINKED) {
+        } else if (method.type == TYPE_PAYMENT.LINKED) {
             val picasso = Picasso.get()
             picasso.setIndicatorsEnabled(false)
             val imageCode = if(method.data?.issuer!= "null") method.data?.issuer else method.data?.swiftCode
@@ -40,11 +40,16 @@ class AddInfoMethod {
         }
 
     }
-    fun setTitle(method: Method, titleText: TextView, noteMethod: TextView,txtFee: TextView?) {
+    fun setTitle(method: Method, titleText: TextView, noteMethod: TextView?,txtFee:TextView?) {
+        if(txtFee!=null){
+            txtFee.text = method.feeDescription
+        }
         if(method.type == TYPE_PAYMENT.WALLET){
-            noteMethod.visibility = View.VISIBLE
-        }else{
-            noteMethod.visibility = View.GONE
+            if(Store.userInfo.accountKycSuccess && Store.userInfo.accountActive){
+                noteMethod?.visibility = View.VISIBLE
+            }else{
+                noteMethod?.visibility = View.GONE
+            }
         }
         if (method.type == TYPE_PAYMENT.BANK_CARD) {
             titleText.text = method.title
@@ -52,18 +57,16 @@ class AddInfoMethod {
             titleText.text = method.title
             val decimal = DecimalFormat("#,###")
             if(Store.userInfo.accountKycSuccess){
-                noteMethod.text = "(${decimal.format(Store.userInfo.balance?.toLong())}đ)"
+                noteMethod?.text = "(${decimal.format(Store.userInfo.balance?.toLong())}đ)"
             }
             return
-        } else if (method.type == TYPE_PAYMENT.NAPAS || method.type == TYPE_PAYMENT.LINKED) {
+        } else if (method.type == TYPE_PAYMENT.LINKED) {
             titleText.text = method.title!!
-            noteMethod.text = method.label!!
+            noteMethod?.text = method.label!!
             return
         } else {
             titleText.text = method.title
         }
-        if(txtFee!=null){
-            txtFee.text = method.feeDescription
-        }
+
     }
 }

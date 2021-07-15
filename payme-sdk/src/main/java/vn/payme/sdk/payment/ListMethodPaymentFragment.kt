@@ -19,10 +19,7 @@ import vn.payme.sdk.adapter.MethodAdapter
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
-import vn.payme.sdk.evenbus.ChangeFragmentPayment
-import vn.payme.sdk.evenbus.ListBankAtm
-import vn.payme.sdk.evenbus.ListBankTransfer
-import vn.payme.sdk.evenbus.PaymentInfoEvent
+import vn.payme.sdk.evenbus.*
 import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.model.BankInfo
 import vn.payme.sdk.model.BankTransferInfo
@@ -41,129 +38,12 @@ class ListMethodPaymentFragment : Fragment() {
     private fun disableLoading() {
         loadingPopup.dismiss()
     }
-
-    private fun checkFee(method: Method) {
-        val paymentApi = PaymentApi()
-        showLoading()
-        paymentApi.getFee(
-            Store.paymentInfo.infoPayment!!.amount,
-            method,
-            onSuccess = { jsonObject ->
-                if (!isVisible) return@getFee
-                val Utility = jsonObject.getJSONObject("Utility")
-                val GetFee = Utility.getJSONObject("GetFee")
-                val succeeded = GetFee.getBoolean("succeeded")
-                val message = GetFee.getString("message")
-                if (succeeded) {
-                    val feeObject = GetFee.getJSONObject("fee")
-                    val fee = feeObject.getInt("fee")
-                    val state = GetFee.getString("state")
-                    if (state == "null") {
-                        EventBus.getDefault().postSticky(PaymentInfoEvent(null, fee))
-                        if (method.type == TYPE_PAYMENT.BANK_CARD) {
-                            val payFunction = PayFunction()
-                            payFunction.getListBank(onSuccess = {
-                                disableLoading()
-                                EventBus.getDefault().post(method)
-                            }, onError = { jsonObject, i, s ->
-                                disableLoading()
-                                PayME.showError(s)
-                            })
-                        } else if (method.type == TYPE_PAYMENT.BANK_TRANSFER) {
-                            val payFunction = PayFunction()
-                            payFunction.getListBank(onSuccess = {
-                                payFunction.getListBankTransfer(onSuccess = {
-                                    disableLoading()
-                                    EventBus.getDefault().post(method)
-                                }, method, onError = { jsonObject, i, s ->
-                                    disableLoading()
-                                    PayME.showError(s)
-                                })
-                            }, onError = { jsonObject, i, s ->
-                                disableLoading()
-                                PayME.showError(s)
-                            })
-
-                        } else {
-                            disableLoading()
-
-                            EventBus.getDefault().post(method)
-                        }
-                    } else {
-                        disableLoading()
-                        PayME.showError(message)
-                    }
-
-                } else {
-                    disableLoading()
-                    PayME.showError(message)
-                }
-            },
-            onError = { jsonObject: JSONObject?, code: Int, message: String? ->
-                if (!isVisible) return@getFee
-                disableLoading()
-                PayME.showError(message)
-            })
+    companion object{
+        var isVisible = false
     }
 
-    private fun getListBankTransfer(method: Method) {
-        val paymentApi = PaymentApi()
-        Keyboard.closeKeyboard(requireContext())
-        paymentApi.payment(
-            method,
-            "",
-            null,
-            "",
-            "",
-            false,
-            null,
-            onSuccess = { jsonObject ->
-                if (!isVisible) return@payment
-                disableLoading()
-                val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
-                val Payment = OpenEWallet.optJSONObject("Payment")
-                val Pay = Payment.optJSONObject("Pay")
-                val succeeded = Pay.optBoolean("succeeded")
-                val payment = Pay.optJSONObject("payment")
-                val message = Pay.optString("message")
-                if (succeeded) {
-                    val listBank = arrayListOf<BankTransferInfo>()
-                    val bankList = payment.optJSONArray("bankList")
-                    for (i in 0 until bankList.length()) {
-                        val bank = bankList.optJSONObject(i)
-                        val bankAccountName = bank.optString("bankAccountName")
-                        val bankAccountNumber = bank.optString("bankAccountNumber")
-                        val bankBranch = bank.optString("bankBranch")
-                        val bankCity = bank.optString("bankCity")
-                        val bankName = bank.optString("bankName")
-                        val content = bank.optString("content")
-                        val swiftCode = bank.optString("swiftCode")
-                        val qrContent = bank.optString("qrContent")
-                        val bankTransferInfo = BankTransferInfo(
-                            bankAccountName,
-                            bankAccountNumber,
-                            bankBranch,
-                            bankCity,
-                            bankName,
-                            content,
-                            swiftCode,
-                            qrContent
-                        )
-                        listBank.add(bankTransferInfo)
-                    }
-                    EventBus.getDefault().postSticky(listBank[0])
-                    EventBus.getDefault().postSticky(ListBankTransfer(listBank))
-                    EventBus.getDefault().post(method)
-                } else {
-                    PayME.showError(message)
-                }
-            },
-            onError = { jsonObject, code, message ->
-                if (!isVisible) return@payment
-                disableLoading()
-                PayME.showError(message)
-            })
-    }
+
+
 
 
     fun setListViewHeightBasedOnChildren(listView: ListView) {
@@ -194,8 +74,9 @@ class ListMethodPaymentFragment : Fragment() {
         Keyboard.closeKeyboard(requireContext())
         listView = view.findViewById(R.id.recipe_list_view)
         loadingProcess = view.findViewById(R.id.loadingListMethodPayment)
-        loadingProcess.getIndeterminateDrawable()
-            .mutate()
+        ListMethodPaymentFragment.isVisible = true
+
+        loadingProcess.getIndeterminateDrawable().mutate()
             .setColorFilter(
                 Color.parseColor(Store.config.colorApp.startColor),
                 PorterDuff.Mode.SRC_ATOP
@@ -213,22 +94,12 @@ class ListMethodPaymentFragment : Fragment() {
         this.listView.setOnItemClickListener { adapterView, view, i, l ->
             if (!loadingPopup.isVisible) {
                 val method = Store.paymentInfo.listMethod[i]
-                Store.paymentInfo.methodSelected = method
-                if (method.type != TYPE_PAYMENT.WALLET && !Store.config.openPayAndKyc) {
-                    PayME.showError("Chức năng chỉ có thể thao tác môi trường production")
-                    return@setOnItemClickListener
-                }
-                if (method.type == TYPE_PAYMENT.CREDIT_CARD ||
-                    method.type == TYPE_PAYMENT.BANK_CARD ||
-                    method?.type == TYPE_PAYMENT.LINKED ||
-                    method?.type == TYPE_PAYMENT.BANK_TRANSFER
-                ) {
-                    checkFee(method)
-                    return@setOnItemClickListener
-                }
                 if (method?.type == TYPE_PAYMENT.WALLET) {
+                    val total = Store.paymentInfo.infoPayment!!.amount + EventBus.getDefault().getStickyEvent(FeeInfo::class.java).feeWallet
+
+                    val feeInfo = EventBus.getDefault().getStickyEvent(FeeInfo::class.java)
                     if (
-                        (!Store.userInfo.accountActive || !Store.userInfo.accountKycSuccess || Store.paymentInfo.infoPayment!!.amount > Store.userInfo.balance)
+                        (!Store.userInfo.accountActive || !Store.userInfo.accountKycSuccess ||total > Store.userInfo.balance )
                     ) {
                         val paymeSDK = PayME()
                         if (!Store.userInfo.accountActive) {
@@ -244,7 +115,7 @@ class ListMethodPaymentFragment : Fragment() {
                                 onError = { jsonObject: JSONObject?, i: Int, message: String? ->
                                     PayME.showError(message)
                                 })
-                        } else if (Store.paymentInfo.infoPayment!!.amount > Store.userInfo.balance) {
+                        } else if (total > Store.userInfo.balance) {
                             paymeSDK.deposit(
                                 PayME.fragmentManager,
                                 0,
@@ -256,18 +127,45 @@ class ListMethodPaymentFragment : Fragment() {
                         EventBus.getDefault()
                             .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, null))
 
-                    } else {
-                        checkFee(method)
+                    }else{
+                        getFee(method)
                     }
-                    return@setOnItemClickListener
-
+                }else{
+                    if(method.methodId != Store.paymentInfo.methodSelected!!.methodId || method.type != Store.paymentInfo.methodSelected!!.type){
+                        getFee(method)
+                    }
                 }
-                PayME.showError("Phương thức chưa được hỗ trợ")
+
 
             }
         }
         return view
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ListMethodPaymentFragment.isVisible = false
+
+    }
+    fun  getFee(method:Method){
+        val payFunction = PayFunction()
+        showLoading()
+        payFunction.checkFee(Store.paymentInfo.infoPayment!!,method,onSuccess = {
+            disableLoading()
+            if (!isVisible) return@checkFee
+            Store.paymentInfo.methodSelected  = method
+            EventBus.getDefault().post(method)
+            methodAdapter.notifyDataSetChanged()
+
+        },onError = {jsonObject, i, s ->
+            disableLoading()
+
+            if (!isVisible) return@checkFee
+            PayME.showError(s)
+
+        })
+    }
+
 
 
 }

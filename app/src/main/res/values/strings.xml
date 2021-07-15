@@ -1,12 +1,21 @@
 <resources>
     <string name="app_name">TESTAPP</string>
     <string-array name="environment_arrays">
+        <item>SANDBOX</item>
         <item>DEV</item>
-        <item>Sandbox</item>
-        <item>Production</item>
+        <item>PRODUCTION</item>
     </string-array>
     <string-array name="lang_arrays">
         <item>VN</item>
         <item>EN</item>
+    </string-array>
+    <string-array name="paycode_arrays">
+        <item>PAYME</item>
+        <item>ATM</item>
+        <item>CREDIT</item>
+        <item>MANUAL_BANK</item>
+        <item>VN_PAY</item>
+        <item>MOMO</item>
+        <item>ZALO_PAY</item>
     </string-array>
 </resources>
