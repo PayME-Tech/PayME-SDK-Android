@@ -292,44 +292,8 @@ payme.openKYC(
 		}
 	     )
 ```
-### scanQR() - Mở chức năng quét mã QR để thanh toán
 
-```kotlin
-fun scanQR(
-	fragmentManager: FragmentManager,
-	onSuccess: (JSONObject?) -> Unit,
-	onError: (JSONObject?, Int, String?) -> Unit
-) : Unit 
-```
-Định dạng qr : 
-```kotlin
- val qrString =  "{$type}|${storeId}|${action}|${amount}|${note}|${orderId}"
-```
 
-Ví dụ  : 
-```kotlin
-val qrString = "OPENEWALLET|54938607|PAYMENT|20000|Chuyentien|2445562323"
-```
-
-- action: loại giao dịch ( 'PAYMENT' => thanh toán)
-- amount: số tiền thanh toán
-- note: Mô tả giao dịch từ phía đối tác
-- orderId: mã giao dịch của đối tác, cần duy nhất trên mỗi giao dịch
-- storeId: ID của store phía công thanh toán thực hiên giao dịch thanh toán
-- type: OPENEWALLET
-- 
-### payQRCode() - thanh toán mã QR code
-```kotlin
-    fun payQRCode(
-    fragmentManager: FragmentManager, 
-    qr: String,
-    isShowResultUI:Boolean,
-    onSuccess: (JSONObject?) -> Unit,
-    onError:(JSONObject?, Int, String?) -> Unit)
-```
-
-- qr: Mã QR để thanh toán  ( Định dạng QR như hàm scanQR() )
-- isShowResultUI: Có muốn hiển thị kết quả giao dịch hay ko  
 
 ### deposit() - Nạp tiền
 
@@ -497,23 +461,6 @@ Ví dụ:
 
 
 
-### getPaymentMethods()
-
-Hàm này được gọi khi từ app tích hợp khi muốn lấy danh sách các phương thức thanh toán mà PayME cung cấp vs từng tài khoản sau khi tài khoản đã kích hoạt và định danh thành công,dùng để truyền vào hàm pay() để chọn trực tiếp phương thức thanh toán mà app đối tác muốn
-
-
-
-```kotlin
-public fun getPaymentMethods(
-	storeId:Long,
-        onSuccess: (ArrayList<Method>) -> Unit,
-        onError: (JSONObject?, Int, String?) -> Unit
-    )
-
-```
-- storeId: ID của store phía công thanh toán thực hiên giao dịch thanh toán
-
-
 
 ### pay() - Thanh toán
 
@@ -524,7 +471,7 @@ public fun pay(
             fragmentManager: FragmentManager,
             infoPayment: InfoPayment,
   	    isShowResultUI: Boolean,
-  	    methodId: Number?,
+  	    payCode: String,
             onSuccess: ((JSONObject?) -> Unit)?,
             onError: ((JSONObject?, Int, String?) -> Unit)?,
         )
@@ -537,7 +484,7 @@ class InfoPayment {
     var type : String? = null
     var referExtraData : String? = null
 }
-- methodId: Id của phương thức
+
 - action: loại giao dịch ( 'PAYMENT' => thanh toán)
 - amount: số tiền thanh toán
 - note: Mô tả giao dịch từ phía đối tác
@@ -571,7 +518,7 @@ val infoPayment = InfoPayment(
 payme?.pay( this.supportFragmentManager,
 	    infoPayment,
 	    true,
-	    null,
+	    PAY_CODE.PAYME,
             onSuccess = { json: JSONObject? -> },
             onError = { jsonObject, code, message ->
                         if (message != null && message.length > 0) {
@@ -589,16 +536,58 @@ payme?.pay( this.supportFragmentManager,
 
 
 ```
+Danh sách PAY_CODE
 
-| Tham số        | **Bắt buộc** | **Giải thích**                                               |
+| **Tham số**    | **Bắt buộc** | **Giải thích**                                               |
 | -------------- | ------------ | ------------------------------------------------------------ |
-| amount         | Yes          | Số tiền cần thanh toán bên app truyền qua cho SDK            |
-| descriptio     | No           | Mô tả nếu có                                                 |
-| extraData      | Yes          | Khi thực hiện thanh toans thì app cần truyền thêm các dữ liệu khác nếu muốn để hệ thông backend PayME có thể IBN lại hệ thống backend tích hợp đối chiều. Ví dụ : transactionID của giao dịch hay bất kỳ dữ liệu nào cần thiết. |
-| isShowResultUI | Yes          | Có muốn hiển thị kết quả giao dịch hay ko                    |
-| method         | No           | (tùy chọn có thể null) cung cấp ở hàm getPaymentMethods()  để chọn trực tiếp phương thức thanh toán mà app đối tác muốn |
+| PAYME| Yes          | Thanh toán ví PayME |
+| ATM | Yes          | Thanh toán thẻ ATM nội đia|
+| CREDIT  | Yes           |  Thẻ tín dụng |
+| MANUAL_BANK  | Yes           |  Thanh toán chuyển khoản ngân hàng |
 
-Trong trường hợp app tích hợp cần lấy số dư để tự hiển thị lên UI trên app thì có thể dùng hàm, hàm này không hiển thị UI của PayME SDK
+### scanQR() - Mở chức năng quét mã QR để thanh toán
+
+```kotlin
+fun scanQR(
+	fragmentManager: FragmentManager,
+	payCode: String,
+	onSuccess: (JSONObject?) -> Unit,
+	onError: (JSONObject?, Int, String?) -> Unit
+) : Unit 
+```
+Định dạng qr : 
+```kotlin
+ val qrString =  "{$type}|${storeId}|${action}|${amount}|${note}|${orderId}"
+```
+
+Ví dụ  : 
+```kotlin
+val qrString = "OPENEWALLET|54938607|PAYMENT|20000|Chuyentien|2445562323"
+```
+
+- action: loại giao dịch ( 'PAYMENT' => thanh toán)
+- amount: số tiền thanh toán
+- note: Mô tả giao dịch từ phía đối tác
+- orderId: mã giao dịch của đối tác, cần duy nhất trên mỗi giao dịch
+- storeId: ID của store phía công thanh toán thực hiên giao dịch thanh toán
+- type: OPENEWALLET
+- payCode : ở bảng payCode ở trên
+
+### payQRCode() - thanh toán mã QR code
+```kotlin
+    fun payQRCode(
+    fragmentManager: FragmentManager, 
+    qr: String,
+    payCode: String,
+    isShowResultUI:Boolean,
+    onSuccess: (JSONObject?) -> Unit,
+    onError:(JSONObject?, Int, String?) -> Unit)
+```
+
+- qr: Mã QR để thanh toán  ( Định dạng QR như hàm scanQR() )
+- isShowResultUI: Có muốn hiển thị kết quả giao dịch hay ko  
+- payCode : ở bảng payCode ở trên
+
 
 ### getWalletInfo() - **Lấy các thông tin của ví**
 
