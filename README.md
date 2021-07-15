@@ -55,35 +55,7 @@ android {
 }
 dependencies {
 ...
-  // thư viện chính
-  implementation 'com.github.PayME-Tech:PayME-SDK-Android:0.9.0'
-  // thư viện kèm theo
-  ...
-  implementation 'com.android.volley:volley:1.1.1'
-  implementation 'org.greenrobot:eventbus:3.0.0'
-  implementation 'com.airbnb.android:lottie:3.0.3'
-  implementation 'com.google.android.material:material:1.2.1'
-  implementation 'com.google.zxing:core:3.3.3'
-  implementation ('com.journeyapps:zxing-android-embedded:3.6.0') { transitive = false }
-
-  implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.0'
-  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
-  implementation 'com.madgag.spongycastle:prov:1.58.0.0'
-  implementation 'com.squareup.picasso:picasso:2.71828'
-
-  implementation 'com.github.GrenderG:Toasty:1.5.0'
-  implementation 'com.otaliastudios:cameraview:2.6.4'
-  implementation "androidx.fragment:fragment:1.2.5"
-
-  def fragment_version = "1.2.5"
-
-  // Java language implementation
-  // Kotlin
-  implementation "androidx.fragment:fragment-ktx:$fragment_version"
-  implementation "androidx.cardview:cardview:1.0.0"
-  implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-  implementation 'androidx.appcompat:appcompat:1.2.0'
-
+  implementation 'com.github.PayME-Tech:PayME-SDK-Android:0.9.8'
 ...
 }
 ```
