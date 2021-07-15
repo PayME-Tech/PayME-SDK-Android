@@ -94,7 +94,7 @@ class ListMethodPaymentFragment : Fragment() {
         this.listView.setOnItemClickListener { adapterView, view, i, l ->
             if (!loadingPopup.isVisible) {
                 val method = Store.paymentInfo.listMethod[i]
-                if (method?.type == TYPE_PAYMENT.WALLET) {
+                if (method?.type == TYPE_PAYMENT.WALLET ) {
                     val total = Store.paymentInfo.infoPayment!!.amount + EventBus.getDefault().getStickyEvent(FeeInfo::class.java).feeWallet
 
                     val feeInfo = EventBus.getDefault().getStickyEvent(FeeInfo::class.java)
@@ -128,7 +128,9 @@ class ListMethodPaymentFragment : Fragment() {
                             .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, null))
 
                     }else{
-                        getFee(method)
+                        if( method.type != Store.paymentInfo.methodSelected!!.type){
+                            getFee(method)
+                        }
                     }
                 }else{
                     if(method.methodId != Store.paymentInfo.methodSelected!!.methodId || method.type != Store.paymentInfo.methodSelected!!.type){
@@ -151,16 +153,15 @@ class ListMethodPaymentFragment : Fragment() {
         val payFunction = PayFunction()
         showLoading()
         payFunction.checkFee(Store.paymentInfo.infoPayment!!,method,onSuccess = {
-            disableLoading()
             if (!isVisible) return@checkFee
+            disableLoading()
             Store.paymentInfo.methodSelected  = method
             EventBus.getDefault().post(method)
             methodAdapter.notifyDataSetChanged()
 
         },onError = {jsonObject, i, s ->
-            disableLoading()
-
             if (!isVisible) return@checkFee
+            disableLoading()
             PayME.showError(s)
 
         })
