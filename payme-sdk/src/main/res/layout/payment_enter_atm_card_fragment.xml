@@ -47,7 +47,7 @@
         app:pbHint="MM / YY"
         app:pbInputType="number"
         app:pbMaxlength="5"
-        app:pbTitle="@string/release_date_mm_yy" />
+        app:pbTitle="@string/release_date_expired" />
 
 
 

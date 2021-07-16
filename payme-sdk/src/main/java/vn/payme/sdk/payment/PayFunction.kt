@@ -78,13 +78,15 @@ internal class PayFunction {
                         val cardNumberLength = bank.optInt("cardNumberLength")
                         val shortName = bank.optString("shortName")
                         val swiftCode = bank.optString("swiftCode")
+                        val requiredDate = bank.optString("requiredDate")
                         val bankInfo = BankInfo(
                             depositable,
                             vietQRAccepted,
                             cardPrefix,
                             cardNumberLength,
                             shortName,
-                            swiftCode
+                            swiftCode,
+                            requiredDate,
                         )
                         listBanks.add(bankInfo)
 

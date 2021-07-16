@@ -41,9 +41,15 @@ class InputInfo : RelativeLayout {
         txtTitle.text = message
         txtTitle.setTextColor(ContextCompat.getColor(context,R.color.red))
     }
-    fun setDefault(){
+    fun setDefault(title:String?){
         isError = false
-        txtTitle.text = titleDefault
+        if(title!=null){
+            txtTitle.text = title
+
+        }else{
+            txtTitle.text = titleDefault
+
+        }
         txtTitle.setTextColor(ContextCompat.getColor(context,R.color.nb40))
         if (isFocus){
             containerInput.background = Store.config.colorApp.backgroundColorRadiusBorder

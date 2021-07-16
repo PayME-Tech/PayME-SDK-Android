@@ -9,13 +9,15 @@ class BankInfo {
   var cardNumberLength : Int = 16
   lateinit  var shortName : String
   lateinit  var swiftCode : String
-  constructor(depositable : Boolean,vietQRAccepted : Boolean,cardPrefix : String,cardNumberLength : Int,shortName : String,swiftCode : String){
+  lateinit  var requiredDate : String
+  constructor(depositable : Boolean,vietQRAccepted : Boolean,cardPrefix : String,cardNumberLength : Int,shortName : String,swiftCode : String,requiredDate:String){
     this.depositable =depositable
     this.vietQRAccepted =vietQRAccepted
     this.cardPrefix = cardPrefix
     this.cardNumberLength = cardNumberLength
     this.shortName = shortName
     this.swiftCode = swiftCode
+    this.requiredDate = requiredDate
   }
 
 }

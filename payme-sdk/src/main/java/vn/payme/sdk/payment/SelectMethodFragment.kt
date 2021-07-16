@@ -126,6 +126,7 @@ class SelectMethodFragment : Fragment() {
                     method?.type == TYPE_PAYMENT.BANK_TRANSFER ||
                     method?.type == TYPE_PAYMENT.WALLET ||
                     method?.type == TYPE_PAYMENT.CREDIT_CARD ||
+                    method?.type == TYPE_PAYMENT.LINKED ||
                     method?.type == TYPE_PAYMENT.BANK_CARD
                             )
                 ){

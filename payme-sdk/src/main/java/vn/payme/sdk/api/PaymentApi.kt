@@ -203,6 +203,7 @@ internal class PaymentApi {
                 "      shortName\n" +
                 "      swiftCode\n" +
                 "      vietQRAccepted\n" +
+                "      requiredDate\n" +
                 "    }\n" +
                 "  }\n" +
                 "}"

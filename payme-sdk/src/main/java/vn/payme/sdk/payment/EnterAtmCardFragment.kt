@@ -98,7 +98,7 @@ class EnterAtmCardFragment : Fragment() {
                 val cardNumber = s?.replace("[^0-9]".toRegex(), "")
                 cardHolder = ""
                 cardNumberValue = ""
-                inputCardHolder.setDefault()
+                inputCardHolder.setDefault(null)
                 inputCardNumber.txtTitleRight.text = ""
                 inputCardHolder.input.setText("")
                 var maxLength = 16
@@ -112,6 +112,11 @@ class EnterAtmCardFragment : Fragment() {
                         if (cardPrefix == cardPrefixBank) {
                             inputCardNumber.imageRight.visibility  = View.VISIBLE
                             bankSelected = listBanks[i]
+                            if(bankSelected?.requiredDate=="ISSUE_DATE"){
+                                inputCardDate.txtTitle.setText(R.string.release_issue_date)
+                            }else{
+                                inputCardDate.txtTitle.setText(R.string.release_date_expired)
+                            }
                             val picasso = Picasso.get()
                             picasso.setIndicatorsEnabled(false)
                             picasso.load("https://firebasestorage.googleapis.com/v0/b/vn-mecorp-payme-wallet.appspot.com/o/image_bank%2Fimage_method%2Fmethod${bankSelected?.swiftCode}.png?alt=media&token=28cdb30e-fa9b-430c-8c0e-5369f500612e")
@@ -136,7 +141,7 @@ class EnterAtmCardFragment : Fragment() {
                     if (!bankVerify) {
                         inputCardNumber.setError(getString(R.string.number_card_error))
                     } else {
-                        inputCardNumber.setDefault()
+                        inputCardNumber.setDefault(null)
                     }
                     var cardNew = ""
 
@@ -172,7 +177,7 @@ class EnterAtmCardFragment : Fragment() {
                     inputCardNumber.input.addTextChangedListener(this)
 
                 } else {
-                    inputCardNumber.setDefault()
+                    inputCardNumber.setDefault(null)
                 }
             }
 
@@ -206,6 +211,12 @@ class EnterAtmCardFragment : Fragment() {
                         newDate += date[i]
                     }
                 }
+                var title = ""
+                if(bankSelected?.requiredDate=="ISSUE_DATE"){
+                    title  = getString(R.string.release_issue_date)
+                }else{
+                    title  = getString(R.string.release_date_expired)
+                }
                 inputCardDate.input.removeTextChangedListener(this)
                 val cursorPosition: Int = inputCardDate.input.getSelectionStart()
                 val newCursorPosition = cursorPosition + (newDate.length - s.length)
@@ -217,14 +228,14 @@ class EnterAtmCardFragment : Fragment() {
                     val yead = newDate.substring(3, 5)
                     if (month < 1 || month > 12) {
                         cardDate = ""
-                        inputCardDate.setError(getString(R.string.release_date_error))
+                        inputCardDate.setError(inputCardDate.txtTitle.text.toString() + " "+ getString(R.string.release_date_error))
                     } else {
                         cardDate = "20${yead}-${newDate.substring(0, 2)}-12T12:08:32.860Z"
-                        inputCardDate.setDefault()
+                        inputCardDate.setDefault(title)
                     }
                 } else {
                     cardDate = ""
-                    inputCardDate.setDefault()
+                    inputCardDate.setDefault(title)
                 }
 
 

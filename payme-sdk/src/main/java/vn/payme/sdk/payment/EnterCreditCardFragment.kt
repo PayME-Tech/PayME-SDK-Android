@@ -92,7 +92,7 @@ class EnterCreditCardFragment : Fragment() {
                     inputCardNumber.input.addTextChangedListener(this)
 
                 } else {
-                    inputCardNumber.setDefault()
+                    inputCardNumber.setDefault(null)
                 }
             }
 
@@ -137,11 +137,11 @@ class EnterCreditCardFragment : Fragment() {
                         inputCardDate.setError(getString(R.string.release_date_error))
                     } else {
                         cardDate = "20${yead}-${newDate.substring(0, 2)}-12T12:08:32.860Z"
-                        inputCardDate.setDefault()
+                        inputCardDate.setDefault(null)
                     }
                 } else {
                     cardDate = ""
-                    inputCardDate.setDefault()
+                    inputCardDate.setDefault(null)
                 }
 
 
