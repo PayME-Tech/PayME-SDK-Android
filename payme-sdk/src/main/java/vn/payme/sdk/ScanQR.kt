@@ -51,7 +51,7 @@ class ScanQR : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         EventBus.getDefault().register(this)
-        setStyle(STYLE_NO_FRAME,R.style.DialogStyle);
+        setStyle(STYLE_NO_FRAME, R.style.DialogStyle);
 
     }
 
@@ -59,14 +59,16 @@ class ScanQR : DialogFragment() {
         EventBus.getDefault().unregister(this)
         super.onDestroy()
     }
+
     @Subscribe
-    fun close(event : MyEven){
-        if(event.type == TypeCallBack.onExpired){
+    fun close(event: MyEven) {
+        if (event.type == TypeCallBack.onExpired) {
             dismiss()
         }
     }
+
     @Subscribe
-    fun eventActivityResult(event: CheckActivityResult){
+    fun eventActivityResult(event: CheckActivityResult) {
         val bitmap = event.data
         if (bitmap != null) {
             val width: Int = bitmap.width
@@ -82,7 +84,7 @@ class ScanQR : DialogFragment() {
                 dismiss()
                 val payme = PayME()
                 val payCode = arguments?.getString("payCode")
-                payme.payQRCodeInSDK(PayME.fragmentManager,result.toString(),payCode!!)
+                payme.payQRCodeInSDK(PayME.fragmentManager, result.toString(), payCode!!)
             } catch (e: NotFoundException) {
                 dismiss()
                 var popup: SearchQrResultPopup = SearchQrResultPopup()
@@ -95,16 +97,17 @@ class ScanQR : DialogFragment() {
 //            PayME.activityResult = null
 //        }
     }
+
     @Subscribe
-    fun eventRequestPermissionsResult(event:RequestPermissionsResult){
-        checkRequestPermissionsResult(event.requestCode,event.permissions,event.grantResults)
+    fun eventRequestPermissionsResult(event: RequestPermissionsResult) {
+        checkRequestPermissionsResult(event.requestCode, event.permissions, event.grantResults)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         scannerView = view.findViewById<CodeScannerView>(R.id.scan_qr)
         scannerView.setOnClickListener {
-            if (cameraAccept){
+            if (cameraAccept) {
                 codeScanner.startPreview()
             }
         }
@@ -112,7 +115,8 @@ class ScanQR : DialogFragment() {
         dialog?.window?.setBackgroundDrawable(Store.config.colorApp.backgroundColor);
 
         if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_GRANTED){
+            == PackageManager.PERMISSION_GRANTED
+        ) {
             val activity = requireActivity()
             codeScanner = CodeScanner(activity, scannerView)
             codeScanner.decodeCallback = DecodeCallback {
@@ -120,25 +124,25 @@ class ScanQR : DialogFragment() {
                     dismiss()
                     val payme = PayME()
                     val payCode = arguments?.getString("payCode")
-                    payme.payQRCodeInSDK(PayME.fragmentManager,it.text.toString(),payCode!!)
+                    payme.payQRCodeInSDK(PayME.fragmentManager, it.text.toString(), payCode!!)
                 }
             }
             cameraAccept = true
-            codeScanner.startPreview()
             containerErrorCamera?.visibility = View.GONE
 
-        }else{
-            PermissionCamera().requestCameraFragment(requireContext(),this)
+        } else {
+            PermissionCamera().requestCameraFragment(requireContext(), this)
         }
 
 
     }
 
 
-    fun checkActivityResult(requestCode: Int, resultCode: Int, data: Intent?){
+    fun checkActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK && data != null) {
             val selectedImage: Uri? = data.data
-            val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, selectedImage)
+            val bitmap =
+                MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, selectedImage)
             if (bitmap != null) {
                 val width: Int = bitmap.width
                 val height: Int = bitmap.height
@@ -153,7 +157,19 @@ class ScanQR : DialogFragment() {
                     dismiss()
                     val payme = PayME()
                     val payCode = arguments?.getString("payCode")
-                    payme.payQRCodeInSDK(PayME.fragmentManager,result.toString(),payCode!!)
+
+                    android.os.Handler().postDelayed(
+                        {
+                            payme.payQRCodeInSDK(
+                                PayME.fragmentManager,
+                                result.toString(),
+                                payCode!!
+                            )
+                        },
+                        500 // Timeout value
+                    )
+
+
                 } catch (e: NotFoundException) {
                     dismiss()
                     var popup: SearchQrResultPopup = SearchQrResultPopup()
@@ -164,11 +180,10 @@ class ScanQR : DialogFragment() {
     }
 
 
-
-    private fun mappingView(v:View) {
+    private fun mappingView(v: View) {
         btnPicker = v.findViewById(R.id.button_picker)
-        btnTorch =  v.findViewById(R.id.button_torch)
-        buttonBack =  v.findViewById(R.id.button_back)
+        btnTorch = v.findViewById(R.id.button_torch)
+        buttonBack = v.findViewById(R.id.button_back)
         containerErrorCamera = v.findViewById(R.id.containerErrorCamera)
         buttonOpenSetting = v.findViewById(R.id.buttonOpenSetting)
         buttonBackHeaderErrorCamera = v.findViewById(R.id.buttonBackHeaderErrorCamera)
@@ -194,7 +209,7 @@ class ScanQR : DialogFragment() {
             }
         }
         btnTorch!!.setOnClickListener {
-            if(cameraAccept) {
+            if (cameraAccept) {
                 if (!toggleTorch) {
                     codeScanner.isFlashEnabled = true
                     toggleTorch = true
@@ -207,10 +222,11 @@ class ScanQR : DialogFragment() {
 
     }
 
-    fun checkRequestPermissionsResult(  requestCode: Int,
-                                        permissions: Array<out String>,
-                                        grantResults: IntArray
-    ){
+    fun checkRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
         if (valid) {
             val activity = requireActivity()
@@ -240,32 +256,32 @@ class ScanQR : DialogFragment() {
 
 
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 //        PayME.onActivityResult(requestCode, resultCode, data)
         checkActivityResult(requestCode, resultCode, data)
     }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        EventBus.getDefault().post(RequestPermissionsResult(requestCode, permissions, grantResults))
         checkRequestPermissionsResult(requestCode, permissions, grantResults)
 
     }
 
     override fun onResume() {
         super.onResume()
-        if(cameraAccept){
+        if (cameraAccept) {
             codeScanner.startPreview()
-
         }
     }
 
     override fun onPause() {
-        if(cameraAccept) {
+        if (cameraAccept) {
             codeScanner.releaseResources()
         }
         super.onPause()
@@ -281,7 +297,7 @@ class ScanQR : DialogFragment() {
             container, false
         )
         mappingView(v)
-        return  v
+        return v
     }
 
-    }
+}

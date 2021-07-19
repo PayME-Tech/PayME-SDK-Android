@@ -168,7 +168,7 @@ class PopupWebViewNapas : DialogFragment() {
         val bundle: Bundle = Bundle()
         if (state == "SUCCEEDED") {
             val data = if (Store.paymentInfo.transaction == "" || Store.paymentInfo.transaction == "null")   JSONObject("""{payment:{}}}""")
-            else  JSONObject("""{payment:{transaction:${Store.paymentInfo.transaction}}}""")
+            else  JSONObject("""{payment:{transaction:"${Store.paymentInfo.transaction}"}}""")
             if (!Store.config.disableCallBackResult) {
                 PayME.onSuccess(data)
             }
