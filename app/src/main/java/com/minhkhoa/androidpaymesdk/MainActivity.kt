@@ -291,7 +291,7 @@ class MainActivity : AppCompatActivity() {
         spinnerLanguage.setOnItemSelectedListener(object : OnItemSelectedListener {
             override fun onItemSelected(
                 parentView: AdapterView<*>?,
-                selectedItemView: View,
+                selectedItemView: View?,
                 position: Int,
                 id: Long
             ) {
@@ -357,6 +357,7 @@ class MainActivity : AppCompatActivity() {
                         //Tài khoản chưa định danh
                     }
                     if (accountStatus == AccountStatus.KYC_APPROVED) {
+                        updateWalletInfo()
                         //Tài khoản đã
                     }
                     payme?.getAccountInfo(onSuccess = { data ->
@@ -502,7 +503,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonPay.setOnClickListener {
-            val nextValues = Random.nextInt(0, 100000)
+            val nextValues = Random.nextInt(0, 1000000000)
 
             val amount = convertInt(moneyPay.text.toString())
 
@@ -520,6 +521,7 @@ class MainActivity : AppCompatActivity() {
                 )
                     payme?.pay(this.supportFragmentManager, infoPayment, true,spinnerPayCode.selectedItem.toString(),
                         onSuccess = { json: JSONObject? ->
+                            println("jsononSuccess"+json)
                         },
                         onError = { jsonObject, code, message ->
 

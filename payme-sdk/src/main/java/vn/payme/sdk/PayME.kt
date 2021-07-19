@@ -661,7 +661,6 @@ public class PayME {
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
-
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE, onError)) {
 
             val accountApi = AccountApi()

@@ -71,6 +71,7 @@
             app:layout_constraintTop_toBottomOf="@id/top" />
 
         <EditText
+            android:lines="1"
             android:id="@+id/inputUserId"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
