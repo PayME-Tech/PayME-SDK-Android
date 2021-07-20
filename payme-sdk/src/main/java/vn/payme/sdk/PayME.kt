@@ -63,6 +63,8 @@ public class PayME {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ): Unit {
+        setLanguage(PayME.context,Store.config.language)
+
         val checkAccount = CheckAccount()
         if (checkAccount.check(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
             if (!((payCode == PAY_CODE.PAYME) ||
@@ -112,6 +114,7 @@ public class PayME {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
+        setLanguage(PayME.context,Store.config.language)
         val checkAccount = CheckAccount()
         if (checkAccount.check(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
             if (!((payCode == PAY_CODE.PAYME) ||
@@ -226,6 +229,7 @@ public class PayME {
     }
     @SuppressWarnings("deprecation")
     fun setLanguage(context: Context,language: LANGUAGES){
+        println("setLanguage"+language.toString())
         Store.config.language = language
 
         val config = context.resources.configuration
@@ -277,7 +281,6 @@ public class PayME {
         Store.userInfo = UserInfo(0, false, false, false, "", null)
         Security.insertProviderAt(BouncyCastleProvider(), 1)
         ENV_API.updateEnv()
-        setLanguage(context,language)
 
     }
 
@@ -421,6 +424,8 @@ public class PayME {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
+        setLanguage(PayME.context,Store.config.language)
+
         PayME.onSuccess = onSuccess
         PayME.onError = onError
         PayME.fragmentManager = fragmentManager
@@ -532,6 +537,8 @@ public class PayME {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
+        setLanguage(PayME.context,Store.config.language)
+
         PayME.fragmentManager = fragmentManager
 
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
@@ -562,6 +569,7 @@ public class PayME {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
+        setLanguage(PayME.context,Store.config.language)
         PayME.fragmentManager = fragmentManager
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
             Store.config.closeWhenDone = closeTransferResult
@@ -591,6 +599,8 @@ public class PayME {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
+        setLanguage(PayME.context,Store.config.language)
+
         PayME.fragmentManager = fragmentManager
 
         if (amount != null) {
@@ -618,6 +628,7 @@ public class PayME {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
+        setLanguage(PayME.context,Store.config.language)
         PayME.fragmentManager = fragmentManager
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
             this.openWalletActivity(
@@ -651,6 +662,7 @@ public class PayME {
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
+        setLanguage(PayME.context,Store.config.language)
         val payment = PayFunction()
         Store.config.disableCallBackResult = false
         payment.pay(fragmentManager, infoPayment, isShowResultUI, payCode, onSuccess, onError)
@@ -662,7 +674,6 @@ public class PayME {
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE, onError)) {
-
             val accountApi = AccountApi()
             accountApi.getAccountInfo(onSuccess = { jsonObject ->
                 val Account = jsonObject.getJSONObject("Account")
