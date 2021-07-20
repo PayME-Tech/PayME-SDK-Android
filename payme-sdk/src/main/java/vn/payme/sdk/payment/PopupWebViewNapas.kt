@@ -59,7 +59,7 @@ class PopupWebViewNapas : DialogFragment() {
                             onResult(message, state)
                         } else if (count < 6) {
                             GlobalScope.launch {
-                                delay(10000)
+                                delay(7000)
                                 loopCallApi()
                             }
                         }

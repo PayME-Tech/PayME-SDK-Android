@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -34,7 +35,6 @@ class EnterCreditCardFragment : Fragment() {
     ): View? {
         val view: View =
             inflater?.inflate(R.layout.payment_enter_credit_card_fragment, container, false)
-        EventBus.getDefault().register(this)
         inputCardNumber = view.findViewById(R.id.inputCardNumber)
         inputCardHolder = view.findViewById(R.id.inputCardHolder)
         inputCardDate = view.findViewById(R.id.inputCardDate)
@@ -47,18 +47,21 @@ class EnterCreditCardFragment : Fragment() {
         inputCardNumber.input.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val stringReplace = s?.replace("[^0-9]".toRegex(), "")
-                val cardNumber =stringReplace?.subSequence(0,if(stringReplace.length<19) stringReplace.length else 19 )
+                val cardNumber = stringReplace?.subSequence(
+                    0,
+                    if (stringReplace.length < 19) stringReplace.length else 19
+                )
                 val cardType = CardType.detect(cardNumber.toString())
-                if (cardType==CardType.JCB){
+                if (cardType == CardType.JCB) {
                     inputCardNumber.imageRight.visibility = View.VISIBLE
                     inputCardNumber.imageRight.setImageResource(R.drawable.ic_logo_jcb)
-                }else if (cardType==CardType.VISA){
+                } else if (cardType == CardType.VISA) {
                     inputCardNumber.imageRight.visibility = View.VISIBLE
                     inputCardNumber.imageRight.setImageResource(R.drawable.ic_logo_visa)
-                }else if (cardType==CardType.MASTERCARD){
+                } else if (cardType == CardType.MASTERCARD) {
                     inputCardNumber.imageRight.visibility = View.VISIBLE
                     inputCardNumber.imageRight.setImageResource(R.drawable.ic_logo_mastercard)
-                }else{
+                } else {
                     inputCardNumber.imageRight.visibility = View.GONE
 
                 }
@@ -73,7 +76,7 @@ class EnterCreditCardFragment : Fragment() {
                                 cardNew += cardNumber[i]
                             }
                         }
-                    }else {
+                    } else {
                         for (i in 0 until cardNumber.length) {
                             if ((i == 3 || i == 7 || i == 11) && (i + 1 < cardNumber.length)) {
                                 cardNew += cardNumber[i] + " "
@@ -82,18 +85,20 @@ class EnterCreditCardFragment : Fragment() {
                             }
                         }
                     }
-                    cardNumberValue  = cardNew.replace("[^0-9]".toRegex(), "")
+                    cardNumberValue = cardNew.replace("[^0-9]".toRegex(), "")
                     inputCardNumber.input.removeTextChangedListener(this)
                     val cursorPosition: Int = inputCardNumber.input.getSelectionStart()
                     val newCursorPosition = cursorPosition + (cardNew.length - s.length)
                     inputCardNumber.input.setText(cardNew)
-                    val check =  newCursorPosition
+                    val check = newCursorPosition
                     inputCardNumber.input.setSelection(check!!)
                     inputCardNumber.input.addTextChangedListener(this)
 
                 } else {
                     inputCardNumber.setDefault(null)
                 }
+                validateCard()
+
             }
 
             override fun beforeTextChanged(
@@ -143,7 +148,7 @@ class EnterCreditCardFragment : Fragment() {
                     cardDate = ""
                     inputCardDate.setDefault(null)
                 }
-
+                validateCard()
 
             }
 
@@ -153,13 +158,19 @@ class EnterCreditCardFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
         })
+        inputCvv.input.addTextChangedListener { text ->
+            validateCard()
+        }
+        inputCardHolder.input.addTextChangedListener { text ->
+            validateCard()
+        }
 
         return view
     }
 
-    @Subscribe
-    fun checkAtm(event: CheckInputAtm) {
-        if (event.isCheck && inputCardHolder.input.text.length>0  && cardDate.length > 0 && cardNumberValue.length > 0 && inputCvv.input.text.length==3)  {
+
+    fun validateCard() {
+        if (inputCardHolder.input.text.length > 0 && cardDate.length > 0 && cardNumberValue.length > 0 && inputCvv.input.text.length == 3) {
             val cardInfo = CardInfo(
                 inputCardDate.input.text.toString(),
                 inputCardNumber.input.text.toString(),
@@ -169,13 +180,14 @@ class EnterCreditCardFragment : Fragment() {
                 cardDate,
                 inputCvv.input.text.toString()
             )
-            EventBus.getDefault().post(CheckInputAtm(false,  cardInfo))
+            EventBus.getDefault().post(CheckInputAtm(true, cardInfo))
+        } else {
+            EventBus.getDefault().post(CheckInputAtm(false, CardInfo("", "", "", "", "", "", "")))
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        EventBus.getDefault().unregister(this)
 
     }
 

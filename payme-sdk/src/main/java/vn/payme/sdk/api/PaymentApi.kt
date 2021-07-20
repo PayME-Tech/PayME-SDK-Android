@@ -51,7 +51,7 @@ internal class PaymentApi {
         context: Context,
         expiredAt:String?,
         cardNumber:String?,
-        linkedId: Double?,
+        linkedId: Long?,
         onSuccess: (String?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ){
@@ -114,7 +114,7 @@ internal class PaymentApi {
     fun authCreditCard(
         expiredAt:String?,
         cardNumber:String?,
-        linkedId:Double?,
+        linkedId:Long?,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ){

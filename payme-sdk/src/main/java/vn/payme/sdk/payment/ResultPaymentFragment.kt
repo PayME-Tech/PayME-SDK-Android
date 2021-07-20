@@ -76,7 +76,7 @@ class ResultPaymentFragment : Fragment() {
             listInfoTop.add(
                 Info(
                     getString(R.string.account_number),
-                    Store.paymentInfo.methodSelected?.title + Store.paymentInfo.methodSelected?.label,
+                    Store.paymentInfo.methodSelected?.title + "-" + Store.paymentInfo.methodSelected?.label?.replace("[^0-9]".toRegex(), ""),
                     null,
                     null,
                     true

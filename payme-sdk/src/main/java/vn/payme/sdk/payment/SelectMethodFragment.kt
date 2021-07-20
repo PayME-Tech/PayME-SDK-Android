@@ -56,6 +56,7 @@ class SelectMethodFragment : Fragment() {
     private var loading: Boolean = false
     private lateinit var buttonSubmit: Button
     private lateinit var infoFee: InfoPayment
+    private lateinit var cardInfo: CardInfo
 
 
     override fun onCreateView(
@@ -122,45 +123,45 @@ class SelectMethodFragment : Fragment() {
                     return@setOnClickListener
                 }
                 val method = Store.paymentInfo.methodSelected
-                if(!(
-                    method?.type == TYPE_PAYMENT.BANK_TRANSFER ||
-                    method?.type == TYPE_PAYMENT.WALLET ||
-                    method?.type == TYPE_PAYMENT.CREDIT_CARD ||
-                    method?.type == TYPE_PAYMENT.LINKED ||
-                    method?.type == TYPE_PAYMENT.BANK_CARD
+                if (!(
+                            method?.type == TYPE_PAYMENT.BANK_TRANSFER ||
+                                    method?.type == TYPE_PAYMENT.WALLET ||
+                                    method?.type == TYPE_PAYMENT.CREDIT_CARD ||
+                                    method?.type == TYPE_PAYMENT.LINKED ||
+                                    method?.type == TYPE_PAYMENT.BANK_CARD
                             )
-                ){
+                ) {
                     PayME.showError(getString(R.string.method_not_supported))
                     return@setOnClickListener
 
                 }
 
-                if(ListMethodPaymentFragment.isVisible){
+                if (ListMethodPaymentFragment.isVisible) {
                     val payFunction = PayFunction()
-                    if(method?.type == TYPE_PAYMENT.BANK_CARD){
+                    if (method?.type == TYPE_PAYMENT.BANK_CARD) {
                         buttonSubmit.enableLoading()
                         payFunction.getListBank(onSuccess = {
                             buttonSubmit.disableLoading()
                             changeMethod(Store.paymentInfo.methodSelected!!)
 
-                        },onError = {jsonObject, i, s ->
+                        }, onError = { jsonObject, i, s ->
                             buttonSubmit.disableLoading()
                             PayME.showError(s)
                         })
                         return@setOnClickListener
 
                     }
-                    if(method?.type == TYPE_PAYMENT.BANK_TRANSFER){
+                    if (method?.type == TYPE_PAYMENT.BANK_TRANSFER) {
                         buttonSubmit.enableLoading()
                         payFunction.getListBank(onSuccess = {
                             payFunction.getListBankTransfer(onSuccess = {
                                 buttonSubmit.disableLoading()
                                 changeMethod(Store.paymentInfo.methodSelected!!)
-                            },Store.paymentInfo.methodSelected!!,onError = {jsonObject, i, s ->
+                            }, Store.paymentInfo.methodSelected!!, onError = { jsonObject, i, s ->
                                 buttonSubmit.disableLoading()
                                 PayME.showError(s)
                             })
-                        },onError = {jsonObject, i, s ->
+                        }, onError = { jsonObject, i, s ->
                             buttonSubmit.disableLoading()
                             PayME.showError(s)
                         })
@@ -173,7 +174,8 @@ class SelectMethodFragment : Fragment() {
                     val popupCheckBankTransfer = PopupCheckBankTransfer()
                     popupCheckBankTransfer.show(parentFragmentManager, null)
                 } else if (method?.type == TYPE_PAYMENT.BANK_CARD || method?.type == TYPE_PAYMENT.CREDIT_CARD) {
-                    EventBus.getDefault().post(CheckInputAtm(true, null))
+                    EventBus.getDefault().postSticky(PaymentInfoEvent(cardInfo))
+                    onSubmit(cardInfo)
                 } else {
                     onSubmit(null)
                 }
@@ -199,10 +201,12 @@ class SelectMethodFragment : Fragment() {
 
         return view
     }
+
     @Subscribe
-    fun evenChangeMethod(event :Method){
+    fun evenChangeMethod(event: Method) {
         getFee()
     }
+
     fun getFee() {
         var listInfoBottom = arrayListOf<Info>()
         val decimal = DecimalFormat("#,###")
@@ -214,10 +218,11 @@ class SelectMethodFragment : Fragment() {
             textMessageError.visibility = View.VISIBLE
             buttonSubmit.setVisible(false)
         } else {
-            val total = Store.paymentInfo.infoPayment!!.amount + EventBus.getDefault().getStickyEvent(FeeInfo::class.java).feeWallet
-            if(Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.WALLET && total> Store.userInfo.balance ){
+            val total = Store.paymentInfo.infoPayment!!.amount + EventBus.getDefault()
+                .getStickyEvent(FeeInfo::class.java).feeWallet
+            if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.WALLET && total > Store.userInfo.balance) {
                 buttonSubmit.setVisible(false)
-            }else{
+            } else {
                 textMessageError.visibility = View.GONE
                 buttonSubmit.setVisible(true)
             }
@@ -246,7 +251,7 @@ class SelectMethodFragment : Fragment() {
         AddInfoMethod().setTitle(
             method,
             textTitleMethodSelected,
-            null,null
+            null, null
         )
         if (method.type == TYPE_PAYMENT.BANK_TRANSFER) {
             buttonSubmit.iconLeft.visibility = View.GONE
@@ -259,11 +264,13 @@ class SelectMethodFragment : Fragment() {
             val fragment = childFragmentManager?.beginTransaction()
             fragment?.replace(R.id.frame_container_select_method, EnterCreditCardFragment())
             fragment?.commit()
+            buttonSubmit.setVisible(false)
         } else if (method.type == TYPE_PAYMENT.BANK_TRANSFER) {
             val fragment = childFragmentManager?.beginTransaction()
             fragment?.replace(R.id.frame_container_select_method, InfoBankTransferFragment())
             fragment?.commit()
         } else if (method.type == TYPE_PAYMENT.BANK_CARD) {
+            buttonSubmit.setVisible(false)
             val fragment = childFragmentManager?.beginTransaction()
             fragment?.replace(R.id.frame_container_select_method, EnterAtmCardFragment())
             fragment?.commit()
@@ -275,10 +282,9 @@ class SelectMethodFragment : Fragment() {
 
     @Subscribe
     fun checkAtmResponse(event: CheckInputAtm) {
-        if (!event.isCheck) {
-            EventBus.getDefault().postSticky(PaymentInfoEvent(event.cardInfo))
-            onSubmit(event.cardInfo)
-        }
+        buttonSubmit.setVisible(event.isCheck)
+        cardInfo = event.cardInfo!!
+
     }
 
     fun authCreditCard(cardInfo: CardInfo?) {

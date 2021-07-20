@@ -152,6 +152,7 @@ class ConfirmOtpFragment : Fragment() {
         showLoading(true)
         val paymentApi = PaymentApi()
         val transaction = Store.paymentInfo.transaction
+        Keyboard.closeKeyboard(requireContext())
         paymentApi.payment(
             Store.paymentInfo.methodSelected!!,
             null,

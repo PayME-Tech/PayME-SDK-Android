@@ -288,22 +288,22 @@ class MainActivity : AppCompatActivity() {
         list.add(Env.DEV.toString())
         list.add(Env.PRODUCTION.toString())
         list.add(Env.SANDBOX.toString())
-        spinnerLanguage.setOnItemSelectedListener(object : OnItemSelectedListener {
-            override fun onItemSelected(
-                parentView: AdapterView<*>?,
-                selectedItemView: View?,
-                position: Int,
-                id: Long
-            ) {
-                if(payme!=null){
-                    payme?.setLanguage(context,if(spinnerLanguage.selectedItem.toString() == LANGUAGES.VN.toString()) LANGUAGES.VN else LANGUAGES.EN)
-                }
-
-            }
-
-            override fun onNothingSelected(parentView: AdapterView<*>?) {
-            }
-        })
+//        spinnerLanguage.setOnItemSelectedListener(object : OnItemSelectedListener {
+//            override fun onItemSelected(
+//                parentView: AdapterView<*>?,
+//                selectedItemView: View?,
+//                position: Int,
+//                id: Long
+//            ) {
+//                if(payme!=null){
+//                    payme?.setLanguage(context,if(spinnerLanguage.selectedItem.toString() == LANGUAGES.VN.toString()) LANGUAGES.VN else LANGUAGES.EN)
+//                }
+//
+//            }
+//
+//            override fun onNothingSelected(parentView: AdapterView<*>?) {
+//            }
+//        })
 
         buttonLogin.setOnClickListener {
             println("spinnerEnvironment.selectedItem.toString()"+spinnerEnvironment.selectedItem.toString())

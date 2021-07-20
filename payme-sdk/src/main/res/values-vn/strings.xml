@@ -15,6 +15,7 @@
     <string name="enter_the_cardholder_full_name">Nhập họ tên chủ thẻ</string>
     <string name="the_cardholder_full_name">Tên chủ thẻ</string>
     <string name="done">Hoàn tất</string>
+    <string name="allow">Cho phép</string>
     <string name="resend_otp">Gửi lại OTP</string>
     <string name="take_picture_again">Chụp lại</string>
     <string name="take_again">Làm lại</string>

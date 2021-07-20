@@ -431,7 +431,7 @@ internal class PayFunction {
                         var data = jsonObject.optJSONObject("data")
                         var dataMethod = DataMethod(null, "", "")
                         if (data != null) {
-                            val linkedId = data.optDouble("linkedId")
+                            val linkedId = data.optLong("linkedId")
                             val swiftCode = data.optString("swiftCode")
                             val issuer = data.optString("issuer")
                             dataMethod = DataMethod(linkedId, swiftCode, issuer)

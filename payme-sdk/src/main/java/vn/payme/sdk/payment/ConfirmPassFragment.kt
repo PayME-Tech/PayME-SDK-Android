@@ -54,55 +54,6 @@ class ConfirmPassFragment : Fragment() {
         pinView.requestFocus()
         loading.visibility = View.GONE
     }
-    fun authCreditCard(securityCode:String) {
-        val paymentApi = PaymentApi()
-        paymentApi.authCreditCard(
-            null,
-            null,
-            Store.paymentInfo.methodSelected?.data?.linkedId,
-            onSuccess = { jsonObject ->
-                disableLoading()
-                val CreditCardLink = jsonObject.optJSONObject("CreditCardLink")
-                val AuthCreditCard = CreditCardLink.optJSONObject("AuthCreditCard")
-                val succeeded = AuthCreditCard.optBoolean("succeeded")
-                val html = AuthCreditCard.optString("html")
-                val message = AuthCreditCard.optString("message")
-                val referenceId = AuthCreditCard.optString("referenceId")
-                if (succeeded) {
-                    val myWebView = WebView(requireContext())
-                    myWebView.settings.javaScriptEnabled = true
-                    var form = "<html><body onload=\"document.forms[0].submit();\">${
-                        html
-                    }</html>,"
-
-                    myWebView.loadDataWithBaseURL(
-                        "x-data://base",
-                        form!!,
-                        "text/html",
-                        "UTF-8",
-                        null
-                    );
-                    myWebView.setWebViewClient(object : WebViewClient() {
-                        override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-                            if(url.contains("CollectRedirect")){
-                                paymentSubmit(securityCode,referenceId)
-                            }
-                            super.onPageStarted(view, url, favicon)
-                        }
-
-                    })
-
-                } else {
-                    EventBus.getDefault()
-                        .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.RESULT, message))
-                }
-            },
-            onError = { jsonObject, i, s ->
-                disableLoading()
-                PayME.showError(s)
-            })
-    }
-
     private fun paymentSubmit(securityCode: String,referenceId:String?) {
         val paymentApi = PaymentApi()
         showLoading()
@@ -223,6 +174,7 @@ class ConfirmPassFragment : Fragment() {
                     val paymentApi = PaymentApi()
                     val pass: String? = SHA256(text.toString())
                     showLoading()
+                    Keyboard.closeKeyboard(requireContext())
                     paymentApi.getSecurityCode(pass!!,
                         onSuccess = { jsonObject ->
                             if(!isVisible) return@getSecurityCode

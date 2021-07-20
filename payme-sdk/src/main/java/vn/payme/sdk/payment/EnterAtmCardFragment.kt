@@ -11,7 +11,6 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import com.squareup.picasso.Picasso
 import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
@@ -19,7 +18,6 @@ import vn.payme.sdk.component.InputInfo
 import vn.payme.sdk.model.BankInfo
 import vn.payme.sdk.evenbus.CheckInputAtm
 import vn.payme.sdk.evenbus.ListBankAtm
-import vn.payme.sdk.model.BankTransferInfo
 import vn.payme.sdk.model.CardInfo
 import java.util.*
 
@@ -35,6 +33,23 @@ class EnterAtmCardFragment : Fragment() {
     private var cardDate: String = ""
     private var cardNumberValue: String = ""
     var count = 0
+    fun checkValidate(){
+        if (cardDate.length > 0 && cardHolder.length > 0 && cardNumberValue.length > 0) {
+            val cardInfo = CardInfo(
+                inputCardDate.input.text.toString(),
+                inputCardNumber.input.text.toString(),
+                bankSelected?.shortName!!,
+                cardNumberValue,
+                cardHolder,
+                cardDate,
+                ""
+            )
+            EventBus.getDefault().post(CheckInputAtm(true,  cardInfo))
+        }else{
+            EventBus.getDefault().post(CheckInputAtm(false,  CardInfo("","","","","","","")))
+        }
+
+    }
 
 
 
@@ -81,14 +96,10 @@ class EnterAtmCardFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater?.inflate(R.layout.payment_enter_atm_card_fragment, container, false)
-        EventBus.getDefault().register(this)
         inputCardNumber = view.findViewById(R.id.inputCardNumber)
         inputCardHolder = view.findViewById(R.id.inputCardHolder)
         inputCardDate = view.findViewById(R.id.inputCardDate)
         val listBanks = EventBus.getDefault().getStickyEvent(ListBankAtm::class.java).listBankATM.filter {bankInfo -> bankInfo.depositable }
-
-//
-//
         inputCardNumber.input.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 count = count+1
@@ -175,6 +186,7 @@ class EnterAtmCardFragment : Fragment() {
                     val check = if (newCursorPosition > maxLength) maxLength else newCursorPosition
                     inputCardNumber.input.setSelection(check)
                     inputCardNumber.input.addTextChangedListener(this)
+                    checkValidate()
 
                 } else {
                     inputCardNumber.setDefault(null)
@@ -195,6 +207,8 @@ class EnterAtmCardFragment : Fragment() {
         })
         inputCardHolder.input.addTextChangedListener { text ->
             cardHolder = text.toString()
+            checkValidate()
+
         }
 
 
@@ -237,47 +251,20 @@ class EnterAtmCardFragment : Fragment() {
                     cardDate = ""
                     inputCardDate.setDefault(title)
                 }
-
-
+                checkValidate()
             }
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
-
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
         })
 
-
-
-
         return view
     }
-    @Subscribe
-    fun checkAtm (event :CheckInputAtm){
-        println("event.isCheck"+event.isCheck)
-        println("cardDate.length"+cardDate.length)
-        println("cardHolder.length"+cardHolder.length)
-        println(" cardNumberValue.length"+ cardNumberValue.length)
 
-        if (event.isCheck && cardDate.length > 0 && cardHolder.length > 0 && cardNumberValue.length > 0) {
-            val cardInfo = CardInfo(
-                inputCardDate.input.text.toString(),
-                inputCardNumber.input.text.toString(),
-                bankSelected?.shortName!!,
-                cardNumberValue,
-                cardHolder,
-                cardDate,
-                ""
-            )
-            EventBus.getDefault().post(CheckInputAtm(false,  cardInfo))
-        }
-
-    }
 
     override fun onDestroy() {
         super.onDestroy()
-        EventBus.getDefault().unregister(this)
 
     }
 

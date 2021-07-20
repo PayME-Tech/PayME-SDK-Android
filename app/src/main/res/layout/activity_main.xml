@@ -367,6 +367,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
+                    android:maxLength="9"
                     android:background="@drawable/background_input"
                     android:hint="Nhập số tiền"
                     android:text="100000"
