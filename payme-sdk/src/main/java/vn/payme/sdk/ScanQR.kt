@@ -16,13 +16,8 @@ import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
-import com.budiyev.android.codescanner.CodeScanner
-import com.budiyev.android.codescanner.CodeScannerView
-import com.budiyev.android.codescanner.DecodeCallback
-import com.google.zxing.BinaryBitmap
-import com.google.zxing.MultiFormatReader
-import com.google.zxing.NotFoundException
-import com.google.zxing.RGBLuminanceSource
+import com.budiyev.android.codescanner.*
+import com.google.zxing.*
 import com.google.zxing.common.HybridBinarizer
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -111,24 +106,36 @@ class ScanQR : DialogFragment() {
                 codeScanner.startPreview()
             }
         }
+        codeScanner = CodeScanner(requireActivity(), scannerView)
+        codeScanner.camera = CodeScanner.CAMERA_BACK
+        codeScanner.formats = arrayListOf(BarcodeFormat.QR_CODE)
+        codeScanner.isAutoFocusEnabled = true
+        codeScanner.scanMode = ScanMode.SINGLE
+        codeScanner.autoFocusMode = AutoFocusMode.SAFE
+        codeScanner.decodeCallback = DecodeCallback {
+            activity?.runOnUiThread {
+                dismiss()
+                android.os.Handler().postDelayed(
+                    {
+                        val payme = PayME()
+                        val payCode = arguments?.getString("payCode")
+                        payme.payQRCodeInSDK(
+                            PayME.fragmentManager,
+                            it.text.toString(),
+                            payCode!!
+                        )
+                    },
+                    500 // Timeout value
+                )
+            }
+        }
         dialog?.window?.setStatusBarColor(Color.TRANSPARENT);
         dialog?.window?.setBackgroundDrawable(Store.config.colorApp.backgroundColor);
 
         if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_GRANTED
         ) {
-            val activity = requireActivity()
-            codeScanner = CodeScanner(activity, scannerView)
-            codeScanner.decodeCallback = DecodeCallback {
-                activity.runOnUiThread {
-                    dismiss()
-                    val payme = PayME()
-                    val payCode = arguments?.getString("payCode")
-                    payme.payQRCodeInSDK(PayME.fragmentManager, it.text.toString(), payCode!!)
-                }
-            }
-            cameraAccept = true
-            containerErrorCamera?.visibility = View.GONE
+           visibleCamera()
 
         } else {
             PermissionCamera().requestCameraFragment(requireContext(), this)
@@ -221,6 +228,15 @@ class ScanQR : DialogFragment() {
         }
 
     }
+    private fun visibleCamera (){
+        val activity = requireActivity()
+        cameraAccept = true
+
+        codeScanner.startPreview()
+
+
+        containerErrorCamera?.visibility = View.GONE
+    }
 
     fun checkRequestPermissionsResult(
         requestCode: Int,
@@ -229,19 +245,7 @@ class ScanQR : DialogFragment() {
     ) {
         val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
         if (valid) {
-            val activity = requireActivity()
-            cameraAccept = true
-            codeScanner = CodeScanner(activity, scannerView)
-            codeScanner.decodeCallback = DecodeCallback {
-                activity.runOnUiThread {
-                    dismiss()
-                    var even: EventBus = EventBus.getDefault()
-                    var myEven: MyEven = MyEven(TypeCallBack.onScan, it.text.toString())
-                    even.post(myEven)
-                }
-            }
-            codeScanner.startPreview()
-            containerErrorCamera?.visibility = View.GONE
+            visibleCamera()
         } else {
             if (Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(
                     permissions[0]!!
