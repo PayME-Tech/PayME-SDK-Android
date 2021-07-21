@@ -34,7 +34,7 @@ class TypeIndentifyAdapter(
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         // Get view for row item
         val method = dataSource[position]
-        val rowView = inflater.inflate(R.layout.item_type_indentify, null, true)
+        val rowView = inflater.inflate(R.layout.payme_item_type_indentify, null, true)
         val titleText = rowView.findViewById(R.id.title) as TextView
         val checkBox = rowView.findViewById(R.id.checkbox) as ImageView
         if (method.selected!!) {

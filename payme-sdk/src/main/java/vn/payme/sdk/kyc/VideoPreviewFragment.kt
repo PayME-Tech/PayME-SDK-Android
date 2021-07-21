@@ -42,7 +42,7 @@ class VideoPreviewFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater?.inflate(R.layout.video_pewview_fragment, container, false)
+        val view: View = inflater?.inflate(R.layout.payme_video_pewview_fragment, container, false)
 
         imagePreView = view.findViewById(R.id.previewImage)
         buttonBack = view.findViewById(R.id.buttonBack)

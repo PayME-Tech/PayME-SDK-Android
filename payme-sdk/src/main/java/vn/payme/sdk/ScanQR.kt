@@ -293,7 +293,7 @@ class ScanQR : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val v: View = inflater.inflate(
-            R.layout.scan_qr,
+            R.layout.payme_scan_qr,
             container, false
         )
         mappingView(v)

@@ -1,15 +1,9 @@
 package vn.payme.sdk.payment
 
-import android.graphics.Bitmap
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.*
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -18,7 +12,6 @@ import androidx.fragment.app.Fragment
 import com.squareup.picasso.Picasso
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
-import org.w3c.dom.EntityReference
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
@@ -67,7 +60,7 @@ class SelectMethodFragment : Fragment() {
 
 
         val view: View =
-            inflater?.inflate(R.layout.payment_select_method_fragment, container, false)
+            inflater?.inflate(R.layout.payme_payment_select_method_fragment, container, false)
 
         textAmount = view.findViewById(R.id.money)
         textAmountHiden = view.findViewById(R.id.money_hidden)

@@ -95,7 +95,7 @@ class EnterAtmCardFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater?.inflate(R.layout.payment_enter_atm_card_fragment, container, false)
+        val view: View = inflater?.inflate(R.layout.payme_payment_enter_atm_card_fragment, container, false)
         inputCardNumber = view.findViewById(R.id.inputCardNumber)
         inputCardHolder = view.findViewById(R.id.inputCardHolder)
         inputCardDate = view.findViewById(R.id.inputCardDate)
@@ -155,10 +155,7 @@ class EnterAtmCardFragment : Fragment() {
                         inputCardNumber.setDefault(null)
                     }
                     var cardNew = ""
-
-
                     if (cardNumberLength == 19) {
-                        var cardNew = ""
                         for (i in 0 until cardNumber.length) {
                             if ((i == 7 || i == 15) && (i + 1 < cardNumber.length)) {
                                 cardNew += cardNumber[i] + " "
@@ -166,7 +163,6 @@ class EnterAtmCardFragment : Fragment() {
                                 cardNew += cardNumber[i]
                             }
                         }
-
                     } else {
                         for (i in 0 until cardNumber.length) {
                             if ((i == 3 || i == 7 || i == 11) && (i + 1 < cardNumber.length)) {
@@ -175,9 +171,8 @@ class EnterAtmCardFragment : Fragment() {
                                 cardNew += cardNumber[i]
                             }
                         }
-
-
                     }
+                    println("cardNew"+cardNew)
                     inputCardNumber.input
                     inputCardNumber.input.removeTextChangedListener(this)
                     val cursorPosition: Int = inputCardNumber.input.getSelectionStart()

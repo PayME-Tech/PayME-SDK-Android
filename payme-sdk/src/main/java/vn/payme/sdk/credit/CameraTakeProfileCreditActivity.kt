@@ -23,7 +23,6 @@ import com.otaliastudios.cameraview.PictureResult
 import com.otaliastudios.cameraview.controls.Flash
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
-import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.enums.TypeCallBack
@@ -87,7 +86,7 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val v: View = inflater.inflate(
-            R.layout.activity_camera_take_profile_credit,
+            R.layout.payme_activity_camera_take_profile_credit,
             container, false
         )
 

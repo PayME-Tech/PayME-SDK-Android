@@ -11,14 +11,12 @@ import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.hepper.Keyboard
-import vn.payme.sdk.model.Info
 import vn.payme.sdk.store.Store
 
 
@@ -85,7 +83,7 @@ class InputInfo : RelativeLayout {
 
 
     private fun init(context: Context,attrs: AttributeSet?) {
-        LayoutInflater.from(getContext()).inflate(R.layout.input, this, true)
+        LayoutInflater.from(getContext()).inflate(R.layout.payme_input, this, true)
 
         txtTitle = findViewById<View>(R.id.title) as TextView
         txtTitleRight = findViewById<View>(R.id.titleRight) as TextView

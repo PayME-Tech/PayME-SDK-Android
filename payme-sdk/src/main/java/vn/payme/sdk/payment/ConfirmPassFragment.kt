@@ -1,6 +1,5 @@
 package vn.payme.sdk.payment
 
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
@@ -8,8 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -136,7 +133,7 @@ class ConfirmPassFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater?.inflate(R.layout.payment_confirm_pass, container, false)
+        val view: View = inflater?.inflate(R.layout.payme_payment_confirm_pass, container, false)
         pinView = view.findViewById(R.id.otp_view)
         imageConfirm = view.findViewById(R.id.image_otp)
 

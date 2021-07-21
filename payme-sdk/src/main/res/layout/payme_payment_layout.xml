@@ -59,6 +59,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <include layout="@layout/power_by_payme" />
+    <include layout="@layout/payme_power_by_payme" />
 
 </LinearLayout>

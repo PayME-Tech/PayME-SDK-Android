@@ -21,7 +21,6 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.R
 import vn.payme.sdk.evenbus.ListBankTransfer
-import vn.payme.sdk.evenbus.PaymentInfoEvent
 import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.hepper.Clipboard
 import vn.payme.sdk.model.BankTransferInfo
@@ -55,7 +54,7 @@ class InfoBankTransferFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View =
-            inflater?.inflate(R.layout.payment_bank_transfer_fragment, container, false)
+            inflater?.inflate(R.layout.payme_payment_bank_transfer_fragment, container, false)
         textBankName = view.findViewById(R.id.txtBankName)
         textBankName2 = view.findViewById(R.id.textBankName2)
         textAmount = view.findViewById(R.id.txtMoneyTransfer)

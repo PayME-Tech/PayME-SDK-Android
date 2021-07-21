@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
@@ -46,7 +45,7 @@ class ResultPaymentFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater?.inflate(R.layout.payment_result_fragment, container, false)
+        val view: View = inflater?.inflate(R.layout.payme_payment_result_fragment, container, false)
         buttonSubmit = view.findViewById(R.id.buttonSubmit)
         textAmount = view.findViewById(R.id.money)
         textError = view.findViewById(R.id.note_error)
@@ -67,7 +66,7 @@ class ResultPaymentFragment : Fragment() {
         textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount!! +fee)} đ"
         val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
         var listInfoTop = arrayListOf<Info>()
-        listInfoTop.add(Info(getString(R.string.transaction_code), Store.paymentInfo.transaction, null, null, false))
+        listInfoTop.add(Info(getString(R.string.transaction_code), Store.paymentInfo.infoPayment!!.orderId, null, null, false))
         listInfoTop.add(Info(getString(R.string.transaction_time), DateStr, null, null, false))
 
 

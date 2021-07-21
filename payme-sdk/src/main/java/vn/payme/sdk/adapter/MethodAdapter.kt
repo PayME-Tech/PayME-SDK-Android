@@ -2,7 +2,6 @@ package vn.payme.sdk.adapter
 
 import android.content.Context
 import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -57,7 +56,7 @@ class MethodAdapter(
             method.type == TYPE_PAYMENT.WALLET
             && ( !Store.userInfo.accountActive || !Store.userInfo.accountKycSuccess ||total > Store.userInfo.balance)
         ) {
-            val rowView = inflater.inflate(R.layout.item_method_wallet_not_kyc, null, true)
+            val rowView = inflater.inflate(R.layout.payme_item_method_wallet_not_kyc, null, true)
             val titleText = rowView.findViewById(R.id.title) as TextView
             val noteMethod = rowView.findViewById(R.id.note_method) as TextView
             val txtButton = rowView.findViewById(R.id.txtButton) as TextView
@@ -80,7 +79,7 @@ class MethodAdapter(
 
         } else {
 
-            val rowView = inflater.inflate(R.layout.payment_item_method, null, true)
+            val rowView = inflater.inflate(R.layout.payme_payment_item_method, null, true)
             val titleText = rowView.findViewById(R.id.title) as TextView
             val noteMethod = rowView.findViewById(R.id.note_method) as TextView
             val txtFee = rowView.findViewById(R.id.txtFee) as TextView

@@ -13,7 +13,7 @@ class ItemInfo : RelativeLayout {
         init(context, info)
     }
     private fun init(context: Context, info: Info) {
-        LayoutInflater.from(getContext()).inflate(R.layout.item_info, this, true)
+        LayoutInflater.from(getContext()).inflate(R.layout.payme_item_info, this, true)
         val txtLabel = findViewById<View>(R.id.txtLabel) as TextView
         val txtValue = findViewById<View>(R.id.txtValue) as TextView
         val dotted = findViewById<View>(R.id.dotted) as ImageView

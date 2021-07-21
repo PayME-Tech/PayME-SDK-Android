@@ -80,7 +80,7 @@ class UploadKycFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater?.inflate(R.layout.upload_kyc_fragment, container, false)
+        val view: View = inflater?.inflate(R.layout.payme_upload_kyc_fragment, container, false)
         layoutUpload = view.findViewById(R.id.upLoadKyc)
         layoutUpload!!.background = Store.config.colorApp.backgroundColor
         GlobalScope.launch(Dispatchers.Main) {

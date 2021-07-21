@@ -10,6 +10,8 @@ class ENV_API() {
                 return "https://sbx-static.payme.vn/Upload"
             } else if (Store.config.env == Env.PRODUCTION) {
                 return "https://static.payme.vn/Upload"
+            } else if (Store.config.env == Env.STAGING) {
+                return "https://static.payme.vn/Upload"
             } else if (Store.config.env == Env.DEV) {
                 return "https://sbx-static.payme.vn/Upload"
             }
@@ -21,6 +23,8 @@ class ENV_API() {
                 return "https://sbx-fe.payme.vn/"
             } else if (Store.config.env == Env.PRODUCTION) {
                 return "https://fe.payme.vn/"
+            }  else if (Store.config.env == Env.STAGING) {
+                return "https://sfe.payme.vn/"
             } else if (Store.config.env == Env.DEV) {
                 return "https://dev-fe.payme.net.vn"
             }
@@ -31,6 +35,8 @@ class ENV_API() {
             if (Store.config.env == Env.SANDBOX) {
                 return true
             } else if (Store.config.env == Env.PRODUCTION) {
+                return true
+            } else if (Store.config.env == Env.STAGING) {
                 return true
             } else if (Store.config.env == Env.DEV) {
                 return false

@@ -53,7 +53,7 @@ class PopupSearchBank : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val v: View = inflater.inflate(
-            R.layout.payment_popup_search_bank,
+            R.layout.payme_payment_popup_search_bank,
             container, false
         )
 
@@ -136,7 +136,7 @@ class PopupSearchBank : DialogFragment() {
     }
 
     override fun setupDialog(dialog: Dialog, style: Int) {
-        val contentView = View.inflate(context, R.layout.payment_layout, null)
+        val contentView = View.inflate(context, R.layout.payme_payment_layout, null)
         dialog.setContentView(contentView)
         (contentView.parent as View).setBackgroundColor(resources.getColor(android.R.color.transparent))
     }

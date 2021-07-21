@@ -66,7 +66,7 @@ class TakePictureIdentifyFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        val view: View = inflater?.inflate(R.layout.take_picture_image_identify, container, false)
+        val view: View = inflater?.inflate(R.layout.payme_take_picture_image_identify, container, false)
 
         EventBus.getDefault().register(this)
         cameraKitView = view.findViewById(R.id.previewCamera)

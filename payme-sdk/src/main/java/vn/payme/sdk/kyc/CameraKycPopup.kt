@@ -51,7 +51,7 @@ class CameraKycPopup : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val v: View = inflater.inflate(
-            R.layout.camera_kyc_activity,
+            R.layout.payme_camera_kyc_activity,
             container, false
         )
         containerErrorCamera = v.findViewById(R.id.containerErrorCamera)

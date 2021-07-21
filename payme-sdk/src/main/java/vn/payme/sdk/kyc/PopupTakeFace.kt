@@ -43,7 +43,7 @@ internal class PopupTakeFace : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater.inflate(
-            R.layout.popup_take_face,
+            R.layout.payme_popup_take_face,
             container, false
         )
         buttonNext = view.findViewById(R.id.buttonNext)
@@ -79,7 +79,7 @@ internal class PopupTakeFace : BottomSheetDialogFragment() {
     }
 
     override fun setupDialog(dialog: Dialog, style: Int) {
-        val contentView = View.inflate(context, R.layout.payment_layout, null)
+        val contentView = View.inflate(context, R.layout.payme_payment_layout, null)
         dialog.setContentView(contentView)
         (contentView.parent as View).setBackgroundColor(resources.getColor(android.R.color.transparent))
     }

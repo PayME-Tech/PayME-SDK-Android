@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.annotation.Nullable
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
@@ -77,7 +76,7 @@ internal class PopupPayment : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val v: View = inflater.inflate(
-            R.layout.payment_layout,
+            R.layout.payme_payment_layout,
             container, false
         )
         frameContainer = v.findViewById(R.id.containerPayment)
@@ -169,7 +168,7 @@ internal class PopupPayment : DialogFragment() {
     }
 
     override fun setupDialog(dialog: Dialog, style: Int) {
-        val contentView = View.inflate(context, R.layout.payment_layout, null)
+        val contentView = View.inflate(context, R.layout.payme_payment_layout, null)
         dialog.setContentView(contentView)
         (contentView.parent as View).setBackgroundColor(resources.getColor(android.R.color.transparent))
     }

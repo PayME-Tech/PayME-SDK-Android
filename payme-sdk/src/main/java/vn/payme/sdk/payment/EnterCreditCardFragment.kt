@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.R
 import vn.payme.sdk.component.InputInfo
 import vn.payme.sdk.evenbus.CheckInputAtm
@@ -34,7 +33,7 @@ class EnterCreditCardFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View =
-            inflater?.inflate(R.layout.payment_enter_credit_card_fragment, container, false)
+            inflater?.inflate(R.layout.payme_payment_enter_credit_card_fragment, container, false)
         inputCardNumber = view.findViewById(R.id.inputCardNumber)
         inputCardHolder = view.findViewById(R.id.inputCardHolder)
         inputCardDate = view.findViewById(R.id.inputCardDate)

@@ -16,13 +16,10 @@ import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.adapter.MethodAdapter
-import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.evenbus.*
 import vn.payme.sdk.hepper.Keyboard
-import vn.payme.sdk.model.BankInfo
-import vn.payme.sdk.model.BankTransferInfo
 import vn.payme.sdk.model.Method
 import vn.payme.sdk.store.Store
 
@@ -70,7 +67,7 @@ class ListMethodPaymentFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View =
-            inflater?.inflate(R.layout.payment_list_method_payme_fragment, container, false)
+            inflater?.inflate(R.layout.payme_payment_list_method_payme_fragment, container, false)
         Keyboard.closeKeyboard(requireContext())
         listView = view.findViewById(R.id.recipe_list_view)
         loadingProcess = view.findViewById(R.id.loadingListMethodPayment)

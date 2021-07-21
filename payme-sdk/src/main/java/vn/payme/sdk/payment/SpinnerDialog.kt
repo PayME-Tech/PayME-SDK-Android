@@ -24,7 +24,7 @@ class SpinnerDialog : DialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view  =  inflater.inflate(R.layout.loading_full_screen, container)
+        val view  =  inflater.inflate(R.layout.payme_loading_full_screen, container)
         progressBar = view.findViewById(R.id.progressBar)
         progressBar.getIndeterminateDrawable()
             .mutate()
@@ -62,7 +62,7 @@ class SpinnerDialog : DialogFragment() {
 
     }
     override fun setupDialog(dialog: Dialog, style: Int) {
-        val contentView = View.inflate(context, R.layout.payment_layout, null)
+        val contentView = View.inflate(context, R.layout.payme_payment_layout, null)
         dialog.setContentView(contentView)
         (contentView.parent as View).setBackgroundColor(resources.getColor(android.R.color.transparent))
     }

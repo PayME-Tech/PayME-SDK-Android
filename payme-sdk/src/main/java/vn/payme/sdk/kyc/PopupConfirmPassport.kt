@@ -1,24 +1,16 @@
 package vn.payme.sdk.payment
 
-import android.app.Dialog
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
-import com.devs.vectorchildfinder.VectorChildFinder
-import com.devs.vectorchildfinder.VectorDrawableCompat
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.R
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.model.TypeIdentify
-import vn.payme.sdk.store.Store
 
 internal class PopupConfirmPassport : DialogFragment() {
 
@@ -37,7 +29,7 @@ internal class PopupConfirmPassport : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater.inflate(
-            R.layout.pupup_comfirm_passport,
+            R.layout.payme_pupup_comfirm_passport,
             container, false
         )
         buttonNext = view.findViewById(R.id.buttonNext)

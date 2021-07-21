@@ -32,7 +32,8 @@ class PopupWebViewNapas : DialogFragment() {
     var count = 0
     fun checkVisa() {
         if (isVisible) {
-            loading.show(parentFragmentManager, null)
+            dismiss()
+            loading.show(PayME.fragmentManager, null)
             loopCallApi()
         }
     }
@@ -89,7 +90,7 @@ class PopupWebViewNapas : DialogFragment() {
     ): View? {
         this.isCancelable = false
         val v: View = inflater.inflate(
-            R.layout.payment_confirm_otp_webview_napas,
+            R.layout.payme_payment_confirm_otp_webview_napas,
             container, false
         )
         val myWebView: WebView = v.findViewById(R.id.webview)

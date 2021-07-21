@@ -50,7 +50,7 @@ class TakeVideoKycFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater?.inflate(R.layout.take_video_kyc, container, false)
+        val view: View = inflater?.inflate(R.layout.payme_take_video_kyc, container, false)
         cameraKitView = view.findViewById(R.id.previewCamera)
         buttonTakePicture = view.findViewById(R.id.btn_takepicture)
         buttonBackHeader = view.findViewById(R.id.buttonBackHeader)

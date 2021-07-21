@@ -4,9 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
-import android.widget.ListView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import vn.payme.sdk.R
@@ -41,7 +39,7 @@ class InfoPayment : RelativeLayout {
 
 
     private fun init(context: Context,attrs: AttributeSet?) {
-        LayoutInflater.from(getContext()).inflate(R.layout.info_payment, this, true)
+        LayoutInflater.from(getContext()).inflate(R.layout.payme_info_payment, this, true)
         listView = findViewById<View>(R.id.recipe_list_view) as LinearLayout
 
 

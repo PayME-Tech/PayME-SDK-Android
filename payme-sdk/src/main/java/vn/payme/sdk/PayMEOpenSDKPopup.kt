@@ -97,7 +97,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val v: View = inflater.inflate(
-            R.layout.webview_activity,
+            R.layout.payme_webview_activity,
             container, false
         )
 
@@ -275,6 +275,8 @@ class PayMEOpenSDKPopup : DialogFragment() {
             domain = "https://dev-sdk.payme.com.vn/"
         } else if (Store.config.env == Env.SANDBOX) {
             domain = "https://sbx-sdk.payme.com.vn/"
+        } else if (Store.config.env == Env.STAGING) {
+            domain = "https://staging-sdk.payme.com.vn/"
         } else {
             domain = "https://sdk.payme.com.vn/"
         }
@@ -303,7 +305,16 @@ class PayMEOpenSDKPopup : DialogFragment() {
     fun onText(myEven: MyEven) {
 
         if (myEven.type == TypeCallBack.onReload) {
-            this.myWebView.reload()
+
+            val injectedJS = "       const script = document.createElement('script');\n" +
+                    "          script.type = 'text/javascript';\n" +
+                    "          script.async = true;\n" +
+                    "          script.text = 'onReloadKYC()';\n" +
+                    "          document.body.appendChild(script);\n" +
+                    "          true; // note: this is required, or you'll sometimes get silent failures\n"
+            myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
+
+//            this.myWebView.reload()
         }
         if (myEven.type == TypeCallBack.onExpired) {
             dismiss()

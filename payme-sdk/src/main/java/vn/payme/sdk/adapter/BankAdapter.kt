@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -42,7 +41,7 @@ class BankAdapter(private val onClick: (BankTransferInfo) -> Unit) :
     /* Creates and inflates view and return FlowerViewHolder. */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BankViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_bank, parent, false)
+            .inflate(R.layout.payme_item_bank, parent, false)
         return BankViewHolder(view, onClick)
     }
 

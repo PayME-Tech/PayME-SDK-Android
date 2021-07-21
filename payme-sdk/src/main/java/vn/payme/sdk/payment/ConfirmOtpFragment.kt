@@ -37,7 +37,7 @@ class ConfirmOtpFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater?.inflate(R.layout.payment_confirm_otp_layout, container, false)
+        val view: View = inflater?.inflate(R.layout.payme_payment_confirm_otp_layout, container, false)
         loadingProgress = view.findViewById(R.id.loading)
         textNote = view.findViewById(R.id.text_note_otp)
         textCountDownTimer = view.findViewById(R.id.counterOtp)

@@ -59,7 +59,7 @@ class TakePictureAvatarFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater?.inflate(R.layout.take_picture_image_avata, container, false)
+        val view: View = inflater?.inflate(R.layout.payme_take_picture_image_avata, container, false)
         cameraKitView = view.findViewById(R.id.previewCamera)
         buttonTakePicture = view.findViewById(R.id.btn_takepicture)
         layoutConfirm = view.findViewById(R.id.confirm_screen)

@@ -37,7 +37,7 @@ internal class PopupSelectTypeIdentify : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater.inflate(
-            R.layout.popup_select_type_indentify,
+            R.layout.payme_popup_select_type_indentify,
             container, false
         )
         listView = view.findViewById(R.id.recipe_list_type_identify)
@@ -100,7 +100,7 @@ internal class PopupSelectTypeIdentify : BottomSheetDialogFragment() {
     }
 
     override fun setupDialog(dialog: Dialog, style: Int) {
-        val contentView = View.inflate(context, R.layout.payment_layout, null)
+        val contentView = View.inflate(context, R.layout.payme_payment_layout, null)
         dialog.setContentView(contentView)
         (contentView.parent as View).setBackgroundColor(resources.getColor(android.R.color.transparent))
     }

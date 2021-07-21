@@ -9,10 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
 import com.airbnb.lottie.LottieAnimationView
@@ -26,12 +23,10 @@ import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.Button
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
-import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.hepper.Keyboard
-import vn.payme.sdk.model.CardInfo
 import vn.payme.sdk.store.Store
 
 
@@ -46,7 +41,7 @@ class PopupCheckBankTransfer : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         isCancelable = false
-        val view = inflater.inflate(R.layout.payment_popup_check_transaction, container)
+        val view = inflater.inflate(R.layout.payme_payment_popup_check_transaction, container)
         lottie = view.findViewById(R.id.lottie_check)
         buttonClose = view.findViewById(R.id.buttonClose)
         containerCheck = view.findViewById(R.id.containerCheck)
@@ -152,7 +147,7 @@ class PopupCheckBankTransfer : DialogFragment() {
     }
 
     override fun setupDialog(dialog: Dialog, style: Int) {
-        val contentView = View.inflate(context, R.layout.payment_layout, null)
+        val contentView = View.inflate(context, R.layout.payme_payment_layout, null)
         dialog.setContentView(contentView)
         (contentView.parent as View).setBackgroundColor(resources.getColor(android.R.color.transparent))
     }
