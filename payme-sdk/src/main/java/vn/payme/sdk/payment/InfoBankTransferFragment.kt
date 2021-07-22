@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
@@ -34,6 +35,7 @@ class InfoBankTransferFragment : Fragment() {
     private lateinit var textAmount: TextView
     private lateinit var textAccountNumber: TextView
     private lateinit var textAccountHolder: TextView
+    private lateinit var textNoteVietQr: TextView
     private lateinit var textChangeBank: TextView
     private lateinit var textNote: TextView
     private lateinit var textListBankSupport: TextView
@@ -60,6 +62,7 @@ class InfoBankTransferFragment : Fragment() {
         textAmount = view.findViewById(R.id.txtMoneyTransfer)
         textAccountNumber = view.findViewById(R.id.txtAccountNumber)
         textAccountHolder = view.findViewById(R.id.txtAccountHolder)
+        textNoteVietQr = view.findViewById(R.id.txtNoteVietQr)
         textChangeBank = view.findViewById(R.id.txtChangeBank)
         containerNote = view.findViewById(R.id.container_note)
         textListBankSupport = view.findViewById(R.id.txtListBankSupport)
@@ -172,8 +175,12 @@ class InfoBankTransferFragment : Fragment() {
             val overlay = BitmapFactory.decodeResource(resources,R.drawable.logo_vietqr_small )
             imageQR.setImageBitmap(mergeBitmaps(overlay,bitmap))
             containerQr.visibility =View.VISIBLE
+            containerListBankSupport.visibility = View.VISIBLE
+            textNoteVietQr.visibility = View.VISIBLE
 
         }else{
+            containerListBankSupport.visibility = View.GONE
+            textNoteVietQr.visibility = View.GONE
             containerQr.visibility =View.GONE
 
         }
@@ -186,6 +193,7 @@ class InfoBankTransferFragment : Fragment() {
             containerNote.visibility = View.GONE
         }else{
             containerNote.visibility = View.VISIBLE
+
         }
         textNote.text = bank.content
     }

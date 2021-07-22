@@ -71,21 +71,11 @@ var AppSecretKey: String = ""
 var PublicKey: String = ""
 
 val APP_TOKEN_DEFAULT =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NywiaWF0IjoxNjE0OTExMDE0fQ.PJ0ke0Ky_0BoMPi45Cu803VlR8F3e8kOMoNh9I07AR4"
-val PUBLIC_KEY_DEFAULT = "-----BEGIN PUBLIC KEY-----\n" +
-        "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJQKJge1dTHz6Qkyz95X92QnsgDqerCB\n" +
-        "UzBmt/Qg+5E/oKpw7RBfni3SlCDGotBJH437YvsDBMx8OMCP8ROd7McCAwEAAQ==\n" +
-        "-----END PUBLIC KEY-----"
-val SECRET_KEY_DEFAULT = "bda4d9de88f37efb93342d8764ac9b84"
-val PRIVATE_KEY_DEFAULT = "-----BEGIN RSA PRIVATE KEY-----\n" +
-        "MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL\n" +
-        "yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF\n" +
-        "5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB\n" +
-        "AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA\n" +
-        "ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK\n" +
-        "xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd\n" +
-        "A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=\n" +
-        "-----END RSA PRIVATE KEY-----"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTgsImlhdCI6MTYyNjkyOTQ1M30.RifF-H0C4w29WDRV0AGgP0qoffaAYbdmp_uyS69DEhI"
+val PUBLIC_KEY_DEFAULT = "\n" +
+        "-----BEGIN PUBLIC KEY-----MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIKTO8wcUDUEFK6c1xWmappjJTpSLR5+0y7j42/S07SdHknPOVVH/EnVj0UxoI+3AZloBwqgs7gV4DyMPHEZPX8CAwEAAQ==-----END PUBLIC KEY-----"
+val SECRET_KEY_DEFAULT = "1cf4df491c0972ff96fffb10327e4963"
+val PRIVATE_KEY_DEFAULT = "-----BEGIN RSA PRIVATE KEY-----MIIBOQIBAAJAeEi2lnt0XYJBk068ncKYjG+C4dS1tZTxvVQrRKgzhrn5RY8NYhGR6rKI6SmfLuZfJwzJ7pAswHQcsZXq8bnFKQIDAQABAkAdt2Eclk1uWKLYwMgKdav4bgg4wLNPtAdxDd1Orftk2jBEzErHn8UEX5z1az1TEUpWvt0iPC3SDDtsJBI0pQ+tAiEAvkd9jsf6exffyG8Kjn/UGa//Xu7gv1FKhfK9+1i94N8CIQCh1D0b0IUHzPKC7F7N7IUeLGuLVMrT1xK78YbNi23y9wIgWI5jJCF0NPeugdUUH6/kYbQkcOVSGhhWS7LmsmThshcCIQCP+AFlfVzcU7hsQV0WVhUXgu0qR4UqcWx5R6ZltmVagQIgfYQl+kA7IIWCY7ist/xAmSAgmaitNYmfvPW8YnQp8fU=-----END RSA PRIVATE KEY-----"
 
 
 class MainActivity : AppCompatActivity() {
@@ -315,6 +305,9 @@ class MainActivity : AppCompatActivity() {
             if (spinnerEnvironment.selectedItem.toString() == Env.PRODUCTION.toString()) {
                 env = Env.PRODUCTION
             }
+            if (spinnerEnvironment.selectedItem.toString() == Env.STAGING.toString()) {
+                env = Env.STAGING
+            }
 
             if (inputPhoneNumber.text.toString().length >= 10 && inputUserId.text.toString().length > 0 && (inputPhoneNumber.text.toString().length == 10 || inputPhoneNumber.text.toString().length == 0) && loading.visibility != View.VISIBLE) {
                 val params: MutableMap<String, Any> = mutableMapOf()
@@ -330,7 +323,7 @@ class MainActivity : AppCompatActivity() {
 
                 val connectToken = CryptoAES.encrypt(
                     dataExample,
-                    if (env == Env.PRODUCTION) SecretKey else if (env == Env.DEV) SECRET_KEY_DEFAULT_DEV else SECRET_KEY_DEFAULT_SANDBOX
+                    if (env == Env.PRODUCTION || env == Env.STAGING) SecretKey else if (env == Env.DEV) SECRET_KEY_DEFAULT_DEV else SECRET_KEY_DEFAULT_SANDBOX
                 )
                 ConnectToken = connectToken
                 loading.visibility = View.VISIBLE
@@ -338,10 +331,10 @@ class MainActivity : AppCompatActivity() {
                 payme =
                     PayME(
                         this,
-                        if (env == Env.PRODUCTION) AppToken else if (env == Env.DEV) APP_TOKEN_DEFAULT_DEV else APP_TOKEN_DEFAULT_SANDBOX,
-                        if (env == Env.PRODUCTION) PublicKey else if (env == Env.DEV) PUBLIC_KEY_DEFAULT_DEV else PUBLIC_KEY_DEFAULT_SANDBOX,
+                        if (env == Env.PRODUCTION || env == Env.STAGING) AppToken else if (env == Env.DEV) APP_TOKEN_DEFAULT_DEV else APP_TOKEN_DEFAULT_SANDBOX,
+                        if (env == Env.PRODUCTION || env == Env.STAGING) PublicKey else if (env == Env.DEV) PUBLIC_KEY_DEFAULT_DEV else PUBLIC_KEY_DEFAULT_SANDBOX,
                         ConnectToken,
-                        if (env == Env.PRODUCTION) PrivateKey else if (env == Env.DEV) PRIVATE_KEY_DEFAULT_DEV else PRIVATE_KEY_DEFAULT_SANDBOX,
+                        if (env == Env.PRODUCTION || env == Env.STAGING) PrivateKey else if (env == Env.DEV) PRIVATE_KEY_DEFAULT_DEV else PRIVATE_KEY_DEFAULT_SANDBOX,
                         configColor,
                         if(spinnerLanguage.selectedItem.toString() == LANGUAGES.VN.toString()) LANGUAGES.VN else LANGUAGES.EN,
                         env,
@@ -507,7 +500,7 @@ class MainActivity : AppCompatActivity() {
             val amount = convertInt(moneyPay.text.toString())
 
             val storeId: Long =
-                if (env == Env.PRODUCTION) 57956431 else if (env == Env.SANDBOX) 37048160 else 9
+                if (env == Env.PRODUCTION ||env == Env.STAGING  ) 223 else if (env == Env.SANDBOX) 37048160 else 9
             val infoPayment =
                 InfoPayment(
                     "PAY",

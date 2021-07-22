@@ -3,6 +3,7 @@
     <string-array name="environment_arrays">
         <item>SANDBOX</item>
         <item>DEV</item>
+        <item>STAGING</item>
         <item>PRODUCTION</item>
     </string-array>
     <string-array name="lang_arrays">

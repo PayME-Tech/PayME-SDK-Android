@@ -66,7 +66,7 @@ class ResultPaymentFragment : Fragment() {
         textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount!! +fee)} đ"
         val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
         var listInfoTop = arrayListOf<Info>()
-        listInfoTop.add(Info(getString(R.string.transaction_code), Store.paymentInfo.infoPayment!!.orderId, null, null, false))
+        listInfoTop.add(Info(getString(R.string.transaction_code), Store.paymentInfo.transaction, null, null, false))
         listInfoTop.add(Info(getString(R.string.transaction_time), DateStr, null, null, false))
 
 

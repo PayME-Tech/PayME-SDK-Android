@@ -101,11 +101,11 @@ class ScanQR : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         scannerView = view.findViewById<CodeScannerView>(R.id.scan_qr)
-        scannerView.setOnClickListener {
-            if (cameraAccept) {
-                codeScanner.startPreview()
-            }
-        }
+//        scannerView.setOnClickListener {
+//            if (cameraAccept) {
+//                codeScanner.startPreview()
+//            }
+//        }
         codeScanner = CodeScanner(requireActivity(), scannerView)
         codeScanner.camera = CodeScanner.CAMERA_BACK
         codeScanner.formats = arrayListOf(BarcodeFormat.QR_CODE)
@@ -129,6 +129,7 @@ class ScanQR : DialogFragment() {
                 )
             }
         }
+
         dialog?.window?.setStatusBarColor(Color.TRANSPARENT);
         dialog?.window?.setBackgroundDrawable(Store.config.colorApp.backgroundColor);
 
@@ -136,7 +137,6 @@ class ScanQR : DialogFragment() {
             == PackageManager.PERMISSION_GRANTED
         ) {
            visibleCamera()
-
         } else {
             PermissionCamera().requestCameraFragment(requireContext(), this)
         }
@@ -229,13 +229,16 @@ class ScanQR : DialogFragment() {
 
     }
     private fun visibleCamera (){
-        val activity = requireActivity()
         cameraAccept = true
-
-        codeScanner.startPreview()
-
-
         containerErrorCamera?.visibility = View.GONE
+
+        android.os.Handler().postDelayed(
+            {
+              codeScanner.startPreview()
+            },
+            500 // Timeout value
+        )
+
     }
 
     fun checkRequestPermissionsResult(

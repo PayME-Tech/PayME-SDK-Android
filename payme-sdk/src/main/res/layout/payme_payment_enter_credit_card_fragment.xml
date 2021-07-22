@@ -26,8 +26,6 @@
         android:visibility="visible"
         android:layout_marginTop="16dp"
         app:layout_constraintTop_toBottomOf="@id/inputCardNumber"
-        app:pbDigits="ABCDEFGHIJKLMNOPQRSTUVWXYZ "
-        app:pbInputType="textFilter"
         app:pbMaxlength="50"
         app:pbTitle="@string/the_cardholder_full_name"
         app:pbHint="@string/enter_the_cardholder_full_name" />
