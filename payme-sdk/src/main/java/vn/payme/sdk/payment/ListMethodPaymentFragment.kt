@@ -92,7 +92,7 @@ class ListMethodPaymentFragment : Fragment() {
             if (!loadingPopup.isVisible) {
                 val method = Store.paymentInfo.listMethod[i]
                 if (method?.type == TYPE_PAYMENT.WALLET ) {
-                    val total = Store.paymentInfo.infoPayment!!.amount + EventBus.getDefault().getStickyEvent(FeeInfo::class.java).feeWallet
+                    val total = Store.paymentInfo.infoPayment!!.amount
 
                     val feeInfo = EventBus.getDefault().getStickyEvent(FeeInfo::class.java)
                     if (

@@ -154,9 +154,14 @@ internal class PayFunction {
                             )
                             listBank.add(bankTransferInfo)
                         }
-                        EventBus.getDefault().postSticky(listBank[0])
-                        EventBus.getDefault().postSticky(ListBankTransfer(listBank))
-                        onSuccess()
+                        if(listBank.size==0){
+                            onError(null,ERROR_CODE.PAYMENT_ERROR,PayME.context.getString(R.string.error_manual_bank))
+                        }else{
+                            EventBus.getDefault().postSticky(listBank[0])
+                            EventBus.getDefault().postSticky(ListBankTransfer(listBank))
+                            onSuccess()
+                        }
+
 
                     } else {
                         onError(null, ERROR_CODE.PAYMENT_ERROR, message)

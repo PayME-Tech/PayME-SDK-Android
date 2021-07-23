@@ -62,8 +62,7 @@ class ResultPaymentFragment : Fragment() {
         val state = arguments?.getString("state")
 
         val decimal = DecimalFormat("#,###")
-        val fee = EventBus.getDefault().getStickyEvent(FeeInfo::class.java).fee
-        textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount!! +fee)} đ"
+        textAmount.text = "${decimal.format(Store.paymentInfo.infoPayment?.amount!!)} đ"
         val event = EventBus.getDefault().getStickyEvent(PaymentInfoEvent::class.java)
         var listInfoTop = arrayListOf<Info>()
         listInfoTop.add(Info(getString(R.string.transaction_code), Store.paymentInfo.transaction, null, null, false))

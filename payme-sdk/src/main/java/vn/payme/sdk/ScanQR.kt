@@ -1,7 +1,6 @@
 package vn.payme.sdk
 
 import android.app.Activity
-import android.app.Instrumentation
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -9,7 +8,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +20,7 @@ import androidx.fragment.app.DialogFragment
 import com.google.zxing.*
 import com.google.zxing.common.HybridBinarizer
 import com.journeyapps.barcodescanner.BarcodeView
+import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.component.Button
@@ -32,6 +31,8 @@ import vn.payme.sdk.evenbus.RequestPermissionsResult
 import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.kyc.*
 import vn.payme.sdk.store.Store
+import java.util.*
+
 
 class ScanQR : DialogFragment()  {
 
@@ -103,6 +104,10 @@ class ScanQR : DialogFragment()  {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         barcodeView = view.findViewById(R.id.scan_qr)
+        val formats: Collection<BarcodeFormat> =
+            Arrays.asList(BarcodeFormat.QR_CODE)
+        val decoder = DefaultDecoderFactory(formats)
+        barcodeView.setDecoderFactory(decoder)
         barcodeView.decodeSingle { result->
             dismiss()
             android.os.Handler().postDelayed(

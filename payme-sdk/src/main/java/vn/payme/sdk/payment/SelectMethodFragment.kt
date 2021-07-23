@@ -16,7 +16,6 @@ import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.component.Button
-import vn.payme.sdk.component.InfoPayment
 import vn.payme.sdk.enums.PAY_CODE
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
@@ -48,7 +47,6 @@ class SelectMethodFragment : Fragment() {
     private lateinit var frameLayout: FrameLayout
     private var loading: Boolean = false
     private lateinit var buttonSubmit: Button
-    private lateinit var infoFee: InfoPayment
     private lateinit var cardInfo: CardInfo
 
 
@@ -84,7 +82,6 @@ class SelectMethodFragment : Fragment() {
 
         buttonSubmit = view.findViewById(R.id.buttonSubmit)
         buttonSubmit.iconLeft.visibility = View.VISIBLE
-        infoFee = view.findViewById(R.id.infoFee)
         EventBus.getDefault().register(this)
         layout.background = Store.config.colorApp.backgroundColorRadiusTop
         val decimal = DecimalFormat("#,###")
@@ -188,7 +185,6 @@ class SelectMethodFragment : Fragment() {
         } else {
             buttonChangeMethod.visibility = View.VISIBLE
             changeMethod(Store.paymentInfo.methodSelected!!)
-            infoFee.visibility = View.GONE
 
         }
 
@@ -205,14 +201,13 @@ class SelectMethodFragment : Fragment() {
         val decimal = DecimalFormat("#,###")
         val event = EventBus.getDefault().getStickyEvent(FeeInfo::class.java)
         val fee = event.fee
-        infoFee.visibility = View.VISIBLE
         if (event.state == "OVER_DAY_QUOTA" || event.state == "OVER_MONTH_QUOTA") {
             textMessageError.text = event.message
             textMessageError.visibility = View.VISIBLE
             buttonSubmit.setVisible(false)
         } else {
-            val total = Store.paymentInfo.infoPayment!!.amount + EventBus.getDefault()
-                .getStickyEvent(FeeInfo::class.java).feeWallet
+            val total = Store.paymentInfo.infoPayment!!.amount
+
             if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.WALLET && total > Store.userInfo.balance) {
                 buttonSubmit.setVisible(false)
             } else {
@@ -221,22 +216,8 @@ class SelectMethodFragment : Fragment() {
             }
 
         }
-        val valueFree = if (fee > 0) "${decimal.format(fee)} đ" else getString(R.string.free)
-        listInfoBottom.add(Info(getString(R.string.fee), valueFree, null, null, false))
-        val infoTotal = Info(
-            getString(R.string.total_payment), "${
-                decimal.format(
-                    Store.paymentInfo.infoPayment?.amount?.plus(
-                        fee
-                    )
-                )
-            } đ", null, ContextCompat.getColor(requireContext(), R.color.red), true
-        )
-        infoTotal.valueTextSize = 17f
-        listInfoBottom.add(
-            infoTotal
-        )
-        infoFee.updateData(listInfoBottom)
+
+
     }
 
     fun changeMethod(method: Method) {

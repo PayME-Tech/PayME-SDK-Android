@@ -50,7 +50,7 @@ class MethodAdapter(
     //4
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val method = dataSource[position]
-        val total = Store.paymentInfo.infoPayment!!.amount + EventBus.getDefault().getStickyEvent(FeeInfo::class.java).feeWallet
+        val total = Store.paymentInfo.infoPayment!!.amount
 
         if (
             method.type == TYPE_PAYMENT.WALLET
@@ -82,7 +82,6 @@ class MethodAdapter(
             val rowView = inflater.inflate(R.layout.payme_payment_item_method, null, true)
             val titleText = rowView.findViewById(R.id.title) as TextView
             val noteMethod = rowView.findViewById(R.id.note_method) as TextView
-            val txtFee = rowView.findViewById(R.id.txtFee) as TextView
             val container = rowView.findViewById(R.id.container) as CardView
             val imageView = rowView.findViewById(R.id.image) as ImageView
             val buttonSelect = rowView.findViewById(R.id.buttonSelect) as ImageView
@@ -91,10 +90,9 @@ class MethodAdapter(
                 ChangeColorImage().changeColor(context,buttonSelect,R.drawable.ic_checked,1)
             }else{
                 buttonSelect.setImageResource(R.drawable.ic_uncheck)
-
             }
 
-            AddInfoMethod().setTitle(method, titleText, noteMethod,txtFee)
+            AddInfoMethod().setTitle(method, titleText, noteMethod,null)
 
             AddInfoMethod().addImage(method, imageView)
 

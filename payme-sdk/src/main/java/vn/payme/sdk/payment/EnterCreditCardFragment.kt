@@ -85,13 +85,17 @@ class EnterCreditCardFragment : Fragment() {
                         }
                     }
                     cardNumberValue = cardNew.replace("[^0-9]".toRegex(), "")
-                    inputCardNumber.input.removeTextChangedListener(this)
-                    val cursorPosition: Int = inputCardNumber.input.getSelectionStart()
-                    val newCursorPosition = cursorPosition + (cardNew.length - s.length)
-                    inputCardNumber.input.setText(cardNew)
-                    val check = newCursorPosition
-                    inputCardNumber.input.setSelection(check!!)
-                    inputCardNumber.input.addTextChangedListener(this)
+
+                    if(cardNew!=s.toString()){
+                        inputCardNumber.input.removeTextChangedListener(this)
+                        val cursorPosition: Int = inputCardNumber.input.getSelectionStart()
+                        val newCursorPosition = cursorPosition + (cardNew.length - s.length)
+                        inputCardNumber.input.setText(cardNew)
+                        val check = newCursorPosition
+                        inputCardNumber.input.setSelection(check!!)
+                        inputCardNumber.input.addTextChangedListener(this)
+                    }
+
 
                 } else {
                     inputCardNumber.setDefault(null)
@@ -127,12 +131,14 @@ class EnterCreditCardFragment : Fragment() {
                         newDate += date[i]
                     }
                 }
-                inputCardDate.input.removeTextChangedListener(this)
-                val cursorPosition: Int = inputCardDate.input.getSelectionStart()
-                val newCursorPosition = cursorPosition + (newDate.length - s.length)
-                inputCardDate.input.setText(newDate)
-                inputCardDate.input.setSelection(if (newCursorPosition > 5) 5 else newCursorPosition)
-                inputCardDate.input.addTextChangedListener(this)
+                if(newDate!=s.toString()) {
+                    inputCardDate.input.removeTextChangedListener(this)
+                    val cursorPosition: Int = inputCardDate.input.getSelectionStart()
+                    val newCursorPosition = cursorPosition + (newDate.length - s.length)
+                    inputCardDate.input.setText(newDate)
+                    inputCardDate.input.setSelection(if (newCursorPosition > 5) 5 else newCursorPosition)
+                    inputCardDate.input.addTextChangedListener(this)
+                }
                 if (newDate.length == 5) {
                     val month = Integer.parseInt(newDate.substring(0, 2))
                     val yead = newDate.substring(3, 5)
