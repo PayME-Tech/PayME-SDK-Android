@@ -4,7 +4,7 @@ import java.util.regex.Pattern
 
 
 enum class CardType {
-    UNKNOWN, VISA, MASTERCARD, JCB;
+    UNKNOWN, VISA, MASTER, JCB;
 
     private var pattern: Pattern?
 
@@ -20,7 +20,7 @@ enum class CardType {
         fun detect(cardNumber: String?): CardType {
             if (cardNumber?.length!! > 0) {
                 if (cardNumber?.subSequence(0, 1) == "3") return JCB
-                if (cardNumber?.subSequence(0, 1) == "5") return MASTERCARD
+                if (cardNumber?.subSequence(0, 1) == "5") return MASTER
                 if (cardNumber?.subSequence(0, 1) == "4") return VISA
             }
 

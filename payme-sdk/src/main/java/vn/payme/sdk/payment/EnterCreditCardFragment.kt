@@ -57,7 +57,7 @@ class EnterCreditCardFragment : Fragment() {
                 } else if (cardType == CardType.VISA) {
                     inputCardNumber.imageRight.visibility = View.VISIBLE
                     inputCardNumber.imageRight.setImageResource(R.drawable.ic_logo_visa)
-                } else if (cardType == CardType.MASTERCARD) {
+                } else if (cardType == CardType.MASTER) {
                     inputCardNumber.imageRight.visibility = View.VISIBLE
                     inputCardNumber.imageRight.setImageResource(R.drawable.ic_logo_mastercard)
                 } else {
