@@ -12,8 +12,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 75
-        versionName "0.9.981"
+        versionCode 78
+        versionName "0.9.10"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -66,10 +66,11 @@ dependencies {
     // Kotlin
     implementation "androidx.fragment:fragment-ktx:$fragment_version"
     implementation "androidx.cardview:cardview:1.0.0"
-    implementation 'com.budiyev.android:code-scanner:2.1.0'
     implementation 'com.google.zxing:core:3.3.3'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation('com.journeyapps:zxing-android-embedded:4.2.0') { transitive = false }
+
 
 
 }

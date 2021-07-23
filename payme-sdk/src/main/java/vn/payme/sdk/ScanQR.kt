@@ -1,6 +1,7 @@
 package vn.payme.sdk
 
 import android.app.Activity
+import android.app.Instrumentation
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -8,17 +9,19 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
-import com.budiyev.android.codescanner.*
 import com.google.zxing.*
 import com.google.zxing.common.HybridBinarizer
+import com.journeyapps.barcodescanner.BarcodeView
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.component.Button
@@ -26,22 +29,25 @@ import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.CheckActivityResult
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.evenbus.RequestPermissionsResult
+import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.kyc.*
 import vn.payme.sdk.store.Store
 
-class ScanQR : DialogFragment() {
-    private lateinit var codeScanner: CodeScanner
-    private lateinit var scannerView: CodeScannerView
+class ScanQR : DialogFragment()  {
+
     private val PICK_IMAGE = 1
     private var toggleTorch = false
     private var btnPicker: LinearLayout? = null
     private var btnTorch: LinearLayout? = null
     private var buttonBack: ImageView? = null
     private var buttonBackHeaderErrorCamera: ImageView? = null
+  lateinit var    imageScan: ImageView
     private var enableSetting = false
     private var containerErrorCamera: ConstraintLayout? = null
     private var buttonOpenSetting: Button? = null
     var cameraAccept = false
+    lateinit var barcodeView: BarcodeView
+    lateinit var textFlash: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,11 +92,7 @@ class ScanQR : DialogFragment() {
                 popup.show(parentFragmentManager, "ModalBottomSheet")
             }
         }
-//        PayME.showError("event.resultCode"+event.resultCode)
-//        if(PayME.activityResult !=null){
-//            checkActivityResult(PayME.activityResult!!.requestCode,PayME.activityResult!!.resultCode,PayME.activityResult!!.data)
-//            PayME.activityResult = null
-//        }
+
     }
 
     @Subscribe
@@ -100,34 +102,22 @@ class ScanQR : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        scannerView = view.findViewById<CodeScannerView>(R.id.scan_qr)
-//        scannerView.setOnClickListener {
-//            if (cameraAccept) {
-//                codeScanner.startPreview()
-//            }
-//        }
-        codeScanner = CodeScanner(requireActivity(), scannerView)
-        codeScanner.camera = CodeScanner.CAMERA_BACK
-        codeScanner.formats = arrayListOf(BarcodeFormat.QR_CODE)
-        codeScanner.isAutoFocusEnabled = true
-        codeScanner.scanMode = ScanMode.SINGLE
-        codeScanner.autoFocusMode = AutoFocusMode.SAFE
-        codeScanner.decodeCallback = DecodeCallback {
-            activity?.runOnUiThread {
-                dismiss()
-                android.os.Handler().postDelayed(
-                    {
-                        val payme = PayME()
-                        val payCode = arguments?.getString("payCode")
-                        payme.payQRCodeInSDK(
-                            PayME.fragmentManager,
-                            it.text.toString(),
-                            payCode!!
-                        )
-                    },
-                    500 // Timeout value
-                )
-            }
+        barcodeView = view.findViewById(R.id.scan_qr)
+        barcodeView.decodeSingle { result->
+            dismiss()
+            android.os.Handler().postDelayed(
+                {
+                    val payme = PayME()
+                    val payCode = arguments?.getString("payCode")
+                    payme.payQRCodeInSDK(
+                        PayME.fragmentManager,
+                        result.text.toString(),
+                        payCode!!
+                    )
+                },
+                500 // Timeout value
+            )
+
         }
 
         dialog?.window?.setStatusBarColor(Color.TRANSPARENT);
@@ -136,7 +126,7 @@ class ScanQR : DialogFragment() {
         if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_GRANTED
         ) {
-           visibleCamera()
+            visibleCamera()
         } else {
             PermissionCamera().requestCameraFragment(requireContext(), this)
         }
@@ -190,16 +180,20 @@ class ScanQR : DialogFragment() {
     private fun mappingView(v: View) {
         btnPicker = v.findViewById(R.id.button_picker)
         btnTorch = v.findViewById(R.id.button_torch)
+        imageScan = v.findViewById(R.id.imageScan)
         buttonBack = v.findViewById(R.id.button_back)
         containerErrorCamera = v.findViewById(R.id.containerErrorCamera)
         buttonOpenSetting = v.findViewById(R.id.buttonOpenSetting)
         buttonBackHeaderErrorCamera = v.findViewById(R.id.buttonBackHeaderErrorCamera)
+        textFlash = v.findViewById(R.id.txtFlash)
         btnPicker!!.setOnClickListener {
             val intent = Intent()
             intent.type = "image/*"
             intent.action = Intent.ACTION_GET_CONTENT
             startActivityForResult(Intent.createChooser(intent, "Chọn ảnh"), PICK_IMAGE)
         }
+        ChangeColorImage().changeColor(requireContext(),imageScan!!,R.drawable.ic_scan_qr,1)
+
         buttonBack?.setOnClickListener {
             dismiss()
         }
@@ -215,29 +209,24 @@ class ScanQR : DialogFragment() {
                 PermissionCamera().requestCamera(requireContext(), requireActivity())
             }
         }
+
         btnTorch!!.setOnClickListener {
-            if (cameraAccept) {
                 if (!toggleTorch) {
-                    codeScanner.isFlashEnabled = true
                     toggleTorch = true
+                    barcodeView.setTorch(true)
+                    textFlash.setText(getString(R.string.off_flash))
                 } else {
-                    codeScanner.isFlashEnabled = false
                     toggleTorch = false
+                    barcodeView.setTorch(false)
+                    textFlash.setText(getString(R.string.on_flash))
+
                 }
-            }
         }
 
     }
     private fun visibleCamera (){
-        cameraAccept = true
+        barcodeView.resume()
         containerErrorCamera?.visibility = View.GONE
-
-        android.os.Handler().postDelayed(
-            {
-              codeScanner.startPreview()
-            },
-            500 // Timeout value
-        )
 
     }
 
@@ -282,16 +271,20 @@ class ScanQR : DialogFragment() {
 
     override fun onResume() {
         super.onResume()
-        if (cameraAccept) {
-            codeScanner.startPreview()
+        if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            visibleCamera()
         }
     }
 
     override fun onPause() {
-        if (cameraAccept) {
-            codeScanner.releaseResources()
-        }
         super.onPause()
+        if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            barcodeView.pause()
+        }
     }
 
     override fun onCreateView(

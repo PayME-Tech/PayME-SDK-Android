@@ -121,5 +121,10 @@
     <string name="list_bank_support">Danh sách ngân hàng hỗ trợ</string>
     <string name="not_found_bank">Không tìm thấy ngân hàng nào</string>
     <string name="checking">Đang kiểm tra...</string>
+    <string name="on_flash">Bật flash</string>
+    <string name="off_flash">Tắt flash</string>
+    <string name="scan_qr_code">Quét QR code</string>
+    <string name="keep_the_QRCode_in_the_frame">Giữ mã QRCode trong khung</string>
+
 
 </resources>
