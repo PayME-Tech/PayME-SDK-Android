@@ -33,6 +33,7 @@ class Config {
     var enlableKycIdentify: Boolean = false
     var enlableKycVideo: Boolean = false
     var enlableKycFace: Boolean = false
+    var creditSacomAuthLink: String = ""
 
     constructor(
         appPrivateKey: String,

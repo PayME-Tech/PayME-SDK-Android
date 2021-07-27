@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 
@@ -25,14 +26,13 @@ import vn.payme.sdk.store.Store
 class TakePictureAvatarFragment : Fragment() {
     private var cameraKitView: CameraView? = null
     private var buttonTakePicture: ImageView? = null
-    private var layoutConfirm: ConstraintLayout? = null
+    private var layoutConfirm: LinearLayout? = null
     private var imagePreView: ImageView? = null
     private var buttonBackHeader: ImageView? = null
     private var buttonBackHeader2: ImageView? = null
     private var buttonBack: Button? = null
     private var buttonNext: Button? = null
     private var saveImage: ByteArray? = null
-    private var cardViewCamera: CardView? = null
 
 
 
@@ -70,7 +70,6 @@ class TakePictureAvatarFragment : Fragment() {
         buttonBack?.setButtonTypeBorder()
 
         buttonBackHeader2 = view.findViewById(R.id.buttonBackHeader2)
-        cardViewCamera = view.findViewById(R.id.cardViewCamera)
         ChangeColorImage().changeColor(requireContext(),buttonTakePicture!!,R.drawable.ic_buttontakepic,1)
         buttonBackHeader2!!.setOnClickListener {
             layoutConfirm!!.visibility = View.GONE

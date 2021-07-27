@@ -93,7 +93,7 @@ internal class PaymentApi {
                             );
                             myWebView.setWebViewClient(object : WebViewClient() {
                                 override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-                                    if(url.contains("CollectRedirect") && !timeCheck ){
+                                    if(url.contains(Store.config.creditSacomAuthLink) && !timeCheck ){
                                         onSuccess(referenceId)
                                         timeCheck = true
                                     }
@@ -290,7 +290,7 @@ internal class PaymentApi {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
         val variables: MutableMap<String, Any> = mutableMapOf()
-        val listKey = arrayListOf<String>("limit.param.amount.payment","limit.param.amount.all","service.main.visible","kyc.mode.enable")
+        val listKey = arrayListOf<String>("limit.param.amount.payment","credit.sacom.auth.link","limit.param.amount.all","service.main.visible","kyc.mode.enable")
         val query = "query Query(\$configsAppId: String, \$configsKeys: [String]) {\n" +
                 "  Setting {\n" +
                 "    configs(appId: \$configsAppId, keys: \$configsKeys) {\n" +

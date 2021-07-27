@@ -17,6 +17,7 @@ import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.adapter.TypeIndentifyAdapter
+import vn.payme.sdk.kyc.CameraKycPopup
 import vn.payme.sdk.model.TypeIdentify
 
 internal class PopupSelectTypeIdentify : BottomSheetDialogFragment() {
@@ -50,21 +51,21 @@ internal class PopupSelectTypeIdentify : BottomSheetDialogFragment() {
             TypeIdentify(
                 "Chứng minh nhân dân",
                 "CMND",
-                true
+                 CameraKycPopup.typeIdentify == "CMND"
             )
         )
         this.listMethod.add(
             TypeIdentify(
                 "Căn cước công dân",
                 "CCCD",
-                false
+                CameraKycPopup.typeIdentify == "CCCD"
             )
         )
         this.listMethod.add(
             TypeIdentify(
                 "Hộ chiếu",
                 "PASSPORT",
-                false
+                CameraKycPopup.typeIdentify == "PASSPORT"
             )
         )
         methodAdapter.notifyDataSetChanged()

@@ -21,6 +21,7 @@ import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.ChangeFragmentKYC
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.evenbus.RequestPermissionsResult
+import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.store.Store
 
 class CameraKycPopup : DialogFragment() {
@@ -31,11 +32,13 @@ class CameraKycPopup : DialogFragment() {
         var imageBackSide: ByteArray? = null
         var typeIdentify: String? = null
         var updateOnlyIdentify = false
-        private var buttonBackHeaderErrorCamera: ImageView? = null
         private var enableSetting = false
-        private var containerErrorCamera: ConstraintLayout? = null
-        private var buttonOpenSetting: Button? = null
     }
+    private var buttonBackHeaderErrorCamera: ImageView? = null
+    lateinit var imageErrorCamera: ImageView
+    private var containerErrorCamera: ConstraintLayout? = null
+    private var buttonOpenSetting: Button? = null
+    private var isAcceptCamera = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         EventBus.getDefault().register(this)
@@ -55,9 +58,12 @@ class CameraKycPopup : DialogFragment() {
             container, false
         )
         containerErrorCamera = v.findViewById(R.id.containerErrorCamera)
+        imageErrorCamera = v.findViewById(R.id.imageErrorCamera)
         buttonOpenSetting = v.findViewById(R.id.buttonOpenSetting)
         buttonBackHeaderErrorCamera = v.findViewById(R.id.buttonBackHeaderErrorCamera)
         containerErrorCamera?.visibility = View.VISIBLE
+        ChangeColorImage().changeColor(requireContext(),imageErrorCamera,R.drawable.icon_error_camera,3)
+
         buttonOpenSetting!!.setOnClickListener {
             if (enableSetting) {
                 PermissionCamera().openSetting(requireActivity())
@@ -88,6 +94,7 @@ class CameraKycPopup : DialogFragment() {
         if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_GRANTED
         ) {
+            isAcceptCamera  = true
             containerErrorCamera?.visibility = View.GONE
             if (Store.config.kycIdentify) {
                 childFragmentManager.commit {
@@ -117,6 +124,7 @@ class CameraKycPopup : DialogFragment() {
     ) {
         val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
         if (valid) {
+            isAcceptCamera = true
             if (Store.config.kycIdentify) {
                 childFragmentManager.commit {
                     setReorderingAllowed(true)
@@ -195,6 +203,34 @@ class CameraKycPopup : DialogFragment() {
     override fun onDestroy() {
         super.onDestroy()
         EventBus.getDefault().unregister(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(!isAcceptCamera){
+            if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED
+            ) {
+                isAcceptCamera  = true
+                containerErrorCamera?.visibility = View.GONE
+                if (Store.config.kycIdentify) {
+                    childFragmentManager.commit {
+                        setReorderingAllowed(true)
+                        add<TakePictureIdentifyFragment>(R.id.content_kyc)
+                    }
+                } else if (Store.config.kycFace) {
+                    childFragmentManager.commit {
+                        setReorderingAllowed(true)
+                        add<TakePictureAvatarFragment>(R.id.content_kyc)
+                    }
+                } else if (Store.config.kycVideo) {
+                    childFragmentManager.commit {
+                        setReorderingAllowed(true)
+                        add<TakeVideoKycFragment>(R.id.content_kyc)
+                    }
+                }            }
+        }
+
     }
 
 }

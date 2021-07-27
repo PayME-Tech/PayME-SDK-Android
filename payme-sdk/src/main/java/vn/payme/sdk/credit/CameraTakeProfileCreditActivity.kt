@@ -29,6 +29,7 @@ import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.CheckActivityResult
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.evenbus.RequestPermissionsResult
+import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.kyc.*
 import vn.payme.sdk.store.Store
 import java.io.ByteArrayOutputStream
@@ -43,13 +44,15 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
     private var buttonTakePicture: ImageView? = null
     private var buttonBackHeader: ImageView? = null
     private var buttonOnOffFlash: ImageView? = null
+    lateinit var imageErrorCamera: ImageView
     private var buttonChooseGallery: ImageView? = null
     private val PICK_IMAGE = 1
-
     private var buttonBackHeaderErrorCamera: ImageView? = null
     private var enableSetting = false
     private var containerErrorCamera: ConstraintLayout? = null
     private var buttonOpenSetting: Button? = null
+    private var isAcceptCamera = false
+
 
     private inner class Listener : CameraListener() {
         override fun onPictureTaken(result: PictureResult) {
@@ -64,7 +67,6 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        isCancelable = false
         EventBus.getDefault().register(this)
         setStyle(STYLE_NO_FRAME,R.style.DialogStyle);
     }
@@ -102,8 +104,10 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
 
 
         containerErrorCamera = v.findViewById(R.id.containerErrorCamera)
+        imageErrorCamera = v.findViewById(R.id.imageErrorCamera)
         buttonOpenSetting = v.findViewById(R.id.buttonOpenSetting)
         buttonBackHeaderErrorCamera = v.findViewById(R.id.buttonBackHeaderErrorCamera)
+        ChangeColorImage().changeColor(requireContext(), imageErrorCamera,R.drawable.icon_error_camera,3)
 
         buttonChooseGallery?.setOnClickListener {
             val i = Intent(
@@ -158,10 +162,25 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_GRANTED){
+            containerErrorCamera?.visibility = View.GONE
             cameraKitView!!.open()
+            isAcceptCamera = true
+
         }else{
             PermissionCamera().requestCameraFragment(requireContext(),this)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(!isAcceptCamera){
+            if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED){
+                containerErrorCamera?.visibility = View.GONE
+                cameraKitView!!.open()
+            }
+        }
+
     }
     @Subscribe
     fun eventActivityResult(event: CheckActivityResult){
@@ -212,7 +231,8 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
          grantResults: IntArray
     ) {
         val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
-        if (valid && !cameraKitView!!.isOpened) {
+        if (valid) {
+            isAcceptCamera = true
             cameraKitView!!.open()
             containerErrorCamera?.visibility = View.GONE
         } else {

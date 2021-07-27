@@ -356,20 +356,23 @@ public class PayME {
                         Store.config.enlableKycVideo = kycVideo
                     }
 
-                    if (key == "limit.param.amount.payment" && valueString != null) {
+                    if (key == "limit.param.amount.payment" && valueString != "null") {
                         val value = JSONObject(valueString)
                         val max = Integer.parseInt(value.optString("max"))
                         val min = Integer.parseInt(value.optString("min"))
                         Store.config.limitPayment = MaxminPayment(min, max)
                     }
-                    if (key == "limit.param.amount.all" && valueString != null) {
+                    if (key == "credit.sacom.auth.link" && valueString != "null") {
+                        Store.config.creditSacomAuthLink  = valueString
+                    }
+                    if (key == "limit.param.amount.all" && valueString != "null") {
                         val value = JSONObject(valueString)
                         val max = Integer.parseInt(value.optString("max"))
                         val min = Integer.parseInt(value.optString("min"))
                         Store.config.limitPayment = MaxminPayment(min, max)
 
                     }
-                    if (key == "service.main.visible" && valueString != null) {
+                    if (key == "service.main.visible" && valueString != "null") {
                         val value = JSONObject(valueString)
                         Store.paymentInfo.listService = arrayListOf()
                         val listService = value.optJSONArray("listService")
@@ -728,7 +731,6 @@ public class PayME {
             }
             Store.config.handShake = handShake
             Store.userInfo.accountLoginSuccess = true
-            Log.d("LOGIN", "login:" + Store.userInfo.accountKycSuccess)
 
             if (Store.userInfo.accountActive) {
                 if (Store.userInfo.accountKycSuccess) {

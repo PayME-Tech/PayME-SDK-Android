@@ -42,6 +42,7 @@ class ScanQR : DialogFragment()  {
     private var btnTorch: LinearLayout? = null
     private var buttonBack: ImageView? = null
     private var buttonBackHeaderErrorCamera: ImageView? = null
+    lateinit var imageErrorCamera: ImageView
   lateinit var    imageScan: ImageView
     private var enableSetting = false
     private var containerErrorCamera: ConstraintLayout? = null
@@ -188,8 +189,12 @@ class ScanQR : DialogFragment()  {
         imageScan = v.findViewById(R.id.imageScan)
         buttonBack = v.findViewById(R.id.button_back)
         containerErrorCamera = v.findViewById(R.id.containerErrorCamera)
+        imageErrorCamera = v.findViewById(R.id.imageErrorCamera)
         buttonOpenSetting = v.findViewById(R.id.buttonOpenSetting)
         buttonBackHeaderErrorCamera = v.findViewById(R.id.buttonBackHeaderErrorCamera)
+
+        ChangeColorImage().changeColor(requireContext(), imageErrorCamera,R.drawable.icon_error_camera,3)
+
         textFlash = v.findViewById(R.id.txtFlash)
         btnPicker!!.setOnClickListener {
             val intent = Intent()

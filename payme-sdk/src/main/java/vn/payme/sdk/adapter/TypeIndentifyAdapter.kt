@@ -8,6 +8,7 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import vn.payme.sdk.R
+import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.model.TypeIdentify
 
 class TypeIndentifyAdapter(
@@ -38,7 +39,7 @@ class TypeIndentifyAdapter(
         val titleText = rowView.findViewById(R.id.title) as TextView
         val checkBox = rowView.findViewById(R.id.checkbox) as ImageView
         if (method.selected!!) {
-            checkBox.setImageResource(R.drawable.checked)
+            ChangeColorImage().changeColor(context,checkBox,R.drawable.ic_radio_checked,1)
         } else {
             checkBox.setImageResource(R.drawable.uncheck)
         }

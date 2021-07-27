@@ -67,7 +67,7 @@ class EnterCreditCardFragment : Fragment() {
                 bankShortName = cardType.toString()
                 if (cardNumber?.length!! >= 6) {
                     var cardNew = ""
-                    if (cardNumber.length == 19) {
+                    if (cardNumber.length >16) {
                         for (i in 0 until cardNumber.length) {
                             if ((i == 7 || i == 15) && (i + 1 < cardNumber.length)) {
                                 cardNew += cardNumber[i] + " "
