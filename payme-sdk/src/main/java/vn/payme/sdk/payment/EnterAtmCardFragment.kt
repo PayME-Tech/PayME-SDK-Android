@@ -34,9 +34,7 @@ class EnterAtmCardFragment : Fragment() {
     private var cardNumberValue: String = ""
     var count = 0
     fun checkValidate() {
-        println("cardNumberValue"+cardNumberValue.length)
-        println("check"+(cardDate.length > 0 && cardHolder.length > 0 && (cardNumberValue.length == 16 || cardNumberValue.length == 19)))
-        if (cardDate.length > 0 && cardHolder.length > 0 && (cardNumberValue.length == 16 || cardNumberValue.length == 19)) {
+        if (bankSelected != null && cardDate.length > 0 && cardHolder.length > 0 && (cardNumberValue.length == 16 || cardNumberValue.length == 19)) {
             val cardInfo = CardInfo(
                 inputCardDate.input.text.toString(),
                 inputCardNumber.input.text.toString(),
@@ -111,11 +109,12 @@ class EnterAtmCardFragment : Fragment() {
 
 
                 val stringReplace = s?.replace("[^0-9]".toRegex(), "")
-                val cardNumber = stringReplace?.subSequence(
+                var cardNumber = stringReplace?.subSequence(
                     0,
                     if (stringReplace.length < 19) stringReplace.length else 19
                 )
-                cardNumberValue = cardNumber.toString()
+                bankSelected = null
+
 
                 if (cardNumber?.length!! >= 6) {
                     val cardPrefix = cardNumber.substring(0, 6)
@@ -138,29 +137,45 @@ class EnterAtmCardFragment : Fragment() {
                                 .centerInside()
                                 .into(inputCardNumber.imageRight)
                             bankVerify = true
-                            if (cardNumber.length ==  16 || cardNumber.length ==  19 ) {
-                                detechCardHoder(cardNumber as String, count)
-                            }
+
 
                         }
                     }
+                    if (bankSelected?.cardNumberLength == 16) {
+                        val filters = arrayOfNulls<InputFilter>(1)
+                        filters[0] = InputFilter.LengthFilter(19)
+                        inputCardNumber.input.filters = filters
+                        cardNumber = stringReplace?.subSequence(
+                            0,
+                            if (stringReplace.length < 16) stringReplace.length else 16
+                        )
+                    } else {
+                        val filters = arrayOfNulls<InputFilter>(1)
+                        filters[0] = InputFilter.LengthFilter(21)
+                        inputCardNumber.input.filters = filters
+                    }
+
 
                     if (!bankVerify) {
                         inputCardNumber.setError(getString(R.string.number_card_error))
                     } else {
+                        if (cardNumber?.length == 16 || cardNumber?.length == 19) {
+                            detechCardHoder(cardNumber as String, count)
+                        }
                         inputCardNumber.setDefault(null)
                     }
+                    cardNumberValue = cardNumber.toString()
                     var cardNew = ""
-                    if (cardNumber.length > 16) {
-                        for (i in 0 until cardNumber.length) {
-                            if ((i == 7 || i == 15) && (i + 1 < cardNumber.length)) {
+                    if (cardNumber?.length!! > 16) {
+                        for (i in 0 until cardNumber!!.length) {
+                            if ((i == 7 || i == 15) && (i + 1 < cardNumber?.length)) {
                                 cardNew += cardNumber[i] + " "
                             } else {
                                 cardNew += cardNumber[i]
                             }
                         }
                     } else {
-                        for (i in 0 until cardNumber.length) {
+                        for (i in 0 until cardNumber!!.length) {
                             if ((i == 3 || i == 7 || i == 11) && (i + 1 < cardNumber.length)) {
                                 cardNew += cardNumber[i] + " "
                             } else {
@@ -171,7 +186,7 @@ class EnterAtmCardFragment : Fragment() {
                     if (cardNew != s.toString()) {
                         inputCardNumber.input.removeTextChangedListener(this)
                         val cursorPosition: Int = inputCardNumber.input.getSelectionStart()
-                        val newCursorPosition = cursorPosition + (cardNew.length - s.length)
+                        val newCursorPosition = cursorPosition + (cardNew.length - s!!.length)
                         inputCardNumber.input.setText(cardNew)
                         val check = newCursorPosition
                         inputCardNumber.input.setSelection(check!!)
