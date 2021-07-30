@@ -151,7 +151,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
 
         }
 
-        buttonBack?.background = Store.config.colorApp.backgroundColorRadiusAlpha
+        buttonBack?.setButtonTypeBorder()
 
         myWebView.setWebViewClient(object : WebViewClient() {
             override fun onReceivedError(
@@ -344,13 +344,13 @@ class PayMEOpenSDKPopup : DialogFragment() {
 
     }
     fun  showButtonClose(isShow: Boolean){
+        requireActivity().runOnUiThread {
             if(isShow == true){
                 header.visibility = View.VISIBLE
             }else{
                 header.visibility = View.GONE
             }
-
-
+        }
     }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return object : Dialog(requireActivity(), theme) {

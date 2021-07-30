@@ -30,6 +30,7 @@ public class JsObject(
 
     @JavascriptInterface
      fun showButtonCloseNapas(boolean: Boolean) {
+        println("showButtonCloseNapas"+boolean)
         try {
             showButtonClose(boolean)
         } catch (e: Exception) {

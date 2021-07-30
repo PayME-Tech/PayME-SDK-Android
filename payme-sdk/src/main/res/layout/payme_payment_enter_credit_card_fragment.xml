@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:pbInputType="number"
-        app:pbMaxlength="21"
+        app:pbMaxlength="19"
         app:pbTitle="@string/card_number"
         app:pbHint="@string/enter_number_card" />
     <vn.payme.sdk.component.InputInfo

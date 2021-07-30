@@ -48,9 +48,10 @@ class EnterCreditCardFragment : Fragment() {
                 val stringReplace = s?.replace("[^0-9]".toRegex(), "")
                 val cardNumber = stringReplace?.subSequence(
                     0,
-                    if (stringReplace.length < 19) stringReplace.length else 19
+                    if (stringReplace.length < 16) stringReplace.length else 16
                 )
                 val cardType = CardType.detect(cardNumber.toString())
+
                 if (cardType == CardType.JCB) {
                     inputCardNumber.imageRight.visibility = View.VISIBLE
                     inputCardNumber.imageRight.setImageResource(R.drawable.ic_logo_jcb)
@@ -65,6 +66,15 @@ class EnterCreditCardFragment : Fragment() {
 
                 }
                 bankShortName = cardType.toString()
+                if(cardNumber?.length!! > 0){
+                    if(cardType == CardType.UNKNOWN){
+                        inputCardNumber.setError(getString(R.string.number_card_error))
+                    }else{
+                        inputCardNumber.setDefault(null)
+                    }
+                }else{
+                    inputCardNumber.setDefault(null)
+                }
                 if (cardNumber?.length!! >= 6) {
                     var cardNew = ""
                     if (cardNumber.length >16) {
@@ -97,8 +107,6 @@ class EnterCreditCardFragment : Fragment() {
                     }
 
 
-                } else {
-                    inputCardNumber.setDefault(null)
                 }
                 validateCard()
 
@@ -175,7 +183,17 @@ class EnterCreditCardFragment : Fragment() {
 
 
     fun validateCard() {
-        if (inputCardHolder.input.text.length > 0 && cardDate.length > 0 && cardNumberValue.length > 0 && inputCvv.input.text.length == 3) {
+        var validateNumberCard = false
+        if(bankShortName == CardType.VISA.toString() &&  ( cardNumberValue.length==13 ||  cardNumberValue.length ==16)){
+            validateNumberCard  = true
+
+        }
+        if((bankShortName == CardType.JCB.toString() || bankShortName == CardType.MASTER.toString()) && cardNumberValue.length ==16){
+            validateNumberCard  = true
+        }
+
+
+        if (inputCardHolder.input.text.length > 0 && cardDate.length > 0 && validateNumberCard && inputCvv.input.text.length == 3) {
             val cardInfo = CardInfo(
                 inputCardDate.input.text.toString(),
                 inputCardNumber.input.text.toString(),

@@ -92,7 +92,7 @@
             android:textColor="@color/darkBlueGrey"
             android:fontFamily="@font/main_regular"
             android:textSize="18dp"
-            android:text="Lỗi kết mạng vui lòng thử lại"
+            android:text="Lỗi kết nối mạng vui lòng thử lại"
             android:layout_height="wrap_content"
             />
         <LinearLayout
