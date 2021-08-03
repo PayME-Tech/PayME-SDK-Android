@@ -100,7 +100,8 @@
     <string name="transaction_code">Mã giao dịch</string>
     <string name="transaction_time">Thời gian giao dịch</string>
     <string name="transaction_fee">Phí giao dịch</string>
-    <string name="please_transfer">Vui lòng chuyển </string>
+    <string name="please_transfer">Vui lòng chuyển tiền nhanh 24/7</string>
+    <string name="amount">số tiền</string>
     <string name="go_to_the_account_information_below">tới</string>
     <string name="enter_the_OTP_code">Nhập mã OTP</string>
     <string name="that_was_sent_to_the_phone_number_that_registered_the_card">đã được gửi qua số điện thoại đăng ký thẻ</string>
@@ -113,9 +114,9 @@
     <string name="account_not_logged_in">Tài khoản chưa đăng nhập</string>
     <string name="account_not_activated">Tài khoản chưa kích hoạt</string>
     <string name="account_unknown">Tài khoản chưa định danh</string>
-    <string name="STK">STK :</string>
-    <string name="C_TK">Chủ TK :</string>
-    <string name="viet_qr_note">(*) Hoặc dùng ứng dụng ngân hàng quét VietQR để chuyển tiền.</string>
+    <string name="STK">Số tài khoản</string>
+    <string name="C_TK">Tên tài khoản</string>
+    <string name="viet_qr_note">Sử dụng ứng dụng ngân hàng có hỗ trợ quét VietQR để chuyển tiền.</string>
     <string name="list_bank_support_u"><u>Danh sách ngân hàng hỗ trợ </u></string>
     <string name="list_bank_support">Danh sách ngân hàng hỗ trợ</string>
     <string name="not_found_bank">Không tìm thấy ngân hàng nào</string>
@@ -125,5 +126,6 @@
     <string name="scan_qr_code">Quét QR code</string>
     <string name="keep_the_QRCode_in_the_frame">Giữ mã QRCode trong khung</string>
     <string name="error_manual_bank">Không tìm thấy danh sách ngân hàng thụ hưởng</string>
+    <string name="other">Hoặc</string>
 
 </resources>

@@ -12,12 +12,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
+import com.squareup.picasso.Picasso
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.R
@@ -38,15 +40,15 @@ class InfoBankTransferFragment : Fragment() {
     private lateinit var textNoteVietQr: TextView
     private lateinit var textChangeBank: TextView
     private lateinit var textNote: TextView
-    private lateinit var textListBankSupport: TextView
     private lateinit var buttonChangeBank: CardView
     private lateinit var buttonCopiAccountNumber: LinearLayout
     private lateinit var buttonCopiNote: LinearLayout
     private lateinit var imageCopiAccountNumber: ImageView
     private lateinit var imageCopiNote: ImageView
+    private lateinit var imageBankBottom: ImageView
+    private lateinit var imageBankTop: ImageView
     private lateinit var imageQR: ImageView
-    private lateinit var containerQr: CardView
-    private lateinit var containerListBankSupport: LinearLayout
+    private lateinit var containerQr: ConstraintLayout
     private lateinit var containerNote: LinearLayout
 
 
@@ -65,7 +67,8 @@ class InfoBankTransferFragment : Fragment() {
         textNoteVietQr = view.findViewById(R.id.txtNoteVietQr)
         textChangeBank = view.findViewById(R.id.txtChangeBank)
         containerNote = view.findViewById(R.id.container_note)
-        textListBankSupport = view.findViewById(R.id.txtListBankSupport)
+        imageBankBottom = view.findViewById(R.id.imageBankBottom)
+        imageBankTop = view.findViewById(R.id.imageBankTop)
         imageQR = view.findViewById(R.id.imageQR)
         textNote = view.findViewById(R.id.txtNote)
         buttonChangeBank = view.findViewById(R.id.buttonChangeBank)
@@ -74,7 +77,6 @@ class InfoBankTransferFragment : Fragment() {
         imageCopiAccountNumber = view.findViewById(R.id.imageCopiAccountNumber)
         imageCopiNote = view.findViewById(R.id.imageCopiNote)
         containerQr = view.findViewById(R.id.containerQr)
-        containerListBankSupport = view.findViewById(R.id.containerListBankSupport)
         setupUi()
         EventBus.getDefault().register(this)
         val bank  = EventBus.getDefault().getStickyEvent(BankTransferInfo::class.java)
@@ -97,13 +99,7 @@ class InfoBankTransferFragment : Fragment() {
             val popupSearchBank = PopupSearchBank()
             popupSearchBank.show(parentFragmentManager,null)
         }
-        containerListBankSupport.setOnClickListener {
-            val popupSearchBank = PopupSearchBank()
-            val bundle = Bundle()
-            bundle.putBoolean("isListBankSupport",true)
-            popupSearchBank.arguments = bundle
-            popupSearchBank.show(parentFragmentManager,null)
-        }
+
 
     }
     fun setupUi(){
@@ -114,14 +110,13 @@ class InfoBankTransferFragment : Fragment() {
         ChangeColorImage().changeColor(requireContext(),imageCopiAccountNumber!!,R.drawable.ic_copi2,1)
         ChangeColorImage().changeColor(requireContext(),imageCopiNote!!,R.drawable.ic_copi2,1)
         textChangeBank.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
-        textListBankSupport.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
     }
     fun setAmount (){
         var iStart = 0
         var iEnd = 0
         val decimal = DecimalFormat("#,###")
         val amount = "${decimal.format(Store.paymentInfo.infoPayment!!.amount)} đ"
-        val spannable: Spannable = SpannableString("${getString(R.string.please_transfer)} ${amount} ${getString(R.string.go_to_the_account_information_below)} :")
+        val spannable: Spannable = SpannableString("${getString(R.string.amount)} ${amount} ${getString(R.string.go_to_the_account_information_below)} :")
         val str = spannable.toString()
         iStart = str.indexOf(amount)
         iEnd = iStart + amount.length
@@ -161,6 +156,16 @@ class InfoBankTransferFragment : Fragment() {
         return combined
     }
     fun setInfoBank(bank:BankTransferInfo){
+        val picasso = Picasso.get()
+        picasso.setIndicatorsEnabled(false)
+        picasso.load("https://firebasestorage.googleapis.com/v0/b/vn-mecorp-payme-wallet.appspot.com/o/image_bank%2Ficon_banks%2Ficon${bank.swiftCode}%402x.png?alt=media&token=0c6cd79a-9a4f-4ea2-b178-94e0b4731ac2")
+            .resize(150, 150)
+            .centerInside()
+            .into(imageBankBottom)
+        picasso.load("https://firebasestorage.googleapis.com/v0/b/vn-mecorp-payme-wallet.appspot.com/o/image_bank%2Ficon_banks%2Ficon${bank.swiftCode}%402x.png?alt=media&token=0c6cd79a-9a4f-4ea2-b178-94e0b4731ac2")
+            .resize(150, 150)
+            .centerInside()
+            .into(imageBankTop)
         if(bank.qrContent!="null"){
             val writer = QRCodeWriter()
             val bitMatrix = writer.encode(bank.qrContent, BarcodeFormat.QR_CODE,512,512)
@@ -175,11 +180,9 @@ class InfoBankTransferFragment : Fragment() {
             val overlay = BitmapFactory.decodeResource(resources,R.drawable.logo_vietqr_small )
             imageQR.setImageBitmap(mergeBitmaps(overlay,bitmap))
             containerQr.visibility =View.VISIBLE
-            containerListBankSupport.visibility = View.VISIBLE
             textNoteVietQr.visibility = View.VISIBLE
 
         }else{
-            containerListBankSupport.visibility = View.GONE
             textNoteVietQr.visibility = View.GONE
             containerQr.visibility =View.GONE
 

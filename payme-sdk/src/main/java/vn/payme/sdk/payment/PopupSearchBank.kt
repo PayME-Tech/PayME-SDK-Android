@@ -66,7 +66,6 @@ class PopupSearchBank : DialogFragment() {
         containerNotFoundBank = v.findViewById(R.id.containerNotFoundBank)
         title = v.findViewById(R.id.title)
         val isListBankSupport = arguments?.getBoolean("isListBankSupport")
-        println("EventBus.getDefault().getStickyEvent(ListBankAtm::class.java).listBankATM"+EventBus.getDefault().getStickyEvent(ListBankAtm::class.java).listBankATM[0])
         val listBanks = EventBus.getDefault().getStickyEvent(ListBankAtm::class.java).listBankATM.filter { bankInfo -> bankInfo.vietQRAccepted }
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
         ChangeColorImage().changeColor(requireContext(),imageSearchBank,R.drawable.ic_not_found_bank,3)
