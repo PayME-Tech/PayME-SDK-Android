@@ -41,13 +41,43 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
     <WebView
         android:id="@+id/webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintTop_toBottomOf="@id/border" />
+     />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:id="@+id/containerErrorNetwork"
+        android:background="@color/white"
+        android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/iconNetworkError"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="wrap_content"
+        android:src="@drawable/icon_network_error"
+        android:layout_height="wrap_content"/>
+    <TextView
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iconNetworkError"
+        android:layout_width="wrap_content"
+        android:id="@+id/titleError"
+        android:textColor="@color/darkBlueGrey"
+        android:fontFamily="@font/main_regular"
+        android:textSize="18dp"
+        android:text="Lỗi kết nối mạng vui lòng thử lại"
+        android:layout_height="wrap_content"
+        />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </LinearLayout>

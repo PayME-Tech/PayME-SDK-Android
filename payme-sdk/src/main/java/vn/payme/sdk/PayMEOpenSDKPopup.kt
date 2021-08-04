@@ -97,7 +97,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val v: View = inflater.inflate(
-            R.layout.payme_webview_activity,
+            R.layout.payme_open_wallet_webview,
             container, false
         )
 

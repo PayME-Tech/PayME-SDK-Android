@@ -327,7 +327,6 @@ internal class PayFunction {
                 )
             }, onError)
         } else if (method?.type == TYPE_PAYMENT.BANK_TRANSFER) {
-            getListBank(onSuccess = {
                 getListBankTransfer(onSuccess = {
                     val popupPayment: PopupPayment = PopupPayment()
                     loading.dismiss()
@@ -336,7 +335,6 @@ internal class PayFunction {
                         "ModalBottomSheet"
                     )
                 }, method, onError)
-            }, onError)
 
         } else {
             val popupPayment: PopupPayment = PopupPayment()

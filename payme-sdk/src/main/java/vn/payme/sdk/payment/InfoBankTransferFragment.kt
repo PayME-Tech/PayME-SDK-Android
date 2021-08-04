@@ -12,12 +12,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.google.zxing.BarcodeFormat
+import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 import com.squareup.picasso.Picasso
 import org.greenrobot.eventbus.EventBus
@@ -47,6 +47,7 @@ class InfoBankTransferFragment : Fragment() {
     private lateinit var imageCopiNote: ImageView
     private lateinit var imageBankBottom: ImageView
     private lateinit var imageBankTop: ImageView
+    private lateinit var lineTop: ImageView
     private lateinit var imageQR: ImageView
     private lateinit var containerQr: ConstraintLayout
     private lateinit var containerNote: LinearLayout
@@ -68,6 +69,7 @@ class InfoBankTransferFragment : Fragment() {
         textChangeBank = view.findViewById(R.id.txtChangeBank)
         containerNote = view.findViewById(R.id.container_note)
         imageBankBottom = view.findViewById(R.id.imageBankBottom)
+        lineTop = view.findViewById(R.id.line1)
         imageBankTop = view.findViewById(R.id.imageBankTop)
         imageQR = view.findViewById(R.id.imageQR)
         textNote = view.findViewById(R.id.txtNote)
@@ -106,6 +108,8 @@ class InfoBankTransferFragment : Fragment() {
         val listBankInfo = EventBus.getDefault().getStickyEvent(ListBankTransfer::class.java)
         if(listBankInfo.listBankTransferInfo.size==1){
             buttonChangeBank.visibility = View.GONE
+        }else{
+            lineTop.visibility = View.GONE
         }
         ChangeColorImage().changeColor(requireContext(),imageCopiAccountNumber!!,R.drawable.ic_copi2,1)
         ChangeColorImage().changeColor(requireContext(),imageCopiNote!!,R.drawable.ic_copi2,1)
@@ -168,7 +172,9 @@ class InfoBankTransferFragment : Fragment() {
             .into(imageBankTop)
         if(bank.qrContent!="null"){
             val writer = QRCodeWriter()
-            val bitMatrix = writer.encode(bank.qrContent, BarcodeFormat.QR_CODE,512,512)
+            val hintMap: MutableMap<EncodeHintType, Any> = HashMap()
+            hintMap[EncodeHintType.MARGIN] = 0
+            val bitMatrix = writer.encode(bank.qrContent, BarcodeFormat.QR_CODE,512,512,hintMap)
             val width = bitMatrix.width
             val height = bitMatrix.height
             val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)

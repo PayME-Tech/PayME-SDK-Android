@@ -1,6 +1,8 @@
 package vn.payme.sdk.payment
 
+import android.content.Context
 import android.graphics.Bitmap
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +11,7 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ImageView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -27,6 +30,8 @@ import vn.payme.sdk.store.Store
 
 class PopupWebViewNapas : DialogFragment() {
     private lateinit var buttonClose: ImageView
+    lateinit var containerErrorNetwork: ConstraintLayout
+
     val loading = SpinnerDialog()
 
     var count = 0
@@ -36,6 +41,10 @@ class PopupWebViewNapas : DialogFragment() {
             loading.show(PayME.fragmentManager, null)
             loopCallApi()
         }
+    }
+    private fun isNetworkConnected(): Boolean {
+        val cm = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        return cm.activeNetworkInfo != null && cm.activeNetworkInfo!!.isConnected
     }
 
     fun loopCallApi() {
@@ -94,6 +103,7 @@ class PopupWebViewNapas : DialogFragment() {
             container, false
         )
         val myWebView: WebView = v.findViewById(R.id.webview)
+        containerErrorNetwork = v.findViewById(R.id.containerErrorNetwork)
         myWebView.settings.javaScriptEnabled = true
         buttonClose = v.findViewById(R.id.buttonClose)
         buttonClose.setOnClickListener {
@@ -101,6 +111,9 @@ class PopupWebViewNapas : DialogFragment() {
                 PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
             }
             dismiss()
+        }
+        if (!isNetworkConnected()) {
+            containerErrorNetwork?.visibility = View.VISIBLE
         }
         var form = ""
         if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.CREDIT_CARD ||
@@ -116,6 +129,17 @@ class PopupWebViewNapas : DialogFragment() {
         }
         myWebView.loadDataWithBaseURL("x-data://base", form!!, "text/html", "UTF-8", null);
         myWebView.setWebViewClient(object : WebViewClient() {
+            override fun onReceivedError(
+                view: WebView?,
+                errorCode: Int,
+                description: String?,
+                failingUrl: String?
+            ) {
+                if (errorCode == -2) {
+                    containerErrorNetwork?.visibility = View.VISIBLE
+                }
+                super.onReceivedError(view, errorCode, description, failingUrl)
+            }
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
                 val checkSuccess = url.contains("https://payme.vn/web/?success=true")
                 val checkError = url.contains("https://payme.vn/web/?success=false")
