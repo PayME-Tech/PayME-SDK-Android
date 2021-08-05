@@ -202,7 +202,11 @@ class PopupWebViewNapas : DialogFragment() {
             bundle.putString("state", state)
             if (!Store.config.disableCallBackResult) {
                 val data = JSONObject("""{state:${state}}""")
-                PayME.onError(data, ERROR_CODE.PAYMENT_ERROR, message)
+                if(state=="PENDING"){
+                    PayME.onError(null, ERROR_CODE.PAYMENT_PENDING, "")
+                }else{
+                    PayME.onError(data, ERROR_CODE.PAYMENT_ERROR, message)
+                }
             }
         }
         if (Store.paymentInfo.isShowResultUI) {
