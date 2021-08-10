@@ -1,7 +1,9 @@
 package vn.payme.sdk
 
+import android.Manifest
 import android.app.Dialog
 import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -15,6 +17,8 @@ import android.webkit.*
 import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import org.greenrobot.eventbus.EventBus
@@ -30,12 +34,17 @@ import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.model.JsObject
 import vn.payme.sdk.store.Store
 import java.net.URLEncoder
+import android.content.ContentResolver
+import android.provider.ContactsContract
+
+import android.util.Log
+import org.json.JSONArray
+import vn.payme.sdk.evenbus.RequestPermissionsResult
 
 
 class PayMEOpenSDKPopup : DialogFragment() {
     lateinit private var loading: ConstraintLayout
     lateinit private var loadingProgressBar: ProgressBar
-    private lateinit var cameraManager: CameraManager
     private lateinit var myWebView: WebView
     private var buttonBack: Button? = null
     private var buttonNext: Button? = null
@@ -43,7 +52,6 @@ class PayMEOpenSDKPopup : DialogFragment() {
     lateinit var containerErrorNetwork: ConstraintLayout
     lateinit var header: ConstraintLayout
     private var checkTimeoutLoadWebView = false
-    private val REQUEST_CODE_TAKE_PICKTURE = 321
     var domain  = ""
 
 
@@ -65,6 +73,71 @@ class PayMEOpenSDKPopup : DialogFragment() {
 
     private fun backScreen(): Unit {
             dismiss()
+    }
+    private fun  getContacts(){
+        if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_CONTACTS)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            val contacts = JSONArray()
+            val cr: ContentResolver = requireContext().getContentResolver()
+            val cur = cr.query(
+                ContactsContract.Contacts.CONTENT_URI,
+                null, null, null, null
+            )
+
+            if (cur?.count ?: 0 > 0) {
+                while (cur != null && cur.moveToNext()) {
+                    val id = cur.getString(
+                        cur.getColumnIndex(ContactsContract.Contacts._ID)
+                    )
+                    val name = cur.getString(
+                        cur.getColumnIndex(
+                            ContactsContract.Contacts.DISPLAY_NAME
+                        )
+                    )
+                    if (cur.getInt(
+                            cur.getColumnIndex(
+                                ContactsContract.Contacts.HAS_PHONE_NUMBER
+                            )
+                        ) > 0
+                    ) {
+                        val pCur = cr.query(
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                            arrayOf(id),
+                            null
+                        )
+                        while (pCur!!.moveToNext()) {
+                            val phoneNo = pCur.getString(
+                                pCur.getColumnIndex(
+                                    ContactsContract.CommonDataKinds.Phone.NUMBER
+                                )
+                            ).replace("[^0-9]".toRegex(), "")
+                            val phone =  JSONObject("""{name:"${name}",phone:"${phoneNo}"}""")
+                            contacts.put(phone)
+
+                        }
+                        pCur.close()
+                    }
+                }
+            }
+            cur?.close()
+            val injectedJS = "       const script = document.createElement('script');\n" +
+                    "          script.type = 'text/javascript';\n" +
+                    "          script.async = true;\n" +
+                    "          script.text = 'onContacts(${contacts})';\n" +
+                    "          document.body.appendChild(script);\n" +
+                    "          true; // note: this is required, or you'll sometimes get silent failures\n"
+            requireActivity().runOnUiThread {
+                myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
+            }
+
+        } else {
+            requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS),1)
+
+        }
+
     }
 
     fun takeImage(): Unit {
@@ -227,7 +300,11 @@ class PayMEOpenSDKPopup : DialogFragment() {
                         payme.openScanQR(parentFragmentManager,PAY_CODE.PAYME,PayME.onSuccess,PayME.onError)
                     },
                     takeImage = { takeImage() },
-                    it,
+                    getContact={
+                        getContacts()
+                    },
+
+                            it,
                 )
             }!!
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
@@ -312,8 +389,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
                     "          script.text = 'onReloadKYC()';\n" +
                     "          document.body.appendChild(script);\n" +
                     "          true; // note: this is required, or you'll sometimes get silent failures\n"
-            myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
-
+                myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
 //            this.myWebView.reload()
         }
         if (myEven.type == TypeCallBack.onExpired) {
@@ -339,9 +415,14 @@ class PayMEOpenSDKPopup : DialogFragment() {
                     "          script.text = 'onUpdateIdentify()';\n" +
                     "          document.body.appendChild(script);\n" +
                     "          true; // note: this is required, or you'll sometimes get silent failures\n"
-            myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
+                myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
+
         }
 
+    }
+    @Subscribe
+    fun eventRequestPermissionsResult(event: RequestPermissionsResult) {
+        checkRequestPermissionsResult(event.requestCode, event.permissions, event.grantResults)
     }
     fun  showButtonClose(isShow: Boolean){
         requireActivity().runOnUiThread {
@@ -352,6 +433,28 @@ class PayMEOpenSDKPopup : DialogFragment() {
             }
         }
     }
+    fun checkRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+        if (valid) {
+            getContacts()
+        }
+
+
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        checkRequestPermissionsResult(requestCode, permissions, grantResults)
+
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return object : Dialog(requireActivity(), theme) {
             override fun onBackPressed() {

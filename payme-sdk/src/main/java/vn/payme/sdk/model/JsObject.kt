@@ -15,8 +15,13 @@ public class JsObject(
     val showButtonClose: (boolean: Boolean) -> Unit,
     val onScanQR: () -> Unit,
     val takeImage: () -> Unit,
+    val getContact: () -> Unit,
     val fragmentManager: FragmentManager,
 ) {
+    @JavascriptInterface
+    fun  getContacts(){
+        getContact()
+    }
     @JavascriptInterface
     public fun onSuccess(string: String) {
         try {
