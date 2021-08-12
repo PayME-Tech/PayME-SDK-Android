@@ -35,11 +35,13 @@ import vn.payme.sdk.model.JsObject
 import vn.payme.sdk.store.Store
 import java.net.URLEncoder
 import android.content.ContentResolver
+import android.os.Build
 import android.provider.ContactsContract
 
 import android.util.Log
 import org.json.JSONArray
 import vn.payme.sdk.evenbus.RequestPermissionsResult
+import vn.payme.sdk.kyc.PermissionCamera
 
 
 class PayMEOpenSDKPopup : DialogFragment() {
@@ -53,6 +55,8 @@ class PayMEOpenSDKPopup : DialogFragment() {
     lateinit var header: ConstraintLayout
     private var checkTimeoutLoadWebView = false
     var domain  = ""
+    private var enableSetting = false
+    private var clickOpenSettings = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,6 +77,14 @@ class PayMEOpenSDKPopup : DialogFragment() {
 
     private fun backScreen(): Unit {
             dismiss()
+    }
+    fun openSetting(){
+        if (enableSetting) {
+            clickOpenSettings = true
+            PermissionCamera().openSetting(requireActivity())
+        } else {
+            requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS),1)
+        }
     }
     private fun  getContacts(){
         if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_CONTACTS)
@@ -129,7 +141,14 @@ class PayMEOpenSDKPopup : DialogFragment() {
                     "          script.text = 'onContacts(${contacts})';\n" +
                     "          document.body.appendChild(script);\n" +
                     "          true; // note: this is required, or you'll sometimes get silent failures\n"
+            val injectedJSPermission = "       const script = document.createElement('script');\n" +
+                    "          script.type = 'text/javascript';\n" +
+                    "          script.async = true;\n" +
+                    "          script.text = 'onPermission(true)';\n" +
+                    "          document.body.appendChild(script);\n" +
+                    "          true; // note: this is required, or you'll sometimes get silent failures\n"
             requireActivity().runOnUiThread {
+                myWebView.evaluateJavascript("(function() {\n" + injectedJSPermission + ";\n})();", null)
                 myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
             }
 
@@ -302,6 +321,8 @@ class PayMEOpenSDKPopup : DialogFragment() {
                     takeImage = { takeImage() },
                     getContact={
                         getContacts()
+                    },  openSetting={
+                        openSetting()
                     },
 
                             it,
@@ -441,6 +462,23 @@ class PayMEOpenSDKPopup : DialogFragment() {
         val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
         if (valid) {
             getContacts()
+        }else{
+            val injectedJSPermission = "       const script = document.createElement('script');\n" +
+                    "          script.type = 'text/javascript';\n" +
+                    "          script.async = true;\n" +
+                    "          script.text = 'onPermission(false)';\n" +
+                    "          document.body.appendChild(script);\n" +
+                    "          true; // note: this is required, or you'll sometimes get silent failures\n"
+            requireActivity().runOnUiThread {
+                myWebView.evaluateJavascript("(function() {\n" + injectedJSPermission + ";\n})();", null)
+            }
+            if (Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(
+                    permissions[0]!!
+                )
+            ) {
+                enableSetting = true
+            } else {
+            }
         }
 
 
@@ -453,6 +491,19 @@ class PayMEOpenSDKPopup : DialogFragment() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         checkRequestPermissionsResult(requestCode, permissions, grantResults)
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(clickOpenSettings){
+            if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_CONTACTS)
+                == PackageManager.PERMISSION_GRANTED
+            ){
+                clickOpenSettings = false
+                getContacts()
+            }
+
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

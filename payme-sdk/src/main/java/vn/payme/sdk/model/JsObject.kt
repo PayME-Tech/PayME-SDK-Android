@@ -16,11 +16,16 @@ public class JsObject(
     val onScanQR: () -> Unit,
     val takeImage: () -> Unit,
     val getContact: () -> Unit,
+    val openSetting: () -> Unit,
     val fragmentManager: FragmentManager,
 ) {
     @JavascriptInterface
     fun  getContacts(){
         getContact()
+    }
+    @JavascriptInterface
+    fun  onOpenSetting(){
+       openSetting()
     }
     @JavascriptInterface
     public fun onSuccess(string: String) {
