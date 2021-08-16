@@ -72,8 +72,7 @@ var PublicKey: String = ""
 
 val APP_TOKEN_DEFAULT =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTgsImlhdCI6MTYyNjkyOTQ1M30.RifF-H0C4w29WDRV0AGgP0qoffaAYbdmp_uyS69DEhI"
-val PUBLIC_KEY_DEFAULT = "\n" +
-        "-----BEGIN PUBLIC KEY-----MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIKTO8wcUDUEFK6c1xWmappjJTpSLR5+0y7j42/S07SdHknPOVVH/EnVj0UxoI+3AZloBwqgs7gV4DyMPHEZPX8CAwEAAQ==-----END PUBLIC KEY-----"
+val PUBLIC_KEY_DEFAULT = "-----BEGIN PUBLIC KEY-----MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIKTO8wcUDUEFK6c1xWmappjJTpSLR5+0y7j42/S07SdHknPOVVH/EnVj0UxoI+3AZloBwqgs7gV4DyMPHEZPX8CAwEAAQ==-----END PUBLIC KEY-----"
 val SECRET_KEY_DEFAULT = "1cf4df491c0972ff96fffb10327e4963"
 val PRIVATE_KEY_DEFAULT = "-----BEGIN RSA PRIVATE KEY-----MIIBOQIBAAJAeEi2lnt0XYJBk068ncKYjG+C4dS1tZTxvVQrRKgzhrn5RY8NYhGR6rKI6SmfLuZfJwzJ7pAswHQcsZXq8bnFKQIDAQABAkAdt2Eclk1uWKLYwMgKdav4bgg4wLNPtAdxDd1Orftk2jBEzErHn8UEX5z1az1TEUpWvt0iPC3SDDtsJBI0pQ+tAiEAvkd9jsf6exffyG8Kjn/UGa//Xu7gv1FKhfK9+1i94N8CIQCh1D0b0IUHzPKC7F7N7IUeLGuLVMrT1xK78YbNi23y9wIgWI5jJCF0NPeugdUUH6/kYbQkcOVSGhhWS7LmsmThshcCIQCP+AFlfVzcU7hsQV0WVhUXgu0qR4UqcWx5R6ZltmVagQIgfYQl+kA7IIWCY7ist/xAmSAgmaitNYmfvPW8YnQp8fU=-----END RSA PRIVATE KEY-----"
 
@@ -348,9 +347,15 @@ class MainActivity : AppCompatActivity() {
                     if (accountStatus == AccountStatus.NOT_KYC) {
                         //Tài khoản chưa định danh
                     }
+                    if (accountStatus == AccountStatus.KYC_REVIEW) {
+                        //Tài khoản đã gửi thông tin định danh dang chờ duyệt
+                    }
+                    if (accountStatus == AccountStatus.KYC_REJECTED) {
+                        //Yêu cầu đinh danh bị từ
+                    }
                     if (accountStatus == AccountStatus.KYC_APPROVED) {
                         updateWalletInfo()
-                        //Tài khoản đã
+                        //Tài khoản đã định danh
                     }
                     payme?.getAccountInfo(onSuccess = { data ->
                         println("getAccountInfo" + data)

@@ -42,8 +42,10 @@ class PopupWebViewNapas : DialogFragment() {
             loopCallApi()
         }
     }
+
     private fun isNetworkConnected(): Boolean {
-        val cm = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val cm =
+            requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return cm.activeNetworkInfo != null && cm.activeNetworkInfo!!.isConnected
     }
 
@@ -58,26 +60,26 @@ class PopupWebViewNapas : DialogFragment() {
             val succeeded = GetTransactionInfo.optBoolean("succeeded")
             val transaction = GetTransactionInfo.optString("transaction")
             val message = GetTransactionInfo.optString("message")
+            val reason = GetTransactionInfo.optString("reason")
             if (succeeded) {
                 if (state == "SUCCEEDED") {
                     loading.dismiss()
                     onResult("", state)
-                } else {
-                    if (state == "PENDING") {
-                        if (count == 6) {
-                            loading.dismiss()
-                            onResult(message, state)
-                        } else if (count < 6) {
-                            GlobalScope.launch {
-                                delay(7000)
-                                loopCallApi()
-                            }
-                        }
-                    } else {
+                } else if (state == "PENDING") {
+                    if (count == 6) {
                         loading.dismiss()
                         onResult(message, state)
+                    } else if (count < 6) {
+                        GlobalScope.launch {
+                            delay(7000)
+                            loopCallApi()
+                        }
                     }
+                } else {
+                    loading.dismiss()
+                    onResult(reason, state)
                 }
+
             } else {
                 loading.dismiss()
                 onResult(message, "FAILED")
@@ -140,6 +142,7 @@ class PopupWebViewNapas : DialogFragment() {
                 }
                 super.onReceivedError(view, errorCode, description, failingUrl)
             }
+
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
                 val checkSuccess = url.contains("https://payme.vn/web/?success=true")
                 val checkError = url.contains("https://payme.vn/web/?success=false")
@@ -192,8 +195,11 @@ class PopupWebViewNapas : DialogFragment() {
         dismiss()
         val bundle: Bundle = Bundle()
         if (state == "SUCCEEDED") {
-            val data = if (Store.paymentInfo.transaction == "" || Store.paymentInfo.transaction == "null")   JSONObject("""{payment:{}}}""")
-            else  JSONObject("""{payment:{transaction:"${Store.paymentInfo.transaction}"}}""")
+            val data =
+                if (Store.paymentInfo.transaction == "" || Store.paymentInfo.transaction == "null") JSONObject(
+                    """{payment:{}}}"""
+                )
+                else JSONObject("""{payment:{transaction:"${Store.paymentInfo.transaction}"}}""")
             if (!Store.config.disableCallBackResult) {
                 PayME.onSuccess(data)
             }
@@ -202,10 +208,10 @@ class PopupWebViewNapas : DialogFragment() {
             bundle.putString("state", state)
             if (!Store.config.disableCallBackResult) {
                 val data = JSONObject("""{state:${state}}""")
-                if(state=="PENDING"){
+                if (state == "PENDING") {
                     PayME.onError(null, ERROR_CODE.PAYMENT_PENDING, "")
-                }else{
-                    PayME.onError(data, ERROR_CODE.PAYMENT_ERROR, message)
+                } else {
+                    PayME.onError(null, ERROR_CODE.PAYMENT_ERROR, message)
                 }
             }
         }

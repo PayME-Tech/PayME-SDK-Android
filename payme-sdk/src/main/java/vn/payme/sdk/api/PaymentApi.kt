@@ -169,6 +169,7 @@ internal class PaymentApi {
                 "         transaction\n" +
                 "         state\n" +
                 "         fee\n" +
+                "         reason\n" +
                 "         description\n" +
                 "       }\n" +
                 "     }\n" +

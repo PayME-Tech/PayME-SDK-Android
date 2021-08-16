@@ -704,6 +704,7 @@ public class PayME {
             val kyc = Init.optJSONObject("kyc")
             val appEnv = Init.optString("appEnv")
             val succeeded = Init.optBoolean("succeeded")
+            var stateKYC  = ""
             Store.userInfo.accountActive = succeeded
             if (appEnv == Env.SANDBOX.toString()) {
                 Store.config.openPayAndKyc = false
@@ -712,6 +713,7 @@ public class PayME {
             }
             if (kyc != null) {
                 val state = kyc.optString("state")
+                stateKYC = state
 
                 if (state == "APPROVED") {
                     Store.userInfo.accountKycSuccess = true
@@ -736,7 +738,15 @@ public class PayME {
                 if (Store.userInfo.accountKycSuccess) {
                     onSuccess(AccountStatus.KYC_APPROVED)
                 } else {
-                    onSuccess(AccountStatus.NOT_KYC)
+                    if(stateKYC =="REJECTED"){
+                        onSuccess(AccountStatus.KYC_REJECTED)
+
+                    }else if(stateKYC =="PENDING"){
+                        onSuccess(AccountStatus.KYC_REVIEW)
+
+                    }else{
+                        onSuccess(AccountStatus.NOT_KYC)
+                    }
                 }
             } else {
                 onSuccess(AccountStatus.NOT_ACTIVATED)
