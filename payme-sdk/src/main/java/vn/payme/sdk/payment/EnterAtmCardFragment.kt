@@ -125,10 +125,10 @@ class EnterAtmCardFragment : Fragment() {
                         if (cardPrefix == cardPrefixBank) {
                             inputCardNumber.imageRight.visibility = View.VISIBLE
                             bankSelected = listBanks[i]
-                            if (bankSelected?.requiredDate == "ISSUE_DATE") {
-                                inputCardDate.txtTitle.setText(R.string.release_issue_date)
-                            } else {
+                            if (bankSelected?.requiredDate == "EXPIRED_DATE") {
                                 inputCardDate.txtTitle.setText(R.string.release_date_expired)
+                            } else {
+                                inputCardDate.txtTitle.setText(R.string.release_issue_date)
                             }
                             val picasso = Picasso.get()
                             picasso.setIndicatorsEnabled(false)
@@ -197,6 +197,7 @@ class EnterAtmCardFragment : Fragment() {
 
                 } else {
                     inputCardNumber.setDefault(null)
+                    inputCardDate.txtTitle.setText(R.string.release_issue_date)
                 }
             }
 
