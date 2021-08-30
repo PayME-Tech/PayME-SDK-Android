@@ -4,13 +4,15 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.os.Build
 import android.provider.Settings
+import vn.payme.sdk.PayME
 import java.io.File
 import java.lang.reflect.Method
+import kotlin.random.Random
 
 
 class ClientInfo {
     var appVersion: String = ""
-    var sdkVerSion: String = "0.9.21"
+    var sdkVerSion: String = "0.9.22"
     var appPackageName: String? = ""
     var deviceId: String? = ""
     fun getDeviceName(): String? {
@@ -50,6 +52,17 @@ class ClientInfo {
             context.contentResolver,
             Settings.Secure.ANDROID_ID
         )
+        if(deviceId?.length==0){
+            val pref = context.getSharedPreferences("PayME_SDK", Context.MODE_PRIVATE)
+            val clientId = pref.getString("deviceId_random", "")
+            if(clientId?.length==0){
+                val nextValues = Random.nextInt(0, 1000000000)
+                this.deviceId =  nextValues.toString()
+                pref.edit().putString("deviceId_random", nextValues.toString()).commit()
+            }else{
+                this.deviceId =clientId
+            }
+        }
         this.appPackageName = context.packageName
     }
     constructor() {

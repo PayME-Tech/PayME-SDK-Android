@@ -253,8 +253,10 @@ class PayMEOpenSDKPopup : DialogFragment() {
                 failingUrl: String?
             ) {
                 if (errorCode == -2) {
-                    loading.visibility = View.GONE
-                    containerErrorNetwork?.visibility = View.VISIBLE
+                    requireActivity().runOnUiThread {
+                        loading.visibility = View.GONE
+                        containerErrorNetwork?.visibility = View.VISIBLE
+                    }
                 }
                 super.onReceivedError(view, errorCode, description, failingUrl)
             }
@@ -279,8 +281,10 @@ class PayMEOpenSDKPopup : DialogFragment() {
                     }
                     if (!checkTimeoutLoadWebView) {
                         if (isVisible){
-                            loading.visibility = View.GONE
-                            containerErrorNetwork?.visibility = View.VISIBLE
+                            requireActivity().runOnUiThread {
+                                loading.visibility = View.GONE
+                                containerErrorNetwork?.visibility = View.VISIBLE
+                            }
                         }
                     }
                 }.start()

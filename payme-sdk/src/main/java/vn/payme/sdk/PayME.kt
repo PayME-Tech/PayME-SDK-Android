@@ -307,7 +307,7 @@ public class PayME {
         val pref = PayME.context.getSharedPreferences("PayME_SDK", Context.MODE_PRIVATE)
         val clientId = pref.getString("clientId", "")
         val dataRegisterClientInfo = pref.getString("dataRegisterClientInfo", "")
-        if (clientId?.length!! <= 0 || !dataRegisterClientInfo.equals(
+        if (clientId?.length == 0 || !dataRegisterClientInfo.equals(
                 Store.config.clientInfo?.getClientInfo().toString() + Store.config.env.toString()
             )
         ) {
@@ -462,7 +462,7 @@ public class PayME {
                             }
                         }
 
-                        val kycVideo = Store.config.enlableKycFace && stateVideo == "REJECTED"
+                        val kycVideo = Store.config.enlableKycVideo && stateVideo == "REJECTED"
                         val kycIdentity =
                             Store.config.enlableKycIdentify && stateImage == "REJECTED"
                         val kycFace = Store.config.enlableKycFace && stateFace == "REJECTED"
