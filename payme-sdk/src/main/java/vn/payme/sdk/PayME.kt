@@ -401,6 +401,7 @@ public class PayME {
         onSuccess: (AccountStatus) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
+        PayME.onError = onError
         getSetting(onSuccess = {
             checkRegisterClient(onSuccess = {
                 loginAccount(onSuccess, onError)
@@ -704,53 +705,65 @@ public class PayME {
             val kyc = Init.optJSONObject("kyc")
             val appEnv = Init.optString("appEnv")
             val succeeded = Init.optBoolean("succeeded")
+            val message = Init.optString("message")
+            val accessToken = Init.optString("accessToken")
+            val handShake = Init.optString("handShake")
+            val phone = Init.optString("phone")
             var stateKYC  = ""
             Store.userInfo.accountActive = succeeded
-            if (appEnv == Env.SANDBOX.toString()) {
-                Store.config.openPayAndKyc = false
-            } else {
-                Store.config.openPayAndKyc = true
-            }
-            if (kyc != null) {
-                val state = kyc.optString("state")
-                stateKYC = state
+            if(!succeeded && (phone == "null" || handShake =="null") ){
+                if(handShake!=="null" && phone == "null"){
+                    onError(null, ERROR_CODE.ACCOUNT_ERROR,PayME.context.getString(R.string.please_enter_the_phone_number))
+                }else{
+                    onError(null, ERROR_CODE.ACCOUNT_ERROR, message)
+                }
+            }else{
+                if (appEnv == Env.SANDBOX.toString()) {
+                    Store.config.openPayAndKyc = false
+                } else {
+                    Store.config.openPayAndKyc = true
+                }
+                if (kyc != null) {
+                    val state = kyc.optString("state")
+                    stateKYC = state
 
-                if (state == "APPROVED") {
-                    Store.userInfo.accountKycSuccess = true
+                    if (state == "APPROVED") {
+                        Store.userInfo.accountKycSuccess = true
+                    } else {
+                        Store.userInfo.accountKycSuccess = false
+                    }
                 } else {
                     Store.userInfo.accountKycSuccess = false
                 }
-            } else {
-                Store.userInfo.accountKycSuccess = false
-            }
 
-            val accessToken = Init.optString("accessToken")
-            val handShake = Init.optString("handShake")
-            if (!accessToken.equals("null")) {
-                Store.userInfo.accessToken = accessToken
-            } else {
-                Store.userInfo.accessToken = ""
-            }
-            Store.config.handShake = handShake
-            Store.userInfo.accountLoginSuccess = true
 
-            if (Store.userInfo.accountActive) {
-                if (Store.userInfo.accountKycSuccess) {
-                    onSuccess(AccountStatus.KYC_APPROVED)
+                if (!accessToken.equals("null")) {
+                    Store.userInfo.accessToken = accessToken
                 } else {
-                    if(stateKYC =="REJECTED"){
-                        onSuccess(AccountStatus.KYC_REJECTED)
-
-                    }else if(stateKYC =="PENDING"){
-                        onSuccess(AccountStatus.KYC_REVIEW)
-
-                    }else{
-                        onSuccess(AccountStatus.NOT_KYC)
-                    }
+                    Store.userInfo.accessToken = ""
                 }
-            } else {
-                onSuccess(AccountStatus.NOT_ACTIVATED)
+                Store.config.handShake = handShake
+                Store.userInfo.accountLoginSuccess = true
+
+                if (Store.userInfo.accountActive) {
+                    if (Store.userInfo.accountKycSuccess) {
+                        onSuccess(AccountStatus.KYC_APPROVED)
+                    } else {
+                        if(stateKYC =="REJECTED"){
+                            onSuccess(AccountStatus.KYC_REJECTED)
+
+                        }else if(stateKYC =="PENDING"){
+                            onSuccess(AccountStatus.KYC_REVIEW)
+
+                        }else{
+                            onSuccess(AccountStatus.NOT_KYC)
+                        }
+                    }
+                } else {
+                    onSuccess(AccountStatus.NOT_ACTIVATED)
+                }
             }
+
         }, onError = { jsonObject, code, message ->
             onError(jsonObject, code, message)
         })

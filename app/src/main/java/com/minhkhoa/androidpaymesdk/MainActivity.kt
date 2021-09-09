@@ -47,6 +47,21 @@ val PRIVATE_KEY_DEFAULT_SANDBOX = "-----BEGIN RSA PRIVATE KEY-----\n" +
         "    xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd\n" +
         "    A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=\n" +
         "    -----END RSA PRIVATE KEY-----"
+//val APP_TOKEN_DEFAULT_SANDBOX =
+//    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NTQsImlhdCI6MTYzMDM5MTUzMn0.StomrI1uDMH0iZl-eud4z1hsm51OQW_PmUHssJyxjsM"
+//val PUBLIC_KEY_DEFAULT_SANDBOX = "-----BEGIN PUBLIC KEY-----\nMFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIQbb2B/TbVL3c3tJ0LD/8wgmkojLt/V\nFpiolJRJcDlaillF8ATJfd1gJYkh9kOPK0UXn/TV2HluHXWAdnetJWsCAwEAAQ==\n-----END PUBLIC KEY-----"
+//val SECRET_KEY_DEFAULT_SANDBOX = "41de5f00bf3ed0f280a394f169e08005"
+//val PRIVATE_KEY_DEFAULT_SANDBOX = """
+//    -----BEGIN RSA PRIVATE KEY-----
+//    MIIBOgIBAAJBAJSar42zVa7+oaR9NrPUsAs4Sd1aPtuIqtpu+CD8OzpxemwUs/zK
+//    YbIyLGc2V3e7w8ElyamDeJFzbWCtJLXerGkCAwEAAQJAE/Vakqt9XI1yZEc0654r
+//    LraWpRYTzyRh3gh9ZuC5i7WxKthxexCEBBBq9GIRCtsaKmDnKa6Y/7Bu1qLK/lay
+//    CQIhAN215h8pNHg42ZqBFVww+HMIT5vr5zNXYc9owXsRq4QjAiEAq5ZRH79X0I+c
+//    p90GW2b78RuiTj1p702wK1hf89TlYAMCIEdX/koutzyshpFqUlZNR9W0afGxsr9Z
+//    shbNDd2tbPTjAiAi893Wn72dqIN61lVDLTlJJh3r3irEKokmazwwiT+oTQIhAJry
+//    3tlOTSuRILYZbS6DqsThdR+O2u7zDyvMmdT/a04W
+//    -----END RSA PRIVATE KEY-----
+//    """.trimIndent()
 
 val APP_TOKEN_DEFAULT_DEV =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTIsImlhdCI6MTYyMDg4MjQ2NH0.DJfi52Dc66IETflV2dQ8G_q4oUAVw_eG4TzrqkL0jLU"
@@ -308,7 +323,7 @@ class MainActivity : AppCompatActivity() {
                 env = Env.STAGING
             }
 
-            if (inputPhoneNumber.text.toString().length >= 10 && inputUserId.text.toString().length > 0 && (inputPhoneNumber.text.toString().length == 10 || inputPhoneNumber.text.toString().length == 0) && loading.visibility != View.VISIBLE) {
+            if ( inputUserId.text.toString().length > 0 && (inputPhoneNumber.text.toString().length == 10 || inputPhoneNumber.text.toString().length == 0) && loading.visibility != View.VISIBLE) {
                 val params: MutableMap<String, Any> = mutableMapOf()
                 val tz = TimeZone.getTimeZone("UTC")
                 val df: DateFormat =
@@ -389,6 +404,8 @@ class MainActivity : AppCompatActivity() {
                     ).show()
                 },
                     onError = { jsonObject, code, message ->
+                        println("message"+message)
+
                         loading.visibility = View.GONE
                         PayME.showError(message)
 
