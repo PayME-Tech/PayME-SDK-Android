@@ -15,6 +15,7 @@ import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.model.CardInfo
 import vn.payme.sdk.model.Method
 import vn.payme.sdk.store.Store
+import kotlin.random.Random
 
 internal class PaymentApi {
     fun getInfoMerchant(
@@ -422,6 +423,11 @@ internal class PaymentApi {
                 "            transaction\n" +
                 "            statePaymentCreditCardResponsed : state\n" +
                 "          }\n" +
+                "          ... on PaymentBankQRCodeResponsed {\n" +
+                "            message\n" +
+                "            qrContent\n" +
+                "            statePaymentBankQRCodeResponsed : state\n" +
+                "          }\n" +
                 "          ... on PaymentBankTransferResponsed {\n" +
                 "            bankList {\n" +
                 "              bankAccountName\n" +
@@ -509,6 +515,13 @@ internal class PaymentApi {
             }
             linked["envName"] = "MobileApp"
             payment["linked"] = linked
+        }else if (method.type == TYPE_PAYMENT.BANK_QR_CODE) {
+            val bankQRCode: MutableMap<String, Any> = mutableMapOf()
+            bankQRCode["active"] = true
+            val nextValues = Random.nextInt(0, 1000000000)
+            Store.paymentInfo.deeplinkUrlScheme= "paymesdk://${Store.config.clientInfo?.appPackageName}/success/$nextValues/"
+            bankQRCode["redirectUrl"] = "paymesdk://${Store.config.clientInfo?.appPackageName}/success/$nextValues/"
+            payment["bankQRCode"] = bankQRCode
         }
         payInput["payment"] = payment
 

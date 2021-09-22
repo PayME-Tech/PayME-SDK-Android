@@ -1,5 +1,10 @@
 package vn.payme.sdk.payment
 
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import androidx.browser.customtabs.CustomTabsClient
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.fragment.app.FragmentManager
 import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
@@ -10,6 +15,7 @@ import vn.payme.sdk.RULE_CHECK_ACCOUNT
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.enums.PAY_CODE
+import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.*
 import vn.payme.sdk.hepper.Keyboard
@@ -263,6 +269,7 @@ internal class PayFunction {
         if (!((payCode == PAY_CODE.PAYME) ||
                     (payCode == PAY_CODE.ATM) ||
                     (payCode == PAY_CODE.MANUAL_BANK) ||
+                    (payCode == PAY_CODE.VN_PAY) ||
                     (payCode == PAY_CODE.CREDIT))
         ) {
             onError(
@@ -345,6 +352,57 @@ internal class PayFunction {
             )
         }
     }
+   fun payVNPAY(
+       fragmentManager: FragmentManager,
+       onError: (JSONObject?, Int, String?) -> Unit,
+       ){
+       val paymentApi = PaymentApi()
+       paymentApi.payment(
+           Store.paymentInfo.methodSelected!!,
+           "",
+           null,
+           "",
+           "",
+           true,
+           null,
+           onSuccess = { jsonObject ->
+               val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
+               val Payment = OpenEWallet.optJSONObject("Payment")
+               val Pay = Payment.optJSONObject("Pay")
+               val history = Pay.optJSONObject("history")
+               if (history != null) {
+                   val payment = history.optJSONObject("payment")
+                   if (payment != null) {
+                       val transaction = payment.optString("transaction")
+                       Store.paymentInfo.transaction = transaction
+                   }
+               }
+               val payment = Pay.optJSONObject("payment")
+               val message = Pay.optString("message")
+
+                   if (payment != null) {
+                           val statePaymentBankQRCodeResponsed = payment.optString("statePaymentBankQRCodeResponsed")
+                       val qrContent = payment.optString("qrContent")
+
+                       if (statePaymentBankQRCodeResponsed == "REQUIRED_TRANSFER") {
+                            loading.dismiss()
+                           val intent = Intent(PayME.context, PaymentResultActivity::class.java)
+                           val bundle = Bundle()
+                           bundle.putString("qrContent",qrContent)
+                           intent.putExtras(bundle)
+                           intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                           PayME.context?.startActivity(intent)
+
+                           } else {
+                               onError(null,ERROR_CODE.PAYMENT_ERROR,message)
+                           }
+                   }else{
+                       onError(null,ERROR_CODE.PAYMENT_ERROR,message)
+
+                   }
+           },onError)
+
+    }
 
     fun checkMethod(
         fragmentManager: FragmentManager,
@@ -353,6 +411,12 @@ internal class PayFunction {
         onError: (JSONObject?, Int, String?) -> Unit,
     ) {
         val checkAccount = CheckAccount()
+        if(payCode== PAY_CODE.VN_PAY){
+            Store.paymentInfo.methodSelected = Store.paymentInfo.listMethod[0]
+            payVNPAY(fragmentManager,onError)
+            return
+
+        }
         if (payCode == PAY_CODE.PAYME && Store.userInfo.accountActive && Store.userInfo.accountKycSuccess) {
             getBalance(onSuccess = {
                 checkFee(infoPayment, Store.paymentInfo.listMethod[0], onSuccess = {
@@ -365,6 +429,7 @@ internal class PayFunction {
             }, onError)
             return
         }
+
         showPopupPayment(
             fragmentManager,
             Store.paymentInfo.listMethod[0],
@@ -469,6 +534,9 @@ internal class PayFunction {
                     }
                     if(payCode==PAY_CODE.MANUAL_BANK){
                         Store.paymentInfo.listMethod = listMethod.filter { method -> method.type == TYPE_PAYMENT.BANK_TRANSFER  } as ArrayList<Method>
+                    }
+                    if(payCode==PAY_CODE.VN_PAY){
+                        Store.paymentInfo.listMethod = listMethod.filter { method -> method.type == TYPE_PAYMENT.BANK_QR_CODE  } as ArrayList<Method>
                     }
 
                     if (Store.paymentInfo.listMethod.size == 0) {

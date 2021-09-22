@@ -174,6 +174,8 @@ internal class NetworkRequest(
                         headers["x-api-key"] = xAPIKey
                         headers["x-api-action"] = xAPIAction
                         headers["x-api-validate"] = xAPIValidate
+                    }else{
+                        headers["x-api-client"] = Store.config.appID.toString()
                     }
                     return headers
                 }

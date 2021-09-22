@@ -18,13 +18,18 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.VIDEO_CAPTURE" />
     <uses-permission android:name="android.permission.AUDIO_CAPTURE" />
+
     <uses-feature android:name="android.hardware.camera.flash" />
 
     <application
+
+        android:launchMode="singleInstance"
         android:allowBackup="false"
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true">
-
+        <activity android:name="vn.payme.sdk.payment.PaymentResultActivity" >
+        </activity>
     </application>
+
 
 </manifest>

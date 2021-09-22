@@ -1,9 +1,11 @@
 package vn.payme.sdk
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -38,6 +40,7 @@ public class PayME {
         lateinit internal var onSuccess: ((JSONObject?) -> Unit)
         lateinit internal var onError: (JSONObject?, Int, String?) -> Unit
         lateinit internal var fragmentManager: FragmentManager
+        fun isInitialised() = ::context.isInitialized
         fun showError(message: String?) {
             if (message != null && message != "null" && message != "") {
                 Toasty.error(PayME.context, message, Toast.LENGTH_SHORT, true).show();
@@ -52,6 +55,35 @@ public class PayME {
             grantResults: IntArray
         ) {
             EventBus.getDefault().post(RequestPermissionsResult(requestCode,permissions,grantResults))
+        }
+        fun onNewIntent(intent: Intent?){
+            val data: Uri? = intent?.data
+            if(!isInitialised()){
+                return
+            }
+            if(Store.paymentInfo.deeplinkUrlScheme.length>0 && data.toString().contains(Store.paymentInfo.deeplinkUrlScheme)){
+                Store.paymentInfo.deeplinkUrlScheme = ""
+                android.os.Handler().postDelayed(
+                    {
+                        val data=   JSONObject("""{payment:{transaction:"${Store.paymentInfo.transaction}"}}""")
+                        PayME.onSuccess(data)
+                        if (Store.paymentInfo.isShowResultUI) {
+                            val bundle: Bundle = Bundle()
+                            bundle.putBoolean("showResult", true)
+                            val paymePayment: PopupPayment = PopupPayment()
+                            paymePayment.arguments = bundle
+                            paymePayment.show(
+                                PayME.fragmentManager,
+                                "ModalBottomSheet"
+                            )
+                        }
+                    },
+                    250 // Timeout value
+                )
+
+
+
+            }
         }
 
     }
@@ -276,7 +308,7 @@ public class PayME {
         )
         Store.paymentInfo = PaymentInfo(
             null, 0, "", null, null, null, "", arrayListOf(),
-            arrayListOf(), null,  true
+            arrayListOf(), null,  true,"",""
         )
         Store.userInfo = UserInfo(0, false, false, false, "", null)
         Security.insertProviderAt(BouncyCastleProvider(), 1)
@@ -356,22 +388,31 @@ public class PayME {
                         Store.config.enlableKycVideo = kycVideo
                     }
 
+
+                    if (key == "credit.sacom.auth.link" && valueString != "null") {
+                        Store.config.creditSacomAuthLink  = valueString
+                    }
+//                    if (key == "limit.param.amount.all" && valueString != "null") {
+//                        val value = JSONObject(valueString)
+//                        val max = Integer.parseInt(value.optString("max"))
+//                        val min = Integer.parseInt(value.optString("min"))
+//                        Store.config.limitPayment = MaxminPayment(min, max)
+//                        println("limit.param.amount.all: "+min)
+//                        println("limit.param.amount.all: "+Store.config.limitPayment.min)
+//
+//
+//                    }
                     if (key == "limit.param.amount.payment" && valueString != "null") {
                         val value = JSONObject(valueString)
                         val max = Integer.parseInt(value.optString("max"))
                         val min = Integer.parseInt(value.optString("min"))
                         Store.config.limitPayment = MaxminPayment(min, max)
-                    }
-                    if (key == "credit.sacom.auth.link" && valueString != "null") {
-                        Store.config.creditSacomAuthLink  = valueString
-                    }
-                    if (key == "limit.param.amount.all" && valueString != "null") {
-                        val value = JSONObject(valueString)
-                        val max = Integer.parseInt(value.optString("max"))
-                        val min = Integer.parseInt(value.optString("min"))
-                        Store.config.limitPayment = MaxminPayment(min, max)
+                        println("limit.param.amount.payment: "+min)
+
+                        println("limit.param.amount.payment: "+Store.config.limitPayment.min)
 
                     }
+                    println("Store.config.limitPayment: "+Store.config.limitPayment.min)
                     if (key == "service.main.visible" && valueString != "null") {
                         val value = JSONObject(valueString)
                         Store.paymentInfo.listService = arrayListOf()
@@ -533,6 +574,29 @@ public class PayME {
         payMEOpenSDKPopup.show(fragmentManager, null)
     }
 
+    fun openHistory(
+        fragmentManager: FragmentManager,
+        onSuccess: (JSONObject?) -> Unit,
+        onError: (JSONObject?, Int, String?) -> Unit
+    ) {
+        setLanguage(PayME.context,Store.config.language)
+
+        PayME.fragmentManager = fragmentManager
+
+        if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
+            this.openWalletActivity(
+                Action.OPEN_HISTORY,
+                0,
+                "",
+                "",
+                null,
+                onSuccess,
+                onError
+            )
+        }
+
+    }
+
 
     fun deposit(
         fragmentManager: FragmentManager,
@@ -671,6 +735,7 @@ public class PayME {
         Store.config.disableCallBackResult = false
         payment.pay(fragmentManager, infoPayment, isShowResultUI, payCode, onSuccess, onError)
     }
+
 
 
     fun getAccountInfo(

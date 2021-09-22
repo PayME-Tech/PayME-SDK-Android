@@ -3,6 +3,7 @@ package com.minhkhoa.androidpaymesdk
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -144,6 +145,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var buttonDeposit: Button
     lateinit var buttonPayQR: Button
     lateinit var buttonScanQR: Button
+    lateinit var buttonOpenHistory: Button
     lateinit var buttonWithdraw: Button
     lateinit var buttonTransfer: Button
     lateinit var buttonScanQr: Button
@@ -194,6 +196,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
+
         context = this
         setContentView(R.layout.activity_main)
         paymePref = getSharedPreferences("PaymePref", MODE_PRIVATE)
@@ -217,6 +221,7 @@ class MainActivity : AppCompatActivity() {
         buttonReload = findViewById(R.id.buttonReload)
         buttonDeposit = findViewById(R.id.buttonDeposit)
         buttonTransfer = findViewById(R.id.buttonTransfer)
+        buttonOpenHistory = findViewById(R.id.buttonOpenHistory)
         buttonPayNotAccount = findViewById(R.id.buttonPayNotAccount)
         loading = findViewById(R.id.loading)
         buttonWithdraw = findViewById(R.id.buttonWithdraw)
@@ -253,12 +258,18 @@ class MainActivity : AppCompatActivity() {
         }
         var configColor = arrayOf<String>("#6756d6", "#6756d6")
 
-
         buttonReload.setOnClickListener {
             if (ConnectToken.length > 0) {
                 updateWalletInfo()
             }
 
+        }
+        buttonOpenHistory.setOnClickListener{
+            payme?.openHistory(supportFragmentManager,onSuccess = {
+
+            },onError = {jsonObject, i, s ->
+                PayME.showError(s)
+            })
         }
         buttonPayQR.setOnClickListener {
             payme?.payQRCode(supportFragmentManager,inputQRString.text.toString(),spinnerPayQRPayCode.selectedItem.toString(),true,onSuccess = {
@@ -323,7 +334,7 @@ class MainActivity : AppCompatActivity() {
                 env = Env.STAGING
             }
 
-            if ( inputUserId.text.toString().length > 0 && (inputPhoneNumber.text.toString().length == 10 || inputPhoneNumber.text.toString().length == 0) && loading.visibility != View.VISIBLE) {
+            if (inputPhoneNumber.text.toString().length >= 10 && inputUserId.text.toString().length > 0 && (inputPhoneNumber.text.toString().length == 10 || inputPhoneNumber.text.toString().length == 0) && loading.visibility != View.VISIBLE) {
                 val params: MutableMap<String, Any> = mutableMapOf()
                 val tz = TimeZone.getTimeZone("UTC")
                 val df: DateFormat =
@@ -538,6 +549,7 @@ class MainActivity : AppCompatActivity() {
                             println("jsononSuccess"+json)
                         },
                         onError = { jsonObject, code, message ->
+                            println("jsononError"+code)
 
                             if (message != null && message.length > 0) {
                                 PayME.showError(message)
@@ -564,11 +576,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        Log.d("TESTAA AppToken", AppToken)
-        Log.d("TESTAA PublicKey", PublicKey)
-        Log.d("TESTAA PrivateKey", PrivateKey)
-        Log.d("TESTAA SecretKey", SecretKey)
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        PayME.onNewIntent(intent)
+
     }
 }
