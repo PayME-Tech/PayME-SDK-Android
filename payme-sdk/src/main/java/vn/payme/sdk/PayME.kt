@@ -66,7 +66,9 @@ public class PayME {
                 android.os.Handler().postDelayed(
                     {
                         val data=   JSONObject("""{payment:{transaction:"${Store.paymentInfo.transaction}"}}""")
-                        PayME.onSuccess(data)
+                        if(!Store.config.disableCallBackResult){
+                            PayME.onSuccess(data)
+                        }
                         if (Store.paymentInfo.isShowResultUI) {
                             val bundle: Bundle = Bundle()
                             bundle.putBoolean("showResult", true)
@@ -102,6 +104,7 @@ public class PayME {
             if (!((payCode == PAY_CODE.PAYME) ||
                         (payCode == PAY_CODE.ATM) ||
                         (payCode == PAY_CODE.MANUAL_BANK) ||
+                        (payCode == PAY_CODE.VN_PAY) ||
                         (payCode == PAY_CODE.CREDIT))
             ) {
                 onError(
@@ -152,6 +155,7 @@ public class PayME {
             if (!((payCode == PAY_CODE.PAYME) ||
                         (payCode == PAY_CODE.ATM) ||
                         (payCode == PAY_CODE.MANUAL_BANK) ||
+                        (payCode == PAY_CODE.VN_PAY) ||
                         (payCode == PAY_CODE.CREDIT))
             ) {
                 onError(
