@@ -42,14 +42,21 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="paymesdk"
-                    android:host="vn.payme.sdk.example" />
+                    android:host="vn.payme.sdk.example"
+                    tools:ignore="AppLinkUrlError" />
             </intent-filter>
+
+
         </activity>
         <activity android:name=".SettingAcitivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+
+
+
+
 
     </application>
 

@@ -4,30 +4,27 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.browser.customtabs.CustomTabsCallback
-import androidx.browser.customtabs.CustomTabsIntent
 
 import vn.payme.sdk.PayME
 import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.store.Store
 import android.content.ComponentName
+import androidx.browser.customtabs.*
 
-import androidx.browser.customtabs.CustomTabsClient
-
-import androidx.browser.customtabs.CustomTabsServiceConnection
-import androidx.browser.customtabs.CustomTabsSession
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import vn.payme.sdk.api.PaymentApi
+import androidx.browser.customtabs.CustomTabsClient
+
+import androidx.browser.customtabs.CustomTabsServiceConnection
 
 
 class PaymentResultActivity : AppCompatActivity() {
-
-
-    lateinit var mClient: CustomTabsClient
     var count = 0
     var navigationEventSave = 0
+    var opened = false
 
     fun loopCallApi() {
         count++
@@ -40,7 +37,7 @@ class PaymentResultActivity : AppCompatActivity() {
             val succeeded = GetTransactionInfo.optBoolean("succeeded")
             if (succeeded) {
                 if (state == "SUCCEEDED") {
-                    if(Store.paymentInfo.deeplinkUrlScheme.length>0 && navigationEventSave != 6){
+                    if (Store.paymentInfo.deeplinkUrlScheme.length > 0 && navigationEventSave != 6) {
                         val urlString = Store.paymentInfo.deeplinkUrlScheme
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(urlString))
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -70,56 +67,59 @@ class PaymentResultActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        CustomTabsClient.bindCustomTabsService(
-            this,
-            "com.android.chrome",
-            object : CustomTabsServiceConnection() {
+        val connection: CustomTabsServiceConnection = object : CustomTabsServiceConnection() {
+            override fun onCustomTabsServiceConnected(
+                name: ComponentName, client: CustomTabsClient
+            ) {
+                val session = client.newSession(object : CustomTabsCallback() {
+                    override fun onNavigationEvent(navigationEvent: Int, extras: Bundle?) {
+                        super.onNavigationEvent(navigationEvent, extras)
+                        if (navigationEventSave == 6) {
+                            count = 0
+                            loopCallApi()
 
-                override fun onCustomTabsServiceConnected(
-                    name: ComponentName,
-                    client: CustomTabsClient
-                ) {
-                    // mClient is now valid.
-
-                    mClient = client
-                    mClient.warmup(0);
-                    val session = mClient.newSession(object : CustomTabsCallback() {
-                        override fun onNavigationEvent(navigationEvent: Int, extras: Bundle?) {
-                            super.onNavigationEvent(navigationEvent, extras)
-                            if (navigationEventSave == 6) {
-                                count = 0
-                                loopCallApi()
-
-                            }
-                            navigationEventSave = navigationEvent
-                            if (navigationEvent == 2) {
-
-
-                            }
                         }
+                        navigationEventSave = navigationEvent
+                        if (navigationEvent == 2) {
 
-                        override fun onPostMessage(message: String, extras: Bundle?) {
-                            super.onPostMessage(message, extras)
+
                         }
+                    }
 
-
-                    })
+                    override fun onPostMessage(message: String, extras: Bundle?) {
+                        super.onPostMessage(message, extras)
+                    }
+                })
+                if (!opened) {
                     openChrome(session)
 
+                }
+            }
 
+            override fun onServiceDisconnected(componentName: ComponentName) {}
+        }
+        CustomTabsClient.bindCustomTabsService(
+            this,
+            "com.android.chrome", connection
+        )
+        android.os.Handler().postDelayed(
+            {
+                if (!opened) {
+                    println("openChrome2222222222")
+                    openChrome(null)
                 }
 
-                override fun onServiceDisconnected(name: ComponentName) {
-                    // mClient is no longer valid. This also invalidates sessions.
-//                    mClient = null
-                }
-            })
+            },
+            500 // Timeout value
+        )
+
         return
 
 
     }
 
     fun openChrome(session: CustomTabsSession?) {
+        opened = true
         val builder = CustomTabsIntent.Builder();
         builder.setShowTitle(false)
         builder.setInstantAppsEnabled(true)
@@ -128,7 +128,6 @@ class PaymentResultActivity : AppCompatActivity() {
         }
         val customTabsIntent = builder.build();
         val url = intent.getStringExtra("qrContent")
-//        val link = "https://stevesouders.com/misc/test-postmessage.php"
 
         customTabsIntent.intent.setData(Uri.parse(url))
         customTabsIntent.intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -137,6 +136,7 @@ class PaymentResultActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        println("onActivityResult" + requestCode)
         if (requestCode == 101) {
             finish()
             Store.paymentInfo.deeplinkUrlScheme = ""

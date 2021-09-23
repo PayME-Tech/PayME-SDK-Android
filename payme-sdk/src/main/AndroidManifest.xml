@@ -22,14 +22,21 @@
     <uses-feature android:name="android.hardware.camera.flash" />
 
     <application
-
+        android:usesCleartextTraffic="true"
         android:launchMode="singleInstance"
         android:allowBackup="false"
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true">
+
         <activity android:name="vn.payme.sdk.payment.PaymentResultActivity" >
+
         </activity>
     </application>
+    <queries>
+        <intent>
+            <action android:name="android.support.customtabs.action.CustomTabsService" />
+        </intent>
+    </queries>
 
 
 </manifest>
