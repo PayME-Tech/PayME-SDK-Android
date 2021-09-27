@@ -113,6 +113,7 @@ class PopupWebViewNapas : DialogFragment() {
             if (!Store.config.disableCallBackResult) {
                 PayME.onError(null, ERROR_CODE.USER_CANCELLED, "")
             }
+            myWebView.removeAllViews();
             dismiss()
         }
         if (!isNetworkConnected()) {
@@ -151,14 +152,13 @@ class PopupWebViewNapas : DialogFragment() {
                 val checkVisaFail = url.contains("CONSUMER_AUTHENTICATION_FAILED")
                 if(checkVisaFail){
                     if(isVisible){
-                        myWebView.removeAllViews();
-                        myWebView.destroy()
+
+
                         onResult("Giao dịch đã huỷ", "FAILED")
                     }
                 }
                 if (checkSuccess || checkError) {
-                    myWebView.removeAllViews();
-                    myWebView.destroy()
+
                     val uri: Uri = Uri.parse(url)
                     val messageResult = uri.getQueryParameter("message")
                     val transIdResult = uri.getQueryParameter("trans_id")
@@ -170,8 +170,7 @@ class PopupWebViewNapas : DialogFragment() {
                         }
                     }
                 } else {
-                    myWebView.removeAllViews();
-                    myWebView.destroy()
+
                     if (checkVisa) {
                         checkVisa()
                     }
@@ -196,11 +195,14 @@ class PopupWebViewNapas : DialogFragment() {
     fun close(event: MyEven) {
         if (event.type == TypeCallBack.onExpired) {
             dismiss()
+
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        myWebView.removeAllViews()
+        myWebView.destroy()
         EventBus.getDefault().unregister(this)
     }
 
