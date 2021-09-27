@@ -119,7 +119,7 @@ public class PayME {
             openScanQR(fragmentManager,payCode, onSuccess = {
             },
                 onError = { jsonObject, i, s ->
-                    PayME.showError(s)
+                        showError(s)
                 }
             )
         }
@@ -258,8 +258,8 @@ public class PayME {
             },
             onError = { jsonObject, code, message ->
                 loading.dismiss()
-                var popup: SearchQrResultPopup = SearchQrResultPopup()
-                popup.show(fragmentManager, "ModalBottomSheet")
+                showError(message)
+
             }
         )
     }

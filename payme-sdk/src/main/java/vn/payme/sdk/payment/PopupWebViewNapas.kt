@@ -30,6 +30,7 @@ import vn.payme.sdk.store.Store
 
 class PopupWebViewNapas : DialogFragment() {
     private lateinit var buttonClose: ImageView
+    lateinit var   myWebView: WebView
     lateinit var containerErrorNetwork: ConstraintLayout
 
     val loading = SpinnerDialog()
@@ -104,7 +105,7 @@ class PopupWebViewNapas : DialogFragment() {
             R.layout.payme_payment_confirm_otp_webview_napas,
             container, false
         )
-        val myWebView: WebView = v.findViewById(R.id.webview)
+        myWebView= v.findViewById(R.id.webview)
         containerErrorNetwork = v.findViewById(R.id.containerErrorNetwork)
         myWebView.settings.javaScriptEnabled = true
         buttonClose = v.findViewById(R.id.buttonClose)
@@ -147,7 +148,17 @@ class PopupWebViewNapas : DialogFragment() {
                 val checkSuccess = url.contains("https://payme.vn/web/?success=true")
                 val checkError = url.contains("https://payme.vn/web/?success=false")
                 val checkVisa = url.contains("https://payme.vn/web")
+                val checkVisaFail = url.contains("CONSUMER_AUTHENTICATION_FAILED")
+                if(checkVisaFail){
+                    if(isVisible){
+                        myWebView.removeAllViews();
+                        myWebView.destroy()
+                        onResult("Giao dịch đã huỷ", "FAILED")
+                    }
+                }
                 if (checkSuccess || checkError) {
+                    myWebView.removeAllViews();
+                    myWebView.destroy()
                     val uri: Uri = Uri.parse(url)
                     val messageResult = uri.getQueryParameter("message")
                     val transIdResult = uri.getQueryParameter("trans_id")
@@ -159,6 +170,8 @@ class PopupWebViewNapas : DialogFragment() {
                         }
                     }
                 } else {
+                    myWebView.removeAllViews();
+                    myWebView.destroy()
                     if (checkVisa) {
                         checkVisa()
                     }
@@ -192,6 +205,7 @@ class PopupWebViewNapas : DialogFragment() {
     }
 
     fun onResult(message: String?, state: String) {
+
         dismiss()
         val bundle: Bundle = Bundle()
         if (state == "SUCCEEDED") {

@@ -415,7 +415,6 @@ class PayMEOpenSDKPopup : DialogFragment() {
                     "          document.body.appendChild(script);\n" +
                     "          true; // note: this is required, or you'll sometimes get silent failures\n"
                 myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
-//            this.myWebView.reload()
         }
         if (myEven.type == TypeCallBack.onExpired) {
             dismiss()
