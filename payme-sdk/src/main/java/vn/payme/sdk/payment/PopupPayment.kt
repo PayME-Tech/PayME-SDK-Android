@@ -60,7 +60,9 @@ internal class PopupPayment : DialogFragment() {
         } else {
             fragmentManager = childFragmentManager
             val fragment = fragmentManager.beginTransaction()
-            fragment.add(R.id.frame_container, SelectMethodFragment())
+            val selectMethodFragment = SelectMethodFragment()
+            selectMethodFragment.arguments = arguments
+            fragment.add(R.id.frame_container, selectMethodFragment)
             fragment.commit()
         }
         bottomSheetDialogFragment.behavior.isDraggable = false

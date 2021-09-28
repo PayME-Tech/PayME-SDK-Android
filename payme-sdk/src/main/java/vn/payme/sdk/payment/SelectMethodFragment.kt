@@ -1,15 +1,23 @@
 package vn.payme.sdk.payment
 
+import android.content.Intent
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import vn.payme.sdk.PayME
@@ -38,6 +46,8 @@ class SelectMethodFragment : Fragment() {
     private lateinit var textIdService: TextView
     private lateinit var textTitleMethodSelected: TextView
     private lateinit var buttonChangeMethod: ConstraintLayout
+    private lateinit var containerLoading: ConstraintLayout
+    private lateinit var loading: ProgressBar
     private lateinit var layout: ConstraintLayout
     private lateinit var headerVisibility: ConstraintLayout
     private lateinit var headerHidden: ConstraintLayout
@@ -45,9 +55,9 @@ class SelectMethodFragment : Fragment() {
     private lateinit var imageLogoMC: ImageView
     private lateinit var containerLogoMC: CardView
     private lateinit var frameLayout: FrameLayout
-    private var loading: Boolean = false
     private lateinit var buttonSubmit: Button
     private lateinit var cardInfo: CardInfo
+    var state= ""
 
 
     override fun onCreateView(
@@ -67,6 +77,9 @@ class SelectMethodFragment : Fragment() {
         textNote = view.findViewById(R.id.note)
         textMessageError = view.findViewById(R.id.txtMessageError)
         layout = view.findViewById(R.id.content)
+        containerLoading = view.findViewById(R.id.containerLoading)
+        loading = view.findViewById(R.id.loading)
+
 
         textPersonReserving = view.findViewById(R.id.txtPersonReserving)
         textIdService = view.findViewById(R.id.txtIdService)
@@ -118,12 +131,18 @@ class SelectMethodFragment : Fragment() {
                                     method?.type == TYPE_PAYMENT.WALLET ||
                                     method?.type == TYPE_PAYMENT.CREDIT_CARD ||
                                     method?.type == TYPE_PAYMENT.LINKED ||
+                                    method?.type == TYPE_PAYMENT.BANK_QR_CODE ||
                                     method?.type == TYPE_PAYMENT.BANK_CARD
                             )
                 ) {
                     PayME.showError(getString(R.string.method_not_supported))
                     return@setOnClickListener
 
+                }
+                if(method?.type == TYPE_PAYMENT.BANK_QR_CODE){
+                    EventBus.getDefault()
+                        .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, null))
+                    return@setOnClickListener
                 }
 
                 if (ListMethodPaymentFragment.isVisible) {
@@ -172,8 +191,25 @@ class SelectMethodFragment : Fragment() {
             }
         }
 
+        if(Store.paymentInfo.payCode == PAY_CODE.VN_PAY){
 
-        if (Store.paymentInfo.payCode == PAY_CODE.PAYME) {
+            containerLoading.visibility = View.VISIBLE
+            loading.getIndeterminateDrawable()
+                .mutate()
+                .setColorFilter(Color.parseColor(Store.config.colorApp.startColor), PorterDuff.Mode.SRC_ATOP)
+            buttonSubmit.setButtonTypeBorder()
+            buttonSubmit.textView.text = getString(R.string.cancel_the_transaction)
+            buttonSubmit.iconLeft.visibility = View.GONE
+            val qrContent = arguments?.getString("qrContent")
+            val builder = CustomTabsIntent.Builder();
+            builder.setShowTitle(false)
+            builder.setInstantAppsEnabled(true)
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(qrContent))
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            requireActivity().startActivity(intent);
+
+
+        } else if (Store.paymentInfo.payCode == PAY_CODE.PAYME) {
             val fragment = childFragmentManager?.beginTransaction()
             fragment?.replace(R.id.frame_container_select_method, ListMethodPaymentFragment())
             fragment?.commit()
@@ -398,11 +434,58 @@ class SelectMethodFragment : Fragment() {
 
     }
 
+    override fun onStop() {
+        state= "onStop"
+        super.onStop()
+    }
+
+    override fun onResume() {
+        println("state"+state)
+        if(state=="onStop"){
+            loopCallApi()
+        }
+        state= "onResume"
+        super.onResume()
+    }
+    fun loopCallApi() {
+        val paymentApi = PaymentApi()
+        paymentApi.checkVisa(onSuccess = { jsonObject ->
+            val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
+            val Payment = OpenEWallet.optJSONObject("Payment")
+            val GetTransactionInfo = Payment.optJSONObject("GetTransactionInfo")
+            val state = GetTransactionInfo.optString("state")
+            val succeeded = GetTransactionInfo.optBoolean("succeeded")
+            if (succeeded) {
+                if (state == "SUCCEEDED") {
+                    EventBus.getDefault()
+                        .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.RESULT, null))
+                } else if (state == "PENDING") {
+                    if (state != "onStop") {
+                        GlobalScope.launch {
+                            delay(5000)
+                            loopCallApi()
+                        }
+                    }
+
+
+                } else {
+                }
+
+            } else {
+            }
+
+
+        }, onError = { jsonObject, code, s ->
+
+        })
+
+    }
 
     override fun onDestroy() {
         EventBus.getDefault().unregister(this)
         super.onDestroy()
     }
+
 
 
 }

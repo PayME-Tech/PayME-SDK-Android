@@ -385,15 +385,25 @@ internal class PayFunction {
                        val qrContent = payment.optString("qrContent")
 
                        if (statePaymentBankQRCodeResponsed == "REQUIRED_TRANSFER") {
-                            loading.dismiss()
-                           val intent = Intent(PayME.context, PaymentResultActivity::class.java)
+//                            loading.dismiss()
+//                           val intent = Intent(PayME.context, PaymentResultActivity::class.java)
+
+//                           intent.putExtras(bundle)
+//                           intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+//                           PayME.context?.startActivity(intent)
+                           val popupPayment: PopupPayment = PopupPayment()
                            val bundle = Bundle()
                            bundle.putString("qrContent",qrContent)
-                           intent.putExtras(bundle)
-                           intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                           PayME.context?.startActivity(intent)
+                           popupPayment.arguments = bundle
+                           loading.dismiss()
+                           popupPayment.show(
+                               fragmentManager,
+                               "ModalBottomSheet"
+                           )
 
-                           } else {
+
+
+                       } else {
                                onError(null,ERROR_CODE.PAYMENT_ERROR,message)
                            }
                    }else{

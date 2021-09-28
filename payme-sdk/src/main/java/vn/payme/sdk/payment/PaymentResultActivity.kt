@@ -74,6 +74,7 @@ class PaymentResultActivity : AppCompatActivity() {
                 val session = client.newSession(object : CustomTabsCallback() {
                     override fun onNavigationEvent(navigationEvent: Int, extras: Bundle?) {
                         super.onNavigationEvent(navigationEvent, extras)
+                        println("navigationEvent"+navigationEvent)
                         if (navigationEventSave == 6) {
                             count = 0
                             loopCallApi()
@@ -128,7 +129,6 @@ class PaymentResultActivity : AppCompatActivity() {
         }
         val customTabsIntent = builder.build();
         val url = intent.getStringExtra("qrContent")
-
         customTabsIntent.intent.setData(Uri.parse(url))
         customTabsIntent.intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         startActivityForResult(customTabsIntent.intent, 101)

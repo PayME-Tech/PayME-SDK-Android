@@ -474,7 +474,9 @@ internal class PaymentApi {
         payInput["storeId"] = Store.paymentInfo.infoPayment?.storeId!!
         payInput["amount"] = Store.paymentInfo.infoPayment?.amount!!
         payInput["orderId"] = Store.paymentInfo.infoPayment?.orderId!!
-        payInput["note"] = Store.paymentInfo.infoPayment?.note!!
+        if(Store.paymentInfo.infoPayment?.note!=null){
+            payInput["note"] = Store.paymentInfo.infoPayment?.note!!
+        }
         if (Store.paymentInfo.infoPayment?.referExtraData != null) {
             payInput["referExtraData"] = Store.paymentInfo.infoPayment?.referExtraData!!
         }
@@ -518,9 +520,6 @@ internal class PaymentApi {
         }else if (method.type == TYPE_PAYMENT.BANK_QR_CODE) {
             val bankQRCode: MutableMap<String, Any> = mutableMapOf()
             bankQRCode["active"] = true
-            val nextValues = Random.nextInt(0, 1000000000)
-            Store.paymentInfo.deeplinkUrlScheme= "paymesdk://${Store.config.clientInfo?.appPackageName}/success/$nextValues/"
-            bankQRCode["redirectUrl"] = "paymesdk://${Store.config.clientInfo?.appPackageName}/success/$nextValues/"
             payment["bankQRCode"] = bankQRCode
         }
         payInput["payment"] = payment

@@ -128,6 +128,8 @@
     <string name="error_manual_bank">Không tìm thấy danh sách ngân hàng thụ hưởng</string>
     <string name="other">Hoặc</string>
     <string name="please_enter_the_phone_number">Vui lòng nhập số điện thoại</string>
+    <string name="please_check_transaction">Giao dịch đang được xử lý</string>
+    <string name="cancel_the_transaction">Huỷ giao dịch</string>
 
 
 
