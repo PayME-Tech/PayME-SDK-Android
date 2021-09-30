@@ -9,10 +9,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.GlobalScope
@@ -201,9 +199,6 @@ class SelectMethodFragment : Fragment() {
             buttonSubmit.textView.text = getString(R.string.cancel_the_transaction)
             buttonSubmit.iconLeft.visibility = View.GONE
             val qrContent = arguments?.getString("qrContent")
-            val builder = CustomTabsIntent.Builder();
-            builder.setShowTitle(false)
-            builder.setInstantAppsEnabled(true)
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(qrContent))
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             requireActivity().startActivity(intent);

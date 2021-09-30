@@ -192,10 +192,6 @@ class CameraTakeProfileCreditActivity : DialogFragment() {
             dismiss()
         }
     }
-    @Subscribe
-    fun eventRequestPermissionsResult(event: RequestPermissionsResult){
-        checkRequestPermissionsResult(event.requestCode,event.permissions,event.grantResults)
-    }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         checkActivityResult(requestCode, resultCode, data)

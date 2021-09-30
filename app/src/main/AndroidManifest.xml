@@ -3,19 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.minhkhoa.androidpaymesdk">
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.VIDEO_CAPTURE" />
-    <uses-permission android:name="android.permission.AUDIO_CAPTURE" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-feature android:name="android.hardware.camera.flash" />
+
     <uses-sdk tools:overrideLibrary="vn.payme.sdk" />
     <application
         android:extractNativeLibs="true"
@@ -37,14 +25,14 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-<!--            <intent-filter android:autoVerify="true"  >-->
-<!--                <action android:name="android.intent.action.VIEW" />-->
-<!--                <category android:name="android.intent.category.DEFAULT" />-->
-<!--                <category android:name="android.intent.category.BROWSABLE" />-->
-<!--                <data android:scheme="paymesdk"-->
-<!--                    android:host="vn.payme.sdk.example"-->
-<!--                    tools:ignore="AppLinkUrlError" />-->
-<!--            </intent-filter>-->
+            <intent-filter android:autoVerify="true"  >
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="example"
+                    android:host="vnpay.result"
+                    tools:ignore="AppLinkUrlError" />
+            </intent-filter>
 
 
         </activity>

@@ -16,7 +16,7 @@ android {
         applicationId "vn.payme.sdk.example"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 99
+        versionCode 100
         versionName "0.9.26"
         setProperty("archivesBaseName", "PayME_SDK-$versionName-$versionCode")
 

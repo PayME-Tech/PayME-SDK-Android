@@ -23,7 +23,7 @@ class PaymentInfo(
     var service: Service? = null,
     var isShowResultUI : Boolean = true,
     var payCode: String = "",
-    var deeplinkUrlScheme: String = "",
+    var redirectUrl: String? = null,
 ) {
 
 }

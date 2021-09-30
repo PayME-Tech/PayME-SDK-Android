@@ -272,14 +272,14 @@ class MainActivity : AppCompatActivity() {
             })
         }
         buttonPayQR.setOnClickListener {
-            payme?.payQRCode(supportFragmentManager,inputQRString.text.toString(),spinnerPayQRPayCode.selectedItem.toString(),true,onSuccess = {
+            payme?.payQRCode(supportFragmentManager,inputQRString.text.toString(),spinnerPayQRPayCode.selectedItem.toString(),"example://vnpay.result",true,onSuccess = {
 
             },onError = {jsonObject, i, s ->
             PayME.showError(s)
             })
         }
         buttonScanQr.setOnClickListener {
-            payme?.scanQR(this.supportFragmentManager,spinnerScanQRPayCode.selectedItem.toString(),onSuccess = {
+            payme?.scanQR(this.supportFragmentManager,spinnerScanQRPayCode.selectedItem.toString(),"example://vnpay.result",onSuccess = {
 
             },onError = {jsonObject, i, s ->  })
         }
@@ -544,7 +544,7 @@ class MainActivity : AppCompatActivity() {
                     "OpenEWallet",
                     ""
                 )
-                    payme?.pay(this.supportFragmentManager, infoPayment, true,spinnerPayCode.selectedItem.toString(),
+                    payme?.pay(this.supportFragmentManager, infoPayment, true,spinnerPayCode.selectedItem.toString(),"example://vnpay.result",
                         onSuccess = { json: JSONObject? ->
                             println("jsononSuccess"+json)
                         },
@@ -576,10 +576,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        PayME.onNewIntent(intent)
-
-    }
 }

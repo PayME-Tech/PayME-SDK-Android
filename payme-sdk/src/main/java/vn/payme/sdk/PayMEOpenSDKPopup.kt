@@ -83,6 +83,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
             clickOpenSettings = true
             PermissionCamera().openSetting(requireActivity())
         } else {
+
             requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS),1)
         }
     }
@@ -443,10 +444,6 @@ class PayMEOpenSDKPopup : DialogFragment() {
 
         }
 
-    }
-    @Subscribe
-    fun eventRequestPermissionsResult(event: RequestPermissionsResult) {
-        checkRequestPermissionsResult(event.requestCode, event.permissions, event.grantResults)
     }
     fun  showButtonClose(isShow: Boolean){
         requireActivity().runOnUiThread {

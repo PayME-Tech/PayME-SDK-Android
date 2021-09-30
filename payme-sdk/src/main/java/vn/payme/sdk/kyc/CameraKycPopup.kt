@@ -20,7 +20,6 @@ import vn.payme.sdk.component.Button
 import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.ChangeFragmentKYC
 import vn.payme.sdk.evenbus.MyEven
-import vn.payme.sdk.evenbus.RequestPermissionsResult
 import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.store.Store
 
@@ -162,11 +161,6 @@ class CameraKycPopup : DialogFragment() {
         grantResults: IntArray
     ) {
         checkRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
-    @Subscribe
-    fun eventRequestPermissionsResult(event: RequestPermissionsResult) {
-      checkRequestPermissionsResult(event.requestCode, event.permissions, event.grantResults)
     }
 
 

@@ -8,14 +8,12 @@ import android.webkit.WebViewClient
 import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 import vn.payme.sdk.PayME
-import vn.payme.sdk.enums.PAY_CODE
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.model.CardInfo
 import vn.payme.sdk.model.Method
 import vn.payme.sdk.store.Store
-import kotlin.random.Random
 
 internal class PaymentApi {
     fun getInfoMerchant(
@@ -520,6 +518,10 @@ internal class PaymentApi {
         }else if (method.type == TYPE_PAYMENT.BANK_QR_CODE) {
             val bankQRCode: MutableMap<String, Any> = mutableMapOf()
             bankQRCode["active"] = true
+            if(Store.paymentInfo.redirectUrl!=null){
+                bankQRCode["redirectUrl"] = Store.paymentInfo.redirectUrl!!
+            }
+
             payment["bankQRCode"] = bankQRCode
         }
         payInput["payment"] = payment

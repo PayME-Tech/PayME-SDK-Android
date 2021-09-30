@@ -1,10 +1,6 @@
 package vn.payme.sdk.payment
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import androidx.browser.customtabs.CustomTabsClient
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.fragment.app.FragmentManager
 import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
@@ -15,10 +11,8 @@ import vn.payme.sdk.RULE_CHECK_ACCOUNT
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.enums.PAY_CODE
-import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.enums.TYPE_PAYMENT
 import vn.payme.sdk.evenbus.*
-import vn.payme.sdk.hepper.Keyboard
 import vn.payme.sdk.model.*
 import vn.payme.sdk.store.Store
 import java.text.DecimalFormat
