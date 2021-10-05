@@ -142,6 +142,7 @@ internal class AccountApi {
                 "          reason\n" +
                 "        }\n" +
                 "        phone\n" +
+                "        fullnameKyc\n" +
                 "        appEnv\n" +
                 "        storeName\n" +
                 "        storeImage\n" +

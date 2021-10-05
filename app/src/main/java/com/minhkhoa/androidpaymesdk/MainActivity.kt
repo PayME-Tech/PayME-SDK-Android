@@ -342,7 +342,8 @@ class MainActivity : AppCompatActivity() {
 
                 df.setTimeZone(tz)
                 val nowAsISO: String = df.format(Date())
-
+                val dataE = "{\"userId\":\"${inputUserId.text.toString()}\",\"phone\":\"${inputPhoneNumber.text.toString()}\",\"timestamp\":\"${nowAsISO}\",\"kycInfo\":{\"fullname\":\"Lai Van Hieu\",\"gender\":\"MALE\",\"birthday\":\"1995-01-20T06:53:07.621Z\",\"address\":\"31 vu tung\",\"identifyType\":\"CMND\",\"identifyNumber\":\"String\",\"issuedAt\":\"2012-01-20T06:53:07.621Z\",\"placeOfIssue\":\"Hai Duong\",\"video\":\"https://sbx-static.payme.vn//2020/10/28/Co-29vnK6.mp4\",\"face\":\"https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg\",\"image\":{\"front\":\"https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg\",\"back\":\"https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg\"}}}"
+                println("dataE:"+dataE)
                 val dataExample =
                     "{\"userId\":\"${inputUserId.text.toString()}\",\"timestamp\":\"${nowAsISO}\",\"phone\":\"${inputPhoneNumber.text.toString()}\"}"
 
@@ -366,7 +367,7 @@ class MainActivity : AppCompatActivity() {
                         showLog
                     )
                 payme?.login(onSuccess = { accountStatus ->
-                    println("accountStatus" + accountStatus)
+//                    println("accountStatus" + accountStatus)
                     if (accountStatus == AccountStatus.NOT_ACTIVATED) {
                         //Tài khoản chưa kich hoạt
                     }
