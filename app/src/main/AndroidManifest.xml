@@ -5,6 +5,8 @@
     package="com.minhkhoa.androidpaymesdk">
 
     <uses-sdk tools:overrideLibrary="vn.payme.sdk" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
         android:extractNativeLibs="true"
         android:requestLegacyExternalStorage="true"

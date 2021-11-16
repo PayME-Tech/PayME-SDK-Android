@@ -42,6 +42,7 @@ import android.util.Log
 import org.json.JSONArray
 import vn.payme.sdk.evenbus.RequestPermissionsResult
 import vn.payme.sdk.kyc.PermissionCamera
+import java.lang.RuntimeException
 
 
 class PayMEOpenSDKPopup : DialogFragment() {
@@ -87,7 +88,44 @@ class PayMEOpenSDKPopup : DialogFragment() {
             requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS),1)
         }
     }
+    fun checkPermissionAndroidManifest (){
+        val pemisions = requireContext()
+            .packageManager
+            .getPackageInfo(
+                requireContext().packageName,
+                PackageManager.GET_PERMISSIONS
+            ).requestedPermissions
+        var check = false
+        for (i in 0 until pemisions!!.size) {
+            if(pemisions[i]=="android.permission.READ_CONTACTS"){
+                check = true
+            }
+        }
+        if(check){
+            getContacts()
+        }else{
+            val injectedJS = "       const script = document.createElement('script');\n" +
+                    "          script.type = 'text/javascript';\n" +
+                    "          script.async = true;\n" +
+                    "          script.text = 'onContacts(${null})';\n" +
+                    "          document.body.appendChild(script);\n" +
+                    "          true; // note: this is required, or you'll sometimes get silent failures\n"
+            val injectedJSPermission = "       const script = document.createElement('script');\n" +
+                    "          script.type = 'text/javascript';\n" +
+                    "          script.async = true;\n" +
+                    "          script.text = 'onPermission(false)';\n" +
+                    "          document.body.appendChild(script);\n" +
+                    "          true; // note: this is required, or you'll sometimes get silent failures\n"
+            requireActivity().runOnUiThread {
+                myWebView.evaluateJavascript("(function() {\n" + injectedJSPermission + ";\n})();", null)
+                myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
+            }
+
+        }
+    }
     private fun  getContacts(){
+
+
         if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_CONTACTS)
             == PackageManager.PERMISSION_GRANTED
         ) {
@@ -325,7 +363,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
                     },
                     takeImage = { takeImage() },
                     getContact={
-                        getContacts()
+                        checkPermissionAndroidManifest()
                     },  openSetting={
                         openSetting()
                     },
@@ -459,8 +497,11 @@ class PayMEOpenSDKPopup : DialogFragment() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
+
+
         val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
-        if (valid) {
+
+            if (valid) {
             getContacts()
         }else{
             val injectedJSPermission = "       const script = document.createElement('script');\n" +
