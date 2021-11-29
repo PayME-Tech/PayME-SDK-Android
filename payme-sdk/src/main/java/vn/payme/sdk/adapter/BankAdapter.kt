@@ -31,7 +31,7 @@ class BankAdapter(private val onClick: (BankTransferInfo) -> Unit) :
             currentFlower = bank
             val picasso = Picasso.get()
             picasso.setIndicatorsEnabled(false)
-            picasso.load("https://firebasestorage.googleapis.com/v0/b/vn-mecorp-payme-wallet.appspot.com/o/image_bank%2Ficon_banks%2Ficon${bank.swiftCode}%402x.png?alt=media&token=0c6cd79a-9a4f-4ea2-b178-94e0b4731ac2")
+            picasso.load("https://static.payme.vn/image_bank/icon_banks/icon${bank.swiftCode}@2x.png")
                 .resize(150, 150)
                 .centerInside()
                 .into(imageBank)
