@@ -73,7 +73,7 @@ class PopupSearchBank : DialogFragment() {
             title.setText(getString(R.string.list_bank_support))
             val listBankVietQR : ArrayList<BankTransferInfo> = arrayListOf<BankTransferInfo>()
             for (i in 0 until listBanks.size){
-                listBankVietQR.add(BankTransferInfo("","","","",listBanks[i].shortName,"",listBanks[i].swiftCode,""))
+                listBankVietQR.add(BankTransferInfo("","","","",listBanks[i].shortName,"",listBanks[i].swiftCode,"",""))
             }
             listBankInfo = listBankVietQR
         }else{

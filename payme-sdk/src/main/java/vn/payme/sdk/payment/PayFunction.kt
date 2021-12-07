@@ -142,6 +142,7 @@ internal class PayFunction {
                             val content = bank.optString("content")
                             val swiftCode = bank.optString("swiftCode")
                             val qrContent = bank.optString("qrContent")
+                            val qrImage = bank.optString("qrImage")
                             val bankTransferInfo = BankTransferInfo(
                                 bankAccountName,
                                 bankAccountNumber,
@@ -151,6 +152,7 @@ internal class PayFunction {
                                 content,
                                 swiftCode,
                                 qrContent,
+                                qrImage
                             )
                             listBank.add(bankTransferInfo)
                         }

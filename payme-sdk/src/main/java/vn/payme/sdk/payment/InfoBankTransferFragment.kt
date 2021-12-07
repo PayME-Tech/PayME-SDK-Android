@@ -7,6 +7,7 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextPaint
 import android.text.style.ClickableSpan
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +30,12 @@ import vn.payme.sdk.hepper.Clipboard
 import vn.payme.sdk.model.BankTransferInfo
 import vn.payme.sdk.store.Store
 import java.text.DecimalFormat
+import android.graphics.BitmapFactory
+
+import android.graphics.Bitmap
+
+
+
 
 
 class InfoBankTransferFragment : Fragment() {
@@ -170,7 +177,7 @@ class InfoBankTransferFragment : Fragment() {
             .resize(150, 150)
             .centerInside()
             .into(imageBankTop)
-        if(bank.qrContent!="null"){
+      if(bank.qrContent!="null"){
             val writer = QRCodeWriter()
             val hintMap: MutableMap<EncodeHintType, Any> = HashMap()
             hintMap[EncodeHintType.MARGIN] = 0

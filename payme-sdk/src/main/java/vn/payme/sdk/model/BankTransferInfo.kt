@@ -9,6 +9,7 @@ class BankTransferInfo(
     val content :String,
     val swiftCode :String,
     val qrContent :String,
+    val qrImage :String,
 ) {
 
 }
