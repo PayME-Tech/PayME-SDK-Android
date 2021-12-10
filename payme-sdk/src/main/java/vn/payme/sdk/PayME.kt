@@ -358,13 +358,16 @@ public class PayME {
                     if (key == "credit.sacom.auth.link" && valueString != "null") {
                         Store.config.creditSacomAuthLink  = valueString
                     }
+                    if (key == "sdk.web.secretKey" && valueString != "null") {
+                        Store.config.sdkWebSecretKey  = valueString
+                    }
 //                    if (key == "limit.param.amount.all" && valueString != "null") {
 //                        println("valueString"+valueString)
 //                        val value = JSONObject(valueString)
 //                        val max = Integer.parseInt(value.optString("max"))
 //                        val min = Integer.parseInt(value.optString("min"))
 //                        Store.config.limitPayment = MaxminPayment(min, max)
-//                        println("limit.param.amount.all: "+min)
+//                        println("limit.param.amount. all: "+min)
 //                        println("limit.param.amount.all: "+Store.config.limitPayment.min)
 //
 //

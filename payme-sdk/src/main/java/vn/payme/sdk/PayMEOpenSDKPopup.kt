@@ -408,7 +408,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
 
 
         val cryptoAES = CryptoAES()
-        val xAPIData = cryptoAES.encrytAESDataWebview("LkaWasflkjfqr2g3", data.toString())
+        val xAPIData = cryptoAES.encrytAESDataWebview(Store.config.sdkWebSecretKey, data.toString())
         val encode: String = URLEncoder.encode(xAPIData, "utf-8")
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
 

@@ -290,7 +290,13 @@ internal class PaymentApi {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
         val variables: MutableMap<String, Any> = mutableMapOf()
-        val listKey = arrayListOf<String>("limit.param.amount.payment","credit.sacom.auth.link","limit.param.amount.all","service.main.visible","kyc.mode.enable")
+        val listKey = arrayListOf<String>(
+            "limit.param.amount.payment",
+            "credit.sacom.auth.link",
+            "limit.param.amount.all",
+            "service.main.visible",
+            "kyc.mode.enable",
+            "sdk.web.secretKey")
         val query = "query Query(\$configsAppId: String, \$configsKeys: [String]) {\n" +
                 "  Setting {\n" +
                 "    configs(appId: \$configsAppId, keys: \$configsKeys) {\n" +
