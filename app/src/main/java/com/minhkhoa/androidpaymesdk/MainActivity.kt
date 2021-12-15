@@ -87,10 +87,21 @@ var AppSecretKey: String = ""
 var PublicKey: String = ""
 
 val APP_TOKEN_DEFAULT =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTgsImlhdCI6MTYyNjkyOTQ1M30.RifF-H0C4w29WDRV0AGgP0qoffaAYbdmp_uyS69DEhI"
-val PUBLIC_KEY_DEFAULT = "-----BEGIN PUBLIC KEY-----MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIKTO8wcUDUEFK6c1xWmappjJTpSLR5+0y7j42/S07SdHknPOVVH/EnVj0UxoI+3AZloBwqgs7gV4DyMPHEZPX8CAwEAAQ==-----END PUBLIC KEY-----"
-val SECRET_KEY_DEFAULT = "1cf4df491c0972ff96fffb10327e4963"
-val PRIVATE_KEY_DEFAULT = "-----BEGIN RSA PRIVATE KEY-----MIIBOQIBAAJAeEi2lnt0XYJBk068ncKYjG+C4dS1tZTxvVQrRKgzhrn5RY8NYhGR6rKI6SmfLuZfJwzJ7pAswHQcsZXq8bnFKQIDAQABAkAdt2Eclk1uWKLYwMgKdav4bgg4wLNPtAdxDd1Orftk2jBEzErHn8UEX5z1az1TEUpWvt0iPC3SDDtsJBI0pQ+tAiEAvkd9jsf6exffyG8Kjn/UGa//Xu7gv1FKhfK9+1i94N8CIQCh1D0b0IUHzPKC7F7N7IUeLGuLVMrT1xK78YbNi23y9wIgWI5jJCF0NPeugdUUH6/kYbQkcOVSGhhWS7LmsmThshcCIQCP+AFlfVzcU7hsQV0WVhUXgu0qR4UqcWx5R6ZltmVagQIgfYQl+kA7IIWCY7ist/xAmSAgmaitNYmfvPW8YnQp8fU=-----END RSA PRIVATE KEY-----"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NSwiaWF0IjoxNjEyNDMzNDI0fQ.rNl0i-yAEk4MOjcT5OAk7gxnxyAzPQVx9dHCiiH86rM"
+val PUBLIC_KEY_DEFAULT = "-----BEGIN PUBLIC KEY-----\n" +
+        "    MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIwGH/c+jndwseq5JCU9SuRSbrT8IMiZ\n" +
+        "    DFyA26aX6xkz42keW2sLRkHo4miAHvc+q91omHJEQXIfcAj2cA1AC6MCAwEAAQ==\n" +
+        "    -----END PUBLIC KEY-----"
+val SECRET_KEY_DEFAULT = "27d616faf57ae6db2f052f561de80e83"
+val PRIVATE_KEY_DEFAULT = "-----BEGIN RSA PRIVATE KEY-----\n" +
+        "    MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL\n" +
+        "    yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF\n" +
+        "    5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB\n" +
+        "    AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA\n" +
+        "    ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK\n" +
+        "    xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd\n" +
+        "    A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=\n" +
+        "    -----END RSA PRIVATE KEY-----"
 
 
 class MainActivity : AppCompatActivity() {
@@ -272,14 +283,14 @@ class MainActivity : AppCompatActivity() {
             })
         }
         buttonPayQR.setOnClickListener {
-            payme?.payQRCode(supportFragmentManager,inputQRString.text.toString(),spinnerPayQRPayCode.selectedItem.toString(),"example://vnpay.result",true,onSuccess = {
+            payme?.payQRCode(supportFragmentManager,inputQRString.text.toString(),spinnerPayQRPayCode.selectedItem.toString(),true,onSuccess = {
 
             },onError = {jsonObject, i, s ->
             PayME.showError(s)
             })
         }
         buttonScanQr.setOnClickListener {
-            payme?.scanQR(this.supportFragmentManager,spinnerScanQRPayCode.selectedItem.toString(),"example://vnpay.result",onSuccess = {
+            payme?.scanQR(this.supportFragmentManager,spinnerScanQRPayCode.selectedItem.toString(),onSuccess = {
 
             },onError = {jsonObject, i, s ->  })
         }
@@ -534,7 +545,7 @@ class MainActivity : AppCompatActivity() {
             val amount = convertInt(moneyPay.text.toString())
 
             val storeId: Long =
-                if (env == Env.PRODUCTION ||env == Env.STAGING  ) 223 else if (env == Env.SANDBOX) 37048160 else 9
+                if (env == Env.PRODUCTION ||env == Env.STAGING  ) 57956431 else if (env == Env.SANDBOX) 37048160 else 9
             val infoPayment =
                 InfoPayment(
                     "PAY",
@@ -545,7 +556,7 @@ class MainActivity : AppCompatActivity() {
                     "OpenEWallet",
                     ""
                 )
-                    payme?.pay(this.supportFragmentManager, infoPayment, true,spinnerPayCode.selectedItem.toString(),"example://vnpay.result",
+                    payme?.pay(this.supportFragmentManager, infoPayment, true,spinnerPayCode.selectedItem.toString(),
                         onSuccess = { json: JSONObject? ->
                             println("jsononSuccess"+json)
                         },

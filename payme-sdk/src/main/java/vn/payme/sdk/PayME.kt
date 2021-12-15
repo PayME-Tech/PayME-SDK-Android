@@ -51,11 +51,9 @@ public class PayME {
     fun scanQR(
         fragmentManager: FragmentManager,
         payCode: String,
-        redirectUrl: String?,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ): Unit {
-        Store.paymentInfo.redirectUrl =redirectUrl
         setLanguage(PayME.context,Store.config.language)
 
         val checkAccount = CheckAccount()
@@ -105,7 +103,6 @@ public class PayME {
         fragmentManager: FragmentManager,
         qr: String,
         payCode: String,
-        redirectUrl: String?,
         isShowResultUI: Boolean,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
@@ -162,7 +159,6 @@ public class PayME {
                             infoPayment,
                             isShowResultUI,
                             payCode,
-                            redirectUrl,
                             onSuccess,
                             onError
                         )
@@ -274,7 +270,7 @@ public class PayME {
         )
         Store.paymentInfo = PaymentInfo(
             null, 0, "", null, null, null, "", arrayListOf(),
-            arrayListOf(), null,  true,"",""
+            arrayListOf(), null,  true,""
         )
         Store.userInfo = UserInfo(0, false, false, false, "", null)
         Security.insertProviderAt(BouncyCastleProvider(), 1)
@@ -697,11 +693,9 @@ public class PayME {
         infoPayment: InfoPayment,
         isShowResultUI: Boolean,
         payCode: String,
-        redirectUrl: String?,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
-        Store.paymentInfo.redirectUrl =redirectUrl
         setLanguage(context,Store.config.language)
         val payment = PayFunction()
         Store.config.disableCallBackResult = false

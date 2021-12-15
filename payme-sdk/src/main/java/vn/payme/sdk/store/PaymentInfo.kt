@@ -23,7 +23,6 @@ class PaymentInfo(
     var service: Service? = null,
     var isShowResultUI : Boolean = true,
     var payCode: String = "",
-    var redirectUrl: String? = null,
 ) {
 
 }

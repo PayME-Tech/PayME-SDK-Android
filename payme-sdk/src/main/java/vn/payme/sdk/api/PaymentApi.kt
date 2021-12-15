@@ -55,7 +55,7 @@ internal class PaymentApi {
         onError: (JSONObject?, Int, String?) -> Unit
     ){
         var timeCheck =  false
-
+        
             authCreditCard(
                 expiredAt,
                 cardNumber,
@@ -524,10 +524,6 @@ internal class PaymentApi {
         }else if (method.type == TYPE_PAYMENT.BANK_QR_CODE) {
             val bankQRCode: MutableMap<String, Any> = mutableMapOf()
             bankQRCode["active"] = true
-            if(Store.paymentInfo.redirectUrl!=null){
-                bankQRCode["redirectUrl"] = Store.paymentInfo.redirectUrl!!
-            }
-
             payment["bankQRCode"] = bankQRCode
         }
         payInput["payment"] = payment

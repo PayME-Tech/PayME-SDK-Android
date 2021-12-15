@@ -265,7 +265,7 @@ internal class PayFunction {
         if (!((payCode == PAY_CODE.PAYME) ||
                     (payCode == PAY_CODE.ATM) ||
                     (payCode == PAY_CODE.MANUAL_BANK) ||
-                    (payCode == PAY_CODE.VN_PAY) ||
+//                    (payCode == PAY_CODE.VN_PAY) ||
                     (payCode == PAY_CODE.CREDIT))
         ) {
             onError(
