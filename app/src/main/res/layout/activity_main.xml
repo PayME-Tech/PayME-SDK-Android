@@ -400,7 +400,7 @@
                     android:background="@drawable/background_input"
                     android:inputType="number"
                     android:padding="8dp"
-                    android:text="OPENEWALLET|37048160|PAYMENT|20000|Chuyentien|24421556232123"
+                    android:text="OPENEWALLET|37048160|PAYMENT|20000|Chuyentien|123132221"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/titleUser" />
                 <LinearLayout

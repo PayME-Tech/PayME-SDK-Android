@@ -48,8 +48,9 @@ internal class PayFunction {
             val GetInfoMerchant = OpenEWallet.getJSONObject("GetInfoMerchant")
             val storeImage = GetInfoMerchant.optString("storeImage")
             val storeName = GetInfoMerchant.optString("storeName")
+            val merchantName = GetInfoMerchant.optString("merchantName")
             val isVisibleHeader = GetInfoMerchant.optBoolean("isVisibleHeader")
-            EventBus.getDefault().postSticky(StoreInfo(storeImage, storeName, isVisibleHeader))
+            EventBus.getDefault().postSticky(StoreInfo(storeImage, storeName,merchantName, isVisibleHeader))
             onSuccess()
         }, onError)
 
@@ -174,44 +175,6 @@ internal class PayFunction {
         }
     }
 
-//    private fun payNotAccount(
-//        fragmentManager: FragmentManager,
-//        infoPayment: InfoPayment,
-//        isShowResultUI: Boolean,
-//        methodId: Number?,
-//        onSuccess: (JSONObject?) -> Unit,
-//        onError: (JSONObject?, Int, String?) -> Unit
-//    ) {
-//        val payme = PayME()
-//        val paymentApi = PaymentApi()
-//        paymentApi.getInfoMerchant(infoPayment.storeId, onSuccess = { jsonObject ->
-//            val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
-//            val GetInfoMerchant = OpenEWallet.optJSONObject("GetInfoMerchant")
-//            val succeeded = GetInfoMerchant.optBoolean("succeeded")
-//            val storeName = GetInfoMerchant.optString("storeName")
-//            val storeImage = GetInfoMerchant.optString("storeImage")
-//            val message = GetInfoMerchant.optString("message")
-//            if (succeeded) {
-//                Store.paymentInfo.storeName = storeName
-//                Store.paymentInfo.storeImage = storeImage
-//                payme.getSetting(onSuccess = {
-//                    payme.checkRegisterClient(onSuccess = {
-//                        checkInfoPayment(
-//                            fragmentManager,
-//                            infoPayment,
-//                            isShowResultUI,
-//                            methodId,
-//                            onSuccess,
-//                            onError
-//                        )
-//                    }, onError)
-//                }, onError)
-//            } else {
-//                onError(null, ERROR_CODE.PAYMENT_ERROR, message)
-//            }
-//
-//        }, onError)
-//    }
 
     fun pay(
         fragmentManager: FragmentManager,
@@ -379,14 +342,7 @@ internal class PayFunction {
                    if (payment != null) {
                            val statePaymentBankQRCodeResponsed = payment.optString("statePaymentBankQRCodeResponsed")
                        val qrContent = payment.optString("qrContent")
-
                        if (statePaymentBankQRCodeResponsed == "REQUIRED_TRANSFER") {
-//                            loading.dismiss()
-//                           val intent = Intent(PayME.context, PaymentResultActivity::class.java)
-
-//                           intent.putExtras(bundle)
-//                           intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//                           PayME.context?.startActivity(intent)
                            val popupPayment: PopupPayment = PopupPayment()
                            val bundle = Bundle()
                            bundle.putString("qrContent",qrContent)

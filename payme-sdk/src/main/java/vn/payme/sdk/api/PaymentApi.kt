@@ -17,7 +17,7 @@ import vn.payme.sdk.store.Store
 
 internal class PaymentApi {
     fun getInfoMerchant(
-        storeId:Long,
+        storeId:Long?,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ){
@@ -32,11 +32,15 @@ internal class PaymentApi {
                 "      succeeded\n" +
                 "      message\n" +
                 "      isVisibleHeader\n" +
+                "      merchantName\n" +
                 "    }\n" +
                 "  }\n" +
                 "}"
         val getInfoMerchantInput: MutableMap<String, Any> = mutableMapOf()
-        getInfoMerchantInput["storeId"] = storeId
+        if(storeId!=null){
+            getInfoMerchantInput["storeId"] = storeId
+        }
+        getInfoMerchantInput["appId"] = Store.config.appID.toString()
         params["query"] = query
         variables["getInfoMerchantInput"]= getInfoMerchantInput
         params["variables"] = variables
@@ -55,7 +59,7 @@ internal class PaymentApi {
         onError: (JSONObject?, Int, String?) -> Unit
     ){
         var timeCheck =  false
-        
+
             authCreditCard(
                 expiredAt,
                 cardNumber,
@@ -244,7 +248,9 @@ internal class PaymentApi {
         params["query"] = query
         params["variables"] = variables
         getFeeInput["clientId"] = Store.config.clientId
-        getFeeInput["storeId"] = Store.paymentInfo.infoPayment?.storeId!!
+        if(Store.paymentInfo.infoPayment?.storeId!=null){
+            getFeeInput["storeId"] = Store.paymentInfo.infoPayment?.storeId!!
+        }
         getFeeInput["serviceType"] = "OPEN_EWALLET_PAYMENT"
         getFeeInput["amount"] = amount
         variables["getFeeInput"] = getFeeInput
@@ -475,7 +481,12 @@ internal class PaymentApi {
                 "}"
         params["query"] = query
         payInput["clientId"] = Store.config.clientId
-        payInput["storeId"] = Store.paymentInfo.infoPayment?.storeId!!
+        if(Store.paymentInfo.infoPayment?.storeId!=null){
+            payInput["storeId"] = Store.paymentInfo.infoPayment?.storeId!!
+        }
+        if(Store.paymentInfo.infoPayment?.userName!=null){
+            payInput["userName"] = Store.paymentInfo.infoPayment?.userName!!
+        }
         payInput["amount"] = Store.paymentInfo.infoPayment?.amount!!
         payInput["orderId"] = Store.paymentInfo.infoPayment?.orderId!!
         if(Store.paymentInfo.infoPayment?.note!=null){
@@ -542,7 +553,7 @@ internal class PaymentApi {
     }
 
     fun getTransferMethods(
-        storeId:Long,
+        storeId:Long?,
         payCode:String,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
@@ -581,7 +592,9 @@ internal class PaymentApi {
                     "  }\n" +
                     "}"
         getPaymentMethodInput["serviceType"] = "OPEN_EWALLET_PAYMENT"
-        extraData["storeId"] = storeId
+        if(storeId!==null){
+            extraData["storeId"] = storeId
+        }
         getPaymentMethodInput["extraData"] = extraData
         getPaymentMethodInput["payCode"] = payCode
         variables["getPaymentMethodInput"] = getPaymentMethodInput
@@ -641,6 +654,7 @@ internal class PaymentApi {
                 "        orderId\n" +
                 "        storeId\n" +
                 "        succeeded\n" +
+                "        userName\n" +
                 "        type\n" +
                 "      }\n" +
                 "    }\n" +

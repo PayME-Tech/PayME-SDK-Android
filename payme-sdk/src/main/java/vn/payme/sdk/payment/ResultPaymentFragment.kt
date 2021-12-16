@@ -125,7 +125,11 @@ class ResultPaymentFragment : Fragment() {
         }
         val listInfoBottom: ArrayList<Info> = arrayListOf()
         val storeInfo = EventBus.getDefault().getStickyEvent(StoreInfo::class.java)
-        listInfoBottom.add(Info(getString(R.string.receiver),storeInfo.storeName , null, null, false))
+        if(storeInfo.storeName=="null"){
+            listInfoBottom.add(Info(getString(R.string.receiver),storeInfo.merchantName , null, null, false))
+        }else{
+            listInfoBottom.add(Info(getString(R.string.receiver),storeInfo.storeName , null, null, false))
+        }
         listInfoBottom.add(Info(getString(R.string.content), Store.paymentInfo.infoPayment?.note, null, null, true))
         if(state =="PENDING"){
             lottie.setAnimation(R.raw.cho_xu_ly)

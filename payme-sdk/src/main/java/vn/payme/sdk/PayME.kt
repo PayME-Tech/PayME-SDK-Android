@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import es.dmoral.toasty.Toasty
@@ -55,13 +56,11 @@ public class PayME {
         onError: (JSONObject?, Int, String?) -> Unit
     ): Unit {
         setLanguage(PayME.context,Store.config.language)
-
         val checkAccount = CheckAccount()
         if (checkAccount.check(RULE_CHECK_ACCOUNT.LOGGIN, onError)) {
             if (!((payCode == PAY_CODE.PAYME) ||
                         (payCode == PAY_CODE.ATM) ||
                         (payCode == PAY_CODE.MANUAL_BANK) ||
-                        (payCode == PAY_CODE.VN_PAY) ||
                         (payCode == PAY_CODE.CREDIT))
             ) {
                 onError(
@@ -135,11 +134,14 @@ public class PayME {
                     val action = Detect.optString("action")
                     val message = Detect.optString("message")
                     val note = Detect.optString("note")
+                    val userName = Detect.optString("userName")
                     val amount = Detect.optInt("amount")
                     val orderId = Detect.optString("orderId")
-                    val storeId = Detect.optLong("storeId")
+
+                    val storeId = Detect.optLong("storeId",)
                     val succeeded = Detect.optBoolean("succeeded")
                     val type = Detect.optString("type")
+                    val checkNullLong = 0
                     if (!succeeded) {
                         onError(null, ERROR_CODE.PAYMENT_ERROR, message)
                     } else {
@@ -149,9 +151,10 @@ public class PayME {
                                 amount,
                                 note,
                                 orderId,
-                                storeId,
+                                if(storeId == checkNullLong.toLong()) null  else storeId ,
                                 type,
-                                Store.paymentInfo.extraData
+                                Store.paymentInfo.extraData,
+                                if(userName!="null") userName else null
                             )
                         val paymeSDK = PayME()
                         paymeSDK.pay(
@@ -178,6 +181,7 @@ public class PayME {
         loading.show(fragmentManager, null)
         paymentApi.postCheckDataQr(qr,
             onSuccess = { jsonObject ->
+
                 loading.dismiss()
                 val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
                 val Payment = OpenEWallet.optJSONObject("Payment")
@@ -188,9 +192,10 @@ public class PayME {
                 val amount = Detect.optInt("amount")
                 val orderId = Detect.optString("orderId")
                 val storeId = Detect.optLong("storeId")
+                val userName = Detect.optString("userName")
                 val succeeded = Detect.optBoolean("succeeded")
                 val type = Detect.optString("type")
-
+                val checkNullLong = 0
                 if (!succeeded) {
                     loading.dismiss()
                     var popup: SearchQrResultPopup = SearchQrResultPopup()
@@ -202,9 +207,11 @@ public class PayME {
                             amount,
                             note,
                             orderId,
-                            storeId,
+                            if(storeId == checkNullLong.toLong())  null else storeId ,
                             type,
-                            Store.paymentInfo.extraData
+                            Store.paymentInfo.extraData,
+                            if(userName!="null") userName else null
+
                         )
                     val paymeSDK = PayME()
                     paymeSDK.payInSDK(
@@ -223,9 +230,7 @@ public class PayME {
     }
     @SuppressWarnings("deprecation")
     fun setLanguage(context: Context,language: LANGUAGES){
-        println("setLanguage"+language.toString())
         Store.config.language = language
-
         val config = context.resources.configuration
         val lang = language.toString().toLowerCase() // your language code
         val locale = Locale(lang)
