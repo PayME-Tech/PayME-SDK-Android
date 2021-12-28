@@ -40,9 +40,11 @@ import android.provider.ContactsContract
 
 import android.util.Log
 import org.json.JSONArray
+import vn.payme.sdk.api.CryptoRSA
 import vn.payme.sdk.evenbus.RequestPermissionsResult
 import vn.payme.sdk.kyc.PermissionCamera
 import java.lang.RuntimeException
+import kotlin.random.Random
 
 
 class PayMEOpenSDKPopup : DialogFragment() {
@@ -406,9 +408,16 @@ class PayMEOpenSDKPopup : DialogFragment() {
                     }"""
         )
 
-
+        val cryptoRSA = CryptoRSA()
+        val nextValues = Random.nextInt(0, 10000000)
+        val encryptKey = nextValues.toString()
+        val publicKey = "-----BEGIN PUBLIC KEY-----\n" +
+                "MFswDQYJKoZIhvcNAQEBBQADSgAwRwJAUtmXPKzZWoKT0taQFyNecMIxI57EdfpJ\n" +
+                "AOznurDJAXrVW0fB9tnem1k6nQmRiUeCzWQ8lkgGitk0rA/+37vWawIDAQAB\n" +
+                "-----END PUBLIC KEY-----"
+        val xAPIKey = cryptoRSA.encryptWebView(publicKey,encryptKey)
         val cryptoAES = CryptoAES()
-        val xAPIData = cryptoAES.encrytAESDataWebview(Store.config.sdkWebSecretKey, data.toString())
+        val xAPIData = cryptoAES.encryptAES(encryptKey, data.toString())
         val encode: String = URLEncoder.encode(xAPIData, "utf-8")
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
 
@@ -425,7 +434,9 @@ class PayMEOpenSDKPopup : DialogFragment() {
             header.visibility = View.GONE
             myWebView.loadUrl("${domain}")
         }
-        myWebView.loadUrl("${domain}active/${encode}")
+        myWebView.loadUrl("${domain}activeWithKey?key=${URLEncoder.encode(xAPIKey)}&data=${encode}")
+
+
         if (!isNetworkConnected()) {
             containerErrorNetwork?.visibility = View.VISIBLE
         }

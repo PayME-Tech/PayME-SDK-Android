@@ -19,7 +19,7 @@ import javax.crypto.NoSuchPaddingException;
 import vn.payme.sdk.PayME;
 import vn.payme.sdk.store.Store;
 
-class CryptoRSA {
+public class CryptoRSA {
     PublicKey publicKey;
     PrivateKey privateKey;
     byte[] encryptedBytes, decryptedBytes;
@@ -59,6 +59,19 @@ class CryptoRSA {
         cipher =  Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
         cipher.init(Cipher.ENCRYPT_MODE, rsaPublicKey);
         encryptedBytes = cipher.doFinal(plain.getBytes(StandardCharsets.UTF_8));
+        return Base64.encodeToString(encryptedBytes, Base64.NO_WRAP);
+    }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public String encryptWebView(String key,String plainText)
+            throws NoSuchAlgorithmException,
+            NoSuchPaddingException,
+            InvalidKeyException,
+            IllegalBlockSizeException,
+            BadPaddingException, InvalidKeySpecException {
+        PublicKey rsaPublicKey =  stringToPublicKey(key);
+        cipher =  Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, rsaPublicKey);
+        encryptedBytes = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
         return Base64.encodeToString(encryptedBytes, Base64.NO_WRAP);
     }
 

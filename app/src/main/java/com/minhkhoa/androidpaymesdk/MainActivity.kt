@@ -168,6 +168,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var inputUserId: EditText
     lateinit var inputQRString: EditText
     lateinit var inputPhoneNumber: EditText
+    lateinit var inputUsername: EditText
     lateinit var moneyDeposit: EditText
     lateinit var moneyPay: EditText
     lateinit var moneyWithdraw: EditText
@@ -242,6 +243,7 @@ class MainActivity : AppCompatActivity() {
         textView = findViewById(R.id.textBalance)
         inputUserId = findViewById(R.id.inputUserId)
         inputQRString = findViewById(R.id.inputPayQR)
+        inputUsername = findViewById(R.id.username)
         inputPhoneNumber = findViewById(R.id.inputPhoneNumber)
         moneyDeposit = findViewById(R.id.moneyDeposit)
         moneyPay = findViewById(R.id.moneyPay)
@@ -555,7 +557,7 @@ class MainActivity : AppCompatActivity() {
                     null,
                     "OpenEWallet",
                     "",
-                    "hieulv"
+                    inputUsername.text.toString()
                 )
                     payme?.pay(this.supportFragmentManager, infoPayment, true,spinnerPayCode.selectedItem.toString(),
                         onSuccess = { json: JSONObject? ->

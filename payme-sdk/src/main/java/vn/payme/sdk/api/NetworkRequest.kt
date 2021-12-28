@@ -17,6 +17,7 @@ import vn.payme.sdk.PayME
 import vn.payme.sdk.enums.ERROR_CODE
 import vn.payme.sdk.store.Store
 import java.nio.charset.Charset
+import kotlin.random.Random
 
 
 internal class NetworkRequest(
@@ -47,7 +48,8 @@ internal class NetworkRequest(
             onError(null, ERROR_CODE.ERROR_KEY_ENCODE, "Vui lòng kiểm tra lại key mã hóa")
         } else {
             val cryptoRSA = CryptoRSA()
-            val encryptKey = "10000000"
+            val nextValues = Random.nextInt(0, 10000000)
+            val encryptKey = nextValues.toString()
             val xAPIKey = cryptoRSA.encrypt(encryptKey)
             val cryptoAES = CryptoAES()
             val xAPIAction = cryptoAES.encryptAES(encryptKey, path)

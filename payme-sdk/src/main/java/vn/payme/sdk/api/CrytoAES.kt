@@ -15,20 +15,6 @@ import kotlin.text.Charsets.UTF_8
 internal class CryptoAES {
     private val SALTED_STR = "Salted__"
     private val SALTED_MAGIC: ByteArray = SALTED_STR.toByteArray(US_ASCII)
-    fun encrytAESDataWebview(key: String,input: String): String {
-        val ivbyte = byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-        try {
-            val bytes = input.toByteArray()
-            val ciper = Cipher.getInstance("AES/CBC/PKCS5Padding")
-            val iv = IvParameterSpec(ivbyte, 0, ciper.blockSize)
-            val secret: SecretKey = SecretKeySpec(key.toByteArray(), "AES")
-            ciper.init(Cipher.ENCRYPT_MODE, secret, iv)
-            val result = ciper.doFinal(bytes)
-            return Base64.encodeToString(result, Base64.NO_WRAP)
-        } catch (e: Exception) {
-            return ""
-        }
-    }
 
     fun encryptAES(password: String, clearText: String): String {
         val pass: ByteArray = password.toByteArray(US_ASCII)
