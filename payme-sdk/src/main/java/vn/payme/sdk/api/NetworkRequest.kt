@@ -113,7 +113,7 @@ internal class NetworkRequest(
                             validateString += decryptKey
                             val result = cryptoAES.decryptAES(decryptKey, xAPIMessageResponse)
                             var dataRaw = ConvertJSON().toString(result)
-                            finalJSONObject = JSONObject(dataRaw?.substring(1, dataRaw?.length - 1))
+                            finalJSONObject = JSONObject(dataRaw)
                             if (BuildConfig.DEBUG){
                                 println("RESPONSE" + finalJSONObject + params)
                             }

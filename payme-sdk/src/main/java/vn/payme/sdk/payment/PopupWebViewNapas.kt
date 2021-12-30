@@ -152,8 +152,6 @@ class PopupWebViewNapas : DialogFragment() {
                 val checkVisaFail = url.contains("CONSUMER_AUTHENTICATION_FAILED")
                 if(checkVisaFail){
                     if(isVisible){
-
-
                         onResult("Giao dịch đã huỷ", "FAILED")
                     }
                 }

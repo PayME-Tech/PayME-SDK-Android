@@ -554,10 +554,10 @@ class MainActivity : AppCompatActivity() {
                     amount,
                     "Nội dung đơn hàng",
                     nextValues.toString(),
-                    null,
+                    storeId,
                     "OpenEWallet",
                     "",
-                    inputUsername.text.toString()
+                    null
                 )
                     payme?.pay(this.supportFragmentManager, infoPayment, true,spinnerPayCode.selectedItem.toString(),
                         onSuccess = { json: JSONObject? ->

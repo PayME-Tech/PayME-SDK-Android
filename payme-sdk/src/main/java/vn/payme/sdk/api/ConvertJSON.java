@@ -9,7 +9,8 @@ public class ConvertJSON {
         dataRaw = dataRaw.replace("\\r","");
         dataRaw = dataRaw.replace("\\n","");
         dataRaw = dataRaw.replaceAll("\\\\\"","\"");
+        dataRaw = dataRaw.replaceAll("\\\\\\\"","\"");
         dataRaw = dataRaw.replace("\\\\","\\");
-        return dataRaw;
+        return dataRaw.substring(1, dataRaw.length() - 1);
     }
 }
