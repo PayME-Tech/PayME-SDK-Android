@@ -24,7 +24,7 @@ class Config {
     var configColor: Array<String>? = null
     var colorApp: ColorApp = ColorApp("#08941f", "#0eb92a")
     var openPayAndKyc: Boolean = true
-    var language: LANGUAGES = LANGUAGES.VN
+    var language: LANGUAGES = LANGUAGES.VI
     var kycIdentify: Boolean = false
     var kycVideo: Boolean = false
     var kycFace: Boolean = false
@@ -44,7 +44,7 @@ class Config {
         showLog: Boolean = false,
         env: Env? = null,
         configColor: Array<String>,
-        language: LANGUAGES = LANGUAGES.VN,
+        language: LANGUAGES = LANGUAGES.VI,
     ) {
 
         this.appPrivateKey = appPrivateKey

@@ -324,7 +324,7 @@ class MainActivity : AppCompatActivity() {
                 id: Long
             ) {
                 if(payme!=null){
-                    payme?.setLanguage(context,if(spinnerLanguage.selectedItem.toString() == LANGUAGES.VN.toString()) LANGUAGES.VN else LANGUAGES.EN)
+                    payme?.setLanguage(context,if(spinnerLanguage.selectedItem.toString() == LANGUAGES.VI.toString()) LANGUAGES.VI else LANGUAGES.EN)
                 }
 
             }
@@ -375,7 +375,7 @@ class MainActivity : AppCompatActivity() {
                         ConnectToken,
                         if (env == Env.PRODUCTION || env == Env.STAGING) PrivateKey else if (env == Env.DEV) PRIVATE_KEY_DEFAULT_DEV else PRIVATE_KEY_DEFAULT_SANDBOX,
                         configColor,
-                        if(spinnerLanguage.selectedItem.toString() == LANGUAGES.VN.toString()) LANGUAGES.VN else LANGUAGES.EN,
+                        if(spinnerLanguage.selectedItem.toString() == LANGUAGES.VI.toString()) LANGUAGES.VI else LANGUAGES.EN,
                         env,
                         showLog
                     )

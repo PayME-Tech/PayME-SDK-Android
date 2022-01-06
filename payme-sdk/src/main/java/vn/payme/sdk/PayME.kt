@@ -230,6 +230,7 @@ public class PayME {
     }
     @SuppressWarnings("deprecation")
     fun setLanguage(context: Context,language: LANGUAGES){
+        println("language.toString().toLowerCase() : "+language.toString().toLowerCase())
         Store.config.language = language
         val config = context.resources.configuration
         val lang = language.toString().toLowerCase() // your language code

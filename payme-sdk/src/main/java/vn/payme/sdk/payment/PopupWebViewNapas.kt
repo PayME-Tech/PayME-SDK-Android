@@ -146,6 +146,7 @@ class PopupWebViewNapas : DialogFragment() {
             }
 
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+                println("url: "+url)
                 val checkSuccess = url.contains("https://payme.vn/web/?success=true")
                 val checkError = url.contains("https://payme.vn/web/?success=false")
                 val checkVisa = url.contains("https://payme.vn/web")
