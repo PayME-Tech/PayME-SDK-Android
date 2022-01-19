@@ -130,6 +130,7 @@ class SelectMethodFragment : Fragment() {
                                     method?.type == TYPE_PAYMENT.CREDIT_CARD ||
                                     method?.type == TYPE_PAYMENT.LINKED ||
                                     method?.type == TYPE_PAYMENT.BANK_QR_CODE ||
+                                    method?.type == TYPE_PAYMENT.CREDIT_BALANCE ||
                                     method?.type == TYPE_PAYMENT.BANK_CARD
                             )
                 ) {
@@ -137,7 +138,7 @@ class SelectMethodFragment : Fragment() {
                     return@setOnClickListener
 
                 }
-                if(method?.type == TYPE_PAYMENT.BANK_QR_CODE){
+                if(method.type == TYPE_PAYMENT.BANK_QR_CODE){
                     EventBus.getDefault()
                         .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, null))
                     return@setOnClickListener
@@ -145,18 +146,17 @@ class SelectMethodFragment : Fragment() {
 
                 if (ListMethodPaymentFragment.isVisible) {
                     val payFunction = PayFunction()
-                    if (method?.type == TYPE_PAYMENT.BANK_CARD) {
+                    if (method.type == TYPE_PAYMENT.BANK_CARD) {
                         buttonSubmit.enableLoading()
                         payFunction.getListBank(onSuccess = {
                             buttonSubmit.disableLoading()
                             changeMethod(Store.paymentInfo.methodSelected!!)
 
-                        }, onError = { jsonObject, i, s ->
+                        }, onError = { _, _, s ->
                             buttonSubmit.disableLoading()
                             PayME.showError(s)
                         })
                         return@setOnClickListener
-
                     }
                     if (method?.type == TYPE_PAYMENT.BANK_TRANSFER) {
                         buttonSubmit.enableLoading()

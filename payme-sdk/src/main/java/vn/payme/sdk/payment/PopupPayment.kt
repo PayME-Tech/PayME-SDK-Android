@@ -156,9 +156,9 @@ internal class PopupPayment : DialogFragment() {
 
         } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_PASS) {
             val confirmPassFragment: ConfirmPassFragment = ConfirmPassFragment()
-            val fragment = childFragmentManager?.beginTransaction()
-            fragment?.replace(R.id.frame_container, confirmPassFragment)
-            fragment?.commit()
+            val fragment = childFragmentManager.beginTransaction()
+            fragment.replace(R.id.frame_container, confirmPassFragment)
+            fragment.commit()
         }
     }
 

@@ -118,7 +118,7 @@ class ConfirmPassFragment : Fragment() {
                 }
 
             },
-            onError = { jsonObject, code, s ->
+            onError = { _, _, s ->
                 if(!isVisible) return@payment
 
                 disableLoading()

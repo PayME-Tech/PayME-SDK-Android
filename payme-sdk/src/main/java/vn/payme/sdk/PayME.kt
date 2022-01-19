@@ -755,11 +755,7 @@ public class PayME {
                     onError(null, ERROR_CODE.ACCOUNT_ERROR, message)
                 }
             }else{
-                if (appEnv == Env.SANDBOX.toString()) {
-                    Store.config.openPayAndKyc = false
-                } else {
-                    Store.config.openPayAndKyc = true
-                }
+                Store.config.openPayAndKyc = appEnv != Env.SANDBOX.toString()
                 if (kyc != null) {
                     val state = kyc.optString("state")
                     stateKYC = state

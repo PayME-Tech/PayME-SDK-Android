@@ -10,5 +10,6 @@ class TYPE_PAYMENT {
         val CREDIT_CARD :String = "CREDIT_CARD"
         val MOMO_PG :String = "MOMO_PG"
         val ZALOPAY_PG :String = "ZALOPAY_PG"
+        val CREDIT_BALANCE :String = "CREDIT_BALANCE"
     }
 }

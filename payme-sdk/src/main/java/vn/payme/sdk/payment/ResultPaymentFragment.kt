@@ -80,6 +80,8 @@ class ResultPaymentFragment : Fragment() {
                     true
                 )
             )
+        } else if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.CREDIT_BALANCE) {
+            listInfoTop.add(Info(getString(R.string.method), getString(R.string.credit_wallet), null, null, false))
         } else {
             listInfoTop.add(
                 Info(

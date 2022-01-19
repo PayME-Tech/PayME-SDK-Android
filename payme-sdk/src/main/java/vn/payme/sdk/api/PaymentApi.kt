@@ -254,40 +254,53 @@ internal class PaymentApi {
         getFeeInput["serviceType"] = "OPEN_EWALLET_PAYMENT"
         getFeeInput["amount"] = amount
         variables["getFeeInput"] = getFeeInput
-        if (method.type == TYPE_PAYMENT.WALLET) {
-            val wallet: MutableMap<String, Any> = mutableMapOf()
-            wallet["active"] = true
-            payment["wallet"] = wallet
-        } else if (method.type == TYPE_PAYMENT.BANK_CARD) {
-            val bankCard: MutableMap<String, Any> = mutableMapOf()
-            bankCard["cardNumber"] = ""
-            payment["bankCard"] = bankCard
-        } else if (method.type == TYPE_PAYMENT.LINKED) {
-            val linked: MutableMap<String, Any> = mutableMapOf()
-            linked["linkedId"] = method.data?.linkedId!!
-            linked["envName"] = "MobileApp"
-            payment["linked"] = linked
-        }else if(method.type==TYPE_PAYMENT.CREDIT_CARD){
-            val creditCard: MutableMap<String, Any> = mutableMapOf()
-            creditCard["cardNumber"] = ""
-            creditCard["expiredAt"] = ""
-            creditCard["cvv"] = ""
-            creditCard["cvv"] = ""
-            payment["creditCard"] = creditCard
-        }else if(method.type==TYPE_PAYMENT.BANK_TRANSFER){
-            val bankTransfer: MutableMap<String, Any> = mutableMapOf()
-            bankTransfer["active"] = true
-            payment["bankTransfer"] = bankTransfer
+        when (method.type) {
+            TYPE_PAYMENT.WALLET -> {
+                val wallet: MutableMap<String, Any> = mutableMapOf()
+                wallet["active"] = true
+                payment["wallet"] = wallet
+            }
+            TYPE_PAYMENT.BANK_CARD -> {
+                val bankCard: MutableMap<String, Any> = mutableMapOf()
+                bankCard["cardNumber"] = ""
+                payment["bankCard"] = bankCard
+            }
+            TYPE_PAYMENT.LINKED -> {
+                val linked: MutableMap<String, Any> = mutableMapOf()
+                linked["linkedId"] = method.data?.linkedId!!
+                linked["envName"] = "MobileApp"
+                payment["linked"] = linked
+            }
+            TYPE_PAYMENT.CREDIT_CARD -> {
+                val creditCard: MutableMap<String, Any> = mutableMapOf()
+                creditCard["cardNumber"] = ""
+                creditCard["expiredAt"] = ""
+                creditCard["cvv"] = ""
+                creditCard["cvv"] = ""
+                payment["creditCard"] = creditCard
+            }
+            TYPE_PAYMENT.BANK_TRANSFER -> {
+                val bankTransfer: MutableMap<String, Any> = mutableMapOf()
+                bankTransfer["active"] = true
+                payment["bankTransfer"] = bankTransfer
+            }
+            TYPE_PAYMENT.CREDIT_BALANCE -> {
+                val creditBalance: MutableMap<String, Any> = mutableMapOf()
+                creditBalance["active"] = true
+                creditBalance["securityCode"] = ""
+                creditBalance["supplierLinkedId"] = method.data?.supplierLinkedId!!
+                payment["creditBalance"] = creditBalance
+            }
         }
 
         getFeeInput["payment"] = payment
 
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path,Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context, ENV_API.API_FE, path,
+            Store.userInfo.accessToken, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
         )
-
     }
     fun getSettings(
         onSuccess: (JSONObject) -> Unit,
@@ -315,7 +328,8 @@ internal class PaymentApi {
         params["variables"] = variables
         variables["configsAppId"] = Store.config.appID.toString()
         variables["configsKeys"] = listKey
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context, ENV_API.API_FE, path,
+            Store.userInfo.accessToken, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -347,7 +361,8 @@ internal class PaymentApi {
         getBankNameInput["type"] = "CARD"
         variables["getBankNameInput"] = getBankNameInput
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context, ENV_API.API_FE, path,
+            Store.userInfo.accessToken, params,ENV_API.IS_SECURITY)
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -380,7 +395,8 @@ internal class PaymentApi {
         variables["createCodeByPasswordInput"] = createCodeByPasswordInput
         params["query"] = query
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(PayME.context, ENV_API.API_FE, path,
+            Store.userInfo.accessToken, params,ENV_API.IS_SECURITY)
 
         request.setOnRequestCrypto(
             onError = onError,
@@ -472,6 +488,11 @@ internal class PaymentApi {
                 "            statePaymentLinkedResponsed : state\n" +
                 "            transaction\n" +
                 "          }\n" +
+                "          ... on PaymentCreditBalanceResponsed {\n" +
+                "            stateCreditBalanceResponsed : state\n" +
+                "            supplierName\n" +
+                "            message\n" +
+                "          }\n" +
                 "         \n" +
                 "        }\n" +
                 "        succeeded\n" +
@@ -495,47 +516,61 @@ internal class PaymentApi {
         if (Store.paymentInfo.infoPayment?.referExtraData != null) {
             payInput["referExtraData"] = Store.paymentInfo.infoPayment?.referExtraData!!
         }
-        if (method.type == TYPE_PAYMENT.WALLET) {
-            val wallet: MutableMap<String, Any> = mutableMapOf()
-            wallet["active"] = true
-            wallet["securityCode"] = securityCode!!
-            payment["wallet"] = wallet
-        } else if (method.type == TYPE_PAYMENT.BANK_CARD) {
-            val bankCard: MutableMap<String, Any> = mutableMapOf()
-            bankCard["cardNumber"] = cardInfo?.cardNumber!!
-            bankCard["cardHolder"] = cardInfo?.cardHolder!!
-            bankCard["issuedAt"] = cardInfo?.cardDate!!
-            payment["bankCard"] = bankCard
-        } else if(method.type==TYPE_PAYMENT.CREDIT_CARD){
-            val creditCard: MutableMap<String, Any> = mutableMapOf()
-            creditCard["cardNumber"] = cardInfo?.cardNumber!!
-            creditCard["cardHolder"] = cardInfo?.cardHolder!!
-            creditCard["expiredAt"] = cardInfo?.cardDateView
-            creditCard["cvv"] = cardInfo?.cvv!!
-            if(referenceId!=null){
-                creditCard["referenceId"] = referenceId
+        when (method.type) {
+            TYPE_PAYMENT.WALLET -> {
+                val wallet: MutableMap<String, Any> = mutableMapOf()
+                wallet["active"] = true
+                wallet["securityCode"] = securityCode!!
+                payment["wallet"] = wallet
             }
-            payment["creditCard"] = creditCard
-        } else if(method.type==TYPE_PAYMENT.BANK_TRANSFER){
-            val bankTransfer: MutableMap<String, Any> = mutableMapOf()
-            bankTransfer["active"] = true
-            bankTransfer["recheck"] = recheck!!
-            payment["bankTransfer"] = bankTransfer
-        } else if (method.type == TYPE_PAYMENT.LINKED) {
-            val linked: MutableMap<String, Any> = mutableMapOf()
-            linked["linkedId"] = method.data?.linkedId!!
-            if(otp!=null){
-                linked["otp"] = otp
+            TYPE_PAYMENT.BANK_CARD -> {
+                val bankCard: MutableMap<String, Any> = mutableMapOf()
+                bankCard["cardNumber"] = cardInfo?.cardNumber!!
+                bankCard["cardHolder"] = cardInfo?.cardHolder!!
+                bankCard["issuedAt"] = cardInfo?.cardDate!!
+                payment["bankCard"] = bankCard
             }
-            if(referenceId!=null){
-                linked["referenceId"] = referenceId
+            TYPE_PAYMENT.CREDIT_CARD -> {
+                val creditCard: MutableMap<String, Any> = mutableMapOf()
+                creditCard["cardNumber"] = cardInfo?.cardNumber!!
+                creditCard["cardHolder"] = cardInfo?.cardHolder!!
+                creditCard["expiredAt"] = cardInfo?.cardDateView
+                creditCard["cvv"] = cardInfo?.cvv!!
+                if(referenceId!=null){
+                    creditCard["referenceId"] = referenceId
+                }
+                payment["creditCard"] = creditCard
             }
-            linked["envName"] = "MobileApp"
-            payment["linked"] = linked
-        }else if (method.type == TYPE_PAYMENT.BANK_QR_CODE) {
-            val bankQRCode: MutableMap<String, Any> = mutableMapOf()
-            bankQRCode["active"] = true
-            payment["bankQRCode"] = bankQRCode
+            TYPE_PAYMENT.BANK_TRANSFER -> {
+                val bankTransfer: MutableMap<String, Any> = mutableMapOf()
+                bankTransfer["active"] = true
+                bankTransfer["recheck"] = recheck!!
+                payment["bankTransfer"] = bankTransfer
+            }
+            TYPE_PAYMENT.LINKED -> {
+                val linked: MutableMap<String, Any> = mutableMapOf()
+                linked["linkedId"] = method.data?.linkedId!!
+                if(otp!=null){
+                    linked["otp"] = otp
+                }
+                if(referenceId!=null){
+                    linked["referenceId"] = referenceId
+                }
+                linked["envName"] = "MobileApp"
+                payment["linked"] = linked
+            }
+            TYPE_PAYMENT.BANK_QR_CODE -> {
+                val bankQRCode: MutableMap<String, Any> = mutableMapOf()
+                bankQRCode["active"] = true
+                payment["bankQRCode"] = bankQRCode
+            }
+            TYPE_PAYMENT.CREDIT_BALANCE -> {
+                val creditBalance: MutableMap<String, Any> = mutableMapOf()
+                creditBalance["active"] = true
+                creditBalance["securityCode"] = securityCode!!
+                creditBalance["supplierLinkedId"] = method.data?.supplierLinkedId!!
+                payment["creditBalance"] = creditBalance
+            }
         }
         payInput["payment"] = payment
 
@@ -577,6 +612,9 @@ internal class PaymentApi {
                     "          }\n" +
                     "          ... on WalletMethodInfo {\n" +
                     "            accountId\n" +
+                    "          }\n" +
+                    "          ... on CreditBalanceInfo {\n" +
+                    "            supplierLinkedId\n" +
                     "          }\n" +
                     "        }\n" +
                     "        fee\n" +

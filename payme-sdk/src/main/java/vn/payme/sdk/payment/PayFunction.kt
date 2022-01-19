@@ -3,6 +3,7 @@ package vn.payme.sdk.payment
 import android.os.Bundle
 import androidx.fragment.app.FragmentManager
 import org.greenrobot.eventbus.EventBus
+import org.json.JSONArray
 import org.json.JSONObject
 import vn.payme.sdk.CheckAccount
 import vn.payme.sdk.PayME
@@ -212,10 +213,7 @@ internal class PayFunction {
                 onError(jsonObject, i, s)
                 loading.dismiss()
             })
-
         }
-
-
     }
 
     private fun checkInfoPayment(
@@ -266,7 +264,6 @@ internal class PayFunction {
             )
             return
         }
-        // Pay Khong co phuong thuc
         getListMethod(
             fragmentManager,
             infoPayment,
@@ -445,34 +442,35 @@ internal class PayFunction {
     ) {
         val paymentApi = PaymentApi()
         paymentApi.getTransferMethods(
-            infoPayment!!.storeId,
+            infoPayment.storeId,
             payCode,
             onSuccess = { jsonObject ->
                 val Utility = jsonObject.optJSONObject("Utility")
                 val GetPaymentMethod = Utility.optJSONObject("GetPaymentMethod")
                 val message = GetPaymentMethod.optString("message")
                 val succeeded = GetPaymentMethod.optBoolean("succeeded")
-                val methods = GetPaymentMethod.optJSONArray("methods")
+                val methods = GetPaymentMethod.optJSONArray("methods") ?: JSONArray()
                 if (succeeded) {
                     Store.paymentInfo.listMethod = arrayListOf()
                     val listMethod = arrayListOf<Method>()
                     for (i in 0 until methods.length()) {
                         val jsonObject = methods.getJSONObject(i)
-                        var data = jsonObject.optJSONObject("data")
-                        var dataMethod = DataMethod(null, "", "")
+                        val data = jsonObject.optJSONObject("data")
+                        var dataMethod = DataMethod(null, "", "", "")
                         if (data != null) {
                             val linkedId = data.optLong("linkedId")
                             val swiftCode = data.optString("swiftCode")
                             val issuer = data.optString("issuer")
-                            dataMethod = DataMethod(linkedId, swiftCode, issuer)
+                            val supplierLinkedId = data.optString("supplierLinkedId")
+                            dataMethod = DataMethod(linkedId, swiftCode, issuer, supplierLinkedId)
                         }
-                        var fee = jsonObject.optInt("fee")
-                        var label = jsonObject.optString("label")
-                        var feeDescription = jsonObject.optString("feeDescription")
-                        var methodIdRes = jsonObject.optInt("methodId")
-                        var minFee = jsonObject.optInt("minFee")
-                        var title = jsonObject.optString("title")
-                        var type = jsonObject.optString("type")
+                        val fee = jsonObject.optInt("fee")
+                        val label = jsonObject.optString("label")
+                        val feeDescription = jsonObject.optString("feeDescription")
+                        val methodIdRes = jsonObject.optInt("methodId")
+                        val minFee = jsonObject.optInt("minFee")
+                        val title = jsonObject.optString("title")
+                        val type = jsonObject.optString("type")
                         val methodRes = Method(
                             dataMethod,
                             fee,
@@ -484,8 +482,6 @@ internal class PayFunction {
                             type,
                         )
                         listMethod.add(methodRes)
-
-
                     }
                     Store.paymentInfo.listMethod = listMethod
                     if(payCode==PAY_CODE.CREDIT){
