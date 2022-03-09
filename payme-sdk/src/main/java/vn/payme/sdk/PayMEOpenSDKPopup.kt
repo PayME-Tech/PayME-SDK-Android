@@ -2,6 +2,8 @@ package vn.payme.sdk
 
 import android.Manifest
 import android.app.Dialog
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Resources
@@ -223,6 +225,33 @@ class PayMEOpenSDKPopup : DialogFragment() {
         return cm.activeNetworkInfo != null && cm.activeNetworkInfo!!.isConnected
     }
 
+    private fun copyToClipboard(text: String) {
+        try {
+            val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipData = ClipData.newPlainText("Copy to clip", text)
+            clipboard.setPrimaryClip(clipData)
+            val injectedJS = "       const script = document.createElement('script');\n" +
+                    "          script.type = 'text/javascript';\n" +
+                    "          script.async = true;\n" +
+                    "          script.text = 'onResultCopy(true)';\n" +
+                    "          document.body.appendChild(script);\n" +
+                    "          true; // note: this is required, or you'll sometimes get silent failures\n"
+            requireActivity().runOnUiThread {
+                myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
+            }
+        } catch (e: Exception) {
+            println(e)
+            val injectedJS = "       const script = document.createElement('script');\n" +
+                    "          script.type = 'text/javascript';\n" +
+                    "          script.async = true;\n" +
+                    "          script.text = 'onResultCopy(false)';\n" +
+                    "          document.body.appendChild(script);\n" +
+                    "          true; // note: this is required, or you'll sometimes get silent failures\n"
+            requireActivity().runOnUiThread {
+                myWebView.evaluateJavascript("(function() {\n" + injectedJS + ";\n})();", null)
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -353,7 +382,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
         webSettings.cacheMode = WebSettings.LOAD_NO_CACHE
 
         val jsObject: JsObject =
-            fragmentManager?.let {
+            fragmentManager?.let { fragmentManager ->
                 JsObject(
                     back = { backScreen() },
                     showButtonClose={b->
@@ -369,8 +398,10 @@ class PayMEOpenSDKPopup : DialogFragment() {
                     },  openSetting={
                         openSetting()
                     },
-
-                            it,
+                    onCopyToClipBoard = {
+                        copyToClipboard(it)
+                    },
+                    fragmentManager
                 )
             }!!
         myWebView.addJavascriptInterface(jsObject, "messageHandlers")
