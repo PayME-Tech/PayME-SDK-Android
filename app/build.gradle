@@ -16,8 +16,8 @@ android {
         applicationId "vn.payme.sdk.example"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 110
-        versionName "0.9.39"
+        versionCode 111
+        versionName "0.9.40"
         setProperty("archivesBaseName", "PayME_SDK-$versionName-$versionCode")
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
