@@ -1,40 +1,55 @@
 package vn.payme.sdk.payment
 
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.add
+import androidx.fragment.app.commit
 import com.squareup.picasso.Picasso
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
 import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
+import vn.payme.sdk.cardmodules.ScanActivity
+import vn.payme.sdk.cardmodules.ScanActivityImpl
+import vn.payme.sdk.component.Button
 import vn.payme.sdk.component.InputInfo
+import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
+import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.model.BankInfo
 import vn.payme.sdk.evenbus.CheckInputAtm
 import vn.payme.sdk.evenbus.ListBankAtm
+import vn.payme.sdk.hepper.ChangeColorImage
+import vn.payme.sdk.kyc.*
 import vn.payme.sdk.model.CardInfo
-import java.util.*
+import vn.payme.sdk.store.Store
 
 
 class EnterAtmCardFragment : Fragment() {
-
     private lateinit var inputCardNumber: InputInfo
     private lateinit var inputCardHolder: InputInfo
     private lateinit var inputCardDate: InputInfo
-
     private var bankSelected: BankInfo? = null
     private var cardHolder: String = ""
     private var cardDate: String = ""
     private var cardNumberValue: String = ""
     var count = 0
     fun checkValidate() {
-        if (bankSelected != null && cardDate.length > 0 && cardHolder.length > 0 && (cardNumberValue.length == 16 || cardNumberValue.length == 19)) {
+        if (bankSelected != null && cardDate.isNotEmpty() && cardHolder.isNotEmpty() && (cardNumberValue.length == 16 || cardNumberValue.length == 19)) {
             val cardInfo = CardInfo(
                 inputCardDate.input.text.toString(),
                 inputCardNumber.input.text.toString(),
@@ -51,9 +66,7 @@ class EnterAtmCardFragment : Fragment() {
 
     }
 
-
     fun detechCardHoder(cardNumber: String, count: Int) {
-
         val paymentApi = PaymentApi()
         inputCardNumber.txtTitleRight.text = getString(R.string.checking)
         paymentApi.detectCardHolder(bankSelected?.swiftCode!!,
@@ -77,16 +90,14 @@ class EnterAtmCardFragment : Fragment() {
                         cardHolder = accountName
                     }
                 }
-
             },
-            onError = { jsonObject, code, message ->
+            onError = { _, _, message ->
                 if (count != this.count) return@detectCardHolder
                 if (!isVisible) return@detectCardHolder
                 inputCardNumber.progressBar.visibility = View.GONE
                 PayME.showError(message)
             }
         )
-
     }
 
     override fun onCreateView(
@@ -95,7 +106,7 @@ class EnterAtmCardFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View =
-            inflater?.inflate(R.layout.payme_payment_enter_atm_card_fragment, container, false)
+            inflater.inflate(R.layout.payme_payment_enter_atm_card_fragment, container, false)
         inputCardNumber = view.findViewById(R.id.inputCardNumber)
         inputCardHolder = view.findViewById(R.id.inputCardHolder)
         inputCardDate = view.findViewById(R.id.inputCardDate)
@@ -103,19 +114,15 @@ class EnterAtmCardFragment : Fragment() {
             .getStickyEvent(ListBankAtm::class.java).listBankATM.filter { bankInfo -> bankInfo.depositable }
         inputCardNumber.input.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                count = count + 1
+                count += 1
                 inputCardNumber.txtTitleRight.text = ""
                 inputCardNumber.imageRight.visibility = View.GONE
-
-
                 val stringReplace = s?.replace("[^0-9]".toRegex(), "")
                 var cardNumber = stringReplace?.subSequence(
                     0,
                     if (stringReplace.length < 19) stringReplace.length else 19
                 )
                 bankSelected = null
-
-
                 if (cardNumber?.length!! >= 6) {
                     val cardPrefix = cardNumber.substring(0, 6)
                     var bankVerify = false
@@ -137,8 +144,6 @@ class EnterAtmCardFragment : Fragment() {
                                 .centerInside()
                                 .into(inputCardNumber.imageRight)
                             bankVerify = true
-
-
                         }
                     }
                     if (bankSelected?.cardNumberLength == 16) {
@@ -155,7 +160,6 @@ class EnterAtmCardFragment : Fragment() {
                         inputCardNumber.input.filters = filters
                     }
 
-
                     if (!bankVerify) {
                         inputCardNumber.setError(getString(R.string.number_card_error))
                     } else {
@@ -168,7 +172,7 @@ class EnterAtmCardFragment : Fragment() {
                     var cardNew = ""
                     if (cardNumber?.length!! > 16) {
                         for (i in 0 until cardNumber!!.length) {
-                            if ((i == 7 || i == 15) && (i + 1 < cardNumber?.length)) {
+                            if ((i == 7 || i == 15) && (i + 1 < cardNumber.length)) {
                                 cardNew += cardNumber[i] + " "
                             } else {
                                 cardNew += cardNumber[i]
@@ -185,16 +189,13 @@ class EnterAtmCardFragment : Fragment() {
                     }
                     if (cardNew != s.toString()) {
                         inputCardNumber.input.removeTextChangedListener(this)
-                        val cursorPosition: Int = inputCardNumber.input.getSelectionStart()
+                        val cursorPosition: Int = inputCardNumber.input.selectionStart
                         val newCursorPosition = cursorPosition + (cardNew.length - s!!.length)
                         inputCardNumber.input.setText(cardNew)
-                        val check = newCursorPosition
-                        inputCardNumber.input.setSelection(check!!)
+                        inputCardNumber.input.setSelection(newCursorPosition)
                         inputCardNumber.input.addTextChangedListener(this)
                     }
-
                     checkValidate()
-
                 } else {
                     inputCardNumber.setDefault(null)
                     inputCardDate.txtTitle.setText(R.string.release_issue_date)
@@ -216,10 +217,7 @@ class EnterAtmCardFragment : Fragment() {
         inputCardHolder.input.addTextChangedListener { text ->
             cardHolder = text.toString()
             checkValidate()
-
         }
-
-
 
         inputCardDate.input.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
@@ -234,14 +232,14 @@ class EnterAtmCardFragment : Fragment() {
                     }
                 }
                 var title = ""
-                if (bankSelected?.requiredDate == "ISSUE_DATE") {
-                    title = getString(R.string.release_issue_date)
+                title = if (bankSelected?.requiredDate == "ISSUE_DATE") {
+                    getString(R.string.release_issue_date)
                 } else {
-                    title = getString(R.string.release_date_expired)
+                    getString(R.string.release_date_expired)
                 }
                 if (newDate != s.toString()) {
                     inputCardDate.input.removeTextChangedListener(this)
-                    val cursorPosition: Int = inputCardDate.input.getSelectionStart()
+                    val cursorPosition: Int = inputCardDate.input.selectionStart
                     val newCursorPosition = cursorPosition + (newDate.length - s.length)
                     inputCardDate.input.setText(newDate)
                     inputCardDate.input.setSelection(if (newCursorPosition > 5) 5 else newCursorPosition)
@@ -275,14 +273,48 @@ class EnterAtmCardFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
         })
-
         return view
     }
 
-
-    override fun onDestroy() {
-        super.onDestroy()
-
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 51234) {
+            when (resultCode) {
+                Activity.RESULT_OK -> {
+                    val number = data?.getStringExtra("cardNumber")
+                    inputCardNumber.input.setText(number)
+                }
+                Activity.RESULT_CANCELED -> {
+                    Log.d("HIEU", "Scan canceled")
+                }
+                else -> {
+                    Log.d("HIEU", "Scan failed")
+                }
+            }
+        }
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        val valid = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+        if (valid) {
+            if (requestCode == PermissionCamera().CAMERA_REQUEST_CODE) {
+                ScanActivity.warmUp(requireContext())
+                val intent = Intent(context, ScanActivityImpl::class.java)
+                startActivityForResult(intent, 51234)
+                return
+            }
+        } else {
+            if (Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(
+                    permissions[0]
+                )
+            ) {
+                PayME.enableSetting = true
+            }
+        }
+    }
 }

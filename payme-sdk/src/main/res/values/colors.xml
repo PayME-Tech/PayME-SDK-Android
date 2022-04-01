@@ -25,4 +25,8 @@
     <color name="red">#ff0000</color>
     <color name="red60">#ff7a3b</color>
     <color name="button_black">#1c1c1c</color>
+    <color name="camera_background">#992F3542</color>
+    <color name="corner_color">#4CD964</color>
+    <color name="white_background">#ffffffff</color>
+    <color name="gray">#88888888</color>
 </resources>

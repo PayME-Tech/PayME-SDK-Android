@@ -47,8 +47,5 @@
         app:pbMaxlength="5"
         app:pbTitle="@string/release_issue_date" />
 
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
 

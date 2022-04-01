@@ -2,6 +2,7 @@ package vn.payme.sdk.api
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.NetworkResponse
@@ -61,6 +62,7 @@ internal class NetworkRequest(
             objectValidateRequest["accessToken"] = token
             objectValidateRequest["x-api-message"] = xAPIMessage
             if(BuildConfig.DEBUG){
+                Log.d("HIEU", "REQUEST_params$params")
                 println("REQUEST_params" + params)
                 println("REQUEST_token" + token)
             }
@@ -115,11 +117,13 @@ internal class NetworkRequest(
                             var dataRaw = ConvertJSON().toString(result)
                             finalJSONObject = JSONObject(dataRaw)
                             if (BuildConfig.DEBUG){
-                                println("RESPONSE" + finalJSONObject + params)
+                                Log.d("HIEU", "RESPONSE$finalJSONObject$params")
+                                println("RESPONSE$finalJSONObject$params")
                             }
                         } else {
                             if (BuildConfig.DEBUG) {
-                                println("RESPONSE  " + response.toString()  + params)
+                                Log.d("HIEU", "RESPONSE  $response$params")
+                                println("RESPONSE  $response$params")
                             }
                             finalJSONObject = JSONObject(response.toString())
                         }
@@ -129,9 +133,7 @@ internal class NetworkRequest(
                             val error = errors.getJSONObject(0)
                             var code = ERROR_CODE.SYSTEM
                             val extensions = error.getJSONObject("extensions")
-                            if (extensions != null) {
-                                code = extensions.optInt("code")
-                            }
+                            code = extensions.optInt("code")
                             val message = error.optString("message")
                             if(code==ERROR_CODE.EXPIRED){
                                 val payme = PayME()
@@ -143,8 +145,6 @@ internal class NetworkRequest(
                         } else if (data != null) {
                             onSuccess(data)
                         }
-
-
                     } catch (error: Exception) {
                         error.printStackTrace()
                         onError(
@@ -155,9 +155,7 @@ internal class NetworkRequest(
                     }
                 },
                 Response.ErrorListener { error ->
-
                     error.printStackTrace()
-
                     onError(
                         null,
                         ERROR_CODE.NETWORK,

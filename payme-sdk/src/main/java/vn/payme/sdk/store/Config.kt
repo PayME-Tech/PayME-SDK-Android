@@ -8,23 +8,25 @@ import vn.payme.sdk.enums.LANGUAGES
 import vn.payme.sdk.model.*
 import java.nio.charset.StandardCharsets
 
-class Config {
-    var appPrivateKey: String = ""
-    var appToken: String = ""
-    var publicKey: String
-    var connectToken: String
+class Config(
+    var appPrivateKey: String,
+    var appToken: String = "",
+    var publicKey: String,
+    var connectToken: String = "",
+    var showLog: Boolean = false,
+    var env: Env? = null,
+    configColor: Array<String>,
+    var language: LANGUAGES = LANGUAGES.VI
+) {
     var appID: Int
     var handShake: String? = ""
-    var showLog: Boolean = false
     var limitPayment: MaxminPayment = MaxminPayment(2000, 100000000)
     var limitAll: MaxminPayment = MaxminPayment(2000, 100000000)
     var clientInfo: ClientInfo? = null
     var clientId : String = ""
-    var env: Env? = null
-    var configColor: Array<String>? = null
+    var configColor: Array<String>? = configColor
     var colorApp: ColorApp = ColorApp("#08941f", "#0eb92a")
     var openPayAndKyc: Boolean = true
-    var language: LANGUAGES = LANGUAGES.VI
     var kycIdentify: Boolean = false
     var kycVideo: Boolean = false
     var kycFace: Boolean = false
@@ -35,27 +37,10 @@ class Config {
     var enlableKycFace: Boolean = false
     var creditSacomAuthLink: String = ""
     var sdkWebSecretKey: String = ""
+    var scanModuleEnable: Boolean = false
 
-    constructor(
-        appPrivateKey: String,
-        appToken: String = "",
-        publicKey: String,
-        connectToken: String = "",
-        showLog: Boolean = false,
-        env: Env? = null,
-        configColor: Array<String>,
-        language: LANGUAGES = LANGUAGES.VI,
-    ) {
-
-        this.appPrivateKey = appPrivateKey
-        this.appToken = appToken
-        this.publicKey = publicKey
-        this.connectToken = connectToken
-        this.showLog = showLog
-        this.env = env
-        this.configColor = configColor
+    init {
         this.colorApp = colorApp
-        this.language = language
         if (clientId != null) {
             this.clientId = clientId
         }
@@ -65,14 +50,14 @@ class Config {
     }
 
     private fun getAppID(appToken: String): Int {
-        try {
+        return try {
             val listId = appToken.split(".")
             val appID = Base64.decode(listId[1], Base64.DEFAULT)
             val appID_UTF_8 = String(appID, StandardCharsets.UTF_8)
             val jsonObject = JSONObject(appID_UTF_8)
-            return jsonObject.getInt("appId")
+            jsonObject.getInt("appId")
         } catch (e: Exception) {
-            return 0
+            0
         }
 
     }

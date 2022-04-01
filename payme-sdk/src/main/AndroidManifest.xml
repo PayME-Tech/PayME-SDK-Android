@@ -19,8 +19,6 @@
     <uses-permission android:name="android.permission.VIDEO_CAPTURE" />
     <uses-permission android:name="android.permission.AUDIO_CAPTURE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
-
     <uses-feature android:name="android.hardware.camera.flash" />
 
     <application
@@ -30,6 +28,15 @@
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true">
 
+        <activity
+            android:enabled="true"
+            android:exported="true"
+            android:label="ScanActivity"
+            android:launchMode="singleInstance"
+            android:excludeFromRecents="true"
+            android:windowSoftInputMode="stateHidden"
+            android:name=".cardmodules.ScanActivityImpl">
+        </activity>
     </application>
 
 

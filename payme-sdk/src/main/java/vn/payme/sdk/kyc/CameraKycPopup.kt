@@ -46,7 +46,6 @@ class CameraKycPopup : DialogFragment() {
         setStyle(STYLE_NO_FRAME, R.style.DialogStyle);
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -116,7 +115,7 @@ class CameraKycPopup : DialogFragment() {
         }
     }
 
-    fun checkRequestPermissionsResult(
+    private fun checkRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
@@ -143,7 +142,7 @@ class CameraKycPopup : DialogFragment() {
             containerErrorCamera?.visibility = View.GONE
         } else {
             if (Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(
-                    permissions[0]!!
+                    permissions[0]
                 )
             ) {
                 enableSetting = true

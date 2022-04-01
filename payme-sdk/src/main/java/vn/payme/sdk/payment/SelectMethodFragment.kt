@@ -55,19 +55,15 @@ class SelectMethodFragment : Fragment() {
     private lateinit var frameLayout: FrameLayout
     private lateinit var buttonSubmit: Button
     private lateinit var cardInfo: CardInfo
-    var state= ""
-
+    var state = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-
         val view: View =
             inflater?.inflate(R.layout.payme_payment_select_method_fragment, container, false)
-
         textAmount = view.findViewById(R.id.money)
         textAmountHiden = view.findViewById(R.id.money_hidden)
         headerVisibility = view.findViewById(R.id.containerIsVisibleHeader)
@@ -77,20 +73,14 @@ class SelectMethodFragment : Fragment() {
         layout = view.findViewById(R.id.content)
         containerLoading = view.findViewById(R.id.containerLoading)
         loading = view.findViewById(R.id.loading)
-
-
         textPersonReserving = view.findViewById(R.id.txtPersonReserving)
         textIdService = view.findViewById(R.id.txtIdService)
-
         textTitleMethodSelected = view.findViewById(R.id.txtTitle)
         buttonChangeMethod = view.findViewById(R.id.wrapButtonChangeMethod)
         imageMethod = view.findViewById(R.id.imageMethod)
-
         containerLogoMC = view.findViewById(R.id.wrapLogoMC)
         imageLogoMC = view.findViewById(R.id.imageLogoMC)
-
         frameLayout = view.findViewById(R.id.frame_container_select_method)
-
         buttonSubmit = view.findViewById(R.id.buttonSubmit)
         buttonSubmit.iconLeft.visibility = View.VISIBLE
         EventBus.getDefault().register(this)
@@ -99,7 +89,6 @@ class SelectMethodFragment : Fragment() {
         val total = "${decimal.format(Store.paymentInfo.infoPayment?.amount)} đ"
         textAmount.text = total
         textAmountHiden.text = total
-
 
         val storeInfo = EventBus.getDefault().getStickyEvent(StoreInfo::class.java)
         if (storeInfo.isVisibleHeader) {
@@ -138,7 +127,7 @@ class SelectMethodFragment : Fragment() {
                     return@setOnClickListener
 
                 }
-                if(method.type == TYPE_PAYMENT.BANK_QR_CODE){
+                if (method.type == TYPE_PAYMENT.BANK_QR_CODE) {
                     EventBus.getDefault()
                         .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CLOSE_PAYMENT, null))
                     return@setOnClickListener
@@ -164,19 +153,17 @@ class SelectMethodFragment : Fragment() {
                             payFunction.getListBankTransfer(onSuccess = {
                                 buttonSubmit.disableLoading()
                                 changeMethod(Store.paymentInfo.methodSelected!!)
-                            }, Store.paymentInfo.methodSelected!!, onError = { jsonObject, i, s ->
+                            }, Store.paymentInfo.methodSelected!!, onError = { _, _, s ->
                                 buttonSubmit.disableLoading()
                                 PayME.showError(s)
                             })
-                        }, onError = { jsonObject, i, s ->
+                        }, onError = { _, _, s ->
                             buttonSubmit.disableLoading()
                             PayME.showError(s)
                         })
                         return@setOnClickListener
-
                     }
                 }
-
                 if (method?.type == TYPE_PAYMENT.BANK_TRANSFER) {
                     val popupCheckBankTransfer = PopupCheckBankTransfer()
                     popupCheckBankTransfer.show(parentFragmentManager, null)
@@ -189,12 +176,14 @@ class SelectMethodFragment : Fragment() {
             }
         }
 
-        if(Store.paymentInfo.payCode == PAY_CODE.VN_PAY){
-
+        if (Store.paymentInfo.payCode == PAY_CODE.VN_PAY) {
             containerLoading.visibility = View.VISIBLE
             loading.getIndeterminateDrawable()
                 .mutate()
-                .setColorFilter(Color.parseColor(Store.config.colorApp.startColor), PorterDuff.Mode.SRC_ATOP)
+                .setColorFilter(
+                    Color.parseColor(Store.config.colorApp.startColor),
+                    PorterDuff.Mode.SRC_ATOP
+                )
             buttonSubmit.setButtonTypeBorder()
             buttonSubmit.textView.text = getString(R.string.cancel_the_transaction)
             buttonSubmit.iconLeft.visibility = View.GONE
@@ -202,12 +191,10 @@ class SelectMethodFragment : Fragment() {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(qrContent))
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             requireActivity().startActivity(intent);
-
-
         } else if (Store.paymentInfo.payCode == PAY_CODE.PAYME) {
             val fragment = childFragmentManager?.beginTransaction()
-            fragment?.replace(R.id.frame_container_select_method, ListMethodPaymentFragment())
-            fragment?.commit()
+            fragment.replace(R.id.frame_container_select_method, ListMethodPaymentFragment())
+            fragment.commit()
             if (Store.userInfo.accountKycSuccess && Store.userInfo.accountKycSuccess) {
                 getFee()
             } else {
@@ -216,9 +203,7 @@ class SelectMethodFragment : Fragment() {
         } else {
             buttonChangeMethod.visibility = View.VISIBLE
             changeMethod(Store.paymentInfo.methodSelected!!)
-
         }
-
         return view
     }
 
@@ -227,7 +212,7 @@ class SelectMethodFragment : Fragment() {
         getFee()
     }
 
-    fun getFee() {
+    private fun getFee() {
         var listInfoBottom = arrayListOf<Info>()
         val decimal = DecimalFormat("#,###")
         val event = EventBus.getDefault().getStickyEvent(FeeInfo::class.java)
@@ -238,20 +223,16 @@ class SelectMethodFragment : Fragment() {
             buttonSubmit.setVisible(false)
         } else {
             val total = Store.paymentInfo.infoPayment!!.amount
-
             if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.WALLET && total > Store.userInfo.balance) {
                 buttonSubmit.setVisible(false)
             } else {
                 textMessageError.visibility = View.GONE
                 buttonSubmit.setVisible(true)
             }
-
         }
-
-
     }
 
-    fun changeMethod(method: Method) {
+    private fun changeMethod(method: Method) {
         AddInfoMethod().addImage(method, imageMethod)
         AddInfoMethod().setTitle(
             method,
@@ -266,19 +247,29 @@ class SelectMethodFragment : Fragment() {
             buttonSubmit.setText(getString(R.string.confirm))
         }
         if (method.type == TYPE_PAYMENT.CREDIT_CARD) {
-            val fragment = childFragmentManager?.beginTransaction()
-            fragment?.replace(R.id.frame_container_select_method, EnterCreditCardFragment())
-            fragment?.commit()
+            PayME.fragmentManager = childFragmentManager
+            val fragment = childFragmentManager.beginTransaction()
+            fragment.replace(
+                R.id.frame_container_select_method,
+                EnterCreditCardFragment(),
+                "inputFragment"
+            )
+            fragment.commit()
             buttonSubmit.setVisible(false)
         } else if (method.type == TYPE_PAYMENT.BANK_TRANSFER) {
             val fragment = childFragmentManager?.beginTransaction()
-            fragment?.replace(R.id.frame_container_select_method, InfoBankTransferFragment())
-            fragment?.commit()
+            fragment.replace(R.id.frame_container_select_method, InfoBankTransferFragment())
+            fragment.commit()
         } else if (method.type == TYPE_PAYMENT.BANK_CARD) {
+            PayME.fragmentManager = childFragmentManager
             buttonSubmit.setVisible(false)
             val fragment = childFragmentManager?.beginTransaction()
-            fragment?.replace(R.id.frame_container_select_method, EnterAtmCardFragment())
-            fragment?.commit()
+            fragment.replace(
+                R.id.frame_container_select_method,
+                EnterAtmCardFragment(),
+                "inputFragment"
+            )
+            fragment.commit()
         } else {
             frameLayout.visibility = View.GONE
         }
@@ -393,21 +384,17 @@ class SelectMethodFragment : Fragment() {
                                     )
                             }
                         }
-
                     } else {
                         EventBus.getDefault()
                             .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.RESULT, message))
                     }
                 }
-
-
             },
-            onError = { jsonObject, code, message ->
+            onError = { _, _, message ->
                 if (!isVisible) return@payment
                 buttonSubmit.disableLoading()
                 PayME.showError(message)
             })
-
     }
 
     private fun onSubmit(cardInfo: CardInfo?) {
@@ -426,23 +413,23 @@ class SelectMethodFragment : Fragment() {
             EventBus.getDefault()
                 .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.CONFIRM_PASS, null))
         }
-
     }
 
     override fun onStop() {
-        state= "onStop"
+        state = "onStop"
         super.onStop()
     }
 
     override fun onResume() {
-        println("state"+state)
-        if(state=="onStop"){
+        println("state" + state)
+        if (state == "onStop") {
             loopCallApi()
         }
-        state= "onResume"
+        state = "onResume"
         super.onResume()
     }
-    fun loopCallApi() {
+
+    private fun loopCallApi() {
         val paymentApi = PaymentApi()
         paymentApi.checkVisa(onSuccess = { jsonObject ->
             val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
@@ -461,26 +448,14 @@ class SelectMethodFragment : Fragment() {
                             loopCallApi()
                         }
                     }
-
-
-                } else {
                 }
-
-            } else {
             }
-
-
         }, onError = { jsonObject, code, s ->
-
         })
-
     }
 
     override fun onDestroy() {
         EventBus.getDefault().unregister(this)
         super.onDestroy()
     }
-
-
-
 }

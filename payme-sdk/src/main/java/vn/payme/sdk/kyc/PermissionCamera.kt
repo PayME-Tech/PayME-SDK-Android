@@ -12,21 +12,17 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 
-class PermissionCamera() {
+class PermissionCamera {
+    internal val CAMERA_REQUEST_CODE = 100
+
     fun isGrantedCamera(context: Context): Boolean {
-        if (ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.CAMERA
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return false
-        } else {
-            return true
-        }
+        return ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     fun requestCamera(context: Context, activity: FragmentActivity) {
-        val MY_CAMERA_REQUEST_CODE = 100
         if (ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.CAMERA
@@ -36,13 +32,11 @@ class PermissionCamera() {
             requestPermissions(
                 activity,
                 arrayOf(Manifest.permission.CAMERA),
-                MY_CAMERA_REQUEST_CODE
-            );
-        } else {
+                CAMERA_REQUEST_CODE
+            )
         }
     }
     fun requestCameraFragment(context: Context, fragment: Fragment) {
-        val MY_CAMERA_REQUEST_CODE = 100
         if (ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.CAMERA
@@ -50,9 +44,8 @@ class PermissionCamera() {
         ) {
             fragment.requestPermissions(
                 arrayOf(Manifest.permission.CAMERA),
-                MY_CAMERA_REQUEST_CODE
-            );
-        } else {
+                CAMERA_REQUEST_CODE
+            )
         }
     }
 
@@ -60,10 +53,10 @@ class PermissionCamera() {
         val i = Intent()
         i.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
         i.addCategory(Intent.CATEGORY_DEFAULT)
-        i.data = Uri.parse("package:" + activity?.applicationContext!!.packageName)
+        i.data = Uri.parse("package:" + activity.applicationContext!!.packageName)
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
         i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
-        activity?.applicationContext!!.startActivity(i)
+        activity.applicationContext!!.startActivity(i)
     }
 }

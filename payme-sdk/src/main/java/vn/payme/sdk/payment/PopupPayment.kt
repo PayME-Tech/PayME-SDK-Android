@@ -1,5 +1,6 @@
 package vn.payme.sdk.payment
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -124,8 +125,8 @@ internal class PopupPayment : DialogFragment() {
                 val bundle = Bundle()
                 bundle.putString("message", message)
                 resultPaymentFragment.arguments = bundle
-                val fragment = childFragmentManager?.beginTransaction()
-                fragment?.replace(
+                val fragment = childFragmentManager.beginTransaction()
+                fragment.replace(
                     R.id.frame_container,
                     resultPaymentFragment
                 )
@@ -140,12 +141,12 @@ internal class PopupPayment : DialogFragment() {
             val bundle = Bundle()
             bundle.putString("securityCode", event.value)
             confirmFragment.arguments
-            val fragment = childFragmentManager?.beginTransaction()
-            fragment?.replace(
+            val fragment = childFragmentManager.beginTransaction()
+            fragment.replace(
                 R.id.frame_container,
                 confirmFragment
             )
-            fragment?.commit()
+            fragment.commit()
         } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_NAPAS) {
             this.dialog?.dismiss()
             val bundle: Bundle = Bundle()
@@ -159,6 +160,9 @@ internal class PopupPayment : DialogFragment() {
             val fragment = childFragmentManager.beginTransaction()
             fragment.replace(R.id.frame_container, confirmPassFragment)
             fragment.commit()
+        } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.OPEN_SETTING) {
+            val openSettingFragment: OpenSettingFragment = OpenSettingFragment()
+            fragmentManager?.let { openSettingFragment.show(it,null) }
         }
     }
 
@@ -169,6 +173,7 @@ internal class PopupPayment : DialogFragment() {
         return dialog
     }
 
+    @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         val contentView = View.inflate(context, R.layout.payme_payment_layout, null)
         dialog.setContentView(contentView)

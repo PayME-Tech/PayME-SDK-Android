@@ -315,7 +315,9 @@ internal class PaymentApi {
             "limit.param.amount.all",
             "service.main.visible",
             "kyc.mode.enable",
-            "sdk.web.secretKey")
+            "sdk.web.secretKey",
+            "sdk.scanModule.enable"
+        )
         val query = "query Query(\$configsAppId: String, \$configsKeys: [String]) {\n" +
                 "  Setting {\n" +
                 "    configs(appId: \$configsAppId, keys: \$configsKeys) {\n" +

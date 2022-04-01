@@ -31,11 +31,8 @@ import vn.payme.sdk.evenbus.RequestPermissionsResult
 import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.kyc.*
 import vn.payme.sdk.store.Store
-import java.util.*
 
-
-class ScanQR : DialogFragment()  {
-
+class ScanQR : DialogFragment() {
     private val PICK_IMAGE = 1
     private var toggleTorch = false
     private var btnPicker: LinearLayout? = null
@@ -43,11 +40,10 @@ class ScanQR : DialogFragment()  {
     private var buttonBack: ImageView? = null
     private var buttonBackHeaderErrorCamera: ImageView? = null
     lateinit var imageErrorCamera: ImageView
-  lateinit var    imageScan: ImageView
+    lateinit var imageScan: ImageView
     private var enableSetting = false
     private var containerErrorCamera: ConstraintLayout? = null
     private var buttonOpenSetting: Button? = null
-    var cameraAccept = false
     lateinit var barcodeView: BarcodeView
     lateinit var textFlash: TextView
 
@@ -73,26 +69,24 @@ class ScanQR : DialogFragment()  {
     @Subscribe
     fun eventActivityResult(event: CheckActivityResult) {
         val bitmap = event.data
-        if (bitmap != null) {
-            val width: Int = bitmap.width
-            val height: Int = bitmap.height
-            val pixels = IntArray(width * height)
-            bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
-            bitmap.recycle()
-            val source = RGBLuminanceSource(width, height, pixels)
-            val bBitmap = BinaryBitmap(HybridBinarizer(source))
-            val reader = MultiFormatReader()
-            try {
-                val result = reader.decode(bBitmap)
-                dismiss()
-                val payme = PayME()
-                val payCode = arguments?.getString("payCode")
-                payme.payQRCodeInSDK(PayME.fragmentManager, result.toString(), payCode!!)
-            } catch (e: NotFoundException) {
-                dismiss()
-                var popup: SearchQrResultPopup = SearchQrResultPopup()
-                popup.show(parentFragmentManager, "ModalBottomSheet")
-            }
+        val width: Int = bitmap.width
+        val height: Int = bitmap.height
+        val pixels = IntArray(width * height)
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
+        bitmap.recycle()
+        val source = RGBLuminanceSource(width, height, pixels)
+        val bBitmap = BinaryBitmap(HybridBinarizer(source))
+        val reader = MultiFormatReader()
+        try {
+            val result = reader.decode(bBitmap)
+            dismiss()
+            val payme = PayME()
+            val payCode = arguments?.getString("payCode")
+            payme.payQRCodeInSDK(PayME.fragmentManager, result.toString(), payCode!!)
+        } catch (e: NotFoundException) {
+            dismiss()
+            var popup: SearchQrResultPopup = SearchQrResultPopup()
+            popup.show(parentFragmentManager, "ModalBottomSheet")
         }
 
     }
@@ -106,10 +100,10 @@ class ScanQR : DialogFragment()  {
         super.onViewCreated(view, savedInstanceState)
         barcodeView = view.findViewById(R.id.scan_qr)
         val formats: Collection<BarcodeFormat> =
-            Arrays.asList(BarcodeFormat.QR_CODE)
+            listOf(BarcodeFormat.QR_CODE)
         val decoder = DefaultDecoderFactory(formats)
-        barcodeView.setDecoderFactory(decoder)
-        barcodeView.decodeSingle { result->
+        barcodeView.decoderFactory = decoder
+        barcodeView.decodeSingle { result ->
             dismiss()
             android.os.Handler().postDelayed(
                 {
@@ -126,7 +120,7 @@ class ScanQR : DialogFragment()  {
 
         }
 
-        dialog?.window?.setStatusBarColor(Color.TRANSPARENT);
+        dialog?.window?.statusBarColor = Color.TRANSPARENT;
         dialog?.window?.setBackgroundDrawable(Store.config.colorApp.backgroundColor);
 
         if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
@@ -141,7 +135,7 @@ class ScanQR : DialogFragment()  {
     }
 
 
-    fun checkActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    private fun checkActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK && data != null) {
             val selectedImage: Uri? = data.data
             val bitmap =
@@ -193,7 +187,12 @@ class ScanQR : DialogFragment()  {
         buttonOpenSetting = v.findViewById(R.id.buttonOpenSetting)
         buttonBackHeaderErrorCamera = v.findViewById(R.id.buttonBackHeaderErrorCamera)
 
-        ChangeColorImage().changeColor(requireContext(), imageErrorCamera,R.drawable.icon_error_camera,3)
+        ChangeColorImage().changeColor(
+            requireContext(),
+            imageErrorCamera,
+            R.drawable.icon_error_camera,
+            3
+        )
 
         textFlash = v.findViewById(R.id.txtFlash)
         btnPicker!!.setOnClickListener {
@@ -202,7 +201,7 @@ class ScanQR : DialogFragment()  {
             intent.action = Intent.ACTION_GET_CONTENT
             startActivityForResult(Intent.createChooser(intent, "Chọn ảnh"), PICK_IMAGE)
         }
-        ChangeColorImage().changeColor(requireContext(),imageScan!!,R.drawable.ic_scan_qr,1)
+        ChangeColorImage().changeColor(requireContext(), imageScan, R.drawable.ic_scan_qr, 1)
 
         buttonBack?.setOnClickListener {
             dismiss()
@@ -221,26 +220,27 @@ class ScanQR : DialogFragment()  {
         }
 
         btnTorch!!.setOnClickListener {
-                if (!toggleTorch) {
-                    toggleTorch = true
-                    barcodeView.setTorch(true)
-                    textFlash.setText(getString(R.string.off_flash))
-                } else {
-                    toggleTorch = false
-                    barcodeView.setTorch(false)
-                    textFlash.setText(getString(R.string.on_flash))
+            if (!toggleTorch) {
+                toggleTorch = true
+                barcodeView.setTorch(true)
+                textFlash.text = getString(R.string.off_flash)
+            } else {
+                toggleTorch = false
+                barcodeView.setTorch(false)
+                textFlash.text = getString(R.string.on_flash)
 
-                }
+            }
         }
 
     }
-    private fun visibleCamera (){
+
+    private fun visibleCamera() {
         barcodeView.resume()
         containerErrorCamera?.visibility = View.GONE
 
     }
 
-    fun checkRequestPermissionsResult(
+    private fun checkRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
@@ -250,7 +250,7 @@ class ScanQR : DialogFragment()  {
             visibleCamera()
         } else {
             if (Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(
-                    permissions[0]!!
+                    permissions[0]
                 )
             ) {
                 enableSetting = true
@@ -259,8 +259,6 @@ class ScanQR : DialogFragment()  {
                 containerErrorCamera?.visibility = View.VISIBLE
             }
         }
-
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

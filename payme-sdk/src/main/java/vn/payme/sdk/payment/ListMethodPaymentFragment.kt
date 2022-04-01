@@ -83,8 +83,9 @@ class ListMethodPaymentFragment : Fragment() {
         setListViewHeightBasedOnChildren(listView)
 
         if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.BANK_CARD) {
+            PayME.fragmentManager = childFragmentManager
             val fragment = fragmentManager?.beginTransaction()
-            fragment?.replace(R.id.frame_container_select_method, EnterAtmCardFragment())
+            fragment?.replace(R.id.frame_container_select_method, EnterAtmCardFragment(), "inputFragment")
             fragment?.commit()
         }
 
