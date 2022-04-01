@@ -38,6 +38,7 @@ import vn.payme.sdk.enums.TypeCallBack
 import vn.payme.sdk.evenbus.MyEven
 import vn.payme.sdk.kyc.PermissionCamera
 import vn.payme.sdk.model.JsObject
+import vn.payme.sdk.payment.OpenSettingFragment
 import vn.payme.sdk.store.Store
 import java.net.URLEncoder
 import kotlin.random.Random
@@ -55,6 +56,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
     private var checkTimeoutLoadWebView = false
     var domain = ""
     private var enableSetting = false
+    private var enableSettingCamera = false
     private var clickOpenSettings = false
 
     private val permissionCamera: PermissionCamera = PermissionCamera()
@@ -83,9 +85,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
     private fun openSetting() {
         if (enableSetting) {
             clickOpenSettings = true
-            permissionCamera.openSetting(requireActivity())
         } else {
-
             requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS), 1)
         }
     }
@@ -272,10 +272,15 @@ class PayMEOpenSDKPopup : DialogFragment() {
             == PackageManager.PERMISSION_GRANTED
         ) {
             ScanActivity.warmUp(requireContext())
-            val intent = Intent(context, ScanActivityImpl::class.java)
+            val intent = Intent(requireContext(), ScanActivityImpl::class.java)
             startActivityForResult(intent, 51234)
         } else {
-            permissionCamera.requestCameraFragment(requireContext(), this)
+            if (enableSettingCamera) {
+                val openSettingFragment: OpenSettingFragment = OpenSettingFragment()
+                openSettingFragment.show(parentFragmentManager,null)
+            } else {
+                permissionCamera.requestCameraFragment(requireContext(), this)
+            }
         }
     }
 
@@ -420,13 +425,14 @@ class PayMEOpenSDKPopup : DialogFragment() {
                     takeImage = { takeImage() },
                     getContact = {
                         checkPermissionAndroidManifest()
-                    }, openSetting = {
+                    },
+                    openSetting = {
                         openSetting()
                     },
                     onCopyToClipBoard = {
                         copyToClipboard(it)
                     },
-                    onPressScanCard = {
+                    pressScanCard = {
                         startScanner()
                     },
                     fragmentManager
@@ -491,13 +497,13 @@ class PayMEOpenSDKPopup : DialogFragment() {
         }
         buttonClose.setOnClickListener {
             header.visibility = View.GONE
-            myWebView.loadUrl("${domain}")
+            myWebView.loadUrl(domain)
         }
         myWebView.loadUrl("${domain}activeWithKey?key=${URLEncoder.encode(xAPIKey)}&data=${encode}")
 
 
         if (!isNetworkConnected()) {
-            containerErrorNetwork?.visibility = View.VISIBLE
+            containerErrorNetwork.visibility = View.VISIBLE
         }
         return v
     }
@@ -572,7 +578,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
         if (valid) {
             if (requestCode == permissionCamera.CAMERA_REQUEST_CODE) {
                 ScanActivity.warmUp(requireContext())
-                val intent = Intent(context, ScanActivityImpl::class.java)
+                val intent = Intent(requireContext(), ScanActivityImpl::class.java)
                 startActivityForResult(intent, 51234)
                 return
             }
@@ -599,7 +605,12 @@ class PayMEOpenSDKPopup : DialogFragment() {
                     permissions[0]
                 )
             ) {
-                enableSetting = true
+                if (requestCode == 1) {
+                    enableSetting = true
+                }
+                if (requestCode == permissionCamera.CAMERA_REQUEST_CODE) {
+                    enableSettingCamera = true
+                }
             }
         }
     }

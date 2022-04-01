@@ -18,7 +18,7 @@ public class JsObject(
     val getContact: () -> Unit,
     val openSetting: () -> Unit,
     val onCopyToClipBoard: (text: String) -> Unit,
-    val onPressScanCard: () -> Unit,
+    val pressScanCard: () -> Unit,
     val fragmentManager: FragmentManager,
 ) {
     @JavascriptInterface
@@ -201,7 +201,7 @@ public class JsObject(
 
     @JavascriptInterface
     public fun onPressScanCard() {
-
+        pressScanCard()
     }
 
     @JavascriptInterface
