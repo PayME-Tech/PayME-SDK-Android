@@ -765,12 +765,7 @@ public class PayME {
                 if (kyc != null) {
                     val state = kyc.optString("state")
                     stateKYC = state
-
-                    if (state == "APPROVED") {
-                        Store.userInfo.accountKycSuccess = true
-                    } else {
-                        Store.userInfo.accountKycSuccess = false
-                    }
+                    Store.userInfo.accountKycSuccess = state == "APPROVED"
                 } else {
                     Store.userInfo.accountKycSuccess = false
                 }

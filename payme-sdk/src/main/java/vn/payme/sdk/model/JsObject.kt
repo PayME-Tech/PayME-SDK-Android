@@ -138,21 +138,14 @@ public class JsObject(
                 }
                 if (kyc != null) {
                     val state = kyc.optString("state")
-                    if (state == "APPROVED") {
-                        Store.userInfo.accountKycSuccess = true
-                    } else {
-                        Store.userInfo.accountKycSuccess = false
-                    }
+                    Store.userInfo.accountKycSuccess = state == "APPROVED"
                 } else {
                     Store.userInfo.accountKycSuccess = false
                 }
                 Store.userInfo.accountActive = true
                 Store.config.handShake = handShake
             } else if (actions == "onNetworkError") {
-
             }
-
-
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -169,7 +162,7 @@ public class JsObject(
             val type = jsonObject.optString("type")
             back()
             PayME.onError(data, code, message)
-            if(code==ERROR_CODE.EXPIRED){
+            if(code==ERROR_CODE.EXPIRED || code == ERROR_CODE.DEACTIVATED_ACCOUNT){
                 val payme = PayME()
                 payme.logout()
             }

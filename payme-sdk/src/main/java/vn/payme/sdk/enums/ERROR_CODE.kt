@@ -15,6 +15,7 @@ class ERROR_CODE {
         val PAYMENT_PENDING = -11
         val ERROR_KEY_ENCODE = -7
         val USER_CANCELLED = -8
+        val DEACTIVATED_ACCOUNT = 405
         val OTHER = 0
 
     }

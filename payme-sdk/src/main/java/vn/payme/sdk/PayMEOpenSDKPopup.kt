@@ -277,7 +277,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
         } else {
             if (enableSettingCamera) {
                 val openSettingFragment: OpenSettingFragment = OpenSettingFragment()
-                openSettingFragment.show(parentFragmentManager,null)
+                openSettingFragment.show(parentFragmentManager, null)
             } else {
                 permissionCamera.requestCameraFragment(requireContext(), this)
             }
@@ -588,12 +588,13 @@ class PayMEOpenSDKPopup : DialogFragment() {
             }
         } else {
             if (requestCode == 1) {
-                val injectedJSPermission = "       const script = document.createElement('script');\n" +
-                        "          script.type = 'text/javascript';\n" +
-                        "          script.async = true;\n" +
-                        "          script.text = 'onPermission(false)';\n" +
-                        "          document.body.appendChild(script);\n" +
-                        "          true; // note: this is required, or you'll sometimes get silent failures\n"
+                val injectedJSPermission =
+                    "       const script = document.createElement('script');\n" +
+                            "          script.type = 'text/javascript';\n" +
+                            "          script.async = true;\n" +
+                            "          script.text = 'onPermission(false)';\n" +
+                            "          document.body.appendChild(script);\n" +
+                            "          true; // note: this is required, or you'll sometimes get silent failures\n"
                 requireActivity().runOnUiThread {
                     myWebView.evaluateJavascript(
                         "(function() {\n$injectedJSPermission;\n})();",
@@ -659,8 +660,8 @@ class PayMEOpenSDKPopup : DialogFragment() {
             when (resultCode) {
                 Activity.RESULT_OK -> {
                     val number = data?.getStringExtra("cardNumber")
-                    val result= JSONObject()
-                    result.put("cardNumber",number)
+                    val result = JSONObject()
+                    result.put("cardNumber", number)
                     val injectedJS = "       const script = document.createElement('script');\n" +
                             "          script.type = 'text/javascript';\n" +
                             "          script.async = true;\n" +
