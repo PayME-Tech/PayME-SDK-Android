@@ -26,7 +26,6 @@ import vn.payme.sdk.store.Store
 internal class PopupPayment : DialogFragment() {
     lateinit var frameContainer : ConstraintLayout
 
-
     lateinit var buttonClose: ConstraintLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,8 +51,8 @@ internal class PopupPayment : DialogFragment() {
             val resultPaymentFragment: ResultPaymentFragment =
                 ResultPaymentFragment()
             resultPaymentFragment.arguments = bundle
-            val fragment = childFragmentManager?.beginTransaction()
-            fragment?.replace(
+            val fragment = childFragmentManager.beginTransaction()
+            fragment.replace(
                 R.id.frame_container,
                 resultPaymentFragment
             )
@@ -68,10 +67,7 @@ internal class PopupPayment : DialogFragment() {
         }
         bottomSheetDialogFragment.behavior.isDraggable = false
         dialog?.setCanceledOnTouchOutside(false)
-
-
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -84,8 +80,6 @@ internal class PopupPayment : DialogFragment() {
         )
         frameContainer = v.findViewById(R.id.containerPayment)
         frameContainer.background = Store.config.colorApp.backgroundColorRadiusTopWhite
-
-
         buttonClose = v.findViewById(R.id.buttonClose)
         buttonClose.setOnClickListener {
             this.dialog?.dismiss()
@@ -93,7 +87,6 @@ internal class PopupPayment : DialogFragment() {
         }
         EventBus.getDefault().register(this)
         return v
-
     }
 
     @Subscribe
@@ -184,5 +177,4 @@ internal class PopupPayment : DialogFragment() {
         EventBus.getDefault().unregister(this);
         super.onDestroy()
     }
-
 }

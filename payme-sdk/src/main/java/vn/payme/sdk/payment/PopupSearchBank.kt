@@ -1,5 +1,6 @@
 package vn.payme.sdk.payment
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -36,10 +37,8 @@ class PopupSearchBank : DialogFragment() {
     var listBankInfo = arrayListOf<BankTransferInfo>()
 
     fun changeAliasCardHolder(alias:String) : String {
-        var str = alias
-
-                    return str
-
+        val str = alias
+        return str
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,16 +68,16 @@ class PopupSearchBank : DialogFragment() {
         val listBanks = EventBus.getDefault().getStickyEvent(ListBankAtm::class.java).listBankATM.filter { bankInfo -> bankInfo.vietQRAccepted }
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
         ChangeColorImage().changeColor(requireContext(),imageSearchBank,R.drawable.ic_not_found_bank,3)
-        if(isListBankSupport != null && isListBankSupport){
-            title.setText(getString(R.string.list_bank_support))
+        listBankInfo = if(isListBankSupport != null && isListBankSupport){
+            title.text = getString(R.string.list_bank_support)
             val listBankVietQR : ArrayList<BankTransferInfo> = arrayListOf<BankTransferInfo>()
-            for (i in 0 until listBanks.size){
+            for (i in listBanks.indices){
                 listBankVietQR.add(BankTransferInfo("","","","",listBanks[i].shortName,"",listBanks[i].swiftCode,"",""))
             }
-            listBankInfo = listBankVietQR
+            listBankVietQR
         }else{
             val listBankTransfer = EventBus.getDefault().getStickyEvent(ListBankTransfer::class.java)
-            listBankInfo = listBankTransfer.listBankTransferInfo
+            listBankTransfer.listBankTransferInfo
         }
 
         flowersAdapter.submitList( this.listBankInfo as MutableList<BankTransferInfo>)
@@ -102,10 +101,8 @@ class PopupSearchBank : DialogFragment() {
 
             }
             flowersAdapter.submitList(listBankNew as MutableList<BankTransferInfo>)
-
         }
         onClick()
-
         return  v
     }
     private fun onClick(){
@@ -124,8 +121,6 @@ class PopupSearchBank : DialogFragment() {
             EventBus.getDefault().post(bank)
             dismiss()
         }
-
-
     }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = BottomSheetDialog(requireContext(), theme)
@@ -134,11 +129,10 @@ class PopupSearchBank : DialogFragment() {
         return dialog
     }
 
+    @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         val contentView = View.inflate(context, R.layout.payme_payment_layout, null)
         dialog.setContentView(contentView)
         (contentView.parent as View).setBackgroundColor(resources.getColor(android.R.color.transparent))
     }
-
-
 }

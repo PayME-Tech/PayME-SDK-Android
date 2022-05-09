@@ -39,11 +39,7 @@ class ListMethodPaymentFragment : Fragment() {
         var isVisible = false
     }
 
-
-
-
-
-    fun setListViewHeightBasedOnChildren(listView: ListView) {
+    private fun setListViewHeightBasedOnChildren(listView: ListView) {
         val mAdapter: ListAdapter = listView.adapter
         var totalHeight = 0
         for (i in 0 until mAdapter.getCount()) {
@@ -56,7 +52,7 @@ class ListMethodPaymentFragment : Fragment() {
         }
         val params = listView.layoutParams
         params.height = (totalHeight
-                + listView.dividerHeight * (mAdapter.getCount() - 1))
+                + listView.dividerHeight * (mAdapter.count - 1))
         listView.layoutParams = params
         listView.requestLayout()
     }
@@ -89,7 +85,7 @@ class ListMethodPaymentFragment : Fragment() {
             fragment?.commit()
         }
 
-        this.listView.setOnItemClickListener { adapterView, view, i, l ->
+        this.listView.setOnItemClickListener { _, view, i, _ ->
             if (!loadingPopup.isVisible) {
                 val method = Store.paymentInfo.listMethod[i]
                 if (method?.type == TYPE_PAYMENT.WALLET ) {
@@ -110,7 +106,7 @@ class ListMethodPaymentFragment : Fragment() {
                             paymeSDK.openKYC(
                                 PayME.fragmentManager,
                                 onSuccess = {},
-                                onError = { jsonObject: JSONObject?, i: Int, message: String? ->
+                                onError = { _: JSONObject?, _: Int, message: String? ->
                                     PayME.showError(message)
                                 })
                         } else if (total > Store.userInfo.balance) {
@@ -135,8 +131,6 @@ class ListMethodPaymentFragment : Fragment() {
                         getFee(method)
                     }
                 }
-
-
             }
         }
         return view
@@ -147,7 +141,7 @@ class ListMethodPaymentFragment : Fragment() {
         ListMethodPaymentFragment.isVisible = false
 
     }
-    fun  getFee(method:Method){
+    private fun getFee(method:Method){
         val payFunction = PayFunction()
         showLoading()
         payFunction.checkFee(Store.paymentInfo.infoPayment!!,method,onSuccess = {
@@ -157,7 +151,7 @@ class ListMethodPaymentFragment : Fragment() {
             EventBus.getDefault().post(method)
             methodAdapter.notifyDataSetChanged()
 
-        },onError = {jsonObject, i, s ->
+        },onError = { _, _, s ->
             if (!isVisible) return@checkFee
             disableLoading()
             PayME.showError(s)

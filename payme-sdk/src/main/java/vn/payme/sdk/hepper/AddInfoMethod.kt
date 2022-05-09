@@ -16,6 +16,8 @@ class AddInfoMethod {
             imageView.setImageResource(R.drawable.ic_zalo)
         } else if (method.type == TYPE_PAYMENT.BANK_TRANSFER) {
             imageView.setImageResource(R.drawable.ic_bank_transfer)
+        } else if (method.type == TYPE_PAYMENT.VIET_QR) {
+            imageView.setImageResource(R.drawable.logo_vietqr_small)
         } else if (method.type == TYPE_PAYMENT.MOMO_PG) {
             imageView.setImageResource(R.drawable.ic_momo)
         } else if (method.type == TYPE_PAYMENT.CREDIT_CARD) {

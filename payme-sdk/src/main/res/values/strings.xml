@@ -135,4 +135,5 @@
     <string name="card_scanner_hint">Đặt số thẻ vừa khớp vào khung để bắt đầu quét!</string>
     <string name="card_scanner_hint2">Vui lòng điều chỉnh vị trí thẻ, đảm bảo nhìn rõ số thẻ, không bị chói, mờ!</string>
     <string name="card_scanning">Đang nhận diện...</string>
+    <string name="scan_viet_qr">Quét VietQR để chuyển khoản</string>
 </resources>

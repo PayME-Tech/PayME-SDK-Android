@@ -53,7 +53,7 @@ class PopupWebViewNapas : DialogFragment() {
     fun loopCallApi() {
         count++
         val paymentApi = PaymentApi()
-        paymentApi.checkVisa(onSuccess = { jsonObject ->
+        paymentApi.checkTransaction(onSuccess = { jsonObject ->
             val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
             val Payment = OpenEWallet.optJSONObject("Payment")
             val GetTransactionInfo = Payment.optJSONObject("GetTransactionInfo")

@@ -17,178 +17,209 @@ import vn.payme.sdk.store.Store
 
 internal class PaymentApi {
     fun getInfoMerchant(
-        storeId:Long?,
+        storeId: Long?,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
-    ){
+    ) {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
         val variables: MutableMap<String, Any> = mutableMapOf()
-        val query = "mutation StoreImageMutation(\$getInfoMerchantInput: OpenEWalletGetInfoMerchantInput!) {\n" +
-                "  OpenEWallet {\n" +
-                "    GetInfoMerchant(input: \$getInfoMerchantInput) {\n" +
-                "      storeImage\n" +
-                "      storeName\n" +
-                "      succeeded\n" +
-                "      message\n" +
-                "      isVisibleHeader\n" +
-                "      merchantName\n" +
-                "    }\n" +
-                "  }\n" +
-                "}"
+        val query =
+            "mutation StoreImageMutation(\$getInfoMerchantInput: OpenEWalletGetInfoMerchantInput!) {\n" +
+                    "  OpenEWallet {\n" +
+                    "    GetInfoMerchant(input: \$getInfoMerchantInput) {\n" +
+                    "      storeImage\n" +
+                    "      storeName\n" +
+                    "      succeeded\n" +
+                    "      message\n" +
+                    "      isVisibleHeader\n" +
+                    "      merchantName\n" +
+                    "    }\n" +
+                    "  }\n" +
+                    "}"
         val getInfoMerchantInput: MutableMap<String, Any> = mutableMapOf()
-        if(storeId!=null){
+        if (storeId != null) {
             getInfoMerchantInput["storeId"] = storeId
         }
         getInfoMerchantInput["appId"] = Store.config.appID.toString()
         params["query"] = query
-        variables["getInfoMerchantInput"]= getInfoMerchantInput
+        variables["getInfoMerchantInput"] = getInfoMerchantInput
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(
+            PayME.context!!,
+            ENV_API.API_FE,
+            path,
+            Store.userInfo.accessToken!!,
+            params,
+            ENV_API.IS_SECURITY
+        )
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
         )
     }
-    fun checkAuthCard  (
+
+    fun checkAuthCard(
         context: Context,
-        expiredAt:String?,
-        cardNumber:String?,
+        expiredAt: String?,
+        cardNumber: String?,
         linkedId: Long?,
         onSuccess: (String?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
-    ){
-        var timeCheck =  false
+    ) {
+        var timeCheck = false
 
-            authCreditCard(
-                expiredAt,
-                cardNumber,
-                linkedId,
-                onSuccess = { jsonObject ->
-                    val CreditCardLink = jsonObject.optJSONObject("CreditCardLink")
-                    val AuthCreditCard = CreditCardLink.optJSONObject("AuthCreditCard")
-                    val succeeded = AuthCreditCard.optBoolean("succeeded")
-                    val html = AuthCreditCard.optString("html")
-                    val message = AuthCreditCard.optString("message")
-                    val referenceId = AuthCreditCard.optString("referenceId")
-                    val isAuth = AuthCreditCard.optBoolean("isAuth")
-                    if (succeeded) {
-                        if(isAuth){
-                            Handler().postDelayed(Runnable {
-                                if (!timeCheck){
-                                    timeCheck = true
+        authCreditCard(
+            expiredAt,
+            cardNumber,
+            linkedId,
+            onSuccess = { jsonObject ->
+                val CreditCardLink = jsonObject.optJSONObject("CreditCardLink")
+                val AuthCreditCard = CreditCardLink.optJSONObject("AuthCreditCard")
+                val succeeded = AuthCreditCard.optBoolean("succeeded")
+                val html = AuthCreditCard.optString("html")
+                val message = AuthCreditCard.optString("message")
+                val referenceId = AuthCreditCard.optString("referenceId")
+                val isAuth = AuthCreditCard.optBoolean("isAuth")
+                if (succeeded) {
+                    if (isAuth) {
+                        Handler().postDelayed(Runnable {
+                            if (!timeCheck) {
+                                timeCheck = true
+                                onSuccess(referenceId)
+                            }
+
+                        }, 7 * 1000)
+                        val myWebView = WebView(context)
+                        myWebView.settings.javaScriptEnabled = true
+                        var form = "<html><body onload=\"document.forms[0].submit();\">${
+                            html
+                        }</html>,"
+
+                        myWebView.loadDataWithBaseURL(
+                            "x-data://base",
+                            form!!,
+                            "text/html",
+                            "UTF-8",
+                            null
+                        );
+                        myWebView.setWebViewClient(object : WebViewClient() {
+                            override fun onPageStarted(
+                                view: WebView,
+                                url: String,
+                                favicon: Bitmap?
+                            ) {
+                                if (url.contains(Store.config.creditSacomAuthLink) && !timeCheck) {
                                     onSuccess(referenceId)
+                                    timeCheck = true
                                 }
+                                super.onPageStarted(view, url, favicon)
+                            }
 
-                            }, 7 * 1000)
-                            val myWebView = WebView(context)
-                            myWebView.settings.javaScriptEnabled = true
-                            var form = "<html><body onload=\"document.forms[0].submit();\">${
-                                html
-                            }</html>,"
-
-                            myWebView.loadDataWithBaseURL(
-                                "x-data://base",
-                                form!!,
-                                "text/html",
-                                "UTF-8",
-                                null
-                            );
-                            myWebView.setWebViewClient(object : WebViewClient() {
-                                override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-                                    if(url.contains(Store.config.creditSacomAuthLink) && !timeCheck ){
-                                        onSuccess(referenceId)
-                                        timeCheck = true
-                                    }
-                                    super.onPageStarted(view, url, favicon)
-                                }
-
-                            })
-                        }else{
-                            onSuccess(null)
-                        }
+                        })
                     } else {
-                        EventBus.getDefault()
-                            .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.RESULT, message))
+                        onSuccess(null)
                     }
-                },
-                onError)
+                } else {
+                    EventBus.getDefault()
+                        .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.RESULT, message))
+                }
+            },
+            onError
+        )
     }
+
     fun authCreditCard(
-        expiredAt:String?,
-        cardNumber:String?,
-        linkedId:Long?,
+        expiredAt: String?,
+        cardNumber: String?,
+        linkedId: Long?,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
-    ){
+    ) {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
         val variables: MutableMap<String, Any> = mutableMapOf()
-        val query = "mutation AuthCreditCardMutation(\$authCreditCardInput: CreditCardAuthInput) {\n" +
-                "  CreditCardLink {\n" +
-                "    AuthCreditCard(input: \$authCreditCardInput) {\n" +
-                "      html\n" +
-                "      message\n" +
-                "      referenceId\n" +
-                "      isAuth\n" +
-                "      succeeded\n" +
-                "    }\n" +
-                "  }\n" +
-                "}"
+        val query =
+            "mutation AuthCreditCardMutation(\$authCreditCardInput: CreditCardAuthInput) {\n" +
+                    "  CreditCardLink {\n" +
+                    "    AuthCreditCard(input: \$authCreditCardInput) {\n" +
+                    "      html\n" +
+                    "      message\n" +
+                    "      referenceId\n" +
+                    "      isAuth\n" +
+                    "      succeeded\n" +
+                    "    }\n" +
+                    "  }\n" +
+                    "}"
         val authCreditCardInput: MutableMap<String, Any> = mutableMapOf()
-        if(expiredAt!=null){
-            authCreditCardInput["expiredAt"] =expiredAt
+        if (expiredAt != null) {
+            authCreditCardInput["expiredAt"] = expiredAt
         }
-        if(cardNumber!=null){
+        if (cardNumber != null) {
             authCreditCardInput["cardNumber"] = cardNumber
         }
-        if(linkedId!=null){
+        if (linkedId != null) {
             authCreditCardInput["linkedId"] = linkedId!!
         }
         authCreditCardInput["storeId"] = Store.paymentInfo.infoPayment?.storeId!!
         params["query"] = query
-        variables["authCreditCardInput"]= authCreditCardInput
+        variables["authCreditCardInput"] = authCreditCardInput
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(
+            PayME.context!!,
+            ENV_API.API_FE,
+            path,
+            Store.userInfo.accessToken!!,
+            params,
+            ENV_API.IS_SECURITY
+        )
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
         )
     }
 
-    fun checkVisa(
+    fun checkTransaction(
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
-        ) {
-            val path = "/graphql"
-            val params: MutableMap<String, Any> = mutableMapOf()
-            val variables: MutableMap<String, Any> = mutableMapOf()
-        val query = "mutation SucceededMutation(\$getTransactionInfoInput: GetTransactionInfoInput!) {\n" +
-                "   OpenEWallet {\n" +
-                "     Payment {\n" +
-                "       GetTransactionInfo(input: \$getTransactionInfoInput) {\n" +
-                "         succeeded\n" +
-                "         message\n" +
-                "         transaction\n" +
-                "         state\n" +
-                "         fee\n" +
-                "         reason\n" +
-                "         description\n" +
-                "       }\n" +
-                "     }\n" +
-                "   }\n" +
-                " }"
+    ) {
+        val path = "/graphql"
+        val params: MutableMap<String, Any> = mutableMapOf()
+        val variables: MutableMap<String, Any> = mutableMapOf()
+        val query =
+            "mutation SucceededMutation(\$getTransactionInfoInput: GetTransactionInfoInput!) {\n" +
+                    "   OpenEWallet {\n" +
+                    "     Payment {\n" +
+                    "       GetTransactionInfo(input: \$getTransactionInfoInput) {\n" +
+                    "         succeeded\n" +
+                    "         message\n" +
+                    "         transaction\n" +
+                    "         state\n" +
+                    "         fee\n" +
+                    "         reason\n" +
+                    "         description\n" +
+                    "       }\n" +
+                    "     }\n" +
+                    "   }\n" +
+                    " }"
         val getTransactionInfoInput: MutableMap<String, Any> = mutableMapOf()
 
         getTransactionInfoInput["transaction"] = Store.paymentInfo.transaction!!
         params["query"] = query
-        variables["getTransactionInfoInput"]= getTransactionInfoInput
+        variables["getTransactionInfoInput"] = getTransactionInfoInput
         params["variables"] = variables
-            val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
-            request.setOnRequestCrypto(
-                onError = onError,
-                onSuccess = onSuccess,
-            )
+        val request = NetworkRequest(
+            PayME.context!!,
+            ENV_API.API_FE,
+            path,
+            Store.userInfo.accessToken!!,
+            params,
+            ENV_API.IS_SECURITY
+        )
+        request.setOnRequestCrypto(
+            onError = onError,
+            onSuccess = onSuccess,
+        )
     }
 
     fun getListBanks(
@@ -213,16 +244,24 @@ internal class PaymentApi {
                 "}"
         params["query"] = query
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(
+            PayME.context!!,
+            ENV_API.API_FE,
+            path,
+            Store.userInfo.accessToken!!,
+            params,
+            ENV_API.IS_SECURITY
+        )
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
         )
 
     }
+
     fun getFee(
-        amount:Int,
-        method:Method,
+        amount: Int,
+        method: Method,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
@@ -248,7 +287,7 @@ internal class PaymentApi {
         params["query"] = query
         params["variables"] = variables
         getFeeInput["clientId"] = Store.config.clientId
-        if(Store.paymentInfo.infoPayment?.storeId!=null){
+        if (Store.paymentInfo.infoPayment?.storeId != null) {
             getFeeInput["storeId"] = Store.paymentInfo.infoPayment?.storeId!!
         }
         getFeeInput["serviceType"] = "OPEN_EWALLET_PAYMENT"
@@ -284,6 +323,11 @@ internal class PaymentApi {
                 bankTransfer["active"] = true
                 payment["bankTransfer"] = bankTransfer
             }
+            TYPE_PAYMENT.VIET_QR -> {
+                val vietQR: MutableMap<String, Any> = mutableMapOf()
+                vietQR["active"] = true
+                payment["vietQR"] = vietQR
+            }
             TYPE_PAYMENT.CREDIT_BALANCE -> {
                 val creditBalance: MutableMap<String, Any> = mutableMapOf()
                 creditBalance["active"] = true
@@ -295,13 +339,16 @@ internal class PaymentApi {
 
         getFeeInput["payment"] = payment
 
-        val request = NetworkRequest(PayME.context, ENV_API.API_FE, path,
-            Store.userInfo.accessToken, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(
+            PayME.context, ENV_API.API_FE, path,
+            Store.userInfo.accessToken, params, ENV_API.IS_SECURITY
+        )
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
         )
     }
+
     fun getSettings(
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
@@ -330,20 +377,23 @@ internal class PaymentApi {
         params["variables"] = variables
         variables["configsAppId"] = Store.config.appID.toString()
         variables["configsKeys"] = listKey
-        val request = NetworkRequest(PayME.context, ENV_API.API_FE, path,
-            Store.userInfo.accessToken, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(
+            PayME.context, ENV_API.API_FE, path,
+            Store.userInfo.accessToken, params, ENV_API.IS_SECURITY
+        )
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
         )
 
     }
-    fun  detectCardHolder(
-        swiftCode:String,
-        cardNumber:String,
+
+    fun detectCardHolder(
+        swiftCode: String,
+        cardNumber: String,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
-    ){
+    ) {
         val path = "/graphql"
         val params: MutableMap<String, Any> = mutableMapOf()
         val variables: MutableMap<String, Any> = mutableMapOf()
@@ -363,8 +413,10 @@ internal class PaymentApi {
         getBankNameInput["type"] = "CARD"
         variables["getBankNameInput"] = getBankNameInput
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context, ENV_API.API_FE, path,
-            Store.userInfo.accessToken, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(
+            PayME.context, ENV_API.API_FE, path,
+            Store.userInfo.accessToken, params, ENV_API.IS_SECURITY
+        )
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -397,8 +449,10 @@ internal class PaymentApi {
         variables["createCodeByPasswordInput"] = createCodeByPasswordInput
         params["query"] = query
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context, ENV_API.API_FE, path,
-            Store.userInfo.accessToken, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(
+            PayME.context, ENV_API.API_FE, path,
+            Store.userInfo.accessToken, params, ENV_API.IS_SECURITY
+        )
 
         request.setOnRequestCrypto(
             onError = onError,
@@ -406,7 +460,6 @@ internal class PaymentApi {
         )
 
     }
-
 
     fun payment(
         method: Method,
@@ -495,6 +548,11 @@ internal class PaymentApi {
                 "            supplierName\n" +
                 "            message\n" +
                 "          }\n" +
+                "          ... on PaymentVietQRResponsed {\n" +
+                "            vietQRState : state\n" +
+                "            qrContent\n" +
+                "            message\n" +
+                "          }\n" +
                 "         \n" +
                 "        }\n" +
                 "        succeeded\n" +
@@ -504,15 +562,15 @@ internal class PaymentApi {
                 "}"
         params["query"] = query
         payInput["clientId"] = Store.config.clientId
-        if(Store.paymentInfo.infoPayment?.storeId!=null){
+        if (Store.paymentInfo.infoPayment?.storeId != null) {
             payInput["storeId"] = Store.paymentInfo.infoPayment?.storeId!!
         }
-        if(Store.paymentInfo.infoPayment?.userName!=null){
+        if (Store.paymentInfo.infoPayment?.userName != null) {
             payInput["userName"] = Store.paymentInfo.infoPayment?.userName!!
         }
         payInput["amount"] = Store.paymentInfo.infoPayment?.amount!!
         payInput["orderId"] = Store.paymentInfo.infoPayment?.orderId!!
-        if(Store.paymentInfo.infoPayment?.note!=null){
+        if (Store.paymentInfo.infoPayment?.note != null) {
             payInput["note"] = Store.paymentInfo.infoPayment?.note!!
         }
         if (Store.paymentInfo.infoPayment?.referExtraData != null) {
@@ -538,7 +596,7 @@ internal class PaymentApi {
                 creditCard["cardHolder"] = cardInfo?.cardHolder!!
                 creditCard["expiredAt"] = cardInfo?.cardDateView
                 creditCard["cvv"] = cardInfo?.cvv!!
-                if(referenceId!=null){
+                if (referenceId != null) {
                     creditCard["referenceId"] = referenceId
                 }
                 payment["creditCard"] = creditCard
@@ -549,13 +607,18 @@ internal class PaymentApi {
                 bankTransfer["recheck"] = recheck!!
                 payment["bankTransfer"] = bankTransfer
             }
+            TYPE_PAYMENT.VIET_QR -> {
+                val vietQR: MutableMap<String, Any> = mutableMapOf()
+                vietQR["active"] = true
+                payment["vietQR"] = vietQR
+            }
             TYPE_PAYMENT.LINKED -> {
                 val linked: MutableMap<String, Any> = mutableMapOf()
                 linked["linkedId"] = method.data?.linkedId!!
-                if(otp!=null){
+                if (otp != null) {
                     linked["otp"] = otp
                 }
-                if(referenceId!=null){
+                if (referenceId != null) {
                     linked["referenceId"] = referenceId
                 }
                 linked["envName"] = "MobileApp"
@@ -576,12 +639,19 @@ internal class PaymentApi {
         }
         payInput["payment"] = payment
 
-        if(transaction!=null){
+        if (transaction != null) {
             payInput["transaction"] = transaction
         }
         variables["payInput"] = payInput
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(
+            PayME.context!!,
+            ENV_API.API_FE,
+            path,
+            Store.userInfo.accessToken!!,
+            params,
+            ENV_API.IS_SECURITY
+        )
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -590,8 +660,8 @@ internal class PaymentApi {
     }
 
     fun getTransferMethods(
-        storeId:Long?,
-        payCode:String,
+        storeId: Long?,
+        payCode: String,
         onSuccess: (JSONObject) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit
     ) {
@@ -632,7 +702,7 @@ internal class PaymentApi {
                     "  }\n" +
                     "}"
         getPaymentMethodInput["serviceType"] = "OPEN_EWALLET_PAYMENT"
-        if(storeId!==null){
+        if (storeId !== null) {
             extraData["storeId"] = storeId
         }
         getPaymentMethodInput["extraData"] = extraData
@@ -640,7 +710,14 @@ internal class PaymentApi {
         variables["getPaymentMethodInput"] = getPaymentMethodInput
         params["query"] = query
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(
+            PayME.context!!,
+            ENV_API.API_FE,
+            path,
+            Store.userInfo.accessToken!!,
+            params,
+            ENV_API.IS_SECURITY
+        )
 
         request.setOnRequestCrypto(
             onError = onError,
@@ -665,7 +742,14 @@ internal class PaymentApi {
                 "}"
         params["query"] = query
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(
+            PayME.context!!,
+            ENV_API.API_FE,
+            path,
+            Store.userInfo.accessToken!!,
+            params,
+            ENV_API.IS_SECURITY
+        )
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
@@ -705,14 +789,53 @@ internal class PaymentApi {
         variables["detectInput"] = detectInput
         params["query"] = query
         params["variables"] = variables
-        val request = NetworkRequest(PayME.context!!, ENV_API.API_FE, path, Store.userInfo.accessToken!!, params,ENV_API.IS_SECURITY)
+        val request = NetworkRequest(
+            PayME.context!!,
+            ENV_API.API_FE,
+            path,
+            Store.userInfo.accessToken!!,
+            params,
+            ENV_API.IS_SECURITY
+        )
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
         )
-
     }
 
-
+    fun getSupportedBankListVietQR(
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int, String?) -> Unit
+    ) {
+        val path = "/graphql"
+        val params: MutableMap<String, Any> = mutableMapOf()
+        val variables: MutableMap<String, Any> = mutableMapOf()
+        val query = """
+                    mutation GetListVietQR {
+                      OpenEWallet {
+                        Payment {
+                          GetListVietQR {
+                            swiftCode
+                            isVietQR
+                          }
+                        }
+                      }
+                    }
+        """
+        params["query"] = query
+        params["variables"] = variables
+        val request = NetworkRequest(
+            PayME.context!!,
+            ENV_API.API_FE,
+            path,
+            Store.userInfo.accessToken,
+            params,
+            ENV_API.IS_SECURITY
+        )
+        request.setOnRequestCrypto(
+            onError = onError,
+            onSuccess = onSuccess,
+        )
+    }
 
 }

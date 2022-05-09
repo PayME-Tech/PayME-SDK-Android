@@ -100,8 +100,6 @@ internal class PayFunction {
                 onError
             )
         }
-
-
     }
 
     internal fun getListBankTransfer(
@@ -113,9 +111,7 @@ internal class PayFunction {
         if (listBank != null && listBank.listBankTransferInfo.size > 0) {
             onSuccess()
         } else {
-
             val paymentApi = PaymentApi()
-
             paymentApi.payment(
                 method,
                 "",
@@ -165,8 +161,6 @@ internal class PayFunction {
                             EventBus.getDefault().postSticky(ListBankTransfer(listBank))
                             onSuccess()
                         }
-
-
                     } else {
                         onError(null, ERROR_CODE.PAYMENT_ERROR, message)
                     }
@@ -176,6 +170,42 @@ internal class PayFunction {
         }
     }
 
+    private fun getListBankVietQR(
+        onSuccess: () -> Unit,
+        onError: (JSONObject?, Int, String?) -> Unit
+    ) {
+        val listBank =
+            EventBus.getDefault().getStickyEvent(ListBankVietQR::class.java)
+        if (listBank != null && listBank.listBankVietQRInfo.size > 0) {
+            onSuccess()
+        } else {
+            val paymentApi = PaymentApi()
+            paymentApi.getSupportedBankListVietQR(
+                onSuccess = { jsonObject ->
+                    val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
+                    val Payment = OpenEWallet.optJSONObject("Payment")
+                    val bankList = Payment.optJSONArray("GetListVietQR")
+                    val listBank = arrayListOf<String>()
+                    if (bankList != null) {
+                        for (i in 0 until bankList.length()) {
+                            val bank = bankList.optJSONObject(i)
+                            val swiftCode = bank.optString("swiftCode")
+                            val isVietQR = bank.optBoolean("isVietQR", false)
+                            if (isVietQR) {
+                                listBank.add(swiftCode)
+                            }
+                        }
+                    }
+
+                    if (listBank.size!=0){
+                        EventBus.getDefault().postSticky(ListBankVietQR(listBank))
+                        onSuccess()
+                    }
+                },
+                onError
+            )
+        }
+    }
 
     fun pay(
         fragmentManager: FragmentManager,
@@ -226,6 +256,7 @@ internal class PayFunction {
         if (!((payCode == PAY_CODE.PAYME) ||
                     (payCode == PAY_CODE.ATM) ||
                     (payCode == PAY_CODE.MANUAL_BANK) ||
+                    (payCode == PAY_CODE.VIET_QR) ||
 //                    (payCode == PAY_CODE.VN_PAY) ||
                     (payCode == PAY_CODE.CREDIT))
         ) {
@@ -280,16 +311,18 @@ internal class PayFunction {
     ) {
         Store.paymentInfo.methodSelected = method
         Store.paymentInfo.transaction = ""
-        if (method?.type == TYPE_PAYMENT.BANK_CARD) {
-            getListBank(onSuccess = {
-                val popupPayment: PopupPayment = PopupPayment()
-                loading.dismiss()
-                popupPayment.show(
-                    fragmentManager,
-                    "ModalBottomSheet"
-                )
-            }, onError)
-        } else if (method?.type == TYPE_PAYMENT.BANK_TRANSFER) {
+        when (method?.type) {
+            TYPE_PAYMENT.BANK_CARD -> {
+                getListBank(onSuccess = {
+                    val popupPayment: PopupPayment = PopupPayment()
+                    loading.dismiss()
+                    popupPayment.show(
+                        fragmentManager,
+                        "ModalBottomSheet"
+                    )
+                }, onError)
+            }
+            TYPE_PAYMENT.BANK_TRANSFER -> {
                 getListBankTransfer(onSuccess = {
                     val popupPayment: PopupPayment = PopupPayment()
                     loading.dismiss()
@@ -298,16 +331,71 @@ internal class PayFunction {
                         "ModalBottomSheet"
                     )
                 }, method, onError)
-
-        } else {
-            val popupPayment: PopupPayment = PopupPayment()
-            loading.dismiss()
-            popupPayment.show(
-                fragmentManager,
-                "ModalBottomSheet"
-            )
+            }
+            else -> {
+                val popupPayment: PopupPayment = PopupPayment()
+                loading.dismiss()
+                popupPayment.show(
+                    fragmentManager,
+                    "ModalBottomSheet"
+                )
+            }
         }
     }
+
+    private fun submitPayVietQR(
+        fragmentManager: FragmentManager,
+        onError: (JSONObject?, Int, String?) -> Unit
+    ) {
+        val paymentApi = PaymentApi()
+        paymentApi.payment(
+            Store.paymentInfo.methodSelected!!,
+            "",
+            null,
+            "",
+            "",
+            false,
+            null,
+            onSuccess = { jsonObject ->
+                val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
+                val Payment = OpenEWallet?.optJSONObject("Payment")
+                val Pay = Payment?.optJSONObject("Pay")
+                val history = Pay?.optJSONObject("history")
+                if (history != null) {
+                    val payment = history.optJSONObject("payment")
+                    if (payment != null) {
+                        val transaction = payment.optString("transaction")
+                        Store.paymentInfo.transaction = transaction
+                    }
+                }
+                val payment = Pay?.optJSONObject("payment")
+                val message = Pay?.optString("message")
+
+                if (payment != null) {
+                    val state = payment.optString("vietQRState")
+                    val qrContent = payment.optString("qrContent", "")
+                    if (state == "REQUIRED_TRANSFER") {
+                        getListBankVietQR(onSuccess = {
+                            val popupPayment = PopupPayment()
+                            loading.dismiss()
+                            EventBus.getDefault().postSticky(QRContentVietQR(qrContent))
+                            popupPayment.show(
+                                fragmentManager,
+                                "ModalBottomSheet"
+                            )
+                        }, onError)
+                    } else {
+                        onError(null, ERROR_CODE.PAYMENT_ERROR, message)
+                    }
+                }else{
+                    onError(null,ERROR_CODE.PAYMENT_ERROR,message)
+
+                }
+            },onError)
+
+
+    }
+
    fun payVNPAY(
        fragmentManager: FragmentManager,
        onError: (JSONObject?, Int, String?) -> Unit,
@@ -349,9 +437,6 @@ internal class PayFunction {
                                fragmentManager,
                                "ModalBottomSheet"
                            )
-
-
-
                        } else {
                                onError(null,ERROR_CODE.PAYMENT_ERROR,message)
                            }
@@ -386,6 +471,12 @@ internal class PayFunction {
                     )
                 }, onError)
             }, onError)
+            return
+        }
+
+        if (payCode == PAY_CODE.VIET_QR) {
+            Store.paymentInfo.methodSelected = Store.paymentInfo.listMethod[0]
+            submitPayVietQR(fragmentManager, onError)
             return
         }
 
@@ -493,6 +584,9 @@ internal class PayFunction {
                     if(payCode==PAY_CODE.MANUAL_BANK){
                         Store.paymentInfo.listMethod = listMethod.filter { method -> method.type == TYPE_PAYMENT.BANK_TRANSFER  } as ArrayList<Method>
                     }
+                    if(payCode==PAY_CODE.VIET_QR){
+                        Store.paymentInfo.listMethod = listMethod.filter { method -> method.type == TYPE_PAYMENT.VIET_QR  } as ArrayList<Method>
+                    }
                     if(payCode==PAY_CODE.VN_PAY){
                         Store.paymentInfo.listMethod = listMethod.filter { method -> method.type == TYPE_PAYMENT.BANK_QR_CODE  } as ArrayList<Method>
                     }
@@ -510,8 +604,6 @@ internal class PayFunction {
                             payCode,
                             onError
                         )
-
-
                     }
 
                 } else {

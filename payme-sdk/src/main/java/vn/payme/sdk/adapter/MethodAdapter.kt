@@ -43,10 +43,6 @@ class MethodAdapter(
         return position.toLong()
     }
 
-
-
-
-
     //4
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val method = dataSource[position]
@@ -78,7 +74,6 @@ class MethodAdapter(
             return rowView
 
         } else {
-
             val rowView = inflater.inflate(R.layout.payme_payment_item_method, null, true)
             val titleText = rowView.findViewById(R.id.title) as TextView
             val noteMethod = rowView.findViewById(R.id.note_method) as TextView
@@ -91,12 +86,8 @@ class MethodAdapter(
             }else{
                 buttonSelect.setImageResource(R.drawable.ic_uncheck)
             }
-
             AddInfoMethod().setTitle(method, titleText, noteMethod,null)
-
             AddInfoMethod().addImage(method, imageView)
-
-
             return rowView
 
         }

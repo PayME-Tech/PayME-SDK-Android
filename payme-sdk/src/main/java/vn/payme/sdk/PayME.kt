@@ -59,6 +59,7 @@ public class PayME {
             if (!((payCode == PAY_CODE.PAYME) ||
                         (payCode == PAY_CODE.ATM) ||
                         (payCode == PAY_CODE.MANUAL_BANK) ||
+                        (payCode == PAY_CODE.VIET_QR) ||
                         (payCode == PAY_CODE.CREDIT))
             ) {
                 onError(
@@ -110,6 +111,7 @@ public class PayME {
             if (!((payCode == PAY_CODE.PAYME) ||
                         (payCode == PAY_CODE.ATM) ||
                         (payCode == PAY_CODE.MANUAL_BANK) ||
+                        (payCode == PAY_CODE.VIET_QR) ||
                         (payCode == PAY_CODE.VN_PAY) ||
                         (payCode == PAY_CODE.CREDIT))
             ) {
@@ -277,7 +279,6 @@ public class PayME {
         Store.userInfo = UserInfo(0, false, false, false, "", null)
         Security.insertProviderAt(BouncyCastleProvider(), 1)
         ENV_API.updateEnv()
-
     }
 
     constructor() {
@@ -521,8 +522,6 @@ public class PayME {
             popupTakeVideo.arguments = bundle
             popupTakeVideo.show(fragmentManager, "ModalBottomSheet")
         }
-
-
     }
 
     private fun openWalletActivity(
@@ -569,7 +568,6 @@ public class PayME {
                 onError
             )
         }
-
     }
 
 
@@ -601,7 +599,6 @@ public class PayME {
                 onError
             )
         }
-
     }
 
     fun transfer(
@@ -632,7 +629,6 @@ public class PayME {
                 onError
             )
         }
-
     }
 
     public fun withdraw(

@@ -61,12 +61,11 @@ internal class NetworkRequest(
             objectValidateRequest["method"] = "POST"
             objectValidateRequest["accessToken"] = token
             objectValidateRequest["x-api-message"] = xAPIMessage
-            if(BuildConfig.DEBUG){
-                Log.d("HIEU", "REQUEST_params$params")
-                println("REQUEST_params" + params)
-                println("REQUEST_token" + token)
-            }
-
+//            if(BuildConfig.DEBUG){
+//                Log.d("HIEU", "REQUEST_params$params")
+//                println("REQUEST_params" + params)
+//                println("REQUEST_token" + token)
+//            }
             var valueParams = ""
             for (key in objectValidateRequest.keys) {
                 valueParams += objectValidateRequest[key]
@@ -82,10 +81,10 @@ internal class NetworkRequest(
             }
 
             var pathAPi = ""
-            if (isSecurity) {
-                pathAPi = url
+            pathAPi = if (isSecurity) {
+                url
             } else {
-                pathAPi = url + path
+                url + path
             }
 
             val queue = Volley.newRequestQueue(context)
@@ -117,13 +116,11 @@ internal class NetworkRequest(
                             var dataRaw = ConvertJSON().toString(result)
                             finalJSONObject = JSONObject(dataRaw)
                             if (BuildConfig.DEBUG){
-                                Log.d("HIEU", "RESPONSE$finalJSONObject$params")
-                                println("RESPONSE$finalJSONObject$params")
+                                Log.d("HIEU", "RESPONSE$finalJSONObject")
                             }
                         } else {
                             if (BuildConfig.DEBUG) {
-                                Log.d("HIEU", "RESPONSE  $response$params")
-                                println("RESPONSE  $response$params")
+                                Log.d("HIEU", "RESPONSE  $response")
                             }
                             finalJSONObject = JSONObject(response.toString())
                         }

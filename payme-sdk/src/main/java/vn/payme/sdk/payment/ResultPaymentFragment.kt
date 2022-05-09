@@ -68,30 +68,33 @@ class ResultPaymentFragment : Fragment() {
         listInfoTop.add(Info(getString(R.string.transaction_code), Store.paymentInfo.transaction, null, null, false))
         listInfoTop.add(Info(getString(R.string.transaction_time), DateStr, null, null, false))
 
-
-        if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.LINKED) {
-            listInfoTop.add(Info(getString(R.string.method), getString(R.string.affiliate_account), null, null, false))
-            listInfoTop.add(
-                Info(
-                    getString(R.string.account_number),
-                    Store.paymentInfo.methodSelected?.title + "-" + Store.paymentInfo.methodSelected?.label?.replace("[^0-9]".toRegex(), ""),
-                    null,
-                    null,
-                    true
+        when (Store.paymentInfo.methodSelected?.type) {
+            TYPE_PAYMENT.LINKED -> {
+                listInfoTop.add(Info(getString(R.string.method), getString(R.string.affiliate_account), null, null, false))
+                listInfoTop.add(
+                    Info(
+                        getString(R.string.account_number),
+                        Store.paymentInfo.methodSelected?.title + "-" + Store.paymentInfo.methodSelected?.label?.replace("[^0-9]".toRegex(), ""),
+                        null,
+                        null,
+                        true
+                    )
                 )
-            )
-        } else if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.CREDIT_BALANCE) {
-            listInfoTop.add(Info(getString(R.string.method), getString(R.string.credit_wallet), null, null, false))
-        } else {
-            listInfoTop.add(
-                Info(
-                    getString(R.string.method),
-                    Store.paymentInfo.methodSelected?.title,
-                    null,
-                    null,
-                    false
+            }
+            TYPE_PAYMENT.CREDIT_BALANCE -> {
+                listInfoTop.add(Info(getString(R.string.method), getString(R.string.credit_wallet), null, null, false))
+            }
+            else -> {
+                listInfoTop.add(
+                    Info(
+                        getString(R.string.method),
+                        Store.paymentInfo.methodSelected?.title,
+                        null,
+                        null,
+                        false
+                    )
                 )
-            )
+            }
         }
         if (Store.paymentInfo.methodSelected?.type == TYPE_PAYMENT.BANK_CARD) {
             val lengthCard = event.cardInfo?.cardNumber?.length

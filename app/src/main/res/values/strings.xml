@@ -17,5 +17,6 @@
         <item>MANUAL_BANK</item>
         <item>MOMO</item>
         <item>ZALO_PAY</item>
+        <item>VIET_QR</item>
     </string-array>
 </resources>
