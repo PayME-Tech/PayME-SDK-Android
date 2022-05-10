@@ -33,36 +33,21 @@ val APP_PHONE = "APP_PHONE"
 val APP_USER_ID = "APP_USER_ID"
 
 val APP_TOKEN_DEFAULT_SANDBOX =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTIsImlhdCI6MTYxMzk5MDU5Nn0.donBYzgUyZ2qJwg2TVu43qCQBmYRkbPCsJwdbmLulQ8"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6OTUsImlhdCI6MTY1MTczMjM0Nn0.TFsg9wizgtWa7EbGzrjC2Gn55TScsJzKGjfeN78bhlg"
 val PUBLIC_KEY_DEFAULT_SANDBOX = "-----BEGIN PUBLIC KEY-----\n" +
-        "    MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIXbBm3mTT7Ovlo9LNJK7noshpk8g+zm\n" +
-        "    ueFTyrU7muUuXKboD7cg1h/K9zMW4qHFG+3LTo4Cc8fjoqbUm4UILgMCAwEAAQ==\n" +
+        "    MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAId28RoBckMTTPqVCC3c1f+fH+BbdVvv\n" +
+        "    wDkSf+0zmaUlCFyQpassU3+8CvM6QbeYSYGWp1YIwGqg2wTF94zT4eECAwEAAQ==\n" +
         "    -----END PUBLIC KEY-----"
-val SECRET_KEY_DEFAULT_SANDBOX = "ecd336c200e96265e00e312c6ca28d22"
+val SECRET_KEY_DEFAULT_SANDBOX = "b5d8cf6c30d9cb4a861036bdde44c137"
 val PRIVATE_KEY_DEFAULT_SANDBOX = "-----BEGIN RSA PRIVATE KEY-----\n" +
-        "    MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL\n" +
-        "    yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF\n" +
-        "    5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB\n" +
-        "    AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA\n" +
-        "    ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK\n" +
-        "    xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd\n" +
-        "    A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=\n" +
+        "    MIIBOwIBAAJBAMEKxNcErAKSzmWcps6HVScLctpdDkBiygA3Pif9rk8BoSU0BYAs\n" +
+        "    G5pW8yRmhCwVMRQq+VhJNZq+MejueSBICz8CAwEAAQJBALfa29K1/mWNEMqyQiSd\n" +
+        "    vDotqzvSOQqVjDJcavSHpgZTrQM+YzWwMKAHXLABYCY4K0t01AjXPPMYBueJtFeA\n" +
+        "    i3ECIQDpb6Fp0yGgulR9LHVcrmEQ4ZTADLEASg+0bxVjv9vkWwIhANOzlw9zDMRr\n" +
+        "    i/5bwttz/YBgY/nMj7YIEy/v4htmllntAiA5jLDRoyCOPIGp3nUMpVz+yW5froFQ\n" +
+        "    nfGjPSOb1OgEMwIhAI4FhyvoJQKIm8wyRxDuSXycLbXhU+/sjuKz7V4wfmEpAiBb\n" +
+        "    PmELTX6BquyCs9jUzoPxDWKQSQGvVUwcWXtpnYxSvQ==\n" +
         "    -----END RSA PRIVATE KEY-----"
-//val APP_TOKEN_DEFAULT_SANDBOX =
-//    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NTQsImlhdCI6MTYzMDM5MTUzMn0.StomrI1uDMH0iZl-eud4z1hsm51OQW_PmUHssJyxjsM"
-//val PUBLIC_KEY_DEFAULT_SANDBOX = "-----BEGIN PUBLIC KEY-----\nMFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIQbb2B/TbVL3c3tJ0LD/8wgmkojLt/V\nFpiolJRJcDlaillF8ATJfd1gJYkh9kOPK0UXn/TV2HluHXWAdnetJWsCAwEAAQ==\n-----END PUBLIC KEY-----"
-//val SECRET_KEY_DEFAULT_SANDBOX = "41de5f00bf3ed0f280a394f169e08005"
-//val PRIVATE_KEY_DEFAULT_SANDBOX = """
-//    -----BEGIN RSA PRIVATE KEY-----
-//    MIIBOgIBAAJBAJSar42zVa7+oaR9NrPUsAs4Sd1aPtuIqtpu+CD8OzpxemwUs/zK
-//    YbIyLGc2V3e7w8ElyamDeJFzbWCtJLXerGkCAwEAAQJAE/Vakqt9XI1yZEc0654r
-//    LraWpRYTzyRh3gh9ZuC5i7WxKthxexCEBBBq9GIRCtsaKmDnKa6Y/7Bu1qLK/lay
-//    CQIhAN215h8pNHg42ZqBFVww+HMIT5vr5zNXYc9owXsRq4QjAiEAq5ZRH79X0I+c
-//    p90GW2b78RuiTj1p702wK1hf89TlYAMCIEdX/koutzyshpFqUlZNR9W0afGxsr9Z
-//    shbNDd2tbPTjAiAi893Wn72dqIN61lVDLTlJJh3r3irEKokmazwwiT+oTQIhAJry
-//    3tlOTSuRILYZbS6DqsThdR+O2u7zDyvMmdT/a04W
-//    -----END RSA PRIVATE KEY-----
-//    """.trimIndent()
 
 val APP_TOKEN_DEFAULT_DEV =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTIsImlhdCI6MTYyMDg4MjQ2NH0.DJfi52Dc66IETflV2dQ8G_q4oUAVw_eG4TzrqkL0jLU"
@@ -546,8 +531,8 @@ class MainActivity : AppCompatActivity() {
 
             val amount = convertInt(moneyPay.text.toString())
 
-            val storeId: Long =
-                if (env == Env.PRODUCTION ||env == Env.STAGING  ) 57956431 else if (env == Env.SANDBOX) 37048160 else 9
+            val storeId: Long? =
+                if (env == Env.PRODUCTION ||env == Env.STAGING  ) 57956431 else if (env == Env.SANDBOX) null else 9
             val infoPayment =
                 InfoPayment(
                     "PAY",

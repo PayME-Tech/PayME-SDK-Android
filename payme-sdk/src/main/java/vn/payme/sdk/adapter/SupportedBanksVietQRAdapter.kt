@@ -21,7 +21,7 @@ class SupportedBanksVietQRAdapter() :
             val picasso = Picasso.get()
             picasso.setIndicatorsEnabled(false)
             picasso.load("https://static.payme.vn/image_bank/icon_banks/icon${swiftCode}@2x.png")
-                .resize(60, 38)
+                .resize(150, 150)
                 .centerInside()
                 .into(imageBank)
         }
