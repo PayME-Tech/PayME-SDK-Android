@@ -255,7 +255,7 @@ class SelectMethodFragment : Fragment() {
         }
         when (method.type) {
             TYPE_PAYMENT.CREDIT_CARD -> {
-                PayME.fragmentManager = childFragmentManager
+                PayME.fragmentManagerScan = childFragmentManager
                 val fragment = childFragmentManager.beginTransaction()
                 fragment.replace(
                     R.id.frame_container_select_method,
@@ -276,7 +276,7 @@ class SelectMethodFragment : Fragment() {
                 fragment.commit()
             }
             TYPE_PAYMENT.BANK_CARD -> {
-                PayME.fragmentManager = childFragmentManager
+                PayME.fragmentManagerScan = childFragmentManager
                 buttonSubmit.setVisible(false)
                 val fragment = childFragmentManager.beginTransaction()
                 fragment.replace(

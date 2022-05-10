@@ -12,13 +12,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.add
-import androidx.fragment.app.commit
 import com.squareup.picasso.Picasso
 import org.greenrobot.eventbus.EventBus
 import vn.payme.sdk.PayME
@@ -26,17 +21,12 @@ import vn.payme.sdk.R
 import vn.payme.sdk.api.PaymentApi
 import vn.payme.sdk.cardmodules.ScanActivity
 import vn.payme.sdk.cardmodules.ScanActivityImpl
-import vn.payme.sdk.component.Button
 import vn.payme.sdk.component.InputInfo
-import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
-import vn.payme.sdk.evenbus.ChangeFragmentPayment
 import vn.payme.sdk.model.BankInfo
 import vn.payme.sdk.evenbus.CheckInputAtm
 import vn.payme.sdk.evenbus.ListBankAtm
-import vn.payme.sdk.hepper.ChangeColorImage
 import vn.payme.sdk.kyc.*
 import vn.payme.sdk.model.CardInfo
-import vn.payme.sdk.store.Store
 
 
 class EnterAtmCardFragment : Fragment() {

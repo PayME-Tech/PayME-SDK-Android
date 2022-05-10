@@ -3,6 +3,7 @@ package vn.payme.sdk.api
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Handler
+import android.util.Log
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import org.greenrobot.eventbus.EventBus
@@ -161,7 +162,10 @@ internal class PaymentApi {
         if (linkedId != null) {
             authCreditCardInput["linkedId"] = linkedId!!
         }
-        authCreditCardInput["storeId"] = Store.paymentInfo.infoPayment?.storeId!!
+        if (Store.paymentInfo.infoPayment?.storeId != null) {
+            authCreditCardInput["storeId"] = Store.paymentInfo.infoPayment?.storeId!!
+        }
+        Log.d("HIEU", Store.userInfo.accessToken.toString())
         params["query"] = query
         variables["authCreditCardInput"] = authCreditCardInput
         params["variables"] = variables

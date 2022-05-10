@@ -12,6 +12,7 @@ import android.text.InputType
 import android.text.method.DigitsKeyListener
 import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnFocusChangeListener
@@ -99,7 +100,8 @@ class InputInfo : RelativeLayout {
         containerInput = findViewById<View>(R.id.containerInput) as ConstraintLayout
         buttonScan = findViewById<View>(R.id.imageScan) as ImageView
         buttonScan.setOnClickListener {
-            val currentFragment = PayME.fragmentManager.findFragmentByTag("inputFragment")
+            val currentFragment = PayME.fragmentManagerScan.findFragmentByTag("inputFragment")
+            Log.d("HIEU", currentFragment.toString())
             if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED
             ) {

@@ -36,6 +36,7 @@ public class PayME {
         internal lateinit var onSuccess: ((JSONObject?) -> Unit)
         internal lateinit var onError: (JSONObject?, Int, String?) -> Unit
         internal lateinit var fragmentManager: FragmentManager
+        internal lateinit var fragmentManagerScan: FragmentManager
         internal var enableSetting: Boolean = false
         fun showError(message: String?) {
             if (message != null && message != "null" && message != "") {
