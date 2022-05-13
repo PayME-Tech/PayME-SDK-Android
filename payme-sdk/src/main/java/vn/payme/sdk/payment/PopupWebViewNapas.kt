@@ -131,7 +131,9 @@ class PopupWebViewNapas : DialogFragment() {
         } else {
             form = arguments?.getString("html")!!
         }
-        myWebView.loadDataWithBaseURL("x-data://base", form!!, "text/html", "UTF-8", null);
+        myWebView.loadDataWithBaseURL("x-data://base", form!!, "text/html", "UTF-8", null)
+        val webSettings = myWebView.settings
+        webSettings.domStorageEnabled = true
         myWebView.setWebViewClient(object : WebViewClient() {
             override fun onReceivedError(
                 view: WebView?,

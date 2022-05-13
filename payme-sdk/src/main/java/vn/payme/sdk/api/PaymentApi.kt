@@ -103,7 +103,9 @@ internal class PaymentApi {
                             "text/html",
                             "UTF-8",
                             null
-                        );
+                        )
+                        val webSettings = myWebView.settings
+                        webSettings.domStorageEnabled = true
                         myWebView.setWebViewClient(object : WebViewClient() {
                             override fun onPageStarted(
                                 view: WebView,
