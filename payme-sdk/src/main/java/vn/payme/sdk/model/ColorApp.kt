@@ -10,26 +10,26 @@ class ColorApp {
     var startColor: String = "#08941f"
     var endColor: String = "#0eb92a"
     var backgroundColorRadius: GradientDrawable = GradientDrawable(
-        GradientDrawable.Orientation.LEFT_RIGHT,
+        GradientDrawable.Orientation.RIGHT_LEFT,
         intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor))
     )
     var backgroundColorRadiusBorder: GradientDrawable = GradientDrawable()
     var backgroundColorRadiusBorder30: GradientDrawable = GradientDrawable()
 
     var backgroundColorRadiusAlpha: GradientDrawable = GradientDrawable(
-        GradientDrawable.Orientation.LEFT_RIGHT,
+        GradientDrawable.Orientation.RIGHT_LEFT,
         intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor))
     )
     var backgroundColor: GradientDrawable = GradientDrawable(
-        GradientDrawable.Orientation.LEFT_RIGHT,
+        GradientDrawable.Orientation.RIGHT_LEFT,
         intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor))
     )
     var backgroundColorRadiusTop: GradientDrawable = GradientDrawable(
-        GradientDrawable.Orientation.LEFT_RIGHT,
+        GradientDrawable.Orientation.RIGHT_LEFT,
         intArrayOf(Color.parseColor(startColor), Color.parseColor(endColor))
     )
    var backgroundColorRadiusTopWhite: GradientDrawable = GradientDrawable(
-        GradientDrawable.Orientation.LEFT_RIGHT,
+        GradientDrawable.Orientation.RIGHT_LEFT,
         intArrayOf(Color.parseColor("#ffffff"), Color.parseColor("#ffffff"))
     )
     fun dbToFloat (f: Float) : Float{
