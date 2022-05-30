@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:fontFamily="@font/main_semibold"
-        android:text="Cho phép truy cập máy ảnh của bạn"
+        android:text="@string/grant_permission_access_camera"
         android:textColor="@color/white"
         android:textSize="18dp"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -35,11 +35,13 @@ import vn.payme.sdk.kyc.TakePictureIdentifyFragment
 import vn.payme.sdk.kyc.TakeVideoKycFragment
 import vn.payme.sdk.store.Store
 
-class OpenSettingFragment : DialogFragment() {
+class OpenSettingFragment(val typeSetting: String) : DialogFragment() {
     private var buttonBackHeaderErrorCamera: ImageView? = null
     lateinit var imageErrorCamera: ImageView
     private var containerErrorCamera: ConstraintLayout? = null
     private var buttonOpenSetting: Button? = null
+    private lateinit var textNoteErrorCamera: TextView
+    private lateinit var titleErrorCamera: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,8 +57,14 @@ class OpenSettingFragment : DialogFragment() {
         containerErrorCamera = view.findViewById(R.id.containerErrorCamera)
         imageErrorCamera = view.findViewById(R.id.imageErrorCamera)
         buttonOpenSetting = view.findViewById(R.id.buttonOpenSetting)
+        textNoteErrorCamera = view.findViewById(R.id.textNoteErrorCamera)
+        titleErrorCamera = view.findViewById(R.id.titleErrorCamera)
         buttonBackHeaderErrorCamera = view.findViewById(R.id.buttonBackHeaderErrorCamera)
         containerErrorCamera?.visibility = View.VISIBLE
+        if (typeSetting == "write_external_storage") {
+            titleErrorCamera.text = getString(R.string.grant_permission_access_storage)
+            textNoteErrorCamera.text = getString(R.string.grant_permission_access_storage_desc)
+        }
         ChangeColorImage().changeColor(
             requireContext(),
             imageErrorCamera,
@@ -75,12 +83,17 @@ class OpenSettingFragment : DialogFragment() {
 
     override fun onResume() {
         super.onResume()
-        if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_GRANTED
+        if ((ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
+                    == PackageManager.PERMISSION_GRANTED
+                    && typeSetting == "camera") || (ContextCompat.checkSelfPermission(
+                requireContext(),
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+                    == PackageManager.PERMISSION_GRANTED
+                    && typeSetting == "write_external_storage")
         ) {
             dismiss()
         }
-
     }
 
 }

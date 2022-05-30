@@ -112,7 +112,7 @@ class InputInfo : RelativeLayout {
                 currentFragment?.let { it1 ->
                     if (PayME.enableSetting) {
                         EventBus.getDefault()
-                            .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.OPEN_SETTING, null))
+                            .post(ChangeFragmentPayment(TYPE_FRAGMENT_PAYMENT.OPEN_SETTING, "camera"))
                     } else {
                         PermissionCamera().requestCameraFragment(context, it1)
                     }

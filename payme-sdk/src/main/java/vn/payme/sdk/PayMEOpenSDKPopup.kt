@@ -276,7 +276,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
             startActivityForResult(intent, 51234)
         } else {
             if (enableSettingCamera) {
-                val openSettingFragment: OpenSettingFragment = OpenSettingFragment()
+                val openSettingFragment: OpenSettingFragment = OpenSettingFragment("camera")
                 openSettingFragment.show(parentFragmentManager, null)
             } else {
                 permissionCamera.requestCameraFragment(requireContext(), this)

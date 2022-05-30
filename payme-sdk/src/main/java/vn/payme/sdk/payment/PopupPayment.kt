@@ -154,7 +154,7 @@ internal class PopupPayment : DialogFragment() {
             fragment.replace(R.id.frame_container, confirmPassFragment)
             fragment.commit()
         } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.OPEN_SETTING) {
-            val openSettingFragment: OpenSettingFragment = OpenSettingFragment()
+            val openSettingFragment: OpenSettingFragment = OpenSettingFragment(event.value ?: "")
             fragmentManager?.let { openSettingFragment.show(it,null) }
         }
     }
