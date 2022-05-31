@@ -130,33 +130,42 @@ class VietQRFragment : Fragment() {
     }
 
     private fun saveImage(bitmap: Bitmap, context: Context, folderName: String) {
-        if (Build.VERSION.SDK_INT >= 29) {
-            val values = contentValues()
-            values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/$folderName")
-            values.put(MediaStore.Images.Media.IS_PENDING, true)
+        try {
+            if (Build.VERSION.SDK_INT >= 29) {
+                val values = contentValues()
+                values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/$folderName")
+                values.put(MediaStore.Images.Media.IS_PENDING, true)
 
-            val uri: Uri? =
+                val uri: Uri? =
+                    context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+                if (uri != null) {
+                    saveImageToStream(bitmap, context.contentResolver.openOutputStream(uri))
+                    values.put(MediaStore.Images.Media.IS_PENDING, false)
+                    context.contentResolver.update(uri, values, null, null)
+                }
+            } else {
+                val directory = File(
+                    context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                        .toString() + File.separator + folderName
+                )
+
+                if (!directory.exists()) {
+                    directory.mkdirs()
+                }
+                val fileName = System.currentTimeMillis().toString() + ".png"
+                val file = File(directory, fileName)
+                saveImageToStream(bitmap, FileOutputStream(file))
+                val values = contentValues()
+                values.put(MediaStore.Images.Media.DATA, file.absolutePath)
                 context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-            if (uri != null) {
-                saveImageToStream(bitmap, context.contentResolver.openOutputStream(uri))
-                values.put(MediaStore.Images.Media.IS_PENDING, false)
-                context.contentResolver.update(uri, values, null, null)
             }
-        } else {
-            val directory = File(
-                context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                    .toString() + File.separator + folderName
-            )
-
-            if (!directory.exists()) {
-                directory.mkdirs()
-            }
-            val fileName = System.currentTimeMillis().toString() + ".png"
-            val file = File(directory, fileName)
-            saveImageToStream(bitmap, FileOutputStream(file))
-            val values = contentValues()
-            values.put(MediaStore.Images.Media.DATA, file.absolutePath)
-            context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        } catch (e: Exception) {
+            Log.d("HIEU", "error save bitmap $e")
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.download_failed_viet_qr),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
