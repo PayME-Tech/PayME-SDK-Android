@@ -105,6 +105,7 @@
     <string name="go_to_the_account_information_below">tới</string>
     <string name="enter_the_OTP_code">Nhập mã OTP</string>
     <string name="that_was_sent_to_the_phone_number_that_registered_the_card">đã được gửi qua số điện thoại đăng ký thẻ</string>
+    <string name="that_was_sent_to_the_phone_number_that_registered_PayME_WALLET">đã được gửi qua số điện thoại đăng ký Ví PayME</string>
     <string name="min_transaction_amount">Số tiền giao dịch tối thiểu</string>
     <string name="maximum_transaction_amount">Số tiền giao dịch tối đa</string>
     <string name="method_not_supported">Phương thức chưa được hỗ trợ</string>

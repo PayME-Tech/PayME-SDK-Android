@@ -128,7 +128,6 @@ internal class PopupPayment : DialogFragment() {
                 this.dialog?.dismiss()
             }
 
-
         } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.CONFIRM_OTP) {
             val confirmFragment = ConfirmOtpFragment()
             val bundle = Bundle()
@@ -152,6 +151,11 @@ internal class PopupPayment : DialogFragment() {
             val confirmPassFragment: ConfirmPassFragment = ConfirmPassFragment()
             val fragment = childFragmentManager.beginTransaction()
             fragment.replace(R.id.frame_container, confirmPassFragment)
+            fragment.commit()
+        } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.SECURITY_CODE_OTP) {
+            val securityCodeOtpFragment: SecurityCodeOtpFragment = SecurityCodeOtpFragment()
+            val fragment = childFragmentManager.beginTransaction()
+            fragment.replace(R.id.frame_container, securityCodeOtpFragment)
             fragment.commit()
         } else if (event.typeFragment == TYPE_FRAGMENT_PAYMENT.OPEN_SETTING) {
             val openSettingFragment: OpenSettingFragment = OpenSettingFragment(event.value ?: "")

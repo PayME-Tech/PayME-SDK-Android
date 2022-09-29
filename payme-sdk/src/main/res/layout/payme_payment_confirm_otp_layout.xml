@@ -82,7 +82,6 @@
         android:textAlignment="center"
         android:fontFamily="@font/main_regular"
         android:textSize="14dp"
-        android:visibility="gone"
         android:textColor="@color/steel"
         android:text="@string/resend_otp"
         android:layout_height="wrap_content"/>

@@ -140,7 +140,7 @@ class ConfirmPassFragment : Fragment() {
         loading = view.findViewById(R.id.loading)
         textForgotPassword = view.findViewById(R.id.txtForgotPassword)
 
-        loading.getIndeterminateDrawable()
+        loading.indeterminateDrawable
             .mutate()
             .setColorFilter(
                 Color.parseColor(Store.config.colorApp.startColor),

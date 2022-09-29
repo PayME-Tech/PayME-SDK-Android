@@ -389,6 +389,14 @@ public class PayME {
                         println("limit.param.amount.payment: $min")
                         println("limit.param.amount.payment: " + Store.config.limitPayment.min)
                     }
+                    if (key == "limit.payment.password" && valueString != "null") {
+                        val value = JSONObject(valueString)
+                        val max = Integer.parseInt(value.optString("max"))
+                        val min = Integer.parseInt(value.optString("min"))
+                        Store.config.limitPaymentPassword = MaxminPayment(min, max)
+                        println("limit.payment.passwordt: $min")
+                        println("limit.payment.password" + Store.config.limitPaymentPassword.max)
+                    }
                     println("Store.config.limitPayment: " + Store.config.limitPayment.min)
                     if (key == "service.main.visible" && valueString != "null") {
                         val value = JSONObject(valueString)

@@ -2,6 +2,7 @@ package vn.payme.sdk.hepper
 
 import android.content.Context
 import android.graphics.Color
+import android.util.Log
 import android.widget.ImageView
 import com.devs.vectorchildfinder.VectorChildFinder
 import com.devs.vectorchildfinder.VectorDrawableCompat
@@ -16,7 +17,7 @@ class ChangeColorImage {
         imageView.invalidate()
     }
    private fun addColor(vector : VectorChildFinder, name:String){
-        val path1: VectorDrawableCompat.VFullPath = vector.findPathByName("colorChange${name}")
-        path1.fillColor = Color.parseColor(Store.config.colorApp.startColor)
+        val path1: VectorDrawableCompat.VFullPath? = vector.findPathByName("colorChange${name}")
+       path1?.fillColor = Color.parseColor(Store.config.colorApp.startColor)
     }
 }

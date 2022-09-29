@@ -369,7 +369,8 @@ internal class PaymentApi {
             "service.main.visible",
             "kyc.mode.enable",
             "sdk.web.secretKey",
-            "sdk.scanModule.enable"
+            "sdk.scanModule.enable",
+            "limit.payment.password"
         )
         val query = "query Query(\$configsAppId: String, \$configsKeys: [String]) {\n" +
                 "  Setting {\n" +
@@ -844,4 +845,79 @@ internal class PaymentApi {
         )
     }
 
+    fun requestOtpSecurityCode(
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int, String?) -> Unit
+    ) {
+        val path = "/graphql"
+        val params: MutableMap<String, Any> = mutableMapOf()
+        val variables: MutableMap<String, Any> = mutableMapOf()
+        val query = "mutation SendOTPCreateCodeByOTP(\$input: SendOTPCreateCodeByOTPInput!) {\n" +
+            "  Account {\n" +
+            "    SecurityCode {\n" +
+            "      SendOTPCreateCodeByOTP(input: \$input) {\n" +
+            "        succeeded\n" +
+            "        message\n" +
+            "      }\n" +
+            "    }\n" +
+            "  }\n" +
+            "}"
+        val input: MutableMap<String, Any> = mutableMapOf()
+        input["clientId"] = Store.config.clientId
+        variables["input"] = input
+        params["query"] = query
+        params["variables"] = variables
+        val request = NetworkRequest(
+            PayME.context!!,
+            ENV_API.API_FE,
+            path,
+            Store.userInfo.accessToken!!,
+            params,
+            ENV_API.IS_SECURITY
+        )
+        request.setOnRequestCrypto(
+            onSuccess = onSuccess,
+            onError = onError,
+        )
+    }
+
+    fun createSecurityCodeByOtp(
+        activeCode: String,
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int, String?) -> Unit
+    ) {
+        val path = "/graphql"
+        val params: MutableMap<String, Any> = mutableMapOf()
+        val variables: MutableMap<String, Any> = mutableMapOf()
+        val query = "mutation SendOTPCreateCodeByOTP(\$input: CreateSecurityCodeByOTPInput!) {\n" +
+            "  Account {\n" +
+            "    SecurityCode {\n" +
+            "      CreateCodeByOTP(input: \$input) {\n" +
+            "        securityCode\n" +
+            "        succeeded\n" +
+            "        message\n" +
+            "        code\n" +
+            "      }\n" +
+            "    }\n" +
+            "  }\n" +
+            "}"
+        val input: MutableMap<String, Any> = mutableMapOf()
+        input["clientId"] = Store.config.clientId
+        input["activeCode"] = activeCode
+        variables["input"] = input
+        params["query"] = query
+        params["variables"] = variables
+        val request = NetworkRequest(
+            PayME.context!!,
+            ENV_API.API_FE,
+            path,
+            Store.userInfo.accessToken!!,
+            params,
+            ENV_API.IS_SECURITY
+        )
+        request.setOnRequestCrypto(
+            onSuccess = onSuccess,
+            onError = onError,
+        )
+    }
 }

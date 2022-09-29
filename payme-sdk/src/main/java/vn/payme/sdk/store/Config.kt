@@ -21,6 +21,7 @@ class Config(
     var appID: Int
     var handShake: String? = ""
     var limitPayment: MaxminPayment = MaxminPayment(2000, 100000000)
+    var limitPaymentPassword: MaxminPayment = MaxminPayment(2000, 4999999)
     var limitAll: MaxminPayment = MaxminPayment(2000, 100000000)
     var clientInfo: ClientInfo? = null
     var clientId : String = ""
