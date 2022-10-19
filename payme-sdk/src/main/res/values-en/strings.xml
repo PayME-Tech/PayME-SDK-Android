@@ -95,7 +95,7 @@
     <string name="receiver">Người nhận</string>
     <string name="service_code">Mã dịch vụ</string>
     <string name="method">Phương thức</string>
-    <string name="affiliate_account">Tài khoản liên kết</string>
+    <string name="affiliate_account">Nguồn tiền liên kết</string>
     <string name="fee">Phí</string>
     <string name="total_payment">Tổng thanh toán</string>
     <string name="transaction_code">Mã giao dịch</string>
