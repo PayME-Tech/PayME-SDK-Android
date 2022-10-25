@@ -350,6 +350,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         buttonLogin.setOnClickListener {
+            textViewQuota.text = ""
             if (spinnerEnvironment.selectedItem.toString() == Env.SANDBOX.toString()) {
                 env = Env.SANDBOX
             }
