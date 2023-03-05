@@ -9,15 +9,15 @@ task sourceJar(type: Jar) {
 
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
     buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "vn.payme.sdk.example"
         minSdkVersion 21
-        targetSdkVersion 30
-        versionCode 128
-        versionName "0.9.50"
+        targetSdkVersion 33
+        versionCode 129
+        versionName "0.9.51"
         setProperty("archivesBaseName", "PayME_SDK-$versionName-$versionCode")
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

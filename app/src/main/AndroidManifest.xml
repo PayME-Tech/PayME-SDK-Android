@@ -21,6 +21,7 @@
         <activity
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize"
+          android:exported="true"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
             android:name=".MainActivity">
             <intent-filter>
@@ -38,7 +39,9 @@
 
 
         </activity>
-        <activity android:name=".SettingAcitivity">
+        <activity android:name=".SettingAcitivity"
+          android:exported="true"
+          >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>

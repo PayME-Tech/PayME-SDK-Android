@@ -389,7 +389,6 @@ class PayMEOpenSDKPopup : DialogFragment() {
 
         val webSettings: WebSettings = myWebView.settings
         webSettings.javaScriptEnabled = true
-        webSettings.setAppCacheEnabled(true)
         webSettings.layoutAlgorithm = WebSettings.LayoutAlgorithm.NORMAL
         webSettings.javaScriptCanOpenWindowsAutomatically = true
         webSettings.mediaPlaybackRequiresUserGesture = false
