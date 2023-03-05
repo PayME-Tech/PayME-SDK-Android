@@ -735,12 +735,49 @@ internal class PaymentApi {
             params,
             ENV_API.IS_SECURITY
         )
-
         request.setOnRequestCrypto(
             onError = onError,
             onSuccess = onSuccess,
         )
+    }
 
+    fun getQuotaRemaining(
+        onSuccess: (JSONObject) -> Unit,
+        onError: (JSONObject?, Int, String?) -> Unit
+    ) {
+        val path = "/graphql"
+        val params: MutableMap<String, Any> = mutableMapOf()
+        val variables: MutableMap<String, Any> = mutableMapOf()
+        val extraData: MutableMap<String, Any> = mutableMapOf()
+        val getPaymentMethodInput: MutableMap<String, Any> = mutableMapOf()
+        val query =
+            "mutation GetPaymentMethodMutation(\$getPaymentMethodInput: PaymentMethodInput) {\n" +
+                    "  Utility {\n" +
+                    "    GetPaymentMethod(input: \$getPaymentMethodInput) {\n" +
+                    "      message\n" +
+                    "      succeeded\n" +
+                    "      remainingQuota\n" +
+                    "    }\n" +
+                    "  }\n" +
+                    "}"
+        getPaymentMethodInput["serviceType"] = "OPEN_EWALLET_PAYMENT"
+        extraData["isQuotaReceive"] = true
+        getPaymentMethodInput["extraData"] = extraData
+        variables["getPaymentMethodInput"] = getPaymentMethodInput
+        params["query"] = query
+        params["variables"] = variables
+        val request = NetworkRequest(
+            PayME.context!!,
+            ENV_API.API_FE,
+            path,
+            Store.userInfo.accessToken!!,
+            params,
+            ENV_API.IS_SECURITY
+        )
+        request.setOnRequestCrypto(
+            onError = onError,
+            onSuccess = onSuccess,
+        )
     }
 
     fun getBalance(

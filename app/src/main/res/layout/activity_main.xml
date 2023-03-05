@@ -146,7 +146,7 @@
             android:layout_height="wrap_content"
             android:background="#F2F2F2"
             android:layout_marginTop="30dp"
-            android:visibility="gone"
+            android:visibility="visible"
             android:padding="16dp"
             android:orientation="vertical">
             <LinearLayout
@@ -341,6 +341,33 @@
                     android:entries="@array/paycode_arrays"
                     android:spinnerMode="dropdown" />
             </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:weightSum="3"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/buttonGetQuotaRemaining"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/background_button"
+                    android:paddingHorizontal="16dp"
+                    android:text="Get quota remaining"
+                    />
+                <TextView
+                    android:id="@+id/textQuota"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="23dp"
+                    android:text=""
+                    android:textColor="@color/colorBlack"
+                    android:textSize="18dp"
+                    />
+            </LinearLayout>
             <EditText
                 android:id="@+id/username"
                 android:layout_width="match_parent"
@@ -370,7 +397,6 @@
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/buttonWithdraw" />
-
                 <Spinner
                     android:id="@+id/payCodeSpiner"
                     android:layout_width="100dp"
@@ -378,7 +404,6 @@
                     android:background="@drawable/background_button"
                     android:entries="@array/paycode_arrays"
                     android:spinnerMode="dropdown" />
-
                 <EditText
                     android:id="@+id/moneyPay"
                     android:layout_width="0dp"
@@ -399,8 +424,6 @@
                 android:layout_marginTop="16dp"
                 android:orientation="vertical"
                 android:gravity="center">
-
-
                 <EditText
                     android:id="@+id/inputPayQR"
                     android:layout_width="match_parent"

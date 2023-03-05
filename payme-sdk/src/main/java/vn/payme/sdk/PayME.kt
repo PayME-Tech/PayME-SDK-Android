@@ -737,6 +737,25 @@ public class PayME {
         }
     }
 
+    fun getRemainingQuota(
+        onSuccess: (Int?) -> Unit,
+        onError: (JSONObject?, Int, String?) -> Unit
+    ) {
+        val paymentApi = PaymentApi()
+        paymentApi.getQuotaRemaining(onSuccess = {jsonObject ->
+            val Utility = jsonObject.optJSONObject("Utility")
+            val GetPaymentMethod = Utility?.optJSONObject("GetPaymentMethod")
+            val message = GetPaymentMethod?.optString("message")
+            val succeeded = GetPaymentMethod?.optBoolean("succeeded") ?: false
+            if (succeeded) {
+                val remainingQuota = GetPaymentMethod?.optInt("remainingQuota")
+                onSuccess(remainingQuota)
+            } else {
+                onError(GetPaymentMethod,ERROR_CODE.OTHER,message)
+            }
+        }, onError)
+    }
+
     private fun loginAccount(
         onSuccess: (AccountStatus) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit

@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity() {
             },
             onError = { jsonObject, code, message ->
                 PayME.showError(message)
-                println("code"+code+"message"+message)
+                println("code" + code + "message" + message)
                 if (code == ERROR_CODE.EXPIRED) {
                     walletView.setVisibility(View.GONE)
                     payme?.logout()
@@ -167,6 +167,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var spinnerScanQRPayCode: Spinner
     lateinit var spinnerService: Spinner
     lateinit var loading: ProgressBar
+    lateinit var buttonQuota: Button
+    lateinit var textViewQuota: TextView
 
     var ConnectToken: String =
         "qBpM18YIyB15rdpFFfJpzsUBXNkaQ9rnCAN3asLNCrmEgQoS9YlhEVL8iQWT+6hhLSMs/C6uBUXxqD1PN33yhtfisiynwC1TeGV8TuT5bcdsSdgR+il/apjp886i1HJ3"
@@ -238,10 +240,22 @@ class MainActivity : AppCompatActivity() {
         spinnerEnvironment = findViewById(R.id.enviromentSpiner)
         spinnerPayCode = findViewById(R.id.payCodeSpiner)
         spinnerPayQRPayCode = findViewById(R.id.payQrPayCodeSpinner)
-        spinnerScanQRPayCode= findViewById(R.id.scanQrPayCodeSpinner)
+        spinnerScanQRPayCode = findViewById(R.id.scanQrPayCodeSpinner)
         spinnerLanguage = findViewById(R.id.languageSpinner)
         spinnerService = findViewById(R.id.serviceSpinner)
         buttonOpenService = findViewById(R.id.buttonOpenService)
+        buttonQuota = findViewById(R.id.buttonGetQuotaRemaining)
+        textViewQuota = findViewById(R.id.textQuota)
+        buttonQuota.setOnClickListener {
+            payme?.getRemainingQuota(onSuccess = {
+                if (it != null) {
+                    val decimal = DecimalFormat("#,###")
+                    textViewQuota.text = "${decimal.format(it)} đ"
+                }
+            }, onError = { jsonObject, i, s ->
+                PayME.showError(s)
+            })
+        }
         inputUserId.setText(userId)
         inputPhoneNumber.setText(phoneNumber)
         inputUserId.addTextChangedListener {
@@ -262,29 +276,43 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-        buttonOpenHistory.setOnClickListener{
-            payme?.openHistory(supportFragmentManager,onSuccess = {
+        buttonOpenHistory.setOnClickListener {
+            payme?.openHistory(supportFragmentManager, onSuccess = {
 
-            },onError = {jsonObject, i, s ->
+            }, onError = { jsonObject, i, s ->
                 PayME.showError(s)
             })
         }
         buttonPayQR.setOnClickListener {
-            payme?.payQRCode(supportFragmentManager,inputQRString.text.toString(),spinnerPayQRPayCode.selectedItem.toString(),true,onSuccess = {
+            payme?.payQRCode(
+                supportFragmentManager,
+                inputQRString.text.toString(),
+                spinnerPayQRPayCode.selectedItem.toString(),
+                true,
+                onSuccess = {
 
-            },onError = {jsonObject, i, s ->
-            PayME.showError(s)
-            })
+                },
+                onError = { jsonObject, i, s ->
+                    PayME.showError(s)
+                })
         }
         buttonScanQr.setOnClickListener {
-            payme?.scanQR(this.supportFragmentManager,spinnerScanQRPayCode.selectedItem.toString(),onSuccess = {
+            payme?.scanQR(
+                this.supportFragmentManager,
+                spinnerScanQRPayCode.selectedItem.toString(),
+                onSuccess = {
 
-            },onError = {jsonObject, i, s ->  })
+                },
+                onError = { jsonObject, i, s -> })
         }
         buttonOpenService.setOnClickListener {
-            payme?.openService(supportFragmentManager,Service(spinnerService.selectedItem.toString(),""),onSuccess = {},onError = {jsonObject, i, s ->
-                PayME.showError(s)
-            })
+            payme?.openService(
+                supportFragmentManager,
+                Service(spinnerService.selectedItem.toString(), ""),
+                onSuccess = {},
+                onError = { jsonObject, i, s ->
+                    PayME.showError(s)
+                })
         }
 
         buttonKYC.setOnClickListener {
@@ -292,7 +320,7 @@ class MainActivity : AppCompatActivity() {
                 println("mo kyc thanh cong")
 
             }, onError = { jsonObject, i, s ->
-                println("code"+i+"message"+s)
+                println("code" + i + "message" + s)
 
                 PayME.showError(s)
             })
@@ -308,8 +336,11 @@ class MainActivity : AppCompatActivity() {
                 position: Int,
                 id: Long
             ) {
-                if(payme!=null){
-                    payme?.setLanguage(context,if(spinnerLanguage.selectedItem.toString() == LANGUAGES.VI.toString()) LANGUAGES.VI else LANGUAGES.EN)
+                if (payme != null) {
+                    payme?.setLanguage(
+                        context,
+                        if (spinnerLanguage.selectedItem.toString() == LANGUAGES.VI.toString()) LANGUAGES.VI else LANGUAGES.EN
+                    )
                 }
 
             }
@@ -319,6 +350,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         buttonLogin.setOnClickListener {
+            textViewQuota.text = ""
             if (spinnerEnvironment.selectedItem.toString() == Env.SANDBOX.toString()) {
                 env = Env.SANDBOX
             }
@@ -340,8 +372,9 @@ class MainActivity : AppCompatActivity() {
 
                 df.setTimeZone(tz)
                 val nowAsISO: String = df.format(Date())
-                val dataE = "{\"userId\":\"${inputUserId.text.toString()}\",\"phone\":\"${inputPhoneNumber.text.toString()}\",\"timestamp\":\"${nowAsISO}\",\"kycInfo\":{\"fullname\":\"Lai Van Hieu\",\"gender\":\"MALE\",\"birthday\":\"1995-01-20T06:53:07.621Z\",\"address\":\"31 vu tung\",\"identifyType\":\"CMND\",\"identifyNumber\":\"String\",\"issuedAt\":\"2012-01-20T06:53:07.621Z\",\"placeOfIssue\":\"Hai Duong\",\"video\":\"https://sbx-static.payme.vn//2020/10/28/Co-29vnK6.mp4\",\"face\":\"https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg\",\"image\":{\"front\":\"https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg\",\"back\":\"https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg\"}}}"
-                println("dataE:"+dataE)
+                val dataE =
+                    "{\"userId\":\"${inputUserId.text.toString()}\",\"phone\":\"${inputPhoneNumber.text.toString()}\",\"timestamp\":\"${nowAsISO}\",\"kycInfo\":{\"fullname\":\"Lai Van Hieu\",\"gender\":\"MALE\",\"birthday\":\"1995-01-20T06:53:07.621Z\",\"address\":\"31 vu tung\",\"identifyType\":\"CMND\",\"identifyNumber\":\"String\",\"issuedAt\":\"2012-01-20T06:53:07.621Z\",\"placeOfIssue\":\"Hai Duong\",\"video\":\"https://sbx-static.payme.vn//2020/10/28/Co-29vnK6.mp4\",\"face\":\"https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg\",\"image\":{\"front\":\"https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg\",\"back\":\"https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg\"}}}"
+                println("dataE:" + dataE)
                 val dataExample =
                     "{\"userId\":\"${inputUserId.text.toString()}\",\"timestamp\":\"${nowAsISO}\",\"phone\":\"${inputPhoneNumber.text.toString()}\"}"
 
@@ -351,7 +384,7 @@ class MainActivity : AppCompatActivity() {
                 )
                 ConnectToken = connectToken
                 loading.visibility = View.VISIBLE
-                println("env"+env.toString())
+                println("env" + env.toString())
                 payme =
                     PayME(
                         this,
@@ -360,7 +393,7 @@ class MainActivity : AppCompatActivity() {
                         ConnectToken,
                         if (env == Env.PRODUCTION || env == Env.STAGING) PrivateKey else if (env == Env.DEV) PRIVATE_KEY_DEFAULT_DEV else PRIVATE_KEY_DEFAULT_SANDBOX,
                         configColor,
-                        if(spinnerLanguage.selectedItem.toString() == LANGUAGES.VI.toString()) LANGUAGES.VI else LANGUAGES.EN,
+                        if (spinnerLanguage.selectedItem.toString() == LANGUAGES.VI.toString()) LANGUAGES.VI else LANGUAGES.EN,
                         env,
                         showLog
                     )
@@ -389,16 +422,20 @@ class MainActivity : AppCompatActivity() {
                     }, onError = { jsonObject, i, s ->
 
                     })
-                    payme?.getSupportedServices(onSuccess = {arrayList ->
+                    payme?.getSupportedServices(onSuccess = { arrayList ->
                         var list = arrayListOf<String>()
 
                         arrayList?.forEach { service ->
                             list.add(service.code)
                         }
-                        val spinnerAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, list)
+                        val spinnerAdapter = ArrayAdapter(
+                            this,
+                            R.layout.support_simple_spinner_dropdown_item,
+                            list
+                        )
                         spinnerService.adapter = spinnerAdapter
 
-                    },onError = {jsonObject, i, s ->
+                    }, onError = { jsonObject, i, s ->
 
                     })
 
@@ -414,7 +451,7 @@ class MainActivity : AppCompatActivity() {
                     ).show()
                 },
                     onError = { jsonObject, code, message ->
-                        println("message"+message)
+                        println("message" + message)
 
                         loading.visibility = View.GONE
                         PayME.showError(message)
@@ -448,7 +485,7 @@ class MainActivity : AppCompatActivity() {
                     },
                     onError = { jsonObject, code, message ->
                         PayME.showError(message)
-                        println("code"+code+"message"+message)
+                        println("code" + code + "message" + message)
 
                         if (code == ERROR_CODE.EXPIRED) {
                             walletView.setVisibility(View.GONE)
@@ -456,8 +493,6 @@ class MainActivity : AppCompatActivity() {
                         }
                     })
             }
-
-
 
 
         }
@@ -474,7 +509,7 @@ class MainActivity : AppCompatActivity() {
                 },
                 onError = { jsonObject, code, message ->
                     PayME.showError(message)
-                    println("code"+code+"message"+message)
+                    println("code" + code + "message" + message)
 
                     if (code == ERROR_CODE.EXPIRED) {
                         walletView.setVisibility(View.GONE)
@@ -490,11 +525,11 @@ class MainActivity : AppCompatActivity() {
 
             val amount = convertInt(moneyWithdraw.text.toString())
 
-            payme?.withdraw(this.supportFragmentManager,amount, false,
+            payme?.withdraw(this.supportFragmentManager, amount, false,
                 onSuccess = { json: JSONObject? ->
                 },
                 onError = { jsonObject, code, message ->
-                    println("code"+code+"message"+message)
+                    println("code" + code + "message" + message)
 
                     PayME.showError(message)
                     if (code == ERROR_CODE.EXPIRED) {
@@ -509,13 +544,13 @@ class MainActivity : AppCompatActivity() {
 
             val amount = convertInt(moneyTransfer.text.toString())
 
-            payme?.transfer(this.supportFragmentManager,amount, "chuyen tien cho ban nhe", true,
+            payme?.transfer(this.supportFragmentManager, amount, "chuyen tien cho ban nhe", true,
                 onSuccess = { json: JSONObject? ->
                     println("onSuccesstransfer")
                 },
                 onError = { jsonObject, code, message ->
                     PayME.showError(message)
-                    println("code"+code+"message"+message)
+                    println("code" + code + "message" + message)
 
                     if (code == ERROR_CODE.EXPIRED) {
                         walletView.setVisibility(View.GONE)
@@ -532,7 +567,7 @@ class MainActivity : AppCompatActivity() {
             val amount = convertInt(moneyPay.text.toString())
 
             val storeId: Long? =
-                if (env == Env.PRODUCTION ||env == Env.STAGING  ) null else if (env == Env.SANDBOX) null else 9
+                if (env == Env.PRODUCTION || env == Env.STAGING) null else if (env == Env.SANDBOX) null else 9
             val infoPayment =
                 InfoPayment(
                     "PAY",
@@ -544,28 +579,28 @@ class MainActivity : AppCompatActivity() {
                     "",
                     null
                 )
-                    payme?.pay(this.supportFragmentManager, infoPayment, true,spinnerPayCode.selectedItem.toString(),
-                        onSuccess = { json: JSONObject? ->
-                            println("jsononSuccess"+json)
-                        },
-                        onError = { jsonObject, code, message ->
-                            println("jsononError"+code)
+            payme?.pay(this.supportFragmentManager,
+                infoPayment,
+                true,
+                spinnerPayCode.selectedItem.toString(),
+                onSuccess = { json: JSONObject? ->
+                    println("jsononSuccess" + json)
+                },
+                onError = { jsonObject, code, message ->
+                    println("jsononError" + code)
 
-                            if (message != null && message.length > 0) {
-                                PayME.showError(message)
-                            }
-                            if (code == ERROR_CODE.EXPIRED) {
-                                walletView.setVisibility(View.GONE)
-                            }
-                            if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
-                                openWallet()
-                            }
-                        }
+                    if (message != null && message.length > 0) {
+                        PayME.showError(message)
+                    }
+                    if (code == ERROR_CODE.EXPIRED) {
+                        walletView.setVisibility(View.GONE)
+                    }
+                    if (code == ERROR_CODE.ACCOUNT_NOT_KYC || code == ERROR_CODE.ACCOUNT_NOT_ACTIVATED) {
+                        openWallet()
+                    }
+                }
 
-                    )
-
-
-
+            )
 
 
         }
