@@ -170,43 +170,6 @@ internal class PayFunction {
         }
     }
 
-    private fun getListBankVietQR(
-        onSuccess: () -> Unit,
-        onError: (JSONObject?, Int, String?) -> Unit
-    ) {
-        val listBank =
-            EventBus.getDefault().getStickyEvent(ListBankVietQR::class.java)
-        if (listBank != null && listBank.listBankVietQRInfo.size > 0) {
-            onSuccess()
-        } else {
-            val paymentApi = PaymentApi()
-            paymentApi.getSupportedBankListVietQR(
-                onSuccess = { jsonObject ->
-                    val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
-                    val Payment = OpenEWallet.optJSONObject("Payment")
-                    val bankList = Payment.optJSONArray("GetListVietQR")
-                    val listBank = arrayListOf<String>()
-                    if (bankList != null) {
-                        for (i in 0 until bankList.length()) {
-                            val bank = bankList.optJSONObject(i)
-                            val swiftCode = bank.optString("swiftCode")
-                            val isVietQR = bank.optBoolean("isVietQR", false)
-                            if (isVietQR) {
-                                listBank.add(swiftCode)
-                            }
-                        }
-                    }
-
-                    if (listBank.size!=0){
-                        EventBus.getDefault().postSticky(ListBankVietQR(listBank))
-                        onSuccess()
-                    }
-                },
-                onError
-            )
-        }
-    }
-
     fun pay(
         fragmentManager: FragmentManager,
         infoPayment: InfoPayment,
@@ -375,15 +338,25 @@ internal class PayFunction {
                     val state = payment.optString("vietQRState")
                     val qrContent = payment.optString("qrContent", "")
                     if (state == "REQUIRED_TRANSFER") {
-                        getListBankVietQR(onSuccess = {
-                            val popupPayment = PopupPayment()
-                            loading.dismiss()
-                            EventBus.getDefault().postSticky(QRContentVietQR(qrContent))
-                            popupPayment.show(
-                                fragmentManager,
-                                "ModalBottomSheet"
-                            )
-                        }, onError)
+                        val popupPayment = PopupPayment()
+                        loading.dismiss()
+                        EventBus.getDefault().postSticky(QRContentVietQR(qrContent))
+                        val bankInfoArray = payment.optJSONArray("banks")
+                        if (bankInfoArray != null && bankInfoArray.length() > 0) {
+                            val bankInfo = bankInfoArray.optJSONObject(0)
+                            val bankName = bankInfo?.optString("bankName")
+                            val bankNumber = bankInfo?.optString("bankNumber")
+                            val fullName = bankInfo?.optString("fullName")
+                            val content = bankInfo?.optString("content")
+                            val vietQRbankInfo = VietQrTransferInfo(bankNumber, bankName, fullName, content)
+                            EventBus.getDefault().postSticky(vietQRbankInfo)
+                        } else {
+                            EventBus.getDefault().postSticky(VietQrTransferInfo(null, null, null, null))
+                        }
+                        popupPayment.show(
+                            fragmentManager,
+                            "ModalBottomSheet"
+                        )
                     } else {
                         onError(null, ERROR_CODE.PAYMENT_ERROR, message)
                     }

@@ -559,6 +559,15 @@ internal class PaymentApi {
                 "            vietQRState : state\n" +
                 "            qrContent\n" +
                 "            message\n" +
+                "            banks {\n" +
+                "              bankName\n" +
+                "              bankShortName\n" +
+                "              bankNumber\n" +
+                "              fullName\n" +
+                "              branch\n" +
+                "              content\n" +
+                "              swiftCode\n" +
+                "            }\n" +
                 "          }\n" +
                 "         \n" +
                 "        }\n" +
@@ -703,6 +712,7 @@ internal class PaymentApi {
                     "        feeDescription\n" +
                     "        title\n" +
                     "        type\n" +
+                    "        iconUrl\n" +
                     "      }\n" +
                     "      succeeded\n" +
                     "    }\n" +

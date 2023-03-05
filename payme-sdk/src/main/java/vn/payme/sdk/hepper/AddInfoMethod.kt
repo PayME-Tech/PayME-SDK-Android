@@ -12,36 +12,48 @@ import java.text.DecimalFormat
 
 class AddInfoMethod {
     fun addImage(method: Method, imageView: ImageView) {
-        if (method.type == TYPE_PAYMENT.ZALOPAY_PG) {
-            imageView.setImageResource(R.drawable.ic_zalo)
-        } else if (method.type == TYPE_PAYMENT.BANK_TRANSFER) {
-            imageView.setImageResource(R.drawable.ic_bank_transfer)
-        } else if (method.type == TYPE_PAYMENT.VIET_QR) {
-            imageView.setImageResource(R.drawable.logo_vietqr_small)
-        } else if (method.type == TYPE_PAYMENT.MOMO_PG) {
-            imageView.setImageResource(R.drawable.ic_momo)
-        } else if (method.type == TYPE_PAYMENT.CREDIT_CARD) {
-            imageView.setImageResource(R.drawable.ic_credit_card)
-        } else if (method.type == TYPE_PAYMENT.BANK_QR_CODE) {
-            imageView.setImageResource(R.drawable.ic_qr_code)
-        } else if (method.type == TYPE_PAYMENT.BANK_CARD) {
-            imageView.setImageResource(R.drawable.ic_atm)
-        } else if (method.type == TYPE_PAYMENT.WALLET) {
-            imageView.setImageResource(R.drawable.ic_payme)
-        } else if (method.type == TYPE_PAYMENT.CREDIT_BALANCE) {
-            imageView.setImageResource(R.drawable.ic_aizen)
-        } else if (method.type == TYPE_PAYMENT.LINKED) {
-            val picasso = Picasso.get()
-            picasso.setIndicatorsEnabled(false)
-            val imageCode =
-                if (method.data?.issuer != "null") method.data?.issuer else method.data?.swiftCode
-            picasso.load("https://static.payme.vn/image_bank/image_method/method${imageCode}@2x.png")
-                .resize(50, 50)
-                .centerInside()
-                .into(imageView)
+        when (method.type) {
+            TYPE_PAYMENT.ZALOPAY_PG -> {
+                imageView.setImageResource(R.drawable.ic_zalo)
+            }
+            TYPE_PAYMENT.BANK_TRANSFER -> {
+                imageView.setImageResource(R.drawable.ic_bank_transfer)
+            }
+            TYPE_PAYMENT.VIET_QR -> {
+                imageView.setImageResource(R.drawable.qr_code_method)
+            }
+            TYPE_PAYMENT.MOMO_PG -> {
+                imageView.setImageResource(R.drawable.ic_momo)
+            }
+            TYPE_PAYMENT.CREDIT_CARD -> {
+                imageView.setImageResource(R.drawable.ic_credit_card)
+            }
+            TYPE_PAYMENT.BANK_QR_CODE -> {
+                imageView.setImageResource(R.drawable.ic_qr_code)
+            }
+            TYPE_PAYMENT.BANK_CARD -> {
+                imageView.setImageResource(R.drawable.ic_atm)
+            }
+            TYPE_PAYMENT.WALLET -> {
+                imageView.setImageResource(R.drawable.ic_payme)
+            }
+            TYPE_PAYMENT.CREDIT_BALANCE -> {
+                imageView.setImageResource(R.drawable.ic_aizen)
+            }
+            TYPE_PAYMENT.LINKED -> {
+                val picasso = Picasso.get()
+                picasso.setIndicatorsEnabled(false)
+                val imageCode =
+                    if (method.data?.issuer != "null") method.data?.issuer else method.data?.swiftCode
+                picasso.load("https://static.payme.vn/image_bank/image_method/method${imageCode}@2x.png")
+                    .resize(50, 50)
+                    .centerInside()
+                    .into(imageView)
 
-        } else {
-            imageView.setImageResource(R.drawable.ic_payme)
+            }
+            else -> {
+                imageView.setImageResource(R.drawable.ic_payme)
+            }
         }
 
     }

@@ -137,7 +137,8 @@
     <string name="card_scanner_hint">Đặt số thẻ vừa khớp vào khung để bắt đầu quét!</string>
     <string name="card_scanning">Đang nhận diện...</string>
     <string name="card_scanner_hint2">Vui lòng điều chỉnh vị trí thẻ, đảm bảo nhìn rõ số thẻ, không bị chói, mờ!</string>
-    <string name="scan_viet_qr">Quét VietQR để chuyển khoản</string>
+    <string name="scan_viet_qr">Sử dụng ứng dụng ngân hàng hoặc ví điện tử có hỗ trợ quét mã QR để thanh toán</string>
+    <string name="viet_qr_hint">Hoặc chuyển khoản đến</string>
     <string name="download_viet_qr">Tải mã thanh toán</string>
     <string name="download_succeeded_viet_qr">Đã tải mã QR thành công</string>
     <string name="download_failed_viet_qr">Tải mã QR thất bại</string>
@@ -145,4 +146,5 @@
     <string name="grant_permission_access_camera_desc">Bạn hãy cho phép truy cập máy ảnh trong phần Cài Đặt của hệ thống để tiếp tục</string>
     <string name="grant_permission_access_storage">Cho phép truy cập bộ nhớ của bạn</string>
     <string name="grant_permission_access_storage_desc">Bạn hãy cho phép truy cập bộ nhớ trong phần Cài Đặt của hệ thống để tiếp tục</string>
+    <string name="copied_to_clipboard">Đã sao chép vào bộ nhớ tạm</string>
 </resources>

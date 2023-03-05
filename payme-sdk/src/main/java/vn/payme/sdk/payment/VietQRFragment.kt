@@ -3,9 +3,11 @@ package vn.payme.sdk.payment
 import android.Manifest
 import android.content.ContentValues
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -16,14 +18,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.flexbox.*
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
@@ -31,28 +31,31 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
-import vn.payme.sdk.PayME
 import vn.payme.sdk.R
-import vn.payme.sdk.adapter.SupportedBanksVietQRAdapter
 import vn.payme.sdk.api.PaymentApi
-import vn.payme.sdk.cardmodules.ScanActivity
-import vn.payme.sdk.cardmodules.ScanActivityImpl
 import vn.payme.sdk.enums.TYPE_FRAGMENT_PAYMENT
 import vn.payme.sdk.evenbus.ChangeFragmentPayment
-import vn.payme.sdk.evenbus.ListBankVietQR
 import vn.payme.sdk.evenbus.QRContentVietQR
-import vn.payme.sdk.kyc.PermissionCamera
+import vn.payme.sdk.evenbus.VietQrTransferInfo
+import vn.payme.sdk.hepper.ChangeColorImage
+import vn.payme.sdk.hepper.Clipboard
 import vn.payme.sdk.store.Store
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
-import java.util.*
 
 
 class VietQRFragment : Fragment() {
     private lateinit var imageQR: ImageView
-    private lateinit var recyclerView: RecyclerView
     private lateinit var textDownload: TextView
+    private lateinit var textBankNumber: TextView
+    private lateinit var textAccountName: TextView
+    private lateinit var textBankName: TextView
+    private lateinit var textContent: TextView
+    private lateinit var buttonCopyBankNumber: ImageView
+    private lateinit var buttonCopyContent: ImageView
+    private lateinit var bankNumberContainer: LinearLayout
+    private lateinit var contentContainer: LinearLayout
     var fragmentState = ""
     private val REQUEST_WRITE_EXTERNAL_STORAGE_CODE = 103
     var enableSettingWriteStorage = false
@@ -65,7 +68,14 @@ class VietQRFragment : Fragment() {
         val view: View =
             inflater.inflate(R.layout.payme_payment_viet_qr_fragment, container, false)
         imageQR = view.findViewById(R.id.imageQR)
-        recyclerView = view.findViewById(R.id.viet_qr_bank_recycler_view)
+        bankNumberContainer = view.findViewById(R.id.bankNumberContainer)
+        contentContainer = view.findViewById(R.id.contentContainer)
+        textBankNumber = view.findViewById(R.id.txtBankNumber)
+        textAccountName = view.findViewById(R.id.txtAccountName)
+        textBankName = view.findViewById(R.id.txtBankName)
+        textContent = view.findViewById(R.id.txtContent)
+        buttonCopyBankNumber = view.findViewById(R.id.iconCopy)
+        buttonCopyContent = view.findViewById(R.id.iconCopyContent)
         textDownload = view.findViewById(R.id.txt_download)
         textDownload.paintFlags = Paint.UNDERLINE_TEXT_FLAG
         textDownload.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
@@ -137,7 +147,10 @@ class VietQRFragment : Fragment() {
                 values.put(MediaStore.Images.Media.IS_PENDING, true)
 
                 val uri: Uri? =
-                    context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+                    context.contentResolver.insert(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        values
+                    )
                 if (uri != null) {
                     saveImageToStream(bitmap, context.contentResolver.openOutputStream(uri))
                     values.put(MediaStore.Images.Media.IS_PENDING, false)
@@ -216,32 +229,64 @@ class VietQRFragment : Fragment() {
                     bitmap.setPixel(x, y, if (bitMatrix.get(x, y)) Color.BLACK else Color.WHITE)
                 }
             }
-            val overlay = BitmapFactory.decodeResource(resources, R.drawable.logo_vietqr_small)
-            imageQR.setImageBitmap(mergeBitmaps(overlay, bitmap))
+            imageQR.setImageBitmap(bitmap)
         }
 
-        // list bank
-        val listBankInfo = EventBus.getDefault().getStickyEvent(ListBankVietQR::class.java)
-        val supportedBanksVietQRAdapterAdapter = SupportedBanksVietQRAdapter()
-        supportedBanksVietQRAdapterAdapter.submitList(listBankInfo.listBankVietQRInfo)
-        recyclerView.adapter = supportedBanksVietQRAdapterAdapter
-        val layoutManager = FlexboxLayoutManager(requireContext(), FlexDirection.ROW, FlexWrap.WRAP)
-        layoutManager.justifyContent = JustifyContent.CENTER
-        layoutManager.alignItems = AlignItems.STRETCH
-        recyclerView.layoutManager = layoutManager
-    }
+        // transfer content
+        val bankInfo = EventBus.getDefault().getStickyEvent(VietQrTransferInfo::class.java)
+        if (bankInfo.bankNumber == null) {
+            bankNumberContainer.visibility = View.GONE
+        } else {
+            textBankNumber.text = bankInfo.bankNumber
+            textBankNumber.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
+            buttonCopyBankNumber.setOnClickListener {
+                Clipboard().setClipboard(requireContext(), bankInfo.bankNumber)
+            }
+        }
 
-    private fun mergeBitmaps(logo: Bitmap?, qrcode: Bitmap): Bitmap? {
-        val combined = Bitmap.createBitmap(qrcode.width, qrcode.height, qrcode.config)
-        val canvas = Canvas(combined)
-        val canvasWidth = canvas.width
-        val canvasHeight = canvas.height
-        canvas.drawBitmap(qrcode, Matrix(), null)
-        val resizeLogo = Bitmap.createScaledBitmap(logo!!, canvasWidth / 6, canvasHeight / 6, true)
-        val centreX = (canvasWidth - resizeLogo.width) / 2
-        val centreY = (canvasHeight - resizeLogo.height) / 2
-        canvas.drawBitmap(resizeLogo, centreX.toFloat(), centreY.toFloat(), null)
-        return combined
+        if (bankInfo.fullName == null) {
+            textAccountName.visibility = View.GONE
+        } else {
+            textAccountName.text = bankInfo.fullName
+            textAccountName.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
+        }
+
+        if (bankInfo.bankName == null) {
+            textBankName.visibility = View.GONE
+        } else {
+            textBankName.text = bankInfo.bankName
+        }
+
+        if (bankInfo.bankName == null) {
+            textBankName.visibility = View.GONE
+        } else {
+            textBankName.text = bankInfo.bankName
+        }
+
+        if (bankInfo.content == null) {
+            contentContainer.visibility = View.GONE
+        } else {
+            val gradientDrawable = GradientDrawable()
+            gradientDrawable.setColor(Color.parseColor(Store.config.colorApp.startColor))
+            gradientDrawable.setStroke(4, Color.parseColor(Store.config.colorApp.startColor))
+            gradientDrawable.cornerRadius = 12f
+            gradientDrawable.alpha = 100
+
+            contentContainer.background = gradientDrawable
+
+            textContent.text = bankInfo.content
+            textContent.setTextColor(Color.parseColor(Store.config.colorApp.startColor))
+
+            buttonCopyContent.setOnClickListener {
+                Clipboard().setClipboard(requireContext(), bankInfo.content)
+            }
+        }
+
+        ChangeColorImage().changeColor(requireContext(), buttonCopyContent, R.drawable.ic_copi2, 1)
+        ChangeColorImage().changeColor(
+            requireContext(),
+            buttonCopyBankNumber, R.drawable.ic_copi2, 1
+        )
     }
 
     override fun onStop() {
