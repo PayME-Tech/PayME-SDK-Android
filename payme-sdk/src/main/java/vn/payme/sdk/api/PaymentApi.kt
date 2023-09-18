@@ -821,23 +821,41 @@ internal class PaymentApi {
         val params: MutableMap<String, Any> = mutableMapOf()
         val variables: MutableMap<String, Any> = mutableMapOf()
         val detectInput: MutableMap<String, Any> = mutableMapOf()
-        val query = "mutation ActionMutation(\$detectInput: OpenEWalletPaymentDetectInput!) {\n" +
-                "  OpenEWallet {\n" +
-                "    Payment {\n" +
-                "      Detect(input: \$detectInput) {\n" +
-                "        action\n" +
-                "        amount\n" +
-                "        message\n" +
-                "        note\n" +
-                "        orderId\n" +
-                "        storeId\n" +
-                "        succeeded\n" +
-                "        userName\n" +
-                "        type\n" +
-                "      }\n" +
-                "    }\n" +
-                "  }\n" +
-                "}"
+        val query = "mutation DetectQR(\$detectInput: OpenEWalletPaymentDetectInput!) {\n" +
+            "  OpenEWallet {\n" +
+            "    Payment {\n" +
+            "      DetectV2(input:\$detectInput ) {\n" +
+            "        succeeded\n" +
+            "        message\n" +
+            "        qrInfo {\n" +
+            "          __typename\n" +
+            "          ...on DefaultQR {\n" +
+            "            type\n" +
+            "            storeId\n" +
+            "            action\n" +
+            "            amount\n" +
+            "            note\n" +
+            "            orderId\n" +
+            "            userName\n" +
+            "          }\n" +
+            "          ... on VietQR {\n" +
+            "            note\n" +
+            "            binCode\n" +
+            "            bankNumber\n" +
+            "            amount\n" +
+            "            fullname\n" +
+            "            swiftCode\n" +
+            "            bankName\n" +
+            "            isNapas\n" +
+            "            isWithdrawable\n" +
+            "            extraData\n" +
+            "          }\n" +
+            "         \n" +
+            "        }\n" +
+            "      }\n" +
+            "    }\n" +
+            "  }\n" +
+            "}"
         detectInput["clientId"] = Store.config.clientId
         detectInput["qrContent"] = dataQR
         variables["detectInput"] = detectInput
