@@ -129,12 +129,12 @@ public class PayME {
             paymentApi.postCheckDataQr(qr,
                 onSuccess = { jsonObject ->
                     loading.dismiss()
-                    val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
-                    val Payment = OpenEWallet.optJSONObject("Payment")
-                    val Detect = Payment.optJSONObject("DetectV2")
-                    val qrInfo = Detect.optJSONObject("qrInfo")
-                    val succeeded = Detect.optBoolean("succeeded")
-                    val message = Detect.optString("message")
+                    val openEWallet = jsonObject.optJSONObject("OpenEWallet")
+                    val payment = openEWallet.optJSONObject("Payment")
+                    val detect = payment.optJSONObject("DetectV2")
+                    val qrInfo = detect.optJSONObject("qrInfo")
+                    val succeeded = detect.optBoolean("succeeded")
+                    val message = detect.optString("message")
                     val typename = qrInfo.optString("__typename")
                     val amount = qrInfo.optInt("amount")
 
@@ -144,7 +144,7 @@ public class PayME {
                         onError(null, ERROR_CODE.PAYMENT_ERROR, message)
                     } else if (typename == "DefaultQR") {
                         val action = qrInfo.optString("action")
-                        val message = qrInfo.optString("message")
+//                        val message = qrInfo.optString("message")
                         val note = qrInfo.optString("note")
                         val amount = qrInfo.optInt("amount")
                         val orderId = qrInfo.optString("orderId")
@@ -172,10 +172,10 @@ public class PayME {
                             onSuccess,
                             onError
                         )
-                    } else {
+                    } else if (typename == "VietQR") {
                         Log.d("test","Lên web")
                         val extraData = qrInfo.optString("extraData")
-                        transfer(fragmentManager, amount, "Chuyen len web", true,
+                        transferInSDK(fragmentManager, amount, "Chuyen len web", true,
                             onSuccess = { json: JSONObject? ->
                                 Log.d("test", json.toString())
                             },
@@ -185,6 +185,9 @@ public class PayME {
                             },
                             extraData
                         )
+                    } else {
+                        loading.dismiss()
+                        onError(null, ERROR_CODE.PAYMENT_ERROR, message)
                     }
                 },
                 onError = { jsonObject, code, message ->
@@ -202,22 +205,22 @@ public class PayME {
         paymentApi.postCheckDataQr(qr,
             onSuccess = { jsonObject ->
                 loading.dismiss()
-                val OpenEWallet = jsonObject.optJSONObject("OpenEWallet")
-                val Payment = OpenEWallet.optJSONObject("Payment")
-                val Detect = Payment.optJSONObject("DetectV2")
-                val qrInfo = Detect.optJSONObject("qrInfo")
-                val succeeded = Detect.optBoolean("succeeded")
+                val openEWallet = jsonObject.optJSONObject("OpenEWallet")
+                val payment = openEWallet.optJSONObject("Payment")
+                val detect = payment.optJSONObject("DetectV2")
+                val qrInfo = detect.optJSONObject("qrInfo")
+                val succeeded = detect.optBoolean("succeeded")
                 val typename = qrInfo.optString("__typename")
                 val amount = qrInfo.optInt("amount")
 
                 val checkNullLong = 0
                 if (!succeeded) {
                     loading.dismiss()
-                    var popup: SearchQrResultPopup = SearchQrResultPopup()
+                    var popup = SearchQrResultPopup()
                     popup.show(fragmentManager, "ModalBottomSheet")
                 } else if (typename == "DefaultQR") {
                     val action = qrInfo.optString("action")
-                    val message = qrInfo.optString("message")
+//                    val message = qrInfo.optString("message")
                     val note = qrInfo.optString("note")
                     val amount = qrInfo.optInt("amount")
                     val orderId = qrInfo.optString("orderId")
@@ -246,7 +249,7 @@ public class PayME {
                 } else {
                     Log.d("test","Lên web")
                     val extraData = qrInfo.optString("extraData")
-                    transfer(fragmentManager, amount, "Chuyen len web", true,
+                    transferInSDK(fragmentManager, amount, "Chuyen len web", true,
                         onSuccess = { json: JSONObject? ->
                             Log.d("test", json.toString())
                         },
@@ -655,8 +658,38 @@ public class PayME {
         closeTransferResult: Boolean,
         onSuccess: (JSONObject?) -> Unit,
         onError: (JSONObject?, Int, String?) -> Unit,
-        data: String? = ""
         ) {
+        setLanguage(PayME.context, Store.config.language)
+        PayME.fragmentManager = fragmentManager
+        if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
+            Store.config.closeWhenDone = closeTransferResult
+            if (amount != null) {
+                Store.paymentInfo.amount = amount
+            } else {
+                Store.paymentInfo.amount = 0
+            }
+
+            this.openWalletActivity(
+                Action.TRANSFER,
+                amount,
+                description,
+                "",
+                null,
+                onSuccess,
+                onError
+            )
+        }
+    }
+
+    private fun transferInSDK(
+        fragmentManager: FragmentManager,
+        amount: Int?,
+        description: String,
+        closeTransferResult: Boolean,
+        onSuccess: (JSONObject?) -> Unit,
+        onError: (JSONObject?, Int, String?) -> Unit,
+        data: String? = ""
+    ) {
         setLanguage(PayME.context, Store.config.language)
         PayME.fragmentManager = fragmentManager
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE_KYC, onError)) {
@@ -731,7 +764,7 @@ public class PayME {
     }
 
 
-    internal fun payInSDK(
+    private fun payInSDK(
         fragmentManager: FragmentManager,
         payCode: String,
         infoPayment: InfoPayment,

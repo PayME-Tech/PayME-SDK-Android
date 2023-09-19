@@ -441,6 +441,7 @@ class PayMEOpenSDKPopup : DialogFragment() {
         val action: String = Store.paymentInfo.action.toString()
         val showLog = if (Store.config.showLog) 1 else 0
         val description = Store.paymentInfo.content
+        val extraData = Store.paymentInfo.extraData
         val data: JSONObject = JSONObject(
             """{
                       connectToken:  '${Store.config.connectToken}',
@@ -467,7 +468,8 @@ class PayMEOpenSDKPopup : DialogFragment() {
                         closeWhenDone:${Store.config.closeWhenDone},
                         serviceCode:${Store.paymentInfo.service?.code},
                         amount:${Store.paymentInfo.amount},
-                        description:'${description}'
+                        description:'${description}',
+                        extraData:'${extraData}'
                       }
                     }"""
         )
@@ -485,14 +487,22 @@ class PayMEOpenSDKPopup : DialogFragment() {
         val encode: String = URLEncoder.encode(xAPIData, "utf-8")
         cookieManager.setAcceptThirdPartyCookies(myWebView, true)
 
-        if (Store.config.env == Env.DEV) {
-            domain = "https://dev-sdk.payme.com.vn/"
-        } else if (Store.config.env == Env.SANDBOX) {
-            domain = "https://sbx-sdk.payme.com.vn/"
-        } else if (Store.config.env == Env.STAGING) {
-            domain = "https://staging-sdk.payme.com.vn/"
-        } else {
-            domain = "https://sdk.payme.com.vn/"
+        domain = when (Store.config.env) {
+            Env.DEV -> {
+                "https://dev-sdk.payme.com.vn/"
+            }
+
+            Env.SANDBOX -> {
+                "https://sbx-sdk.payme.com.vn/"
+            }
+
+            Env.STAGING -> {
+                "https://staging-sdk.payme.com.vn/"
+            }
+
+            else -> {
+                "https://sdk.payme.com.vn/"
+            }
         }
         buttonClose.setOnClickListener {
             header.visibility = View.GONE
