@@ -175,7 +175,8 @@ public class PayME {
                     } else if (typename == "VietQR") {
                         Log.d("test","Lên web")
                         val extraData = qrInfo.optString("extraData")
-                        transferInSDK(fragmentManager, amount, "Chuyen len web", true,
+                        val note = qrInfo.optString("note")
+                        transferInSDK(fragmentManager, amount, note, true,
                             onSuccess = { json: JSONObject? ->
                                 Log.d("test", json.toString())
                             },
@@ -249,7 +250,8 @@ public class PayME {
                 } else {
                     Log.d("test","Lên web")
                     val extraData = qrInfo.optString("extraData")
-                    transferInSDK(fragmentManager, amount, "Chuyen len web", true,
+                    val note = qrInfo.optString("note")
+                    transferInSDK(fragmentManager, amount, note, true,
                         onSuccess = { json: JSONObject? ->
                             Log.d("test", json.toString())
                         },
@@ -796,8 +798,8 @@ public class PayME {
         if (CheckAccount().check(RULE_CHECK_ACCOUNT.LOGGIN_ACTIVE, onError)) {
             val accountApi = AccountApi()
             accountApi.getAccountInfo(onSuccess = { jsonObject ->
-                val Account = jsonObject.getJSONObject("Account")
-                val kyc = Account.optJSONObject("kyc")
+                val account = jsonObject.getJSONObject("Account")
+                val kyc = account.optJSONObject("kyc")
                 if (kyc != null) {
                     val state = kyc.getString("state")
                     if (state == "APPROVED") {
@@ -815,15 +817,15 @@ public class PayME {
     ) {
         val paymentApi = PaymentApi()
         paymentApi.getQuotaRemaining(onSuccess = {jsonObject ->
-            val Utility = jsonObject.optJSONObject("Utility")
-            val GetPaymentMethod = Utility?.optJSONObject("GetPaymentMethod")
-            val message = GetPaymentMethod?.optString("message")
-            val succeeded = GetPaymentMethod?.optBoolean("succeeded") ?: false
+            val utility = jsonObject.optJSONObject("Utility")
+            val getPaymentMethod = utility?.optJSONObject("GetPaymentMethod")
+            val message = getPaymentMethod?.optString("message")
+            val succeeded = getPaymentMethod?.optBoolean("succeeded") ?: false
             if (succeeded) {
-                val remainingQuota = GetPaymentMethod?.optInt("remainingQuota")
+                val remainingQuota = getPaymentMethod?.optInt("remainingQuota")
                 onSuccess(remainingQuota)
             } else {
-                onError(GetPaymentMethod,ERROR_CODE.OTHER,message)
+                onError(getPaymentMethod,ERROR_CODE.OTHER,message)
             }
         }, onError)
     }
@@ -834,16 +836,16 @@ public class PayME {
     ) {
         val accountApi = AccountApi()
         accountApi.intAccount(onSuccess = { jsonObject ->
-            val OpenEWallet = jsonObject.getJSONObject("OpenEWallet")
-            val Init = OpenEWallet.getJSONObject("Init")
-            Store.userInfo.dataInit = Init
-            val kyc = Init.optJSONObject("kyc")
-            val appEnv = Init.optString("appEnv")
-            val succeeded = Init.optBoolean("succeeded")
-            val message = Init.optString("message")
-            val accessToken = Init.optString("accessToken")
-            val handShake = Init.optString("handShake")
-            val phone = Init.optString("phone")
+            val openEWallet = jsonObject.getJSONObject("OpenEWallet")
+            val init = openEWallet.getJSONObject("Init")
+            Store.userInfo.dataInit = init
+            val kyc = init.optJSONObject("kyc")
+            val appEnv = init.optString("appEnv")
+            val succeeded = init.optBoolean("succeeded")
+            val message = init.optString("message")
+            val accessToken = init.optString("accessToken")
+            val handShake = init.optString("handShake")
+            val phone = init.optString("phone")
             var stateKYC = ""
             Store.userInfo.accountActive = succeeded
             if (!succeeded && (phone == "null" || handShake == "null")) {
