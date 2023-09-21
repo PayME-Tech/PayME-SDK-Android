@@ -7,22 +7,15 @@
             <TextView android:layout_width="100dp" android:layout_height="wrap_content" android:textSize="16dp" android:text="Environment" android:layout_marginRight="20dp"/>
             <Spinner android:id="@+id/enviromentSpiner" android:layout_width="150dp" android:layout_height="wrap_content" android:background="@drawable/background_button" android:spinnerMode="dropdown" android:entries="@array/environment_arrays" />
             <ImageView android:id="@+id/buttonSetting" android:layout_width="35dp" android:layout_height="35dp" android:layout_marginLeft="20dp" android:src="@drawable/setting" />
-
         </LinearLayout>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:orientation="horizontal">
             <TextView android:layout_width="100dp" android:layout_height="wrap_content" android:textSize="16dp" android:text="Language" android:layout_marginRight="20dp"/>
             <Spinner android:id="@+id/languageSpinner" android:layout_width="150dp" android:layout_height="wrap_content" android:layout_marginRight="55dp" android:background="@drawable/background_button" android:spinnerMode="dropdown" android:entries="@array/lang_arrays" />
-
-
         </LinearLayout>
         <TextView android:id="@+id/titleUser" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="UserID" android:textSize="16dp" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintTop_toBottomOf="@id/top" />
-
         <EditText android:lines="1" android:id="@+id/inputUserId" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:background="@drawable/background_input" android:hint="required" android:padding="8dp" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintTop_toBottomOf="@id/titleUser" />
-
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:textSize="16dp" android:text="Phone Number" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintTop_toBottomOf="@id/top" />
-
         <EditText android:id="@+id/inputPhoneNumber" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:maxLength="10" android:background="@drawable/background_input" android:hint="optional" android:padding="8dp" android:inputType="number" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintTop_toBottomOf="@id/titleUser" />
-
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="30dp" android:weightSum="2">
             <ProgressBar android:id="@+id/loading" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
             <Button android:id="@+id/buttonLogin" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:background="@drawable/background_button" android:layout_marginRight="15dp" android:text="Login"/>
@@ -31,36 +24,25 @@
         <Button android:visibility="gone" android:id="@+id/buttonPayNotAccount" android:layout_marginTop="16dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1" android:background="@drawable/background_button" android:text="PAY_NOT_ACCOUNT"/>
         <LinearLayout android:id="@+id/walletView" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="#F2F2F2" android:layout_marginTop="30dp" android:visibility="visible" android:padding="16dp" android:orientation="vertical">
             <LinearLayout android:id="@+id/top" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:orientation="horizontal" app:layout_constraintTop_toTopOf="parent">
-
                 <TextView android:id="@+id/textview" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1" android:text="Balance" android:textColor="@color/colorBlack" android:textSize="16dp" />
                 <TextView android:id="@+id/textBalance" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="23dp" android:text="" android:textColor="@color/colorBlack" android:textSize="18dp" />
                 <ImageView android:id="@+id/buttonReload" android:layout_width="20dp" android:layout_height="wrap_content" android:src="@drawable/reload" />
-
             </LinearLayout>
-
             <Button android:id="@+id/button" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:background="@drawable/background_button" android:text="Open Wallet" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintRight_toRightOf="parent" app:layout_constraintTop_toBottomOf="@id/inputUserId" />
             <Button android:id="@+id/buttonOpenHistory" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:background="@drawable/background_button" android:text="Open History" />
-
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:gravity="center" android:weightSum="3" android:orientation="horizontal">
-
                 <Button android:id="@+id/buttonDeposit" android:layout_width="0dp" android:layout_weight="1.2" android:layout_height="match_parent" android:layout_marginRight="8dp" android:background="@drawable/background_button" android:paddingHorizontal="16dp" android:text="Deposit" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintRight_toRightOf="parent" app:layout_constraintTop_toBottomOf="@id/button" />
-
                 <EditText android:id="@+id/moneyDeposit" android:layout_weight="2" android:layout_width="0dp" android:maxLength="9" android:layout_height="wrap_content" android:background="@drawable/background_input" android:hint="Nhập số tiền" android:inputType="number" android:padding="8dp" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintTop_toBottomOf="@id/titleUser" />
             </LinearLayout>
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:gravity="center" android:weightSum="3" android:orientation="horizontal">
-
                 <Button android:id="@+id/buttonWithdraw" android:layout_width="0dp" android:layout_height="match_parent" android:layout_marginRight="8dp" android:layout_weight="1.2" android:background="@drawable/background_button" android:paddingHorizontal="16dp" android:text="Withdraw" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintRight_toRightOf="parent" app:layout_constraintTop_toBottomOf="@id/buttonDeposit" tools:layout_editor_absoluteX="167dp" tools:layout_editor_absoluteY="447dp" />
-
                 <EditText android:id="@+id/moneyWithdraw" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2" android:maxLength="9" android:background="@drawable/background_input" android:hint="Nhập số tiền" android:inputType="number" android:padding="8dp" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintTop_toBottomOf="@id/titleUser" />
             </LinearLayout>
-
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:gravity="center" android:weightSum="3" android:orientation="horizontal">
-
                 <Button android:id="@+id/buttonTransfer" android:layout_width="0dp" android:layout_height="match_parent" android:layout_marginRight="8dp" android:layout_weight="1.2" android:background="@drawable/background_button" android:paddingHorizontal="16dp" android:text="Transfer" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintRight_toRightOf="parent" app:layout_constraintTop_toBottomOf="@id/buttonDeposit" tools:layout_editor_absoluteX="167dp" tools:layout_editor_absoluteY="447dp" />
                 <EditText android:id="@+id/moneyTransfer" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2" android:maxLength="9" android:background="@drawable/background_input" android:hint="Nhập số tiền" android:inputType="number" android:padding="8dp" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintTop_toBottomOf="@id/titleUser" />
             </LinearLayout>
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:gravity="center" android:weightSum="3" android:orientation="horizontal">
-
                 <Button android:id="@+id/buttonOpenService" android:layout_width="0dp" android:layout_height="match_parent" android:layout_marginRight="8dp" android:layout_weight="1" android:background="@drawable/background_button" android:paddingHorizontal="16dp" android:text="Open Service" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintRight_toRightOf="parent" app:layout_constraintTop_toBottomOf="@id/buttonDeposit" tools:layout_editor_absoluteX="167dp" tools:layout_editor_absoluteY="447dp" />
                 <Spinner android:layout_weight="2" android:layout_width="0dp" android:id="@+id/serviceSpinner" android:layout_height="match_parent" android:background="@drawable/background_button" android:entries="@array/paycode_arrays" android:spinnerMode="dropdown" />
             </LinearLayout>
@@ -75,23 +57,17 @@
                 <EditText android:id="@+id/moneyPay" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2" android:maxLength="9" android:background="@drawable/background_input" android:hint="Nhập số tiền" android:text="10000" android:inputType="number" android:padding="8dp" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintTop_toBottomOf="@id/titleUser" />
             </LinearLayout>
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:orientation="vertical" android:gravity="center">
-                <EditText android:id="@+id/inputPayQR" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="2" android:background="@drawable/background_input" android:inputType="number" android:padding="8dp" android:text="00020101021238600010A00000072701300006970400011697040000000000180208QRIBFTTA5303704540750000005802VN62120808Xin chao6304857B" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintTop_toBottomOf="@id/titleUser" />
+                <EditText android:id="@+id/inputPayQR" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="2" android:background="@drawable/background_input" android:inputType="number" android:padding="8dp" android:text="OPENEWALLET|37048160|PAYMENT|20000|Chuyentien|123132221" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintTop_toBottomOf="@id/titleUser" />
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
                     <Button android:layout_marginTop="10dp" android:id="@+id/buttonPayQR" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginRight="16dp" android:background="@drawable/background_button" android:paddingHorizontal="16dp" android:text="PayQR" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintRight_toRightOf="parent" app:layout_constraintTop_toBottomOf="@id/buttonWithdraw" />
                     <Spinner android:layout_marginTop="10dp" android:id="@+id/payQrPayCodeSpinner" android:layout_width="100dp" android:layout_height="match_parent" android:background="@drawable/background_button" android:entries="@array/paycode_arrays" android:spinnerMode="dropdown" />
                 </LinearLayout>
-
             </LinearLayout>
-
-
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
                 <Button android:layout_marginTop="10dp" android:id="@+id/buttonScanQr" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginRight="16dp" android:background="@drawable/background_button" android:paddingHorizontal="16dp" android:text="ScanQR" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintRight_toRightOf="parent" app:layout_constraintTop_toBottomOf="@id/buttonWithdraw" />
                 <Spinner android:layout_marginTop="10dp" android:id="@+id/scanQrPayCodeSpinner" android:layout_width="100dp" android:layout_height="match_parent" android:background="@drawable/background_button" android:entries="@array/paycode_arrays" android:spinnerMode="dropdown" />
             </LinearLayout>
             <Button android:id="@+id/buttonKYC" android:layout_marginVertical="10dp" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginRight="8dp" android:layout_weight="1" android:background="@drawable/background_button" android:paddingHorizontal="16dp" android:text="KYC" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintRight_toRightOf="parent" app:layout_constraintTop_toBottomOf="@id/buttonDeposit" tools:layout_editor_absoluteX="167dp" tools:layout_editor_absoluteY="447dp" />
-
         </LinearLayout>
-
     </LinearLayout>
-
 </ScrollView>
