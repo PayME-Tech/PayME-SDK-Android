@@ -12,7 +12,7 @@ import kotlin.random.Random
 
 class ClientInfo {
     var appVersion: String = ""
-    var sdkVerSion: String = "0.9.38"
+    var sdkVerSion: String = "0.9.53"
     var appPackageName: String? = ""
     var deviceId: String? = ""
     fun getDeviceName(): String? {

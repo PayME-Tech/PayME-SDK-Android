@@ -566,8 +566,7 @@ class MainActivity : AppCompatActivity() {
 
             val amount = convertInt(moneyPay.text.toString())
 
-            val storeId: Long? =
-                if (env == Env.PRODUCTION || env == Env.STAGING) null else if (env == Env.SANDBOX) null else 9
+            val storeId: Long? = null
             val infoPayment =
                 InfoPayment(
                     "PAY",
