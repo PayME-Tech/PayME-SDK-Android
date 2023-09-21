@@ -288,7 +288,7 @@ class MainActivity : AppCompatActivity() {
                 supportFragmentManager,
                 inputQRString.text.toString(),
                 spinnerPayQRPayCode.selectedItem.toString(),
-                true,
+                false,
                 onSuccess = {
 
                 },

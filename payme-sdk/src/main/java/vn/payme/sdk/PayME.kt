@@ -176,7 +176,7 @@ public class PayME {
                         Log.d("test","Lên web")
                         val extraData = qrInfo.optString("extraData")
                         val note = qrInfo.optString("note")
-                        transferInSDK(fragmentManager, amount, note, true,
+                        transferInSDK(fragmentManager, amount, note, !isShowResultUI,
                             onSuccess = { json: JSONObject? ->
                                 Log.d("test", json.toString())
                             },
