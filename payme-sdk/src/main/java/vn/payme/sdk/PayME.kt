@@ -176,14 +176,13 @@ public class PayME {
                         Log.d("test","Lên web")
                         val extraData = qrInfo.optString("extraData")
                         val note = qrInfo.optString("note")
-                        transferInSDK(fragmentManager, amount, note, !isShowResultUI,
-                            onSuccess = { json: JSONObject? ->
-                                Log.d("test", json.toString())
-                            },
-                            onError = { jsonObject, code, message ->
-                                showError(message)
-                                Log.d("test", message.toString())
-                            },
+                        transferInSDK(
+                            fragmentManager,
+                            amount,
+                            note,
+                            !isShowResultUI,
+                            onSuccess,
+                            onError,
                             extraData
                         )
                     } else {
@@ -248,17 +247,15 @@ public class PayME {
                         infoPayment,
                     )
                 } else {
-                    Log.d("test","Lên web")
                     val extraData = qrInfo.optString("extraData")
                     val note = qrInfo.optString("note")
-                    transferInSDK(fragmentManager, amount, note, true,
-                        onSuccess = { json: JSONObject? ->
-                            Log.d("test", json.toString())
-                        },
-                        onError = { jsonObject, code, message ->
-                            showError(message)
-                            Log.d("test", message.toString())
-                        },
+                    transferInSDK(
+                        fragmentManager,
+                        amount,
+                        note,
+                        true,
+                        onSuccess,
+                        onError,
                         extraData
                     )
                 }
